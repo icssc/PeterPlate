@@ -27,6 +27,7 @@ export const events = pgTable(
   (table) => {
     return {
       pk: primaryKey({
+        name: "events_pk",
         columns: [table.title, table.restaurantId, table.start],
       }),
     };

@@ -1,5 +1,11 @@
 import { relations } from "drizzle-orm";
-import { date, foreignKey, pgTable, primaryKey, text } from "drizzle-orm/pg-core";
+import {
+  date,
+  foreignKey,
+  pgTable,
+  primaryKey,
+  text,
+} from "drizzle-orm/pg-core";
 
 import { dishes } from "./dishes";
 import { restaurantIdEnum } from "./enums";
@@ -7,25 +13,30 @@ import { periods } from "./periods";
 import { restaurants } from "./restaurants";
 import { metadataColumns } from "./utils";
 
-export const menus = pgTable("menus", {
-  id: text("id").primaryKey(),
-  periodId: text("period_id")
-    .notNull(),
-  date: date("date", { mode: "string" }).notNull(),
-  restaurantId: restaurantIdEnum("restaurant_id")
-    .notNull()
-    .references(() => restaurants.id, {
-      onDelete: "restrict",
-      onUpdate: "cascade",
-    }),
-  price: text("price").notNull(),
-  ...metadataColumns,
-}, (table) => ({
-  periodFk: foreignKey({
-    columns: [table.periodId, table.date, table.restaurantId],
-    foreignColumns: [periods.id, periods.date, periods.restaurantId]
-  }).onDelete("restrict").onUpdate("cascade"),
-}));
+export const menus = pgTable(
+  "menus",
+  {
+    id: text("id").primaryKey(),
+    periodId: text("period_id").notNull(),
+    date: date("date", { mode: "string" }).notNull(),
+    restaurantId: restaurantIdEnum("restaurant_id")
+      .notNull()
+      .references(() => restaurants.id, {
+        onDelete: "restrict",
+        onUpdate: "cascade",
+      }),
+    price: text("price").notNull(),
+    ...metadataColumns,
+  },
+  (table) => ({
+    periodFk: foreignKey({
+      columns: [table.periodId, table.date, table.restaurantId],
+      foreignColumns: [periods.id, periods.date, periods.restaurantId],
+    })
+      .onDelete("restrict")
+      .onUpdate("cascade"),
+  }),
+);
 
 export const menusRelations = relations(menus, ({ one, many }) => ({
   restaurant: one(restaurants, {
@@ -58,7 +69,10 @@ export const dishesToMenus = pgTable(
       .references(() => dishes.id),
   },
   (table) => ({
-    pk: primaryKey({ columns: [table.menuId, table.dishId] }),
+    pk: primaryKey({
+      name: "dishes_to_menus_pk",
+      columns: [table.menuId, table.dishId],
+    }),
   }),
 );
 

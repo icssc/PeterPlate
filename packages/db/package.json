@@ -16,7 +16,6 @@
     "test": "echo 'Add test script here'",
     "lint": "eslint .",
     "db:generate": "pnpm with-env drizzle-kit generate --name zotmeal",
-    "db:push": "pnpm with-env drizzle-kit push",
     "db:migrate": "pnpm with-env drizzle-kit migrate",
     "db:studio": "pnpm with-env drizzle-kit studio --port 3000 --verbose",
     "db:drop": "pnpm with-env drizzle-kit drop",

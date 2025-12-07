@@ -1,5 +1,5 @@
 {
-  "id": "24a0a589-091e-42af-8049-100e030542b6",
+  "id": "8bbe2b07-52d8-4369-951f-c9cb87189077",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -213,12 +213,6 @@
           "primaryKey": false,
           "notNull": true
         },
-        "menu_id": {
-          "name": "menu_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
         "name": {
           "name": "name",
           "type": "text",
@@ -281,19 +275,6 @@
           "tableTo": "stations",
           "columnsFrom": [
             "station_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "restrict",
-          "onUpdate": "cascade"
-        },
-        "dishes_menu_id_menus_id_fk": {
-          "name": "dishes_menu_id_menus_id_fk",
-          "tableFrom": "dishes",
-          "tableTo": "menus",
-          "columnsFrom": [
-            "menu_id"
           ],
           "columnsTo": [
             "id"
@@ -383,8 +364,8 @@
         }
       },
       "compositePrimaryKeys": {
-        "events_title_restaurant_id_start_pk": {
-          "name": "events_title_restaurant_id_start_pk",
+        "events_pk": {
+          "name": "events_pk",
           "columns": [
             "title",
             "restaurant_id",
@@ -441,8 +422,8 @@
         }
       },
       "compositePrimaryKeys": {
-        "dishes_to_menus_menu_id_dish_id_pk": {
-          "name": "dishes_to_menus_menu_id_dish_id_pk",
+        "dishes_to_menus_pk": {
+          "name": "dishes_to_menus_pk",
           "columns": [
             "menu_id",
             "dish_id"
@@ -747,8 +728,8 @@
         }
       },
       "compositePrimaryKeys": {
-        "periods_id_date_restaurant_id_pk": {
-          "name": "periods_id_date_restaurant_id_pk",
+        "periods_pk": {
+          "name": "periods_pk",
           "columns": [
             "id",
             "date",
@@ -818,8 +799,8 @@
         }
       },
       "compositePrimaryKeys": {
-        "pins_user_id_dish_id_pk": {
-          "name": "pins_user_id_dish_id_pk",
+        "pins_pk": {
+          "name": "pins_pk",
           "columns": [
             "user_id",
             "dish_id"
@@ -910,8 +891,8 @@
         }
       },
       "compositePrimaryKeys": {
-        "ratings_user_id_dish_id_pk": {
-          "name": "ratings_user_id_dish_id_pk",
+        "ratings_pk": {
+          "name": "ratings_pk",
           "columns": [
             "user_id",
             "dish_id"

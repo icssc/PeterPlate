@@ -45,7 +45,6 @@ CREATE TABLE IF NOT EXISTS "diet_restrictions" (
 CREATE TABLE IF NOT EXISTS "dishes" (
 	"id" text PRIMARY KEY NOT NULL,
 	"station_id" text NOT NULL,
-	"menu_id" text NOT NULL,
 	"name" text NOT NULL,
 	"description" text NOT NULL,
 	"ingredients" text DEFAULT 'Ingredient Statement Not Available',
@@ -66,13 +65,13 @@ CREATE TABLE IF NOT EXISTS "events" (
 	"end" timestamp,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp,
-	CONSTRAINT "events_title_restaurant_id_start_pk" PRIMARY KEY("title","restaurant_id","start")
+	CONSTRAINT "events_pk" PRIMARY KEY("title","restaurant_id","start")
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "dishes_to_menus" (
 	"menu_id" text NOT NULL,
 	"dish_id" text NOT NULL,
-	CONSTRAINT "dishes_to_menus_menu_id_dish_id_pk" PRIMARY KEY("menu_id","dish_id")
+	CONSTRAINT "dishes_to_menus_pk" PRIMARY KEY("menu_id","dish_id")
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "menus" (
@@ -116,7 +115,7 @@ CREATE TABLE IF NOT EXISTS "periods" (
 	"name" text NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp,
-	CONSTRAINT "periods_id_date_restaurant_id_pk" PRIMARY KEY("id","date","restaurant_id")
+	CONSTRAINT "periods_pk" PRIMARY KEY("id","date","restaurant_id")
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "pins" (
@@ -124,7 +123,7 @@ CREATE TABLE IF NOT EXISTS "pins" (
 	"dish_id" text NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp,
-	CONSTRAINT "pins_user_id_dish_id_pk" PRIMARY KEY("user_id","dish_id")
+	CONSTRAINT "pins_pk" PRIMARY KEY("user_id","dish_id")
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "push_tokens" (
@@ -137,7 +136,7 @@ CREATE TABLE IF NOT EXISTS "ratings" (
 	"rating" smallint NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp,
-	CONSTRAINT "ratings_user_id_dish_id_pk" PRIMARY KEY("user_id","dish_id")
+	CONSTRAINT "ratings_pk" PRIMARY KEY("user_id","dish_id")
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "restaurants" (
@@ -170,12 +169,6 @@ END $$;
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "dishes" ADD CONSTRAINT "dishes_station_id_stations_id_fk" FOREIGN KEY ("station_id") REFERENCES "public"."stations"("id") ON DELETE restrict ON UPDATE cascade;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "dishes" ADD CONSTRAINT "dishes_menu_id_menus_id_fk" FOREIGN KEY ("menu_id") REFERENCES "public"."menus"("id") ON DELETE restrict ON UPDATE cascade;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
