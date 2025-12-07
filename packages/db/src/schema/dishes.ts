@@ -15,6 +15,12 @@ export const dishes = pgTable("dishes", {
       onDelete: "restrict",
       onUpdate: "cascade",
     }),
+  menuId: text("menu_id")
+    .notNull()
+    .references(() => menus.id, {
+      onDelete: "restrict",
+      onUpdate: "cascade",
+    }),
   name: text("name").notNull(),
   description: text("description").notNull(),
   ingredients: text("ingredients").default(
