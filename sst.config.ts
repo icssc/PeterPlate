@@ -1,6 +1,16 @@
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="./.sst/platform/config.d.ts" />
 
+function getDomain() {
+  if ($app.stage === "production") {
+    return "peterplate.com";
+  } else if ($app.stage.match(/^staging-(\d+)$/)) {
+    return `${$app.stage}.peterplate.com`;
+  }
+
+  throw new Error("Invalid stage");
+}
+
 export default $config({
   app(input) {
     return {
@@ -80,10 +90,15 @@ export default $config({
       },
     });
 
+    const domain = getDomain();
     const site = new sst.aws.Nextjs("site", {
       path: "apps/next",
       environment: {
         NEXT_PUBLIC_API_URL: api.url,
+      },
+      domain: {
+        name: domain,
+        redirects: [`www.${domain}`],
       },
     });
 
