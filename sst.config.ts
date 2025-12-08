@@ -106,20 +106,22 @@ export default $config({
     });
 
     // Redirect zotmeal.com and www.zotmeal.com to peterplate.com
-    new sst.aws.Router("ZotmealRedirect", {
-      domain: {
-        name: "zotmeal.com",
-        redirects: ["www.zotmeal.com"],
-        dns: sst.aws.dns({
-          zone: "Z05683903NC7KZ5HQGFOI",
-        }),
-      },
-      routes: {
-        "/*": {
-          url: `https://${domain}`,
+    if ($app.stage === "production") {
+      new sst.aws.Router("ZotmealRedirect", {
+        domain: {
+          name: "zotmeal.com",
+          redirects: ["www.zotmeal.com"],
+          dns: sst.aws.dns({
+            zone: "Z05683903NC7KZ5HQGFOI",
+          }),
         },
-      },
-    });
+        routes: {
+          "/*": {
+            url: `https://${domain}`,
+          },
+        },
+      });
+    }
 
     return {
       api: api.url,
