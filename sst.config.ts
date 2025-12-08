@@ -26,7 +26,20 @@ export default $config({
     };
   },
   async run() {
-    const api = new sst.aws.ApiGatewayV2("Api");
+    const domain = getDomain();
+
+    const api = new sst.aws.ApiGatewayV2("Api", {
+      cors: {
+        allowOrigins: [
+          `https://${domain}`,
+          `https://www.${domain}`,
+          ...(domain === "peterplate.com" ? [] : ["http://localhost:3000"]),
+        ],
+        allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        allowHeaders: ["content-type", "x-trpc-source"],
+        allowCredentials: false,
+      },
+    });
 
     api.route("ANY /{proxy+}", {
       handler: "apps/server/src/functions/trpc/handler.main",
@@ -90,7 +103,6 @@ export default $config({
       },
     });
 
-    const domain = getDomain();
     const site = new sst.aws.Nextjs("site", {
       path: "apps/next",
       environment: {
