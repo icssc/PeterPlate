@@ -14,7 +14,7 @@ function getDomain() {
 export default $config({
   app(input) {
     return {
-      name: "zotmeal",
+      name: "peterplate",
       removal: input?.stage === "production" ? "retain" : "remove",
       protect: ["production"].includes(input?.stage),
       home: "aws",
@@ -98,7 +98,10 @@ export default $config({
       },
       domain: {
         name: domain,
-        redirects: [`www.${domain}`],
+        redirects: [`www.${domain}`, `zotmeal.com`, `www.zotmeal.com`],
+        dns: sst.aws.dns({
+          zone: "Z0068414KAXPBCK29ENX",
+        }),
       },
     });
 
