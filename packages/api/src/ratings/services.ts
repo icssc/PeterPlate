@@ -52,35 +52,45 @@ export const deleteRating = async (db: Drizzle, userId: string, dishId: string) 
 
 export const getUserRatedDishes = async (db: Drizzle, userId: string) => {
   try {
+    // Step 1: Get all ratings for this user
     const allRatings = await db.query.ratings.findMany({
       where: (ratings, { eq }) => eq(ratings.userId, userId),
-      orderBy: (ratings, { desc }) => [desc(ratings.updatedAt)], // Changed from createdAt
+      orderBy: (ratings, { desc }) => [desc(ratings.updatedAt)],
     });
 
+    // Step 2: For each rating, fetch the full dish info
     const enrichedResults = await Promise.all(
-      allRatings.map(async (item) => {
+      allRatings.map(async (rating) => {
         const dish = await db.query.dishes.findFirst({
-          where: (dishes, { eq }) => eq(dishes.id, item.dishId),
+          where: (dishes, { eq }) => eq(dishes.id, rating.dishId),
           with: {
+            nutritionInfo: true,
+            dietRestriction: true,
             station: {
               with: {
-                restaurant: true,
+                restaurant: true, // Fetch the restaurant from station
               },
             },
           },
         });
 
-        if (!dish) return null;
+        if (!dish) {
+          console.warn(`Dish not found for rating: ${rating.dishId}`);
+          return null;
+        }
 
+        // Add the restaurant field to match DishInfo type
         return {
           ...dish,
-          rating: item.rating,
-          ratedAt: item.updatedAt, // Changed from createdAt - shows last update time
+          restaurant: dish.station?.restaurant?.name || "Unknown Restaurant",
+          rating: rating.rating,
+          ratedAt: rating.updatedAt,
         };
       })
     );
 
-    return enrichedResults.filter((item) => item !== null);
+    const result = enrichedResults.filter((item) => item !== null);
+    return result;
   } catch (error) {
     console.error("Error fetching rated dishes:", error);
     return [];
