@@ -62,7 +62,7 @@ export default function SidebarContent(): JSX.Element {
           <SidebarDivider title="Account"/>
           <SidebarButton Icon={User} title="My Account" href="/account"/>
           <SidebarButton Icon={Star} title="My Ratings" href="/ratings"/>
-          <SidebarButton Icon={Heart} title="My Favorites" href="/favorites" deactivated/>
+          <SidebarButton Icon={Heart} title="My Favorites" href="/my-favs"/>
           <SidebarButton Icon={NotebookPen} title="My Meal Tracker" href="/meal-tracker" deactivated/>
 
           <SidebarDivider title="Miscellaneous"/>

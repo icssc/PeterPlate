@@ -1,12 +1,15 @@
 "use client";
 
 import React from "react";
+
 import { DishInfo } from "@zotmeal/api";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { formatFoodName, getFoodIcon, toTitleCase } from "@/utils/funcs";
+import { cn } from "@/utils/tw";
 import { Dialog, DialogTrigger } from "../shadcn/dialog";
 import FoodDialogContent from "../food-dialog-content"
 import { Card, CardContent } from "../shadcn/card"; 
-import { CirclePlus, Star, Utensils } from "lucide-react";
-import { formatFoodName, getFoodIcon } from "@/utils/funcs";
+import { CirclePlus, Heart, Star, Utensils } from "lucide-react";
 import { Drawer, DrawerTrigger } from "../shadcn/drawer";
 import FoodDrawerContent from "../food-drawer-content";
 import { trpc } from "@/utils/trpc";
@@ -23,6 +26,22 @@ interface FoodCardContentProps extends React.HTMLAttributes<HTMLDivElement> {
    * The dish information to display.
    */
   dish: DishInfo;
+  /**
+   * Whether the dish is currently marked as favorite.
+   */
+  isFavorited?: boolean;
+  /**
+   * Whether the favorite toggle button should be disabled.
+   */
+  favoriteDisabled?: boolean;
+  /**
+   * Handler invoked when a user toggles the favorite button.
+   */
+  onToggleFavorite?: (dishId: string, currentlyFavorite: boolean) => void;
+  /** 
+   * Whether to display the restaurant or dining hall name for this dish.
+   */
+  showRestaurant?: boolean;
 }
 
 /**
@@ -30,10 +49,12 @@ interface FoodCardContentProps extends React.HTMLAttributes<HTMLDivElement> {
  * It shows the food's name, icon, calories, and a placeholder rating.
  * This component is intended to be used as a trigger for a dialog showing more details.
  */
-const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
-  ({ dish, ...divProps }, ref) => {
+const FoodCardContent = React.forwardRef<
+  HTMLDivElement,
+  FoodCardContentProps
+>(({ dish, isFavorited, favoriteDisabled, onToggleFavorite, className, ...divProps }, ref) => {
     const IconComponent = getFoodIcon(dish.name) ?? Utensils;
-
+  
     /**
      * Fetches the average rating and rating count for the dish.
      */
@@ -81,8 +102,18 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
     });
   };
 
+  const handleFavoriteClick = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    if (favoriteDisabled || !onToggleFavorite) return;
+    onToggleFavorite(dish.id, Boolean(isFavorited));
+  };
+
   return (
-    <div ref={ref} {...divProps} className="w-full"> 
+    <div ref={ref} {...divProps} className={cn("w-full", className)}>
       <Card className="cursor-pointer hover:shadow-lg transition w-full">
         <CardContent>
           <div className="flex justify-between h-full pt-6">
@@ -91,9 +122,13 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
               <div className="flex flex-col">
                 <strong>{formatFoodName(dish.name)}</strong>
                 <div className="flex gap-2 items-center">
-                  {caloricInformationAvailable && <span className="text-zinc-600 text-sm">
-                    {Math.round(parseFloat(dish.nutritionInfo.calories ?? "0"))} cal
-                  </span>}
+                  <span>{dish.nutritionInfo.calories == null ? "-" : `${Math.round(parseFloat(dish.nutritionInfo.calories))} cal`}</span>
+                  {dish.restaurant && (
+                    <>
+                      <span className="text-zinc-400">•</span>
+                      <span className="text-zinc-500">{toTitleCase(dish.restaurant)}</span>
+                    </>
+                  )}
                   {/* Average rating display - grey outline star */}
                     <div className="flex gap-1 items-center">
                       <Star
@@ -109,6 +144,34 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
               {/*//TODO: Add user feedback on clicking button (e.g. changing Icon, making it green) */}
               <button onClick={handleLogMeal}>
                 <CirclePlus/>
+              </button>
+            </div>
+            <div className="flex items-start">
+              <button
+                type="button"
+                aria-label={
+                  isFavorited
+                    ? "Remove meal from favorites"
+                    : "Add meal to favorites"
+                }
+                aria-pressed={isFavorited}
+                disabled={favoriteDisabled}
+                onClick={handleFavoriteClick}
+                className={cn(
+                  "rounded-full p-2 transition",
+                  favoriteDisabled
+                    ? "opacity-60"
+                    : "hover:bg-rose-50 hover:text-rose-600",
+                )}
+              >
+                <Heart
+                  className={cn(
+                    "w-5 h-5",
+                    isFavorited
+                      ? "fill-rose-500 stroke-rose-500"
+                      : "stroke-zinc-500",
+                  )}
+                />
               </button>
             </div>
           </div>
@@ -129,14 +192,37 @@ FoodCardContent.displayName = "FoodCardContent";
  * @param {DishInfo} dish - The dish information to display and pass to the dialog.
  * @returns {JSX.Element} A React component representing a food card.
  */
-export default function FoodCard(dish: DishInfo): JSX.Element {
+interface FoodCardProps extends DishInfo {
+  /** Whether this dish is currently favorited. */
+  isFavorited?: boolean;
+  /** Loading state for favorite toggles. */
+  favoriteIsLoading?: boolean;
+  /** Handler to toggle the favorite state. */
+  onToggleFavorite?: (dishId: string, currentlyFavorite: boolean) => void;
+  /** Whether to display the restaurant/dining hall name. */
+  showRestaurant?: boolean;
+}
+
+export default function FoodCard({
+  isFavorited = false,
+  favoriteIsLoading = false,
+  onToggleFavorite,
+  showRestaurant = false,
+  ...dish
+}: FoodCardProps): JSX.Element {
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   if (isDesktop)
     return (
       <Dialog>
         <DialogTrigger asChild>
-          <FoodCardContent dish={dish} />
+          <FoodCardContent
+            dish={dish}
+            isFavorited={isFavorited}
+            favoriteDisabled={favoriteIsLoading}
+            onToggleFavorite={onToggleFavorite}
+            showRestaurant={showRestaurant}
+          />
         </DialogTrigger>
         <FoodDialogContent {...dish} />
       </Dialog>
@@ -145,7 +231,13 @@ export default function FoodCard(dish: DishInfo): JSX.Element {
     return (
       <Drawer>
         <DrawerTrigger asChild>
-          <FoodCardContent dish={dish} />
+          <FoodCardContent
+            dish={dish}
+            isFavorited={isFavorited}
+            favoriteDisabled={favoriteIsLoading}
+            onToggleFavorite={onToggleFavorite}
+            showRestaurant={showRestaurant}
+          />
         </DrawerTrigger>
         <FoodDrawerContent {...dish} />
       </Drawer>

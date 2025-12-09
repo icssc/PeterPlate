@@ -5,7 +5,7 @@ export * from "./events";
 export * from "./menus";
 export * from "./nutritionInfos";
 export * from "./periods";
-export * from "./pins";
+export * from "./favorites";
 export * from "./pushTokens";
 export * from "./ratings";
 export * from "./restaurants";

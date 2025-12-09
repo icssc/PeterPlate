@@ -25,7 +25,7 @@ interface SideProps {
   /** The specific dining hall to display information for. */
   hall: HallEnum;
   /** A function for toggling between sides on mobile. */
-  toggleHall: Function;
+  toggleHall?: () => void;
 }
 
 /**
@@ -36,7 +36,10 @@ interface SideProps {
  * @param {SideProps} props - The properties for the Side component.
  * @returns {JSX.Element} The rendered side panel for the specified dining hall.
  */
-export default function Side({hall, toggleHall} : SideProps): JSX.Element {
+export default function Side({
+  hall,
+  toggleHall,
+}: SideProps): JSX.Element {
     const { selectedDate } = useDate();
     const today = new Date();
     const isDesktop = useMediaQuery('(min-width: 768px)'); // Tailwind's `md` breakpoint
@@ -190,14 +193,16 @@ export default function Side({hall, toggleHall} : SideProps): JSX.Element {
             fill
             priority 
           />
-          {!isDesktop && <Button
-            variant="outline"
-            size="icon"
-            className="absolute top-[68px] right-3 rounded-full bg-white shadow-md"
-            onClick={() => toggleHall()}
-          >
-            <ArrowRightLeft className="text-black-500 w-5 h-5" />
-          </Button>}
+          {!isDesktop && toggleHall && (
+            <Button
+              variant="outline"
+              size="icon"
+              className="absolute top-[68px] right-3 rounded-full bg-white shadow-md"
+              onClick={() => toggleHall()}
+            >
+              <ArrowRightLeft className="text-black-500 w-5 h-5" />
+            </Button>
+          )}
         </div>
         
         <div className="p-5 flex flex-col flex-grow h-1" id="side-content"> 
