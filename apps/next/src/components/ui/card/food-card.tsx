@@ -3,7 +3,6 @@
 import React from "react";
 
 import { DishInfo } from "@zotmeal/api";
-import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { formatFoodName, getFoodIcon, toTitleCase } from "@/utils/funcs";
 import { cn } from "@/utils/tw";
 import { Dialog, DialogTrigger } from "../shadcn/dialog";
@@ -38,10 +37,6 @@ interface FoodCardContentProps extends React.HTMLAttributes<HTMLDivElement> {
    * Handler invoked when a user toggles the favorite button.
    */
   onToggleFavorite?: (dishId: string, currentlyFavorite: boolean) => void;
-  /** 
-   * Whether to display the restaurant or dining hall name for this dish.
-   */
-  showRestaurant?: boolean;
 }
 
 /**
@@ -199,15 +194,12 @@ interface FoodCardProps extends DishInfo {
   favoriteIsLoading?: boolean;
   /** Handler to toggle the favorite state. */
   onToggleFavorite?: (dishId: string, currentlyFavorite: boolean) => void;
-  /** Whether to display the restaurant/dining hall name. */
-  showRestaurant?: boolean;
 }
 
 export default function FoodCard({
   isFavorited = false,
   favoriteIsLoading = false,
   onToggleFavorite,
-  showRestaurant = false,
   ...dish
 }: FoodCardProps): JSX.Element {
   const isDesktop = useMediaQuery("(min-width: 768px)");
@@ -221,7 +213,6 @@ export default function FoodCard({
             isFavorited={isFavorited}
             favoriteDisabled={favoriteIsLoading}
             onToggleFavorite={onToggleFavorite}
-            showRestaurant={showRestaurant}
           />
         </DialogTrigger>
         <FoodDialogContent {...dish} />
@@ -236,7 +227,6 @@ export default function FoodCard({
             isFavorited={isFavorited}
             favoriteDisabled={favoriteIsLoading}
             onToggleFavorite={onToggleFavorite}
-            showRestaurant={showRestaurant}
           />
         </DrawerTrigger>
         <FoodDrawerContent {...dish} />
