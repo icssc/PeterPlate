@@ -71,16 +71,16 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                       <span className="text-zinc-400 text-sm">
                         {averageRating.toFixed(1)} ({ratingCount})
                       </span>
-                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  },
-);
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+});
 FoodCardContent.displayName = "FoodCardContent";
 
 /**
