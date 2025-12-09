@@ -1,18 +1,27 @@
 "use client"; // Need state for toggling nutrient visibility
 
-import { Pin, Star } from "lucide-react";
-import { DialogHeader, DialogTitle, DialogDescription, DialogContent } from "./shadcn/dialog";
+import {
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogContent,
+} from "./shadcn/dialog";
 import Image from "next/image";
-import React, { useState } from "react"; 
+import React, { useState, useEffect } from "react";
 import { Button } from "./shadcn/button";
 import { cn } from "@/utils/tw";
-import { nutrientToUnit,} from "@/utils/types";
-import { formatFoodName, formatNutrientLabel, formatNutrientValue } from "@/utils/funcs";
+import { nutrientToUnit } from "@/utils/types";
+import {
+  formatFoodName,
+  formatNutrientLabel,
+  formatNutrientValue,
+} from "@/utils/funcs";
 import { DishInfo } from "@zotmeal/api";
 import { toTitleCase, enhanceDescription } from "@/utils/funcs";
 import { AllergenBadge } from "./allergen-badge";
 import { Dialog, DialogTrigger } from "@radix-ui/react-dialog";
 import IngredientsDialog from "../ingredients-dialog";
+import InteractiveStarRating from "./interactive-star-rating";
 
 /**
  * `FoodDialogContent` renders the detailed view of a food item (dish) within a dialog.
@@ -29,8 +38,21 @@ import IngredientsDialog from "../ingredients-dialog";
  */
 export default function FoodDialogContent(dish: DishInfo): JSX.Element {
   const [showAllNutrients, setShowAllNutrients] = useState(false);
-  const initialNutrients = ['calories', 'totalFatG', 'totalCarbsG', 'proteinG', 'sugarsG']; // Define which nutrients to show initially
-  const recognizedNutrients = initialNutrients.concat(['transFatG', 'saturatedFatG', 'cholesterolMg', 'sodiumMg', 'calciumMg', 'ironMg'])
+  const initialNutrients = [
+    "calories",
+    "totalFatG",
+    "totalCarbsG",
+    "proteinG",
+    "sugarsG",
+  ]; // Define which nutrients to show initially
+  const recognizedNutrients = initialNutrients.concat([
+    "transFatG",
+    "saturatedFatG",
+    "cholesterolMg",
+    "sodiumMg",
+    "calciumMg",
+    "ironMg",
+  ]);
 
   const ingredientsAvailable: boolean = dish.ingredients != null 
     && dish.ingredients.length > 0;
@@ -49,18 +71,18 @@ export default function FoodDialogContent(dish: DishInfo): JSX.Element {
             className="w-full h-48 object-cover"
           />
           <div className="flex flex-col gap-2">
-            <div className="flex gap-12 px-4 items-center" id="food-header-info">
+            <div
+              className="flex justify-between px-4 items-center"
+              id="food-header-info"
+            >
               <div className="flex gap-3 items-center">
-                <DialogTitle className="text-3xl">{formatFoodName(dish.name)}</DialogTitle>
+                <DialogTitle className="text-3xl">
+                  {formatFoodName(dish.name)}
+                </DialogTitle>
                 {/* <Pin className="stroke-zinc-500"/> */}
               </div>
-              {/* <div className="flex gap-2">
-                <Star className="stroke-zinc-500" size={26}/>
-                <Star className="stroke-zinc-500" size={26}/>
-                <Star className="stroke-zinc-500" size={26}/>
-                <Star className="stroke-zinc-500" size={26}/>
-                <Star className="stroke-zinc-500" size={26}/>
-              </div> */}
+              {/* Interactive rating stars - right aligned */}
+              <InteractiveStarRating dishId={dish.id} />
             </div>
             <div className="px-4 flex items-center gap-2 text-zinc-500">
               <span>{!caloricInformationAvailable ? "-" : `${Math.round(parseFloat(dish.nutritionInfo.calories ?? "0"))} cal`} • {toTitleCase(dish.restaurant)}</span>
@@ -69,7 +91,9 @@ export default function FoodDialogContent(dish: DishInfo): JSX.Element {
               {dish.dietRestriction.isGlutenFree && <AllergenBadge variant={"gluten_free"}/>}
               {dish.dietRestriction.isKosher && <AllergenBadge variant={"kosher"}/>}
             </div>
-            <DialogDescription className="text-black px-4">{enhanceDescription(dish.name, dish.description)}</DialogDescription>
+            <DialogDescription className="text-black px-4">
+              {enhanceDescription(dish.name, dish.description)}
+            </DialogDescription>
             <div>
               <h1 className="px-4 text-2xl font-bold">Nutrients</h1>
               <div className="grid grid-cols-2 gap-x-4 w-full px-4 text-black mb-4" id="nutrient-content">
@@ -77,22 +101,32 @@ export default function FoodDialogContent(dish: DishInfo): JSX.Element {
                   .filter(key => recognizedNutrients.includes(key))
                   .map(nutrient => {
                     // Assert that 'nutrient' is a valid key of nutritionInfo
-                    const nutrientKey = nutrient as keyof typeof dish.nutritionInfo;
+                    const nutrientKey =
+                      nutrient as keyof typeof dish.nutritionInfo;
                     const value = dish.nutritionInfo[nutrientKey]; // Now correctly typed
-                    const formattedValue = formatNutrientValue(nutrientKey, value);
+                    const formattedValue = formatNutrientValue(
+                      nutrientKey,
+                      value,
+                    );
                     const isInitial = initialNutrients.includes(nutrientKey); // Use nutrientKey here too for consistency
                     return (
                       <div
                         key={nutrientKey}
                         className={cn(
                           "grid grid-cols-subgrid col-span-2 transition-all duration-500 ease-in-out overflow-hidden", // Base styles for transition
-                          !isInitial && !showAllNutrients ? "max-h-0 opacity-0 py-0" : "max-h-8 opacity-100 py-0.5" // Conditional styles for collapse/expand
+                          !isInitial && !showAllNutrients
+                            ? "max-h-0 opacity-0 py-0"
+                            : "max-h-8 opacity-100 py-0.5", // Conditional styles for collapse/expand
                         )}
                       >
-                        <strong className="col-span-1">{formatNutrientLabel(nutrientKey)}</strong>
+                        <strong className="col-span-1">
+                          {formatNutrientLabel(nutrientKey)}
+                        </strong>
                         <span className="col-span-1 text-right">
-                          {value == null ? "-" : `${String(formattedValue)} ${nutrientToUnit[nutrientKey]}`}
-                          </span>
+                          {value == null
+                            ? "-"
+                            : `${String(formattedValue)} ${nutrientToUnit[nutrientKey]}`}
+                        </span>
                       </div>
                     );
                   })
@@ -125,7 +159,7 @@ export default function FoodDialogContent(dish: DishInfo): JSX.Element {
             </div>
           </div>
         </div>
-      </DialogHeader>     
+      </DialogHeader>
     </DialogContent>
-  )
+  );
 }
