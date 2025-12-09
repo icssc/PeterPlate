@@ -87,7 +87,7 @@ const FoodCardContent = React.forwardRef<
                   </div> */}
                 </div>
               </div>
-              //TODO: Add user feedback on clicking button (e.g. changing Icon, making it green)
+              {/*//TODO: Add user feedback on clicking button (e.g. changing Icon, making it green) */}
               <button onClick={handleLogMeal}>
                 <CirclePlus/>
               </button>
