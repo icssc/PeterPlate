@@ -250,9 +250,10 @@ export default function Side({
               <Tabs
                 value={selectedStation}
                 onValueChange={(value) => setSelectedStation(value || '')}
-                className="w-full" 
+                className="flex w-full justify-center" 
               >
-                  <TabsList className="flex flex-wrap w-full">
+                <div className="overflow-x-auto">
+                  <TabsList className="mx-auto">
                       {fetchedStations.map((station => {
                         return (
                           <TabsTrigger key={station.name} value={station.name.toLowerCase()}>
@@ -261,6 +262,7 @@ export default function Side({
                         )
                       }))}
                   </TabsList>
+                </div>
               </Tabs>
             )}
             {isLoading && <TabsSkeleton/> /* Tab Skeleton */}

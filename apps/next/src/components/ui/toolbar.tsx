@@ -6,6 +6,15 @@ import { Sheet, SheetTrigger } from "./shadcn/sheet";
 import SidebarContent from "./sidebar/sidebar-content";
 import { DatePicker } from "./shadcn/date-picker";
 import { useDate } from "@/context/date-context";
+import { trpc } from "@/utils/trpc"; // Import tRPC hook
+import { useEffect, useState } from "react";
+import { DateList } from "../../../../../packages/db/src/schema";
+
+/** Dates to restrict calendar navigation. */
+export type CalendarRange = {
+  earliest: Date,
+  latest: Date,
+}
 
 /**
  * Renders the main toolbar for the application.
@@ -22,13 +31,30 @@ import { useDate } from "@/context/date-context";
  */
 export default function Toolbar(): JSX.Element {
   const { selectedDate, setSelectedDate } = useDate();
+  const [enabledDates, setEnabledDates] = useState<DateList>([new Date()]);  // default: enable today
+  const [calendarRange, setCalendarRange] = useState<CalendarRange>({
+    earliest: new Date(),
+    latest: new Date(),
+  });  // default: restrict to today
+
+  const { data: dateRes } = trpc.pickableDates.useQuery()
+  
+  useEffect(() => {
+    if (dateRes) {
+      setEnabledDates(dateRes);
+      setCalendarRange({
+        earliest: dateRes[0],
+        latest: dateRes[dateRes.length-1]
+      });
+    }
+  }, [dateRes])
 
   /**
    * Handles the date selection event from the `DatePicker` component.
    *
    * This function updates the `selectedDate` in the `DateContext`.
    * - If the `newDateFromPicker` is the current calendar day ("today"),
-   *   `selectedDate` is set to the current date *and time* (i.e., `new Date()`).
+   *   `selectedDate` is set to the current date and time (i.e., `new Date()`).
    *   This ensures that any application logic relying on the current time of day
    *   (e.g., determining if a dining hall is currently open) operates correctly.
    * - If `newDateFromPicker` is a day other than today (past or future),
@@ -80,6 +106,8 @@ export default function Toolbar(): JSX.Element {
             <DatePicker
               date={selectedDate}
               onSelect={handleDateSelect}
+              enabledDates={enabledDates}
+              range={calendarRange}
             />
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon">

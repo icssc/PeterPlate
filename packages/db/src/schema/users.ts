@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { pgTable, text } from "drizzle-orm/pg-core";
+import { pgTable, text, boolean, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 
 import { favorites } from "./favorites";
@@ -9,6 +9,9 @@ import { metadataColumns } from "./utils";
 export const users = pgTable("users", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
+  email: text("email").notNull().unique(),
+  emailVerified: boolean("emailVerified").notNull().default(false),
+  image: text("image"),
   ...metadataColumns,
 });
 

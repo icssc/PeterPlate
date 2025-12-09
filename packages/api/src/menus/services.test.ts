@@ -1,9 +1,9 @@
 import { apiTest } from "@api/apiTest";
 import { upsertPeriod } from "@api/periods/services";
 import { upsertRestaurant } from "@api/restaurants/services";
-import { describe } from "vitest";
+import { describe, it } from "vitest";
 
-import { upsertMenu } from "./services";
+import { getPickableDates, upsertMenu } from "./services";
 
 describe("upsertMenu", () => {
   apiTest("inserts valid menu into db", async ({ expect, db, testData }) => {
@@ -33,3 +33,19 @@ describe("upsertMenu", () => {
     ).rejects.toThrowError("Rollback");
   });
 });
+
+describe("getDateList", () => {
+  apiTest("gets list of pickable dates", async ({ expect, db }) => {
+    const res = await getPickableDates(db);
+    if (res) {
+      res.forEach(d => {
+        expect(d).toBeInstanceOf(Date);
+      })
+
+      // check dates are unique and asc
+      for (let i = 1; i < res.length; i++)
+        expect(res[i]!.getTime())
+          .toBeGreaterThan(res[i - 1]!.getTime());
+    }
+  });
+})

@@ -21,8 +21,6 @@ export async function upsertDish(
         set: dishData,
       });
 
-      // console.log(dietRestriction)
-
       const upsertedDietRestriction = await upsert(
         tx,
         dietRestrictions,
@@ -32,8 +30,6 @@ export async function upsertDish(
           set: dietRestriction,
         },
       );
-
-      // console.log(upsertedDietRestriction)
 
       const upsertedNutritionInfo = await upsert(
         tx,

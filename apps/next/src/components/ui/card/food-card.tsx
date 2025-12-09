@@ -3,17 +3,20 @@
 import React from "react";
 
 import { DishInfo } from "@zotmeal/api";
-import { Heart, Utensils } from "lucide-react";
-
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { formatFoodName, getFoodIcon, toTitleCase } from "@/utils/funcs";
 import { cn } from "@/utils/tw";
-
-import FoodDialogContent from "../food-dialog-content";
-import FoodDrawerContent from "../food-drawer-content";
-import { Card, CardContent } from "../shadcn/card";
 import { Dialog, DialogTrigger } from "../shadcn/dialog";
+import FoodDialogContent from "../food-dialog-content"
+import { Card, CardContent } from "../shadcn/card"; 
+import { CirclePlus, Heart, Star, Utensils } from "lucide-react";
 import { Drawer, DrawerTrigger } from "../shadcn/drawer";
+import FoodDrawerContent from "../food-drawer-content";
+import { trpc } from "@/utils/trpc";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
+
+// TODO: remove this variable and get the currently signed in user through session
+const DUMMY_USER_ID = "TEST_USER";
 
 /**
  * Props for the FoodCardContent component.
@@ -43,14 +46,61 @@ interface FoodCardContentProps extends React.HTMLAttributes<HTMLDivElement> {
 
 /**
  * FoodCardContent component displays the visual representation of a food item within a card.
- * It shows the food's name, icon, calories, and a placeholder for rating.
+ * It shows the food's name, icon, calories, and a placeholder rating.
  * This component is intended to be used as a trigger for a dialog showing more details.
  */
 const FoodCardContent = React.forwardRef<
   HTMLDivElement,
   FoodCardContentProps
->(({ dish, isFavorited, favoriteDisabled, onToggleFavorite, showRestaurant = false, className, ...divProps }, ref) => {
-  const IconComponent = getFoodIcon(dish.name) ?? Utensils;
+>(({ dish, isFavorited, favoriteDisabled, onToggleFavorite, className, ...divProps }, ref) => {
+    const IconComponent = getFoodIcon(dish.name) ?? Utensils;
+  
+    /**
+     * Fetches the average rating and rating count for the dish.
+     */
+    const { data: ratingData } = trpc.dish.getAverageRating.useQuery(
+      { dishId: dish.id },
+      { staleTime: 5 * 60 * 1000 },
+    );
+    /**
+     * fetch above
+     */
+
+    const averageRating = ratingData?.averageRating ?? 0;
+    const ratingCount = ratingData?.ratingCount ?? 0;
+
+    const caloricInformationAvailable: boolean = dish.nutritionInfo.calories != null
+      && dish.nutritionInfo.calories.length > 0;
+
+
+  const utils = trpc.useUtils();
+  const logMealMutation = trpc.nutrition.logMeal.useMutation({
+    onSuccess: () => {
+      //TODO: Replace this with a shad/cn sonner or equivalent.
+      alert(`Added ${formatFoodName(dish.name)} to your log`);
+      utils.nutrition.invalidate();
+    },
+    onError: (error: Error) => {
+      console.error(error.message);
+    }
+  });
+
+  const handleLogMeal = (e: React.MouseEvent) => {
+    e.stopPropagation(); 
+    
+    if (!DUMMY_USER_ID) {
+      //TODO: Replace this with a shad/cn sonner or equivalent.
+      alert("You must be logged in to track meals");
+      return;
+    }
+
+    logMealMutation.mutate({
+      dishId: dish.id,
+      userId: DUMMY_USER_ID,
+      dishName: dish.name,
+      servings: 1, // Default to 1 serving (TODO: add ability to manually input servings. Maybe a popup will ask to input a multiple of 0.5)
+    });
+  };
 
   const handleFavoriteClick = (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -67,20 +117,34 @@ const FoodCardContent = React.forwardRef<
       <Card className="cursor-pointer hover:shadow-lg transition w-full">
         <CardContent>
           <div className="flex justify-between h-full pt-6">
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-6 w-full">
               {IconComponent && <IconComponent className="w-10 h-10 text-slate-700" />}
-              <div className="flex flex-col h-full">
+              <div className="flex flex-col">
                 <strong>{formatFoodName(dish.name)}</strong>
                 <div className="flex gap-2 items-center">
                   <span>{dish.nutritionInfo.calories == null ? "-" : `${Math.round(parseFloat(dish.nutritionInfo.calories))} cal`}</span>
-                  {showRestaurant && dish.restaurant && (
+                  {dish.restaurant && (
                     <>
                       <span className="text-zinc-400">•</span>
                       <span className="text-zinc-500">{toTitleCase(dish.restaurant)}</span>
                     </>
                   )}
+                  {/* Average rating display - grey outline star */}
+                    <div className="flex gap-1 items-center">
+                      <Star
+                        className="w-4 h-4 stroke-zinc-200"
+                        strokeWidth={1}
+                      />
+                      <span className="text-zinc-400 text-sm">
+                        {averageRating.toFixed(1)} ({ratingCount})
+                      </span>
+                  </div>
                 </div>
               </div>
+              {/*//TODO: Add user feedback on clicking button (e.g. changing Icon, making it green) */}
+              <button onClick={handleLogMeal}>
+                <CirclePlus/>
+              </button>
             </div>
             <div className="flex items-start">
               <button
@@ -118,14 +182,13 @@ const FoodCardContent = React.forwardRef<
 });
 FoodCardContent.displayName = "FoodCardContent";
 
-
 /**
  * A Client Component that renders an interactive food card.
  * Clicking the card opens a dialog with full dish details.
- * 
+ *
  * This component combines an `FoodCardContent` (the visual card) with a
  * `Dialog` and {@link FoodDialogContent} (the full dish details dialog).
- * 
+ *
  * @param {DishInfo} dish - The dish information to display and pass to the dialog.
  * @returns {JSX.Element} A React component representing a food card.
  */
@@ -161,10 +224,10 @@ export default function FoodCard({
             showRestaurant={showRestaurant}
           />
         </DialogTrigger>
-        <FoodDialogContent {... dish}/>
+        <FoodDialogContent {...dish} />
       </Dialog>
     );
-  else 
+  else
     return (
       <Drawer>
         <DrawerTrigger asChild>
@@ -176,7 +239,7 @@ export default function FoodCard({
             showRestaurant={showRestaurant}
           />
         </DrawerTrigger>
-        <FoodDrawerContent {... dish}/>
+        <FoodDrawerContent {...dish} />
       </Drawer>
     );
 }
