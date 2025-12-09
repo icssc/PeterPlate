@@ -12,6 +12,7 @@ export * from "./restaurants";
 export * from "./stations";
 export * from "./users";
 export * from "./contributors";
+export * from "./loggedMeals";
 export * from "./auth-schema";
 
 // import { drizzle } from 'drizzle-orm/node-postgres'; // or your DB driver

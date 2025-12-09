@@ -8,7 +8,7 @@ import { Button } from "../shadcn/button";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in";
 import SidebarButton from "./sidebar-button";
 import SidebarDivider from "./sidebar-divider";
-import { Settings2, CalendarFold, LogOut, House, Info, Pin, Trophy, StarIcon, Heart, Star, User, NotebookPen } from "lucide-react";
+import { Settings2, CalendarFold, LogOut, House, Info, Pin, Trophy, StarIcon, Heart, Star, User, NotebookPen, Carrot } from "lucide-react";
 import { useSession, signOut } from "@/utils/auth-client"; // BetterAuth React hook
 
 /**
@@ -57,6 +57,7 @@ export default function SidebarContent(): JSX.Element {
           <SidebarButton Icon={House} title="Home" href="/"/>
           <SidebarButton Icon={CalendarFold} title="Events" href="/events"/>
           <SidebarButton Icon={Trophy} title="Most Liked" href="/leaderboard" deactivated/>
+          <SidebarButton Icon={Carrot} title="Nutrition" href="/nutrition"/>
 
           <SidebarDivider title="Account"/>
           <SidebarButton Icon={User} title="My Account" href="/account"/>

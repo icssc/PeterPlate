@@ -3,14 +3,17 @@
 import React from "react";
 import { DishInfo } from "@zotmeal/api";
 import { Dialog, DialogTrigger } from "../shadcn/dialog";
-import FoodDialogContent from "../food-dialog-content";
-import { Card, CardContent } from "../shadcn/card";
-import { Star, Utensils } from "lucide-react";
+import FoodDialogContent from "../food-dialog-content"
+import { Card, CardContent } from "../shadcn/card"; 
+import { CirclePlus, Star, Utensils } from "lucide-react";
 import { formatFoodName, getFoodIcon } from "@/utils/funcs";
-import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { Drawer, DrawerTrigger } from "../shadcn/drawer";
 import FoodDrawerContent from "../food-drawer-content";
 import { trpc } from "@/utils/trpc";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
+
+// TODO: remove this variable and get the currently signed in user through session
+const DUMMY_USER_ID = "TEST_USER";
 
 /**
  * Props for the FoodCardContent component.
@@ -49,12 +52,41 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
       && dish.nutritionInfo.calories.length > 0;
 
 
+  const utils = trpc.useUtils();
+  const logMealMutation = trpc.nutrition.logMeal.useMutation({
+    onSuccess: () => {
+      //TODO: Replace this with a shad/cn sonner or equivalent.
+      alert(`Added ${formatFoodName(dish.name)} to your log`);
+      utils.nutrition.invalidate();
+    },
+    onError: (error: Error) => {
+      console.error(error.message);
+    }
+  });
+
+  const handleLogMeal = (e: React.MouseEvent) => {
+    e.stopPropagation(); 
+    
+    if (!DUMMY_USER_ID) {
+      //TODO: Replace this with a shad/cn sonner or equivalent.
+      alert("You must be logged in to track meals");
+      return;
+    }
+
+    logMealMutation.mutate({
+      dishId: dish.id,
+      userId: DUMMY_USER_ID,
+      dishName: dish.name,
+      servings: 1, // Default to 1 serving (TODO: add ability to manually input servings. Maybe a popup will ask to input a multiple of 0.5)
+    });
+  };
+
   return (
     <div ref={ref} {...divProps} className="w-full"> 
       <Card className="cursor-pointer hover:shadow-lg transition w-full">
         <CardContent>
           <div className="flex justify-between h-full pt-6">
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-6 w-full">
               {IconComponent && <IconComponent className="w-10 h-10 text-slate-700" />}
               <div className="flex flex-col">
                 <strong>{formatFoodName(dish.name)}</strong>
@@ -74,6 +106,10 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                   </div>
                 </div>
               </div>
+              {/*//TODO: Add user feedback on clicking button (e.g. changing Icon, making it green) */}
+              <button onClick={handleLogMeal}>
+                <CirclePlus/>
+              </button>
             </div>
           </div>
         </CardContent>

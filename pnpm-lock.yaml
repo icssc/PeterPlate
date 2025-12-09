@@ -234,6 +234,9 @@ importers:
       '@zotmeal/api':
         specifier: workspace:*
         version: link:../../packages/api
+      '@zotmeal/db':
+        specifier: workspace:*
+        version: link:../../packages/db
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1

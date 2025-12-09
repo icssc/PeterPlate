@@ -7,6 +7,7 @@ import { notificationRouter } from "./notifications/router";
 import { getRestaurantsByDate } from "./restaurants/services";
 import { createTRPCRouter, publicProcedure } from "./trpc";
 import { userRouter } from "./users/router";
+import { nutritionRouter } from "./nutrition/router";
 import { getContributors } from "./contributors/services";
 import { getPickableDates } from "./menus/services";
 
@@ -15,6 +16,7 @@ export const appRouter = createTRPCRouter({
   dish: dishRouter,
   notification: notificationRouter,
   user: userRouter,
+  nutrition: nutritionRouter,
   /** Returns "Hello, world!" */
   hello: publicProcedure.query(() => "Hello, world!"),
   /** Get all information about restaurants on a given date. */
