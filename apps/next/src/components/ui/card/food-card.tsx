@@ -45,24 +45,24 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
     const averageRating = ratingData?.averageRating ?? 0;
     const ratingCount = ratingData?.ratingCount ?? 0;
 
-    return (
-      <div ref={ref} {...divProps} className="w-full">
-        <Card className="cursor-pointer hover:shadow-lg transition w-full">
-          <CardContent>
-            <div className="flex justify-between h-full pt-6">
-              <div className="flex items-center gap-6">
-                {IconComponent && (
-                  <IconComponent className="w-10 h-10 text-slate-700" />
-                )}
-                <div className="flex flex-col h-full">
-                  <strong>{formatFoodName(dish.name)}</strong>
-                  <div className="flex gap-2 items-center">
-                    <span className="text-zinc-600 text-sm">
-                      {dish.nutritionInfo.calories == null
-                        ? "—"
-                        : `${Math.round(parseFloat(dish.nutritionInfo.calories))} cal`}
-                    </span>
-                    {/* Average rating display - grey outline star */}
+    const caloricInformationAvailable: boolean = dish.nutritionInfo.calories != null
+      && dish.nutritionInfo.calories.length > 0;
+
+
+  return (
+    <div ref={ref} {...divProps} className="w-full"> 
+      <Card className="cursor-pointer hover:shadow-lg transition w-full">
+        <CardContent>
+          <div className="flex justify-between h-full pt-6">
+            <div className="flex items-center gap-6">
+              {IconComponent && <IconComponent className="w-10 h-10 text-slate-700" />}
+              <div className="flex flex-col">
+                <strong>{formatFoodName(dish.name)}</strong>
+                <div className="flex gap-2 items-center">
+                  {caloricInformationAvailable && <span className="text-zinc-600 text-sm">
+                    {Math.round(parseFloat(dish.nutritionInfo.calories ?? "0"))} cal
+                  </span>}
+                  {/* Average rating display - grey outline star */}
                     <div className="flex gap-1 items-center">
                       <Star
                         className="w-4 h-4 stroke-zinc-200"
@@ -72,7 +72,6 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                         {averageRating.toFixed(1)} ({ratingCount})
                       </span>
                     </div>
-                  </div>
                 </div>
               </div>
             </div>

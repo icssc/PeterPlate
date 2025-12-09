@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "exports": {
+    "./auth": "./src/auth/index.ts",
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./src/index.ts"
@@ -21,6 +22,7 @@
     "@trpc/server": "catalog:",
     "@zotmeal/db": "workspace:*",
     "@zotmeal/validators": "workspace:*",
+    "better-auth": "^1.3.34",
     "cheerio": "catalog:",
     "date-fns": "catalog:",
     "date-fns-tz": "catalog:",

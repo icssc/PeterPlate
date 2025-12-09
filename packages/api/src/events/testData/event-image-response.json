@@ -1,0 +1,404 @@
+{
+  "data": {
+    "eventList": {
+      "items": [
+        {
+          "_path": "/content/dam/cf/ch/uci/en/events/brownie-a-la-mode",
+          "campus": [
+            "campus"
+          ],
+          "endDate": "2025-10-01",
+          "endTime": "15:00:00",
+          "hideDate": false,
+          "hideTime": null,
+          "image": {
+            "_dynamicUrl": "/adobe/dynamicmedia/deliver/dm-aid--5242f6f5-75d7-41c3-8165-1b86fa2cce23/RDE_event_brandywine_842x542_1001.jpg",
+            "height": 542,
+            "width": 842
+          },
+          "location": {
+            "_path": "/content/dam/cf/ch/uci/en/locations/campus/brandywine",
+            "name": "Brandywine"
+          },
+          "startDate": "2025-10-01",
+          "startTime": "11:00:00",
+          "title": "Brownie a La Mode"
+        },
+        {
+          "_path": "/content/dam/cf/ch/uci/en/events/mac-cheese-bar",
+          "campus": [
+            "campus"
+          ],
+          "endDate": "2025-10-31",
+          "endTime": "15:00:00",
+          "hideDate": null,
+          "hideTime": null,
+          "image": {
+            "_dynamicUrl": "/adobe/dynamicmedia/deliver/dm-aid--b5984cd5-4d9c-4baf-86f6-aff9784fd673/RDE_event_brandywine_842x542_1003.jpg",
+            "height": 542,
+            "width": 842
+          },
+          "location": {
+            "_path": "/content/dam/cf/ch/uci/en/locations/campus/brandywine",
+            "name": "Brandywine"
+          },
+          "startDate": "2025-10-03",
+          "startTime": "11:00:00",
+          "title": "Mac & Cheese Bar"
+        },
+        {
+          "_path": "/content/dam/cf/ch/uci/en/events/fall-fest",
+          "campus": [
+            "campus"
+          ],
+          "endDate": "2025-10-22",
+          "endTime": "15:00:00",
+          "hideDate": null,
+          "hideTime": null,
+          "image": {
+            "_dynamicUrl": "/adobe/dynamicmedia/deliver/dm-aid--d5770f93-da5d-4ed5-b4f6-ed6b3b76d9cd/Updated_Fall_Fest_image.jpg",
+            "height": 556,
+            "width": 864
+          },
+          "location": {
+            "_path": "/content/dam/cf/ch/uci/en/locations/campus/brandywine",
+            "name": "Brandywine"
+          },
+          "startDate": "2025-10-22",
+          "startTime": "11:00:00",
+          "title": "Fall Fest"
+        },
+        {
+          "_path": "/content/dam/cf/ch/uci/en/events/battle-of-the-chefs-1",
+          "campus": [
+            "campus"
+          ],
+          "endDate": "2025-10-23",
+          "endTime": null,
+          "hideDate": null,
+          "hideTime": null,
+          "image": {
+            "_dynamicUrl": "/adobe/dynamicmedia/deliver/dm-aid--f6ab6824-63b5-4b45-bd6f-4bf59d92e13f/RDE_event_anteatery_842x542_1023.jpg",
+            "height": 542,
+            "width": 842
+          },
+          "location": {
+            "_path": "/content/dam/cf/ch/uci/en/locations/campus/the-anteatery",
+            "name": "The Anteatery"
+          },
+          "startDate": "2025-10-23",
+          "startTime": "11:00:00",
+          "title": "Battle of the Chefs - The Anteatery"
+        },
+        {
+          "_path": "/content/dam/cf/ch/uci/en/events/diwali",
+          "campus": [
+            "campus"
+          ],
+          "endDate": "2025-10-24",
+          "endTime": "20:00:00",
+          "hideDate": null,
+          "hideTime": null,
+          "image": {
+            "_dynamicUrl": "/adobe/dynamicmedia/deliver/dm-aid--79b2ceb2-d5b0-4590-b3e8-77dedb8f1988/RDE_event_brandywine_842x542_1024.jpg",
+            "height": 542,
+            "width": 842
+          },
+          "location": {
+            "_path": "/content/dam/cf/ch/uci/en/locations/campus/brandywine",
+            "name": "Brandywine"
+          },
+          "startDate": "2025-10-24",
+          "startTime": "16:30:00",
+          "title": "Diwali "
+        },
+        {
+          "_path": "/content/dam/cf/ch/uci/en/events/mangonada",
+          "campus": [
+            "campus"
+          ],
+          "endDate": "2025-10-28",
+          "endTime": "15:00:00",
+          "hideDate": null,
+          "hideTime": null,
+          "image": {
+            "_dynamicUrl": "/adobe/dynamicmedia/deliver/dm-aid--61209f3a-e890-4024-9f1c-23f899b43314/RDE_event_anteatery_842x542_1028.jpg",
+            "height": 542,
+            "width": 842
+          },
+          "location": {
+            "_path": "/content/dam/cf/ch/uci/en/locations/campus/the-anteatery",
+            "name": "The Anteatery"
+          },
+          "startDate": "2025-10-28",
+          "startTime": "11:00:00",
+          "title": "Mangonada"
+        },
+        {
+          "_path": "/content/dam/cf/ch/uci/en/events/hoagies",
+          "campus": [
+            "campus"
+          ],
+          "endDate": "2025-10-29",
+          "endTime": "15:00:00",
+          "hideDate": null,
+          "hideTime": null,
+          "image": {
+            "_dynamicUrl": "/adobe/dynamicmedia/deliver/dm-aid--5c4fb27e-8ac1-4a2e-8c39-8d010e6502dc/RDE_event_brandywine_842x542_1029.jpg",
+            "height": 542,
+            "width": 842
+          },
+          "location": {
+            "_path": "/content/dam/cf/ch/uci/en/locations/campus/brandywine",
+            "name": "Brandywine"
+          },
+          "startDate": "2025-10-29",
+          "startTime": "11:00:00",
+          "title": "Hoagies"
+        },
+        {
+          "_path": "/content/dam/cf/ch/uci/en/events/athletics-spirit-day-halloween-senior-day-brandywine",
+          "campus": [
+            "campus"
+          ],
+          "endDate": "2025-10-31",
+          "endTime": "20:00:00",
+          "hideDate": null,
+          "hideTime": null,
+          "image": {
+            "_dynamicUrl": "/adobe/dynamicmedia/deliver/dm-aid--fb2384f9-196d-4b58-a9fb-912e2c87810e/athletic_spirit_day_refresh_thumbnail_842x542_1.jpg",
+            "height": 542,
+            "width": 842
+          },
+          "location": {
+            "_path": "/content/dam/cf/ch/uci/en/locations/campus/brandywine",
+            "name": "Brandywine"
+          },
+          "startDate": "2025-10-31",
+          "startTime": "16:30:00",
+          "title": "Halloween and Senior Day for Men's Soccer"
+        },
+        {
+          "_path": "/content/dam/cf/ch/uci/en/events/athletics-spirit-day-halloween-senior-day-the-anteatery",
+          "campus": [
+            "campus"
+          ],
+          "endDate": "2025-10-31",
+          "endTime": "20:00:00",
+          "hideDate": null,
+          "hideTime": null,
+          "image": {
+            "_dynamicUrl": "/adobe/dynamicmedia/deliver/dm-aid--fb2384f9-196d-4b58-a9fb-912e2c87810e/athletic_spirit_day_refresh_thumbnail_842x542_1.jpg",
+            "height": 542,
+            "width": 842
+          },
+          "location": {
+            "_path": "/content/dam/cf/ch/uci/en/locations/campus/the-anteatery",
+            "name": "The Anteatery"
+          },
+          "startDate": "2025-10-31",
+          "startTime": "16:30:00",
+          "title": "Halloween and Senior Day for Men's Soccer"
+        },
+        {
+          "_path": "/content/dam/cf/ch/uci/en/events/loaded-potato-bar",
+          "campus": [
+            "campus"
+          ],
+          "endDate": "2025-11-24",
+          "endTime": "15:00:00",
+          "hideDate": null,
+          "hideTime": null,
+          "image": {
+            "_dynamicUrl": "/adobe/dynamicmedia/deliver/dm-aid--78444782-097b-474c-bc9c-c71bea440fad/RDE_event_anteatery_842x542__4_.jpg",
+            "height": 542,
+            "width": 842
+          },
+          "location": {
+            "_path": "/content/dam/cf/ch/uci/en/locations/campus/the-anteatery",
+            "name": "The Anteatery"
+          },
+          "startDate": "2025-11-03",
+          "startTime": "11:00:00",
+          "title": "Loaded Potato Bar"
+        },
+        {
+          "_path": "/content/dam/cf/ch/uci/en/events/foodie-favs",
+          "campus": [
+            "campus"
+          ],
+          "endDate": "2025-11-04",
+          "endTime": "15:00:00",
+          "hideDate": null,
+          "hideTime": null,
+          "image": {
+            "_dynamicUrl": "/adobe/dynamicmedia/deliver/dm-aid--3495aaeb-b82a-474a-805c-4d720bd341ae/RDE_event_anteatery_842x542__6_.jpg",
+            "height": 542,
+            "width": 842
+          },
+          "location": {
+            "_path": "/content/dam/cf/ch/uci/en/locations/campus/the-anteatery",
+            "name": "The Anteatery"
+          },
+          "startDate": "2025-11-04",
+          "startTime": "11:00:00",
+          "title": "Foodie Favs"
+        },
+        {
+          "_path": "/content/dam/cf/ch/uci/en/events/gelato-milkshakes",
+          "campus": [
+            "campus"
+          ],
+          "endDate": "2025-11-05",
+          "endTime": "15:00:00",
+          "hideDate": null,
+          "hideTime": null,
+          "image": {
+            "_dynamicUrl": "/adobe/dynamicmedia/deliver/dm-aid--9d1d182d-908f-4f06-a969-d77ad42d68da/RDE_event_brandywine_842x542__5_.jpg",
+            "height": 542,
+            "width": 842
+          },
+          "location": {
+            "_path": "/content/dam/cf/ch/uci/en/locations/campus/brandywine",
+            "name": "Brandywine"
+          },
+          "startDate": "2025-11-05",
+          "startTime": "11:00:00",
+          "title": "Milkshakes"
+        },
+        {
+          "_path": "/content/dam/cf/ch/uci/en/events/color-your-plate",
+          "campus": [
+            "campus"
+          ],
+          "endDate": "2025-11-12",
+          "endTime": "15:00:00",
+          "hideDate": null,
+          "hideTime": null,
+          "image": {
+            "_dynamicUrl": "/adobe/dynamicmedia/deliver/dm-aid--bc268eff-7ab6-485f-b798-57cfe7f7cf26/RDE_event_brandywine_842x542.jpg",
+            "height": 542,
+            "width": 842
+          },
+          "location": {
+            "_path": "/content/dam/cf/ch/uci/en/locations/campus/brandywine",
+            "name": "Brandywine"
+          },
+          "startDate": "2025-11-12",
+          "startTime": "11:00:00",
+          "title": "Color Your Plate"
+        },
+        {
+          "_path": "/content/dam/cf/ch/uci/en/events/k-pop-night",
+          "campus": [
+            "campus"
+          ],
+          "endDate": "2025-11-14",
+          "endTime": "20:00:00",
+          "hideDate": null,
+          "hideTime": null,
+          "image": {
+            "_dynamicUrl": "/adobe/dynamicmedia/deliver/dm-aid--1a9a57fa-205b-4511-a9d1-1653a1804cb9/athletic_spirit_day_refresh_thumbnail_842x542_2.jpg",
+            "height": 542,
+            "width": 842
+          },
+          "location": {
+            "_path": "/content/dam/cf/ch/uci/en/locations/campus/the-anteatery",
+            "name": "The Anteatery"
+          },
+          "startDate": "2025-11-14",
+          "startTime": "16:30:00",
+          "title": "K-Pop Night"
+        },
+        {
+          "_path": "/content/dam/cf/ch/uci/en/events/copy-of-k-pop-night",
+          "campus": [
+            "campus"
+          ],
+          "endDate": "2025-11-14",
+          "endTime": "20:00:00",
+          "hideDate": null,
+          "hideTime": null,
+          "image": {
+            "_dynamicUrl": "/adobe/dynamicmedia/deliver/dm-aid--1a9a57fa-205b-4511-a9d1-1653a1804cb9/athletic_spirit_day_refresh_thumbnail_842x542_2.jpg",
+            "height": 542,
+            "width": 842
+          },
+          "location": {
+            "_path": "/content/dam/cf/ch/uci/en/locations/campus/brandywine",
+            "name": "Brandywine"
+          },
+          "startDate": "2025-11-14",
+          "startTime": "16:30:00",
+          "title": "K-Pop Night"
+        },
+        {
+          "_path": "/content/dam/cf/ch/uci/en/events/friendsgiving",
+          "campus": [
+            "campus"
+          ],
+          "endDate": "2025-11-20",
+          "endTime": "15:00:00",
+          "hideDate": null,
+          "hideTime": null,
+          "image": {
+            "_dynamicUrl": "/adobe/dynamicmedia/deliver/dm-aid--f511021d-0c7e-4ff2-83eb-0980ed060f4a/RDE_event_brandywine_842x542__2_.jpg",
+            "height": 542,
+            "width": 842
+          },
+          "location": {
+            "_path": "/content/dam/cf/ch/uci/en/locations/campus/brandywine",
+            "name": "Brandywine"
+          },
+          "startDate": "2025-11-20",
+          "startTime": "11:00:00",
+          "title": "Friendsgiving"
+        },
+        {
+          "_path": "/content/dam/cf/ch/uci/en/events/brown-sugar-boba",
+          "campus": [
+            "campus"
+          ],
+          "endDate": "2025-11-25",
+          "endTime": "15:00:00",
+          "hideDate": null,
+          "hideTime": null,
+          "image": {
+            "_dynamicUrl": "/adobe/dynamicmedia/deliver/dm-aid--b7fc6925-d3dd-4ad0-8b04-529c3e23f361/RDE_event_anteatery_842x542__5_.jpg",
+            "height": 542,
+            "width": 842
+          },
+          "location": {
+            "_path": "/content/dam/cf/ch/uci/en/locations/campus/the-anteatery",
+            "name": "The Anteatery"
+          },
+          "startDate": "2025-11-25",
+          "startTime": "11:00:00",
+          "title": "Brown Sugar Boba"
+        },
+        {
+          "_path": "/content/dam/cf/ch/uci/en/events/cake-pops",
+          "campus": [
+            "campus"
+          ],
+          "endDate": "2025-11-26",
+          "endTime": "15:00:00",
+          "hideDate": null,
+          "hideTime": null,
+          "image": {
+            "_dynamicUrl": "/adobe/dynamicmedia/deliver/dm-aid--70b059f0-620d-4197-967b-58c2f8390589/RDE_event_brandywine_842x542__4_.jpg",
+            "height": 542,
+            "width": 842
+          },
+          "location": {
+            "_path": "/content/dam/cf/ch/uci/en/locations/campus/the-anteatery",
+            "name": "The Anteatery"
+          },
+          "startDate": "2025-11-26",
+          "startTime": "11:00:00",
+          "title": "Frosted Rice Krispies"
+        }
+      ]
+    }
+  }
+}

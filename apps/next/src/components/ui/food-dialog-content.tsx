@@ -54,8 +54,10 @@ export default function FoodDialogContent(dish: DishInfo): JSX.Element {
     "ironMg",
   ]);
 
-  const ingredientsAvailable: boolean =
-    dish.ingredients != "Ingredient Statement Not Available";
+  const ingredientsAvailable: boolean = dish.ingredients != null 
+    && dish.ingredients.length > 0;
+  const caloricInformationAvailable: boolean = dish.nutritionInfo.calories != null
+    && dish.nutritionInfo.calories.length > 0;
 
   return (
     <DialogContent>
@@ -83,38 +85,21 @@ export default function FoodDialogContent(dish: DishInfo): JSX.Element {
               <InteractiveStarRating dishId={dish.id} />
             </div>
             <div className="px-4 flex items-center gap-2 text-zinc-500">
-              <span>
-                {dish.nutritionInfo.calories == null
-                  ? "-"
-                  : `${Math.round(parseFloat(dish.nutritionInfo.calories))} cal`}
-              </span>
-              <span>•</span>
-              <span>{toTitleCase(dish.restaurant)}</span>
-              {dish.dietRestriction.isVegetarian && (
-                <AllergenBadge variant={"vegetarian"} />
-              )}
-              {dish.dietRestriction.isVegan && (
-                <AllergenBadge variant={"vegan"} />
-              )}
-              {dish.dietRestriction.isGlutenFree && (
-                <AllergenBadge variant={"gluten_free"} />
-              )}
-              {dish.dietRestriction.isKosher && (
-                <AllergenBadge variant={"kosher"} />
-              )}
+              <span>{!caloricInformationAvailable ? "-" : `${Math.round(parseFloat(dish.nutritionInfo.calories ?? "0"))} cal`} • {toTitleCase(dish.restaurant)}</span>
+              {dish.dietRestriction.isVegetarian && <AllergenBadge variant={"vegetarian"}/>}
+              {dish.dietRestriction.isVegan && <AllergenBadge variant={"vegan"}/>}
+              {dish.dietRestriction.isGlutenFree && <AllergenBadge variant={"gluten_free"}/>}
+              {dish.dietRestriction.isKosher && <AllergenBadge variant={"kosher"}/>}
             </div>
             <DialogDescription className="text-black px-4">
               {enhanceDescription(dish.name, dish.description)}
             </DialogDescription>
             <div>
               <h1 className="px-4 text-2xl font-bold">Nutrients</h1>
-              <div
-                className="grid grid-cols-2 gap-x-4 w-full px-4 text-black mb-4"
-                id="nutrient-content"
-              >
-                {Object.keys(dish.nutritionInfo)
-                  .filter((key) => recognizedNutrients.includes(key))
-                  .map((nutrient) => {
+              <div className="grid grid-cols-2 gap-x-4 w-full px-4 text-black mb-4" id="nutrient-content">
+                {caloricInformationAvailable && Object.keys(dish.nutritionInfo)
+                  .filter(key => recognizedNutrients.includes(key))
+                  .map(nutrient => {
                     // Assert that 'nutrient' is a valid key of nutritionInfo
                     const nutrientKey =
                       nutrient as keyof typeof dish.nutritionInfo;
@@ -144,28 +129,32 @@ export default function FoodDialogContent(dish: DishInfo): JSX.Element {
                         </span>
                       </div>
                     );
-                  })}
+                  })
+                }
               </div>
+              {!caloricInformationAvailable &&
+                <h2 className="text-center w-full my-10 text-sm text-zinc-600">
+                  Nutritional information not available.
+                </h2> 
+              }
               <div className="px-4 flex flex-col gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full"
-                  onClick={() => setShowAllNutrients(!showAllNutrients)}
-                >
+
+                {caloricInformationAvailable &&
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full"
+                    onClick={() => setShowAllNutrients(!showAllNutrients)}
+                  >
                   {showAllNutrients ? "Show Less" : "Show More Nutrients"}
-                </Button>
-                {ingredientsAvailable && (
-                  <IngredientsDialog
-                    name={dish.name}
-                    ingredients={dish.ingredients!}
-                  />
-                )}
-                {!ingredientsAvailable && (
-                  <Button variant="deactivated">
-                    Ingredients Not Available
                   </Button>
-                )}
+                }
+                {ingredientsAvailable &&
+                  <IngredientsDialog name={dish.name} ingredients={dish.ingredients!}/>
+                }
+                {!ingredientsAvailable &&
+                  <Button variant="deactivated">Ingredients Not Available</Button>
+                }
               </div>
             </div>
           </div>

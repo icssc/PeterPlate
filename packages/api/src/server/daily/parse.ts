@@ -40,6 +40,7 @@ import {
 import axios, { AxiosError, AxiosResponse } from "axios";
 import { logger } from "@api/logger";
 import { writeFileSync } from "node:fs";
+import { queryEventImageEndpoint } from "@api/events/images";
 
 
 /**

@@ -2,8 +2,8 @@ import type { PoolConfig } from "pg";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 
-import * as schema from "./schema";
 
+import * as schema from "./schema";
 export const pool = (config: PoolConfig): Pool => new Pool(config);
 
 /**
@@ -22,3 +22,7 @@ export const createDrizzle = (config: PoolConfig, logger?: boolean) =>
 
 export type Drizzle = ReturnType<typeof createDrizzle>;
 export * from "./schema";
+
+export const db = createDrizzle({
+  connectionString: process.env.DATABASE_URL,
+});
