@@ -8,6 +8,7 @@ import { upsert } from "@api/utils";
 import { contributors, InsertContributor } from "@zotmeal/db";
 import { getAEMEvents } from "../daily/parse";
 import { upsertMenusForWeek } from "./upsert";
+import { queryEventImageEndpoint } from "@api/events/images";
 
 /**
  * Query the GraphQL Events Endpoint for both restaurants and upsert them into 
@@ -15,12 +16,30 @@ import { upsertMenusForWeek } from "./upsert";
  * @param db The Drizzle database instance to insert into.
  */
 export async function eventJob(db: Drizzle): Promise<void> {
-  const brandywineEvents = await getAEMEvents("Brandywine");
-  const anteateryEvents = await getAEMEvents("The Anteatery");
+  try {
+    const [brandywineEvents, anteateryEvents] = await Promise.all([
+      getAEMEvents("Brandywine"),
+      getAEMEvents("The Anteatery"),
+    ]);
 
-  logger.info(`[weekly] Upserting ${brandywineEvents.length + anteateryEvents.length} events...`)
-  const upsertedEvents = await upsertEvents(db, brandywineEvents.concat(anteateryEvents));
-  logger.info(`[weekly] Upserted ${upsertedEvents.length} events.`)
+    const allEvents = [...brandywineEvents, ...anteateryEvents];
+    const eventImages = await queryEventImageEndpoint();
+
+    logger.info(`[weekly] Found images for events ${Array.from(eventImages.keys())}`)
+    for (const event of allEvents) {
+      const imageURL = eventImages.get(event.title);
+      if (imageURL)
+        event.image = imageURL;
+      else
+        logger.info(`[weekly] Could not find image for event ${event.title}.`)
+    }
+
+    logger.info(`[weekly] Upserting ${allEvents.length} events...`);
+    const upsertedEvents = await upsertEvents(db, allEvents);
+    logger.info(`[weekly] Upserted ${upsertedEvents.length} events.`);
+  } catch (error) {
+    logger.error(error, "[weekly] eventJob(): Failed to fetch or upsert events.");
+  }
 }
 
 
@@ -110,6 +129,6 @@ export async function upsertContributors(
 
 export async function weekly(db: Drizzle): Promise<void> {
   await eventJob(db);
-  // await contributorsJob(db);
+  await contributorsJob(db);
   await weeklyJob(db);
 }

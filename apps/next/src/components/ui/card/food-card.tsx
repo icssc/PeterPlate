@@ -27,14 +27,30 @@ interface FoodCardContentProps extends React.HTMLAttributes<HTMLDivElement> {
 
 /**
  * FoodCardContent component displays the visual representation of a food item within a card.
- * It shows the food's name, icon, calories, and a placeholder for rating.
+ * It shows the food's name, icon, calories, and a placeholder rating.
  * This component is intended to be used as a trigger for a dialog showing more details.
  */
-const FoodCardContent = React.forwardRef<
-  HTMLDivElement,
-  FoodCardContentProps
->(({ dish, ...divProps }, ref) => {
-  const IconComponent = getFoodIcon(dish.name) ?? Utensils;
+const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
+  ({ dish, ...divProps }, ref) => {
+    const IconComponent = getFoodIcon(dish.name) ?? Utensils;
+
+    /**
+     * Fetches the average rating and rating count for the dish.
+     */
+    const { data: ratingData } = trpc.dish.getAverageRating.useQuery(
+      { dishId: dish.id },
+      { staleTime: 5 * 60 * 1000 },
+    );
+    /**
+     * fetch above
+     */
+
+    const averageRating = ratingData?.averageRating ?? 0;
+    const ratingCount = ratingData?.ratingCount ?? 0;
+
+    const caloricInformationAvailable: boolean = dish.nutritionInfo.calories != null
+      && dish.nutritionInfo.calories.length > 0;
+
 
   const utils = trpc.useUtils();
   const logMealMutation = trpc.nutrition.logMeal.useMutation({
@@ -72,19 +88,22 @@ const FoodCardContent = React.forwardRef<
           <div className="flex justify-between h-full pt-6">
             <div className="flex items-center gap-6 w-full">
               {IconComponent && <IconComponent className="w-10 h-10 text-slate-700" />}
-              <div className="flex flex-col h-full">
+              <div className="flex flex-col">
                 <strong>{formatFoodName(dish.name)}</strong>
                 <div className="flex gap-2 items-center">
-                  <span>{dish.nutritionInfo.calories == null
-                    ? "-"
-                    :`${Math.round(parseFloat(dish.nutritionInfo.calories))} cal`}
-                  </span>
-                  {/* <div className="flex gap-1 items-center">
-                    <Star className="w-4 stroke-zinc-400 stroke-2"></Star>
-                    <span className="text-zinc-400 text-sm text-center">
-                      {4.5} ({100})
-                    </span>
-                  </div> */}
+                  {caloricInformationAvailable && <span className="text-zinc-600 text-sm">
+                    {Math.round(parseFloat(dish.nutritionInfo.calories ?? "0"))} cal
+                  </span>}
+                  {/* Average rating display - grey outline star */}
+                    <div className="flex gap-1 items-center">
+                      <Star
+                        className="w-4 h-4 stroke-zinc-200"
+                        strokeWidth={1}
+                      />
+                      <span className="text-zinc-400 text-sm">
+                        {averageRating.toFixed(1)} ({ratingCount})
+                      </span>
+                  </div>
                 </div>
               </div>
               {/*//TODO: Add user feedback on clicking button (e.g. changing Icon, making it green) */}
@@ -92,9 +111,6 @@ const FoodCardContent = React.forwardRef<
                 <CirclePlus/>
               </button>
             </div>
-            {/* <div className="flex flex-col justify-center">
-              <Star className="w-8 h-8 stroke-zinc-400"></Star>
-            </div> */}
           </div>
         </CardContent>
       </Card>
@@ -103,36 +119,35 @@ const FoodCardContent = React.forwardRef<
 });
 FoodCardContent.displayName = "FoodCardContent";
 
-
 /**
  * A Client Component that renders an interactive food card.
  * Clicking the card opens a dialog with full dish details.
- * 
+ *
  * This component combines an `FoodCardContent` (the visual card) with a
  * `Dialog` and {@link FoodDialogContent} (the full dish details dialog).
- * 
+ *
  * @param {DishInfo} dish - The dish information to display and pass to the dialog.
  * @returns {JSX.Element} A React component representing a food card.
  */
 export default function FoodCard(dish: DishInfo): JSX.Element {
-  const isDesktop = useMediaQuery('(min-width: 768px)');
+  const isDesktop = useMediaQuery("(min-width: 768px)");
 
   if (isDesktop)
     return (
       <Dialog>
         <DialogTrigger asChild>
-          <FoodCardContent dish={dish}/>
+          <FoodCardContent dish={dish} />
         </DialogTrigger>
-        <FoodDialogContent {... dish}/>
+        <FoodDialogContent {...dish} />
       </Dialog>
     );
-  else 
+  else
     return (
       <Drawer>
         <DrawerTrigger asChild>
-          <FoodCardContent dish={dish}/>
+          <FoodCardContent dish={dish} />
         </DrawerTrigger>
-        <FoodDrawerContent {... dish}/>
+        <FoodDrawerContent {...dish} />
       </Drawer>
     );
 }

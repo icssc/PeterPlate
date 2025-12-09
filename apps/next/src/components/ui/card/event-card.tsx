@@ -4,7 +4,7 @@ import React from "react";
 import { HallEnum } from "@/utils/types";
 import { dateToString, toTitleCase } from "@/utils/funcs";
 import { Dialog, DialogTrigger } from "../shadcn/dialog";
-import { Card, CardContent } from "../shadcn/card"
+import { Card, CardContent } from "../shadcn/card";
 import Image from "next/image";
 import EventDialogContent from "../event-dialog-content";
 import OngoingBadge from "../ongoing-badge";
@@ -17,24 +17,24 @@ import EventDrawerContent from "../event-drawer-content";
  * Defines the structure for event information used by event-related components.
  */
 export interface EventInfo {
-    /** The name or title of the event. */
-    name: string;
-    /** A brief, one-sentence description of the event, displayed on the card. */
-    shortDesc: string;
-    /** A detailed description of the event, displayed in the full dialog. */
-    longDesc: string;
-    /** The URL or path to the event's image, used on the card. */
-    imgSrc: string;
-    /** The alt text for the event's image, for accessibility. */
-    alt: string;
-    /** The start date and time of the event. */
-    startTime: Date;
-    /** The end date and time of the event. */
-    endTime: Date;
-    /** The physical location of the event, from {@link HallEnum}. */
-    location: HallEnum;
-    /** If true, indicates the event is currently ongoing and displays a badge. */
-    isOngoing: boolean;
+  /** The name or title of the event. */
+  name: string;
+  /** A brief, one-sentence description of the event, displayed on the card. */
+  shortDesc: string;
+  /** A detailed description of the event, displayed in the full dialog. */
+  longDesc: string;
+  /** The URL or path to the event's image, used on the card. */
+  imgSrc: string;
+  /** The alt text for the event's image, for accessibility. */
+  alt: string;
+  /** The start date and time of the event. */
+  startTime: Date;
+  /** The end date and time of the event. */
+  endTime: Date;
+  /** The physical location of the event, from {@link HallEnum}. */
+  location: HallEnum;
+  /** If true, indicates the event is currently ongoing and displays a badge. */
+  isOngoing: boolean;
 }
 
 /**
@@ -62,40 +62,43 @@ interface EventCardContentProps extends React.HTMLAttributes<HTMLDivElement> {
 const EventCardContent = React.forwardRef<
   HTMLDivElement,
   EventCardContentProps
->(({ props, ...divProps}, ref) => {
-    return (
-      <div ref={ref} {...divProps}>
-        <Card className="cursor-pointer hover:shadow-lg transition">
-          <CardContent className="flex items-center h-full w-full pt-6 gap-3 flex-wrap">
-            <Image 
-              src={props.imgSrc}
-              alt={props.alt}
-              width={0}
-              height={0}
-              sizes="100vw"
-              className="w-full sm:w-[300px] md:w-[200px] h-auto rounded-sm"
-            />
-            <div className="flex flex-col gap-1 h-full" id="event-card-content">
-              <div className="flex flex-row gap-2">
-                <strong className="text-2xl">{props.name}</strong>
-                {props.isOngoing && <OngoingBadge/>}
-              </div>
-              <div className="text-zinc-400 flex flex-col sm:flex-row gap-x-4 gap-y-1" id="event-card-subheader">
-                <div className="flex gap-1">
-                  <Clock className="stroke-zinc-400"/>
-                  <p>{dateToString(props.startTime, props.endTime)}</p>
-                </div>
-                <div className="flex gap-1">
-                  <MapPinned/>
-                  <p>{toTitleCase(HallEnum[props.location])}</p>
-                </div>
-              </div>
-              <p className="max-w-xl">{props.shortDesc}</p>
+>(({ props, ...divProps }, ref) => {
+  return (
+    <div ref={ref} {...divProps}>
+      <Card className="cursor-pointer hover:shadow-lg transition">
+        <CardContent className="flex items-center h-full w-full pt-6 gap-3 flex-wrap">
+          <Image
+            src={props.imgSrc}
+            alt={props.alt}
+            width={0}
+            height={0}
+            sizes="100vw"
+            className="w-full sm:w-[300px] md:w-[200px] h-auto rounded-sm"
+          />
+          <div className="flex flex-col gap-1 h-full" id="event-card-content">
+            <div className="flex flex-row gap-2">
+              <strong className="text-2xl">{props.name}</strong>
+              {props.isOngoing && <OngoingBadge />}
             </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
+            <div
+              className="text-zinc-400 flex flex-col sm:flex-row gap-x-4 gap-y-1"
+              id="event-card-subheader"
+            >
+              <div className="flex gap-1">
+                <Clock className="stroke-zinc-400" />
+                <p>{dateToString(props.startTime, props.endTime)}</p>
+              </div>
+              <div className="flex gap-1">
+                <MapPinned />
+                <p>{toTitleCase(HallEnum[props.location])}</p>
+              </div>
+            </div>
+            <p className="max-w-xl">{props.shortDesc}</p>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
 });
 
 EventCardContent.displayName = "EventCardContent";
@@ -110,25 +113,25 @@ EventCardContent.displayName = "EventCardContent";
  * @param {EventInfo} props - The event data to be displayed. See {@link EventInfo} for detailed property descriptions.
  * @returns {JSX.Element} A React component representing an event card.
  */
-export default function EventCard(props : EventInfo): JSX.Element {
-  const isDesktop = useMediaQuery('(min-width: 768px)');
+export default function EventCard(props: EventInfo): JSX.Element {
+  const isDesktop = useMediaQuery("(min-width: 768px)");
 
   if (isDesktop)
     return (
       <Dialog>
         <DialogTrigger asChild>
-          <EventCardContent props={props}/>
+          <EventCardContent props={props} />
         </DialogTrigger>
-        <EventDialogContent {... props}/>
+        <EventDialogContent {...props} />
       </Dialog>
     );
-  else 
+  else
     return (
       <Drawer>
         <DrawerTrigger asChild>
-          <EventCardContent props={props}/>
+          <EventCardContent props={props} />
         </DrawerTrigger>
-        <EventDrawerContent {... props}/>
+        <EventDrawerContent {...props} />
       </Drawer>
     );
 }

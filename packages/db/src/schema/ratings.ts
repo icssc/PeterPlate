@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { pgTable, primaryKey, smallint, text } from "drizzle-orm/pg-core";
+import { pgTable, primaryKey, real, text } from "drizzle-orm/pg-core"; // switched from smallint to real
 import { createInsertSchema } from "drizzle-zod";
 
 import { dishes } from "./dishes";
@@ -21,7 +21,7 @@ export const ratings = pgTable(
         onDelete: "cascade",
         onUpdate: "cascade",
       }),
-    rating: smallint("rating").notNull(),
+    rating: real("rating").notNull(),
     ...metadataColumns,
   },
   (table) => {

@@ -35,3 +35,29 @@ export async function upsert<T extends TableConfig>(
 
   return result[0];
 }
+
+export async function upsertBatch<T extends TableConfig>(
+  db: Drizzle,
+  table: PgTableWithColumns<T>,
+  values: PgInsertValue<PgTableWithColumns<T>>[],
+  config: PgInsertOnConflictDoUpdateConfig<PgInsert<PgTableWithColumns<T>>>,
+) {
+  if (values.length === 0) {
+    return [];
+  }
+  
+  const result = await db
+    .insert(table)
+    .values(values)
+    .onConflictDoUpdate(config)
+    .returning();
+  
+  if (!isNotQueryResultNever(result))
+    throw new Error(
+      `[upsertBatch > ${table._.name}]: unexpected result with config ${JSON.stringify(
+        config,
+      )}`,
+    );
+  
+  return result;
+}

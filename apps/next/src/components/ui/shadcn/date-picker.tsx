@@ -11,15 +11,23 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "./popover"
+import type { CalendarRange } from "../toolbar"
+import { isSameDay } from "@/utils/funcs"
+import { DateList } from "../../../../../../packages/db/src/schema"
 
-export function DatePicker({date, onSelect} : {date: Date | undefined, onSelect: (newDateFromPicker : Date | undefined) => void}) {
+export function DatePicker({date, enabledDates, range, onSelect} : {
+    date: Date | undefined,
+    enabledDates: DateList,
+    range: CalendarRange,
+    onSelect: (newDateFromPicker : Date | undefined) => void
+}) {
   return (
     <Popover>
       <PopoverTrigger asChild>
         <Button
           variant={"ghost"}
           className={cn(
-            "w-[180px] justify-start text-left font-normal",
+            "w-full justify-start text-left font-normal",
             !date && "text-muted-foreground"
           )}
         >
@@ -33,6 +41,13 @@ export function DatePicker({date, onSelect} : {date: Date | undefined, onSelect:
           selected={date}
           onSelect={onSelect}
           initialFocus
+          fromDate={range.earliest}
+          toDate={range.latest}
+          disabled={(d) => 
+            (date ? isSameDay(d, date) : true)
+            || !enabledDates?.some(
+              ed => ed.getTime() === d.getTime()
+          )}
         />
       </PopoverContent>
     </Popover>
