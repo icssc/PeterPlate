@@ -37,17 +37,15 @@ import { createDrizzle } from "@zotmeal/db";
 export const createTRPCContext = ({
   headers,
   connectionString,
-  ssl,
 }: {
   headers: Headers;
   connectionString: string;
-  ssl?: PoolConfig["ssl"];
 }) => {
   const source = headers.get("x-trpc-source") ?? "unknown";
 
   console.log(">>> tRPC Request from", source);
 
-  const db = createDrizzle({ connectionString, ssl });
+  const db = createDrizzle({ connectionString });
 
   return { db };
 };

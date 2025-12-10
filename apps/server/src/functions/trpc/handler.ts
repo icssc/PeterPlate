@@ -6,7 +6,6 @@ import type { AnyRouter } from "@trpc/server";
 import { APIGatewayProxyEventV2, Context } from "aws-lambda";
 
 import { appRouter, createTRPCContext } from "@zotmeal/api";
-import { ssl } from "../ssl";
 
 const createContext = (
   _opts: CreateAWSLambdaContextOptions<APIGatewayProxyEventV2>,
@@ -16,7 +15,6 @@ const createContext = (
       "x-trpc-source": "zotmeal-lambda",
     }),
     connectionString: process.env.DATABASE_URL,
-    ssl,
   });
 
 // type Context = Awaited<ReturnType<typeof createContext>>;

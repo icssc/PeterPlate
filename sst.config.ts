@@ -48,12 +48,6 @@ export default $config({
         DATABASE_URL: process.env.DATABASE_URL!,
         NODE_ENV: process.env.NODE_ENV || "development",
       },
-      copyFiles: [
-        {
-          from: "apps/server/certs",
-          to: "certs",
-        },
-      ],
     });
 
     new sst.aws.Cron("TestLog", {
@@ -67,7 +61,7 @@ export default $config({
       },
     });
 
-    new sst.aws.Cron("Daily", {
+    const dailyCron = new sst.aws.Cron("Daily", {
       schedule: "cron(0 0 * * ? *)", // Run daily at 00:00 UTC
       job: {
         handler: "apps/server/src/functions/cron/daily.main",
@@ -76,12 +70,6 @@ export default $config({
           DATABASE_URL: process.env.DATABASE_URL!,
           NODE_ENV: process.env.NODE_ENV || "development",
         },
-        copyFiles: [
-          {
-            from: "apps/server/certs",
-            to: "certs",
-          },
-        ],
       },
     });
 
@@ -94,12 +82,6 @@ export default $config({
           DATABASE_URL: process.env.DATABASE_URL!,
           NODE_ENV: process.env.NODE_ENV || "development",
         },
-        copyFiles: [
-          {
-            from: "apps/server/certs",
-            to: "certs",
-          },
-        ],
       },
     });
 
@@ -115,6 +97,12 @@ export default $config({
           zone: "Z0068414KAXPBCK29ENX",
         }),
       },
+    });
+
+    // Seed database on deployment by invoking Daily cron
+    new aws.lambda.Invocation("DailySeed", {
+      functionName: dailyCron.nodes.function.name,
+      input: JSON.stringify({}),
     });
 
     // ! TODO @KevinWu098: figure out the router
