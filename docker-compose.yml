@@ -1,18 +1,13 @@
+name: peterplate
+
 services:
   db:
-    image: postgres
-    restart: always
-    # or set shared memory limit when deploy via swarm stack
-    environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin
-      POSTGRES_DB: zotmeal
-    # TODO: volume is out of date, rn just do docker-compose up and db:push
-    # volumes:
-    #   - ./docker/db/zotmeal.sql:/docker-entrypoint-initdb.d/init.sql
-    #   - db_data:/var/lib/postgresql/data
+    build:
+      context: packages/db
+      dockerfile: Dockerfile
     ports:
-      - 5434:5432
-
-volumes:
-  db_data:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: peterplate

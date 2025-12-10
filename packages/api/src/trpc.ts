@@ -11,6 +11,7 @@
 // import { auth } from "@zotmeal/auth";
 
 // import { Expo } from "expo-server-sdk";
+import type { PoolConfig } from "pg";
 import { initTRPC } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
@@ -36,15 +37,17 @@ import { createDrizzle } from "@zotmeal/db";
 export const createTRPCContext = ({
   headers,
   connectionString,
+  ssl,
 }: {
   headers: Headers;
   connectionString: string;
+  ssl?: PoolConfig["ssl"];
 }) => {
   const source = headers.get("x-trpc-source") ?? "unknown";
 
   console.log(">>> tRPC Request from", source);
 
-  const db = createDrizzle({ connectionString });
+  const db = createDrizzle({ connectionString, ssl });
 
   return { db };
 };

@@ -27,6 +27,7 @@ export const ratings = pgTable(
   (table) => {
     return {
       pk: primaryKey({
+        name: "ratings_pk",
         columns: [table.userId, table.dishId],
       }),
     };

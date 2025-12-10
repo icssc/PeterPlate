@@ -25,6 +25,7 @@ export const pins = pgTable(
   (table) => {
     return {
       pk: primaryKey({
+        name: "pins_pk",
         columns: [table.userId, table.dishId],
       }),
     };
