@@ -215,10 +215,16 @@ export async function getAdobeEcommerceMenuDaily(
   
   const parsedData: LocationRecipesDaily
     = GetLocationRecipesDailySchema.parse(res.data);
-  const parsedProducts = 
-    parseProducts(parsedData.data.getLocationRecipes.products.items);
-  const stationSkuMap = 
-    parsedData.data.getLocationRecipes.locationRecipesMap.stationSkuMap;
+  
+  const products = parsedData.data.getLocationRecipes.products;
+  const locationRecipesMap = parsedData.data.getLocationRecipes.locationRecipesMap;
+
+  // Return empty array if no data is available for this meal period
+  if (products == null || locationRecipesMap == null)
+    return [];
+
+  const parsedProducts = parseProducts(products.items);
+  const stationSkuMap = locationRecipesMap.stationSkuMap;
 
   // Map all of the items from each station into a list of dishes
   return stationSkuMap.flatMap(station => 

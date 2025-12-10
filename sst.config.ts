@@ -90,6 +90,7 @@ export default $config({
       environment: {
         NEXT_PUBLIC_API_URL: api.url,
       },
+      cachePolicy: "50ea56d0-b7b0-4bf7-9ab8-0f7f9a0d03d5",
       domain: {
         name: domain,
         redirects: [`www.${domain}`],
