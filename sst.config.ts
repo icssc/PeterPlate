@@ -48,12 +48,6 @@ export default $config({
         DATABASE_URL: process.env.DATABASE_URL!,
         NODE_ENV: process.env.NODE_ENV || "development",
       },
-      copyFiles: [
-        {
-          from: "apps/server/certs",
-          to: "certs",
-        },
-      ],
     });
 
     new sst.aws.Cron("TestLog", {
@@ -76,12 +70,6 @@ export default $config({
           DATABASE_URL: process.env.DATABASE_URL!,
           NODE_ENV: process.env.NODE_ENV || "development",
         },
-        copyFiles: [
-          {
-            from: "apps/server/certs",
-            to: "certs",
-          },
-        ],
       },
     });
 
@@ -94,12 +82,6 @@ export default $config({
           DATABASE_URL: process.env.DATABASE_URL!,
           NODE_ENV: process.env.NODE_ENV || "development",
         },
-        copyFiles: [
-          {
-            from: "apps/server/certs",
-            to: "certs",
-          },
-        ],
       },
     });
 
