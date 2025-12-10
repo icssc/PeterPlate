@@ -6,6 +6,7 @@ import React from "react";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { dateToString, toTitleCase } from "@/utils/funcs";
 import { HallEnum } from "@/utils/types";
+import Image from "next/image";
 import EventDialogContent from "../event-dialog-content";
 import EventDrawerContent from "../event-drawer-content";
 import OngoingBadge from "../ongoing-badge";

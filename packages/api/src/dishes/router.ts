@@ -1,9 +1,9 @@
-import { upsertRating } from "@api/ratings/services";
+import { upsertRating, getAverageRating, getUserRating, getUserRatedDishes, deleteRating } from "@api/ratings/services";
+import { upsertUser } from "@api/users/services";
 import { createTRPCRouter, publicProcedure } from "@api/trpc";
 import { getUser } from "@api/users/services";
 import { dishes, RatingSchema } from "@peterplate/db";
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 const getDishProcedure = publicProcedure
@@ -25,6 +25,7 @@ const getDishProcedure = publicProcedure
 const rateDishProcedure = publicProcedure
   .input(RatingSchema)
   .mutation(async ({ ctx: { db }, input }) => {
+    // 1. Check dish exists
     const dish = await db.query.dishes.findFirst({
       where: (dishes, { eq }) => eq(dishes.id, input.dishId),
     });
@@ -35,40 +36,55 @@ const rateDishProcedure = publicProcedure
         message: "dish not found",
       });
 
-    const user = await getUser(db, input.userId);
+    // 2. Create user if they don't exist
+    await upsertUser(db, { id: input.userId, name: "Anonymous" });
 
-    const oldRating = user.ratings.find((rating) => rating.dishId === dish.id);
-
+    // 3. Upsert the rating
     await upsertRating(db, input);
 
-    const newNumRatings = dish.numRatings + (oldRating ? 0 : 1);
-
-    const newTotalRating =
-      dish.totalRating + (input.rating - (oldRating?.rating ?? 0));
-
-    const rating = await upsertRating(db, input);
-
-    const updateDishResult = await db
-      .update(dishes)
-      .set({
-        numRatings: newNumRatings,
-        totalRating: newTotalRating,
-      })
-      .where(eq(dishes.id, rating.dishId))
-      .returning();
-
-    if (!updateDishResult[0])
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "failed to update dish",
-      });
-
-    return updateDishResult[0];
+    // 4. Return the new average
+    return await getAverageRating(db, input.dishId);
   });
 
+const getAverageRatingProcedure = publicProcedure
+  .input(z.object({ dishId: z.string() }))
+  .query(async ({ ctx: { db }, input }) => {
+    return await getAverageRating(db, input.dishId);
+  });
+
+
+const getUserRatedDishesProcedure = publicProcedure
+  .input(z.object({ userId: z.string() }))
+  .query(async ({ ctx: { db }, input }) => {
+    try {
+      const result = await getUserRatedDishes(db, input.userId);
+      return result;
+    } catch (error) {
+      console.error("Error in getUserRatedDishesProcedure:", error);
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to fetch rated dishes",
+        cause: error,
+      });
+    }
+  });
+
+const deleteRatingProcedure = publicProcedure
+  .input(z.object({ 
+    userId: z.string(), 
+    dishId: z.string() 
+  }))
+  .mutation(async ({ ctx: { db }, input }) => {
+    await deleteRating(db, input.userId, input.dishId);
+    return { success: true };
+  });
+
+
+
 export const dishRouter = createTRPCRouter({
-  /** Get a dish by its id. */
   get: getDishProcedure,
-  /** Rate a dish and return the updated dish. */
   rate: rateDishProcedure,
+  getAverageRating: getAverageRatingProcedure,
+  rated: getUserRatedDishesProcedure,
+  deleteRating: deleteRatingProcedure,
 });

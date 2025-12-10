@@ -24,7 +24,7 @@ interface SideProps {
   /** The specific dining hall to display information for. */
   hall: HallEnum;
   /** A function for toggling between sides on mobile. */
-  toggleHall: () => void;
+  toggleHall?: () => void;
 }
 
 /**

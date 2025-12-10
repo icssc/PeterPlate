@@ -2,19 +2,25 @@
 
 import type { DishInfo } from "@peterplate/api";
 import { Pin, Star } from "lucide-react";
-import Image from "next/image";
-import { useState } from "react";
 import {
-  enhanceDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogContent,
+} from "./shadcn/dialog";
+import Image from "next/image";
+import React, { useState, useEffect } from "react";
+import { Button } from "./shadcn/button";
+import { cn } from "@/utils/tw";
+import { nutrientToUnit } from "@/utils/types";
+import {
   formatFoodName,
   formatNutrientLabel,
   formatNutrientValue,
-  toTitleCase,
 } from "@/utils/funcs";
-import { cn } from "@/utils/tw";
-import { nutrientToUnit } from "@/utils/types";
+import { DishInfo } from "@zotmeal/api";
+import { toTitleCase, enhanceDescription } from "@/utils/funcs";
 import { AllergenBadge } from "./allergen-badge";
-import { Button } from "./shadcn/button";
 import {
   DrawerContent,
   DrawerDescription,
@@ -22,6 +28,9 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "./shadcn/drawer";
+import { useRatings } from "@/hooks/useRatings";
+import { trpc } from "@/utils/trpc";
+import InteractiveStarRating from "./interactive-star-rating";
 
 export default function FoodDrawerContent(dish: DishInfo) {
   const caloricInformationAvailable: boolean =
@@ -86,12 +95,9 @@ export default function FoodDrawerContent(dish: DishInfo) {
                 <AllergenBadge variant={"kosher"} />
               )}
             </div>
+            {/* Interactive rating stars */}
             <div className="flex gap-2 ml-1 pt-0.5">
-              <Star className="stroke-zinc-500" size={22} />
-              <Star className="stroke-zinc-500" size={22} />
-              <Star className="stroke-zinc-500" size={22} />
-              <Star className="stroke-zinc-500" size={22} />
-              <Star className="stroke-zinc-500" size={22} />
+              <InteractiveStarRating dishId={dish.id} />
             </div>
             <DrawerDescription className="text-black text-left px-1 py-2 ">
               {enhanceDescription(dish.name, dish.description)}

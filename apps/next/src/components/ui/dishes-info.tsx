@@ -7,10 +7,14 @@ import FoodCard from "./card/food-card";
 import MealDivider from "./meal-divider";
 import FoodCardSkeleton from "./skeleton/food-card-skeleton";
 import MealDividerSkeleton from "./skeleton/meal-divider-skeleton";
+import { useFavorites } from "@/hooks/useFavorites";
+
 
 /** Props for the {@link DishesInfo} component. */
 interface DishesInfoProps {
-  /** An array of `DishInfo` objects to be displayed. */
+  /**
+   * An array of `DishInfo` objects to be displayed.
+   */
   dishes: DishInfo[];
   /**
    * A boolean indicating whether the data is currently being loaded.
@@ -22,7 +26,9 @@ interface DishesInfoProps {
    * If true, an error message will be displayed.
    */
   isError: boolean;
-  /** An optional error message string to display if `isError` is true. */
+  /**
+   * An optional error message string to display if `isError` is true.
+   */
   errorMessage?: string;
 }
 
@@ -40,7 +46,18 @@ export default function DishesInfo({
   errorMessage,
 }: DishesInfoProps): JSX.Element {
   // Sort the dishes by category string
-  const categoryMap: { [dishCategory: string]: DishInfo[] } = {};
+  const {
+    favoriteIds,
+    isLoadingFavorites,
+    toggleFavorite,
+    isFavoritePending,
+  } = useFavorites();
+
+  const favoriteDishIds = favoriteIds ?? [];
+  const onToggleFavorite = toggleFavorite;
+  const isFavoritesLoading = isLoadingFavorites;
+  
+  let categoryMap: {[dishCategory : string]: DishInfo[]} = {};
   dishes.forEach((dish) => {
     if (dish.category in categoryMap) categoryMap[dish.category].push(dish);
     else categoryMap[dish.category] = [dish];
@@ -64,9 +81,34 @@ export default function DishesInfo({
       )}
 
       {isError && (
-        <p className="text-red-500 w-full text-center">
-          Error loading data: {errorMessage}
-        </p>
+        <p className="text-red-500 w-full text-center">Error loading data: {errorMessage}</p>
+      )}
+
+      {!isLoading && !isError && (
+        <> 
+          {dishes.length === 0 ? (
+            <p className="text-center text-gray-500 py-4">
+              No dishes available for this selection.
+            </p>
+          ) : (
+                sortCategoryKeys(Object.keys(categoryMap)).map(categoryString => 
+                  <React.Fragment key={`${categoryString}`}>
+                    <MealDivider title={categoryString} />
+                    {categoryMap[categoryString].map(dish => 
+                      <FoodCard
+                        key={dish.id}
+                        {... dish}
+                        isFavorited={favoriteDishIds?.includes(dish.id)}
+                        favoriteIsLoading={
+                          !!isFavoritesLoading || !!isFavoritePending?.(dish.id)
+                        }
+                        onToggleFavorite={onToggleFavorite}
+                      />
+                    )}
+                  </React.Fragment>
+                )
+            )}
+        </>
       )}
 
       {!isLoading &&

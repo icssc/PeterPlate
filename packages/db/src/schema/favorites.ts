@@ -5,8 +5,8 @@ import { dishes } from "./dishes";
 import { users } from "./users";
 import { metadataColumns } from "./utils";
 
-export const pins = pgTable(
-  "pins",
+export const favorites = pgTable(
+  "favorites",
   {
     userId: text("user_id")
       .notNull()
@@ -31,24 +31,25 @@ export const pins = pgTable(
   },
 );
 
-export const pinsRelations = relations(pins, ({ one }) => ({
+export const favoritesRelations = relations(favorites, ({ one }) => ({
   dish: one(dishes, {
-    fields: [pins.dishId],
+    fields: [favorites.dishId],
     references: [dishes.id],
   }),
   user: one(users, {
-    fields: [pins.userId],
+    fields: [favorites.userId],
     references: [users.id],
   }),
 }));
 
 /**
- * A pin a user has put on a dish.
+ * A favorite a user has put on a dish.
  *
- * A pin has one:
+ * A favorite has one:
  *
  * {@linkcode dishes}
  * {@linkcode users}
  */
-export type InsertPin = typeof pins.$inferInsert;
-export type SelectPin = typeof pins.$inferSelect;
+export type InsertFavorite = typeof favorites.$inferInsert;
+export type SelectFavorite = typeof favorites.$inferSelect;
+

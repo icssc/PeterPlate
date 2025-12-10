@@ -6,13 +6,23 @@ import { Button } from "@/components/ui/shadcn/button";
 import { Calendar } from "@/components/ui/shadcn/calendar";
 import { cn } from "@/utils/tw";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
+import { cn } from "@/utils/tw"
+import { Button } from "@/components/ui/shadcn/button"
+import { Calendar } from "@/components/ui/shadcn/calendar"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "./popover"
+import type { CalendarRange } from "../toolbar"
+import { isSameDay } from "@/utils/funcs"
+import { DateList } from "../../../../../../packages/db/src/schema"
 
-export function DatePicker({
-  date,
-  onSelect,
-}: {
-  date: Date | undefined;
-  onSelect: (newDateFromPicker: Date | undefined) => void;
+export function DatePicker({date, enabledDates, range, onSelect} : {
+    date: Date | undefined,
+    enabledDates: DateList,
+    range: CalendarRange,
+    onSelect: (newDateFromPicker : Date | undefined) => void
 }) {
   return (
     <Popover>
@@ -20,8 +30,8 @@ export function DatePicker({
         <Button
           variant={"ghost"}
           className={cn(
-            "justify-start text-left font-normal px-2",
-            !date && "text-muted-foreground",
+            "w-full justify-start text-left font-normal",
+            !date && "text-muted-foreground"
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
@@ -34,6 +44,13 @@ export function DatePicker({
           selected={date}
           onSelect={onSelect}
           initialFocus
+          fromDate={range.earliest}
+          toDate={range.latest}
+          disabled={(d) => 
+            (date ? isSameDay(d, date) : true)
+            || !enabledDates?.some(
+              ed => ed.getTime() === d.getTime()
+          )}
         />
       </PopoverContent>
     </Popover>

@@ -1,26 +1,27 @@
 "use client"; // Need state for toggling nutrient visibility
 
-import type { DishInfo } from "@peterplate/api";
-import Image from "next/image";
-import { useState } from "react";
 import {
-  enhanceDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogContent,
+} from "./shadcn/dialog";
+import Image from "next/image";
+import React, { useState, useEffect } from "react";
+import { Button } from "./shadcn/button";
+import { cn } from "@/utils/tw";
+import { nutrientToUnit } from "@/utils/types";
+import {
   formatFoodName,
   formatNutrientLabel,
   formatNutrientValue,
-  toTitleCase,
 } from "@/utils/funcs";
-import { cn } from "@/utils/tw";
-import { nutrientToUnit } from "@/utils/types";
+import { DishInfo } from "@peterplate/api";
+import { toTitleCase, enhanceDescription } from "@/utils/funcs";
 import { AllergenBadge } from "./allergen-badge";
-import IngredientsDialog from "./ingredients-dialog";
-import { Button } from "./shadcn/button";
-import {
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "./shadcn/dialog";
+import { Dialog, DialogTrigger } from "@radix-ui/react-dialog";
+import IngredientsDialog from "../ingredients-dialog";
+import InteractiveStarRating from "./interactive-star-rating";
 
 /**
  * `FoodDialogContent` renders the detailed view of a food item (dish) within a dialog.
@@ -72,7 +73,7 @@ export default function FoodDialogContent(dish: DishInfo): JSX.Element {
           />
           <div className="flex flex-col gap-2">
             <div
-              className="flex gap-12 px-4 items-center"
+              className="flex justify-between px-4 items-center"
               id="food-header-info"
             >
               <div className="flex gap-3 items-center">
@@ -81,13 +82,8 @@ export default function FoodDialogContent(dish: DishInfo): JSX.Element {
                 </DialogTitle>
                 {/* <Pin className="stroke-zinc-500"/> */}
               </div>
-              {/* <div className="flex gap-2">
-                <Star className="stroke-zinc-500" size={26}/>
-                <Star className="stroke-zinc-500" size={26}/>
-                <Star className="stroke-zinc-500" size={26}/>
-                <Star className="stroke-zinc-500" size={26}/>
-                <Star className="stroke-zinc-500" size={26}/>
-              </div> */}
+              {/* Interactive rating stars - right aligned */}
+              <InteractiveStarRating dishId={dish.id} />
             </div>
             <div className="px-4 flex items-center gap-2 text-zinc-500">
               <span>

@@ -18,3 +18,33 @@ export const upsertMenuBatch = async (db: Drizzle, menuBatch: InsertMenu[]) =>
       price: sql`excluded.price`,
     },
   });
+
+/* 
+ * Returns an object with the earliest
+ * and latest dates present in the menus table.
+*/
+export async function getPickableDates(db: Drizzle): Promise<DateList> {
+  const rows = await db
+    .selectDistinct({ date: menus.date })
+    .from(menus)
+    .orderBy(menus.date);
+  
+  if (!rows.length)
+    return null;
+  
+  return rows
+    .map((r) => toLocalDate(r.date))
+    .filter((d) => d !== null);
+}
+
+function toLocalDate(dateString: string | null): Date | null {
+  if (!dateString)
+    return null
+
+  const [y, m, d] = dateString.split("-").map(Number);
+
+  if (!y || !m || !d)
+    return null
+  
+  return new Date(y, m-1, d);
+}

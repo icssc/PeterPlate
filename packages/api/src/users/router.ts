@@ -4,6 +4,7 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 import { getUser, upsertUser } from "./services";
+import { getUserRating } from "@api/ratings/services";
 
 const getUserProcedure = publicProcedure
   .input(z.object({ id: z.string() }))
@@ -31,9 +32,14 @@ const upsertUserProcedure = publicProcedure.input(UserSchema).mutation(
     }),
 );
 
+const getUserRatingProcedure = publicProcedure
+  .input(z.object({ userId: z.string(), dishId: z.string() }))
+  .query(async ({ ctx: { db }, input }) => {
+    return await getUserRating(db, input.userId, input.dishId);
+  });
+
 export const userRouter = createTRPCRouter({
-  /** Get a user by id. */
   get: getUserProcedure,
-  /** Upsert a user. */
   upsert: upsertUserProcedure,
+  getUserRating: getUserRatingProcedure,
 });

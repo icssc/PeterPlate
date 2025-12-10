@@ -2,7 +2,7 @@ import { upsert } from "@api/utils";
 import type {
   Drizzle,
   InsertUser,
-  SelectPin,
+  SelectFavorite,
   SelectRating,
   SelectUser,
 } from "@peterplate/db";
@@ -14,14 +14,14 @@ export async function getUser(
   id: string,
 ): Promise<
   SelectUser & {
-    pins: SelectPin[];
+    favorites: SelectFavorite[];
     ratings: SelectRating[];
   }
 > {
   const fetchedUser = await db.query.users.findFirst({
     where: (user, { eq }) => eq(user.id, id),
     with: {
-      pins: true,
+      favorites: true,
       ratings: true,
     },
   });
