@@ -30,10 +30,16 @@
     "typecheck": "turbo typecheck"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.3.8",
+    "@commitlint/cli": "^20.2.0",
+    "@commitlint/config-conventional": "^20.2.0",
     "@turbo/gen": "catalog:",
     "@zotmeal/prettier-config": "workspace:*",
     "aws-cdk-lib": "^2.170.0",
     "constructs": "^10.4.2",
+    "devmoji": "^2.3.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
     "prettier": "catalog:",
     "sst": "^3.0.0",
     "ts-node": "catalog:",
@@ -45,5 +51,10 @@
     "overrides": {
       "@auth/core": "0.20.0"
     }
+  },
+  "lint-staged": {
+    "*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}": [
+      "biome check --write --no-errors-on-unmatched"
+    ]
   }
 }
