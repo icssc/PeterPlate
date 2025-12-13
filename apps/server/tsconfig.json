@@ -12,11 +12,7 @@
     "outDir": "lib"
   },
   "include": ["src/**/*.ts"],
-  "exclude": [
-    "node_modules/**/*",
-    ".sst/**/*",
-    ".vscode/**/*"
-  ],
+  "exclude": ["node_modules/**/*", ".sst/**/*", ".vscode/**/*"],
   "ts-node": {
     "require": ["tsconfig-paths/register"]
   }
