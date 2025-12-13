@@ -1,0 +1,19 @@
+import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
+import type { AnyRouter } from "@trpc/server";
+import { appRouter, createTRPCContext } from "@zotmeal/api";
+
+const handler = (req: Request) => {
+  console.log("DATABASE_URL:", process.env.DATABASE_URL);
+  return fetchRequestHandler({
+    endpoint: "/api/trpc",
+    req,
+    router: appRouter as unknown as AnyRouter,
+    createContext: () =>
+      createTRPCContext({
+        headers: req.headers,
+        connectionString: process.env.DATABASE_URL!,
+      }),
+  });
+};
+
+export { handler as GET, handler as POST };

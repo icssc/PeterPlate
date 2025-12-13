@@ -1,14 +1,14 @@
 # PeterPlate
 
 <pre style="color: green;">
- ███████████            █████                       ███████████  ████             █████            
-▒▒███▒▒▒▒▒███          ▒▒███                       ▒▒███▒▒▒▒▒███▒▒███            ▒▒███             
- ▒███    ▒███  ██████  ███████    ██████  ████████  ▒███    ▒███ ▒███   ██████   ███████    ██████ 
+ ███████████            █████                       ███████████  ████             █████
+▒▒███▒▒▒▒▒███          ▒▒███                       ▒▒███▒▒▒▒▒███▒▒███            ▒▒███
+ ▒███    ▒███  ██████  ███████    ██████  ████████  ▒███    ▒███ ▒███   ██████   ███████    ██████
  ▒██████████  ███▒▒███▒▒▒███▒    ███▒▒███▒▒███▒▒███ ▒██████████  ▒███  ▒▒▒▒▒███ ▒▒▒███▒    ███▒▒███
- ▒███▒▒▒▒▒▒  ▒███████   ▒███    ▒███████  ▒███ ▒▒▒  ▒███▒▒▒▒▒▒   ▒███   ███████   ▒███    ▒███████ 
- ▒███        ▒███▒▒▒    ▒███ ███▒███▒▒▒   ▒███      ▒███         ▒███  ███▒▒███   ▒███ ███▒███▒▒▒  
- █████       ▒▒██████   ▒▒█████ ▒▒██████  █████     █████        █████▒▒████████  ▒▒█████ ▒▒██████ 
-▒▒▒▒▒         ▒▒▒▒▒▒     ▒▒▒▒▒   ▒▒▒▒▒▒  ▒▒▒▒▒     ▒▒▒▒▒        ▒▒▒▒▒  ▒▒▒▒▒▒▒▒    ▒▒▒▒▒   ▒▒▒▒▒▒  
+ ▒███▒▒▒▒▒▒  ▒███████   ▒███    ▒███████  ▒███ ▒▒▒  ▒███▒▒▒▒▒▒   ▒███   ███████   ▒███    ▒███████
+ ▒███        ▒███▒▒▒    ▒███ ███▒███▒▒▒   ▒███      ▒███         ▒███  ███▒▒███   ▒███ ███▒███▒▒▒
+ █████       ▒▒██████   ▒▒█████ ▒▒██████  █████     █████        █████▒▒████████  ▒▒█████ ▒▒██████
+▒▒▒▒▒         ▒▒▒▒▒▒     ▒▒▒▒▒   ▒▒▒▒▒▒  ▒▒▒▒▒     ▒▒▒▒▒        ▒▒▒▒▒  ▒▒▒▒▒▒▒▒    ▒▒▒▒▒   ▒▒▒▒▒▒
 </pre>
 
 ## About
@@ -17,10 +17,10 @@ Navigating UCI's dining options at Brandywine and the Anteatery is now simpler a
 
 Key features of PeterPlate include:
 
-- **_Detailed Menu Viewer_**: Browse current and upcoming menus, allowing you 
-to strategically plan your meal swipes and never miss your favorite dishes.
-- **_Allergen and Dietary Information_**: Make informed choices with easy 
-access to comprehensive ingredient and allergen details for every meal.
+- **_Detailed Menu Viewer_**: Browse current and upcoming menus, allowing you
+  to strategically plan your meal swipes and never miss your favorite dishes.
+- **_Allergen and Dietary Information_**: Make informed choices with easy
+  access to comprehensive ingredient and allergen details for every meal.
 - **_Event Calendar_**: Stay updated on special dining hall events and limited-time offerings.
 - **_Dish Ratings_**: Contribute your own feedback to help fellow Anteaters discover the best of campus dining.
 
@@ -34,9 +34,10 @@ PeterPlate consists of a Next.JS frontend with a shared backend. A summary of th
 
 - [Next.js](https://nextjs.org) - Full-stack React framework used for the website.
 - [shad/cn](https://ui.shadcn.com/) - A library of fully customizable, plug-n-play components for use with React.
-- [Zustand](https://github.com/pmndrs/zustand) - State management library for React apps. 
+- [Zustand](https://github.com/pmndrs/zustand) - State management library for React apps.
 
 ### Backend
+
 - [Drizzle](https://drizzle.dev/) - ORM for Postgres.
 - [AWS](https://aws.amazon.com/) - RDS and Lambda.
 - [Serverless Framework](https://www.serverless.com/) - Framework for cloud resources such as AWS Lambda.
@@ -50,7 +51,7 @@ PeterPlate consists of a Next.JS frontend with a shared backend. A summary of th
 
 ### Schema ER Diagram
 
-```mermaid 
+```mermaid
 erDiagram
    push_tokens {
       token text
@@ -211,10 +212,10 @@ erDiagram
 
    events ||--|| restaurant : occurs
    events ||--|| restaurant_id_enum : refers
-   
+
    restaurants ||--|| restaurant_id_enum : refers
    restaurants ||--|| restaurant_name_enum : refers
-   
+
 ```
 
 ## Getting Started
@@ -247,9 +248,9 @@ erDiagram
 1. Clone the PeterPlate repository from GitHub.
    `git clone https://github.com/icssc/PeterPlate.git`
 
-2. Navigate to the root directory and change your node version to the one specified in the .nvmrc by running 
+2. Navigate to the root directory and change your node version to the one specified in the .nvmrc by running
    `nvm use` or `fnm use`. In particular, we will be using Node v20.
-   
+
 3. While still in the root directory and install the dependencies by running
    `cd PeterPlate && pnpm install`
 
@@ -268,24 +269,26 @@ erDiagram
    http://localhost:3000/events.get
    ```
 
-8.  Pull the latest CampusDish data into your local database by `cd`'ing into the `apps/server` directory and running `pnpm run test:daily` or `pnpm run test:weekly`.
+8. Pull the latest CampusDish data into your local database by `cd`'ing into the `apps/server` directory and running `pnpm run test:daily` or `pnpm run test:weekly`.
 
-9.  View the local website at [http://localhost:8080](http://localhost:8080). As you make changes to the Next.js application, those changes will be automatically
-reflected on the local website.
+9. View the local website at [http://localhost:3000](http://localhost:3000). As you make changes to the Next.js application, those changes will be automatically
+   reflected on the local website.
 
 ### Troubleshooting
 
 Sometimes, you may run into errors when trying to run some of the commands listed above. Here are some things that can help fix this:
 
 Reinstall packages
+
 - Run `rm -force node_modules` and `pnpm install` to reinstall all packages in the project
 
 Ensure Node is correct version
+
 - Node v20 (latest of that version)
 - Check by running `node -v`
 - If not, download/switch to v20, by running:
-   - `fnm install v20` or `nvm install v20`
-   - `fnm use 20` or `nvm use 20`
+  - `fnm install v20` or `nvm install v20`
+  - `fnm use 20` or `nvm use 20`
 
 ### Testing
 
@@ -293,7 +296,7 @@ Run `npx turbo test` at the root of the project.
 
 **Database**
 
-Run the following commands to pull data into your local database. 
+Run the following commands to pull data into your local database.
 
 ```sh
 cd apps/server

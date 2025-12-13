@@ -4,8 +4,6 @@
   "scripts": {
     "clean": "rm -rf .turbo node_modules",
     "with-env": "dotenv -e .env.development -- ",
-    "dev": "echo 'Run sst dev from project root'",
-    "deploy": "echo 'Run sst deploy from project root'",
     "test:daily": "pnpm with-env npx sst shell --stage dev -- node -e \"import('./src/functions/cron/daily.js').then(m => m.main())\"",
     "test:weekly": "pnpm with-env npx sst shell --stage dev -- node -e \"import('./src/functions/cron/weekly.js').then(m => m.main())\""
   },
