@@ -1,22 +1,21 @@
-# ZotMeal
+# PeterPlate
 
 <pre style="color: green;">
-__/\\\\\\\\\\\\\\\______________________________/\\\\____________/\\\\________________________________/\\\\\\____
- _\////////////\\\______________________________\/\\\\\\________/\\\\\\_______________________________\////\\\____
-  ___________/\\\/_____________________/\\\______\/\\\//\\\____/\\\//\\\__________________________________\/\\\____
-   _________/\\\/_________/\\\\\_____/\\\\\\\\\\\_\/\\\\///\\\/\\\/_\/\\\_____/\\\\\\\\___/\\\\\\\\\_______\/\\\____
-    _______/\\\/_________/\\\///\\\__\////\\\////__\/\\\__\///\\\/___\/\\\___/\\\/////\\\_\////////\\\______\/\\\____
-     _____/\\\/__________/\\\__\//\\\____\/\\\______\/\\\____\///_____\/\\\__/\\\\\\\\\\\____/\\\\\\\\\\_____\/\\\____
-      ___/\\\/___________\//\\\__/\\\_____\/\\\_/\\__\/\\\_____________\/\\\_\//\\///////____/\\\/////\\\_____\/\\\____
-       __/\\\\\\\\\\\\\\\__\///\\\\\/______\//\\\\\___\/\\\_____________\/\\\__\//\\\\\\\\\\_\//\\\\\\\\/\\__/\\\\\\\\\_
-        _\///////////////_____\/////_________\/////____\///______________\///____\//////////___\////////\//__\/////////__
+ ███████████            █████                       ███████████  ████             █████            
+▒▒███▒▒▒▒▒███          ▒▒███                       ▒▒███▒▒▒▒▒███▒▒███            ▒▒███             
+ ▒███    ▒███  ██████  ███████    ██████  ████████  ▒███    ▒███ ▒███   ██████   ███████    ██████ 
+ ▒██████████  ███▒▒███▒▒▒███▒    ███▒▒███▒▒███▒▒███ ▒██████████  ▒███  ▒▒▒▒▒███ ▒▒▒███▒    ███▒▒███
+ ▒███▒▒▒▒▒▒  ▒███████   ▒███    ▒███████  ▒███ ▒▒▒  ▒███▒▒▒▒▒▒   ▒███   ███████   ▒███    ▒███████ 
+ ▒███        ▒███▒▒▒    ▒███ ███▒███▒▒▒   ▒███      ▒███         ▒███  ███▒▒███   ▒███ ███▒███▒▒▒  
+ █████       ▒▒██████   ▒▒█████ ▒▒██████  █████     █████        █████▒▒████████  ▒▒█████ ▒▒██████ 
+▒▒▒▒▒         ▒▒▒▒▒▒     ▒▒▒▒▒   ▒▒▒▒▒▒  ▒▒▒▒▒     ▒▒▒▒▒        ▒▒▒▒▒  ▒▒▒▒▒▒▒▒    ▒▒▒▒▒   ▒▒▒▒▒▒  
 </pre>
 
 ## About
 
-Navigating UCI's dining options at Brandywine and the Anteatery is now simpler and more informed with ZotMeal. This comprehensive menu viewer, available as a website and mobile app, is designed to enhance your campus dining experience. UCI students use ZotMeal to plan their daily meals and track progress toward their nutritional goals.
+Navigating UCI's dining options at Brandywine and the Anteatery is now simpler and more informed with PeterPlate. This comprehensive menu viewer, available as a website and mobile app, is designed to enhance your campus dining experience. UCI students use PeterPlate to plan their daily meals and track progress toward their nutritional goals.
 
-Key features of ZotMeal include:
+Key features of PeterPlate include:
 
 - **_Detailed Menu Viewer_**: Browse current and upcoming menus, allowing you 
 to strategically plan your meal swipes and never miss your favorite dishes.
@@ -25,11 +24,11 @@ access to comprehensive ingredient and allergen details for every meal.
 - **_Event Calendar_**: Stay updated on special dining hall events and limited-time offerings.
 - **_Dish Ratings_**: Contribute your own feedback to help fellow Anteaters discover the best of campus dining.
 
-![A screenshot of the ZotMeal website homepage.](./zotmeal-screenshot.jpg)
+![A screenshot of the PeterPlate website homepage.](./peterplate-screenshot.jpg)
 
 ## Technology
 
-ZotMeal consists of a Next.JS frontend with a shared backend. A summary of the libraries used in each are listed below.
+PeterPlate consists of a Next.JS frontend with a shared backend. A summary of the libraries used in each are listed below.
 
 ### Frontend
 
@@ -245,14 +244,14 @@ erDiagram
 
 ### Developing
 
-1. Clone the ZotMeal repository from GitHub.
-   `git clone https://github.com/icssc/ZotMeal.git`
+1. Clone the PeterPlate repository from GitHub.
+   `git clone https://github.com/icssc/PeterPlate.git`
 
 2. Navigate to the root directory and change your node version to the one specified in the .nvmrc by running 
    `nvm use` or `fnm use`. In particular, we will be using Node v20.
    
 3. While still in the root directory and install the dependencies by running
-   `cd ZotMeal && pnpm install`
+   `cd PeterPlate && pnpm install`
 
 4. To start a local Postgres container database run the `docker compose up` in the root directory.
    This will automatically set up and run a test database using docker.
