@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import path from "node:path";
 
 const nextConfig: NextConfig = {
   // ! TODO: Fix these errors
@@ -19,6 +20,13 @@ const nextConfig: NextConfig = {
         hostname: "images.elevate-dxp.com",
       },
     ],
+  },
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      "@api": path.resolve(__dirname, "../../packages/api/src"),
+    };
+    return config;
   },
 };
 
