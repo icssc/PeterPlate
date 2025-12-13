@@ -1,10 +1,12 @@
 import type { PoolConfig } from "pg";
 import { drizzle } from "drizzle-orm/node-postgres";
-import { Pool } from "pg";
+import pg, { type Pool as PoolType } from "pg";
+
+const { Pool } = pg;
 
 import * as schema from "./schema";
 
-export const pool = (config: PoolConfig): Pool => new Pool(config);
+export const pool = (config: PoolConfig): PoolType => new Pool(config);
 
 /**
  * Create a drizzle instance with a connection string (add ssl or enable logs if needed)

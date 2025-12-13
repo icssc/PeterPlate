@@ -43,9 +43,6 @@ export const createTRPCContext = ({
 }) => {
   const source = headers.get("x-trpc-source") ?? "unknown";
 
-  console.log(">>> tRPC Request from", source);
-  console.log(">>> Connection string:", connectionString);
-
   const db = createDrizzle({ connectionString });
 
   return { db };

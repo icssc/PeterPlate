@@ -12,8 +12,8 @@
     "build": "turbo build",
     "clean": "git clean -xdf node_modules",
     "clean:workspaces": "turbo clean",
-    "cron:daily": "tsx scripts/run-cron.ts daily",
-    "cron:weekly": "tsx scripts/run-cron.ts weekly",
+    "cron:daily": "pnpm -F @zotmeal/server test:daily",
+    "cron:weekly": "pnpm -F @zotmeal/server test:weekly",
     "db:generate": "pnpm -F db db:generate",
     "db:migrate": "pnpm -F db db:migrate",
     "db:studio": "pnpm --filter db run db:studio",
@@ -45,7 +45,6 @@
     "prettier": "catalog:",
     "sst": "^3.0.0",
     "ts-node": "catalog:",
-    "tsx": "^4.19.2",
     "turbo": "catalog:",
     "typescript": "catalog:"
   },

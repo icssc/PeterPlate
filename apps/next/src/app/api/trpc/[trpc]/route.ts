@@ -3,7 +3,6 @@ import type { AnyRouter } from "@trpc/server";
 import { appRouter, createTRPCContext } from "@zotmeal/api";
 
 const handler = (req: Request) => {
-  console.log("DATABASE_URL:", process.env.DATABASE_URL);
   return fetchRequestHandler({
     endpoint: "/api/trpc",
     req,

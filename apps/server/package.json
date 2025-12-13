@@ -1,11 +1,11 @@
 {
   "name": "@zotmeal/server",
   "version": "0.1.0",
+  "type": "module",
   "scripts": {
     "clean": "rm -rf .turbo node_modules",
-    "with-env": "dotenv -e .env.development -- ",
-    "test:daily": "pnpm with-env npx sst shell --stage dev -- node -e \"import('./src/functions/cron/daily.js').then(m => m.main())\"",
-    "test:weekly": "pnpm with-env npx sst shell --stage dev -- node -e \"import('./src/functions/cron/weekly.js').then(m => m.main())\""
+    "test:daily": "tsx -e \"import('./src/functions/cron/daily.ts').then(m => m.main())\"",
+    "test:weekly": "tsx -e \"import('./src/functions/cron/weekly.ts').then(m => m.main())\""
   },
   "license": "MIT",
   "dependencies": {
@@ -15,13 +15,17 @@
     "@zotmeal/validators": "workspace:*",
     "axios": "catalog:",
     "date-fns": "catalog:",
-    "expo-server-sdk": "catalog:"
+    "dotenv": "catalog:",
+    "expo-server-sdk": "catalog:",
+    "pino": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@types/aws-lambda": "catalog:",
     "@types/minimatch": "^6.0.0",
     "@types/node": "catalog:",
     "@zotmeal/eslint-config": "workspace:*",
-    "dotenv-cli": "catalog:"
+    "dotenv-cli": "catalog:",
+    "tsx": "catalog:"
   }
 }

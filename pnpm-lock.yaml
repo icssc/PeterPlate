@@ -60,6 +60,9 @@ catalogs:
     date-fns-tz:
       specifier: ^3.1.3
       version: 3.1.3
+    dotenv:
+      specifier: ^16.4.5
+      version: 16.4.5
     dotenv-cli:
       specifier: ^7.4.1
       version: 7.4.2
@@ -135,6 +138,9 @@ catalogs:
     ts-node:
       specifier: ^10.9.2
       version: 10.9.2
+    tsx:
+      specifier: ^4.19.2
+      version: 4.21.0
     turbo:
       specifier: ^1.13.2
       version: 1.13.4
@@ -333,9 +339,18 @@ importers:
       date-fns:
         specifier: 'catalog:'
         version: 3.6.0
+      dotenv:
+        specifier: 'catalog:'
+        version: 16.4.5
       expo-server-sdk:
         specifier: 'catalog:'
         version: 3.10.0
+      pino:
+        specifier: 'catalog:'
+        version: 8.21.0
+      zod:
+        specifier: 'catalog:'
+        version: 3.23.8
     devDependencies:
       '@types/aws-lambda':
         specifier: 'catalog:'
@@ -352,6 +367,9 @@ importers:
       dotenv-cli:
         specifier: 'catalog:'
         version: 7.4.2
+      tsx:
+        specifier: 'catalog:'
+        version: 4.21.0
 
   packages/api:
     dependencies:
@@ -2154,8 +2172,8 @@ packages:
   '@radix-ui/react-focus-scope@1.1.7':
     resolution: {integrity: sha512-t2ODlkXBQyn7jkl6TNaw/MtVEVvIGelJDCG41Okq/KwUsJBwQ4XVZsHAVUkK4mBv3ewiAS3PGuUWuY2BoK4ZUw==}
     peerDependencies:
-      '@types/react': '*'
-      '@types/react-dom': '*'
+      '@types/react': 19.2.4
+      '@types/react-dom': 19.2.3
       react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
       react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
     peerDependenciesMeta:
@@ -2250,8 +2268,8 @@ packages:
   '@radix-ui/react-portal@1.1.9':
     resolution: {integrity: sha512-bpIxvq03if6UNwXZ+HTK71JLh4APvnXntDc6XOX8UVq4XQOVl7lwok0AvIl+b8zgCw3fSaVTZMpAPPagXbKmHQ==}
     peerDependencies:
-      '@types/react': '*'
-      '@types/react-dom': '*'
+      '@types/react': 19.2.4
+      '@types/react-dom': 19.2.3
       react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
       react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
     peerDependenciesMeta:
@@ -4763,9 +4781,6 @@ packages:
 
   get-tsconfig@4.10.0:
     resolution: {integrity: sha512-kGzZ3LWWQcGIAmg6iWvXn0ei6WDtV26wzHRMwDSzmAbcXrTEXxHy6IehI6/4eT6VRKyMP1eF1VqwrVUmE/LR7A==}
-
-  get-tsconfig@4.8.1:
-    resolution: {integrity: sha512-k9PN+cFBmaLWtVz29SkUoqU5O0slLuHJXt/2P+tMVFT+phsSGXGkp9t3rQIqdz0e+06EHNGs3oM6ZX1s2zHxRg==}
 
   get-uri@6.0.3:
     resolution: {integrity: sha512-BzUrJBS9EcUb4cFol8r4W3v1cPsSyajLSthNkz5BxbpDcHN5tIrM10E2eNvfnvBn3DaT3DUgx0OpsBKkaOpanw==}
@@ -8231,7 +8246,7 @@ snapshots:
   '@esbuild-kit/esm-loader@2.6.5':
     dependencies:
       '@esbuild-kit/core-utils': 3.3.2
-      get-tsconfig: 4.8.1
+      get-tsconfig: 4.10.0
 
   '@esbuild/aix-ppc64@0.19.12':
     optional: true
@@ -12227,10 +12242,6 @@ snapshots:
       get-intrinsic: 1.3.0
 
   get-tsconfig@4.10.0:
-    dependencies:
-      resolve-pkg-maps: 1.0.0
-
-  get-tsconfig@4.8.1:
     dependencies:
       resolve-pkg-maps: 1.0.0
 
