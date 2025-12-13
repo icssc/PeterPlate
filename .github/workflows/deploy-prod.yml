@@ -42,6 +42,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Migrate database
+        run: pnpm db:migrate
+
       - name: Deploy Peterplate to production
-        run: |
-          STAGE=production pnpm db:migrate && pnpm sst deploy --stage production
+        run: pnpm sst deploy --stage production
