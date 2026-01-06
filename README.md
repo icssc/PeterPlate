@@ -269,7 +269,7 @@ erDiagram
    http://localhost:3000/events.get
    ```
 
-8. Pull the latest CampusDish data into your local database by `cd`'ing into the `apps/server` directory and running `pnpm run test:daily` or `pnpm run test:weekly`.
+8. Pull the latest CampusDish data into your local database by running `pnpm dev:data`.
 
 9. View the local website at [http://localhost:3000](http://localhost:3000). As you make changes to the Next.js application, those changes will be automatically
    reflected on the local website.
@@ -296,16 +296,10 @@ Run `npx turbo test` at the root of the project.
 
 **Database**
 
-Run the following commands to pull data into your local database.
+Run the following command to pull data for the week into your local database.
 
 ```sh
-cd apps/server
-
-# For daily test
-pnpm test:daily
-
-# For weekly test
-pnpm test:weekly
+pnpm dev:data
 ```
 
 If you want to check the contents of the database, run the following command in the root directory (while the server is not running).

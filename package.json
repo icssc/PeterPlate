@@ -20,6 +20,7 @@
     "db:dump": "pg_dump -h icssc.cf3yrjegcna8.us-east-1.rds.amazonaws.com -U zotmeal_prod -W -O -x zotmeal > ./docker/db/zotmeal.sql",
     "dev": "turbo dev --filter=./apps/next",
     "dev:graphql": "turbo dev --filter=./packages/graphql",
+    "dev:data": "pnpm -F @zotmeal/server test:weekly",
     "deploy": "npx sst deploy --stage production",
     "deploy:dev": "npx sst deploy --stage dev",
     "format": "turbo format --continue -- --cache --cache-location node_modules/.cache/.prettiercache",
