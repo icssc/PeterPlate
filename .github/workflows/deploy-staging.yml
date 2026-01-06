@@ -1,0 +1,79 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/SchemaStore/schemastore/master/src/schemas/json/github-workflow.json
+---
+name: Deploy to staging
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - unlabeled
+
+permissions:
+  id-token: write
+  contents: read
+  deployments: write
+  pull-requests: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  DATABASE_URL: ${{ secrets.DEV_DATABASE_URL }}
+  PR_NUM: ${{ github.event.pull_request.number }}
+
+jobs:
+  deploy:
+    if: (!contains(github.event.pull_request.labels.*.name, 'no deploy'))
+
+    runs-on: ubuntu-latest
+
+    environment:
+      name: staging-${{ github.event.pull_request.number }}
+      url: https://staging-${{ github.event.pull_request.number }}.peterplate.com
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js and pnpm
+        uses: ./.github/actions/setup-node-and-pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Migrate database
+        run: pnpm db:migrate
+
+      - name: Create deployment
+        id: create-deployment
+        uses: chrnorm/deployment-action@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          environment: staging-${{ github.event.pull_request.number }}
+          ref: ${{ github.event.pull_request.head.sha }}
+          description: Staging deployment for PR #${{ github.event.pull_request.number }}
+
+      - name: Deploy Peterplate to staging
+        id: deploy
+        run: pnpm sst deploy --stage staging-$PR_NUM
+
+      - name: Update deployment status (success)
+        if: success()
+        uses: chrnorm/deployment-status@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          deployment-id: ${{ steps.create-deployment.outputs.deployment_id }}
+          state: success
+          environment-url: https://staging-${{ github.event.pull_request.number }}.peterplate.com
+
+      - name: Update deployment status (failure)
+        if: failure()
+        uses: chrnorm/deployment-status@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          deployment-id: ${{ steps.create-deployment.outputs.deployment_id }}
+          state: failure

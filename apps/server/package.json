@@ -1,34 +1,31 @@
 {
   "name": "@zotmeal/server",
   "version": "0.1.0",
-  "main": "serverless.ts",
+  "type": "module",
   "scripts": {
     "clean": "rm -rf .turbo node_modules",
-    "with-env": "dotenv -e .env.development -- ",
-    "dev": "pnpm with-env sls offline --noPrependStageInUrl --host 127.0.0.1",
-    "deploy": "pnpm with-env AWS_PROFILE=icssc sls deploy --stage production",
-    "test:daily": "pnpm with-env sls invoke local --function daily | pino-pretty",
-    "test:weekly": "pnpm with-env sls invoke local --function weekly | pino-pretty"
+    "test:daily": "tsx -e \"import('./src/functions/cron/daily.ts').then(m => m.main())\"",
+    "test:weekly": "tsx -e \"import('./src/functions/cron/weekly.ts').then(m => m.main())\""
   },
   "license": "MIT",
   "dependencies": {
     "@aws-sdk/client-scheduler": "catalog:",
-    "@serverless/typescript": "catalog:",
     "@zotmeal/api": "workspace:*",
     "@zotmeal/db": "workspace:*",
     "@zotmeal/validators": "workspace:*",
     "axios": "catalog:",
     "date-fns": "catalog:",
+    "dotenv": "catalog:",
     "expo-server-sdk": "catalog:",
-    "serverless": "^3.40.0",
-    "serverless-esbuild": "catalog:",
-    "serverless-offline": "catalog:"
+    "pino": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@types/aws-lambda": "catalog:",
     "@types/minimatch": "^6.0.0",
     "@types/node": "catalog:",
     "@zotmeal/eslint-config": "workspace:*",
-    "dotenv-cli": "catalog:"
+    "dotenv-cli": "catalog:",
+    "tsx": "catalog:"
   }
 }

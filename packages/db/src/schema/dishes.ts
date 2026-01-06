@@ -1,9 +1,12 @@
 import { relations } from "drizzle-orm";
 import { integer, pgTable, text } from "drizzle-orm/pg-core";
 
-import { dietRestrictions, InsertDietRestriction } from "./dietRestrictions";
+import {
+  dietRestrictions,
+  type InsertDietRestriction,
+} from "./dietRestrictions";
 import { dishesToMenus, menus } from "./menus";
-import { InsertNutritionInfo, nutritionInfos } from "./nutritionInfos";
+import { type InsertNutritionInfo, nutritionInfos } from "./nutritionInfos";
 import { stations } from "./stations";
 import { metadataColumns } from "./utils";
 
@@ -14,16 +17,18 @@ export const dishes = pgTable("dishes", {
     .references(() => stations.id, {
       onDelete: "restrict",
       onUpdate: "cascade",
-  }),
+    }),
   menuId: text("menu_id")
     .notNull()
     .references(() => menus.id, {
       onDelete: "restrict",
       onUpdate: "cascade",
-  }),
+    }),
   name: text("name").notNull(),
   description: text("description").notNull(),
-  ingredients: text("ingredients").default("Ingredient Statement Not Available"),
+  ingredients: text("ingredients").default(
+    "Ingredient Statement Not Available",
+  ),
   /** Defaults to "Other" if not specified. */
   category: text("category").notNull().default("Other"),
   numRatings: integer("num_ratings").default(0).notNull(),

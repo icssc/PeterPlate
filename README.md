@@ -1,43 +1,43 @@
-# ZotMeal
+# PeterPlate
 
 <pre style="color: green;">
-__/\\\\\\\\\\\\\\\______________________________/\\\\____________/\\\\________________________________/\\\\\\____
- _\////////////\\\______________________________\/\\\\\\________/\\\\\\_______________________________\////\\\____
-  ___________/\\\/_____________________/\\\______\/\\\//\\\____/\\\//\\\__________________________________\/\\\____
-   _________/\\\/_________/\\\\\_____/\\\\\\\\\\\_\/\\\\///\\\/\\\/_\/\\\_____/\\\\\\\\___/\\\\\\\\\_______\/\\\____
-    _______/\\\/_________/\\\///\\\__\////\\\////__\/\\\__\///\\\/___\/\\\___/\\\/////\\\_\////////\\\______\/\\\____
-     _____/\\\/__________/\\\__\//\\\____\/\\\______\/\\\____\///_____\/\\\__/\\\\\\\\\\\____/\\\\\\\\\\_____\/\\\____
-      ___/\\\/___________\//\\\__/\\\_____\/\\\_/\\__\/\\\_____________\/\\\_\//\\///////____/\\\/////\\\_____\/\\\____
-       __/\\\\\\\\\\\\\\\__\///\\\\\/______\//\\\\\___\/\\\_____________\/\\\__\//\\\\\\\\\\_\//\\\\\\\\/\\__/\\\\\\\\\_
-        _\///////////////_____\/////_________\/////____\///______________\///____\//////////___\////////\//__\/////////__
+ ███████████            █████                       ███████████  ████             █████
+▒▒███▒▒▒▒▒███          ▒▒███                       ▒▒███▒▒▒▒▒███▒▒███            ▒▒███
+ ▒███    ▒███  ██████  ███████    ██████  ████████  ▒███    ▒███ ▒███   ██████   ███████    ██████
+ ▒██████████  ███▒▒███▒▒▒███▒    ███▒▒███▒▒███▒▒███ ▒██████████  ▒███  ▒▒▒▒▒███ ▒▒▒███▒    ███▒▒███
+ ▒███▒▒▒▒▒▒  ▒███████   ▒███    ▒███████  ▒███ ▒▒▒  ▒███▒▒▒▒▒▒   ▒███   ███████   ▒███    ▒███████
+ ▒███        ▒███▒▒▒    ▒███ ███▒███▒▒▒   ▒███      ▒███         ▒███  ███▒▒███   ▒███ ███▒███▒▒▒
+ █████       ▒▒██████   ▒▒█████ ▒▒██████  █████     █████        █████▒▒████████  ▒▒█████ ▒▒██████
+▒▒▒▒▒         ▒▒▒▒▒▒     ▒▒▒▒▒   ▒▒▒▒▒▒  ▒▒▒▒▒     ▒▒▒▒▒        ▒▒▒▒▒  ▒▒▒▒▒▒▒▒    ▒▒▒▒▒   ▒▒▒▒▒▒
 </pre>
 
 ## About
 
-Navigating UCI's dining options at Brandywine and the Anteatery is now simpler and more informed with ZotMeal. This comprehensive menu viewer, available as a website and mobile app, is designed to enhance your campus dining experience. UCI students use ZotMeal to plan their daily meals and track progress toward their nutritional goals.
+Navigating UCI's dining options at Brandywine and the Anteatery is now simpler and more informed with PeterPlate. This comprehensive menu viewer, available as a website and mobile app, is designed to enhance your campus dining experience. UCI students use PeterPlate to plan their daily meals and track progress toward their nutritional goals.
 
-Key features of ZotMeal include:
+Key features of PeterPlate include:
 
-- **_Detailed Menu Viewer_**: Browse current and upcoming menus, allowing you 
-to strategically plan your meal swipes and never miss your favorite dishes.
-- **_Allergen and Dietary Information_**: Make informed choices with easy 
-access to comprehensive ingredient and allergen details for every meal.
+- **_Detailed Menu Viewer_**: Browse current and upcoming menus, allowing you
+  to strategically plan your meal swipes and never miss your favorite dishes.
+- **_Allergen and Dietary Information_**: Make informed choices with easy
+  access to comprehensive ingredient and allergen details for every meal.
 - **_Event Calendar_**: Stay updated on special dining hall events and limited-time offerings.
 - **_Dish Ratings_**: Contribute your own feedback to help fellow Anteaters discover the best of campus dining.
 
-![A screenshot of the ZotMeal website homepage.](./zotmeal-screenshot.jpg)
+![A screenshot of the PeterPlate website homepage.](./peterplate-screenshot.jpg)
 
 ## Technology
 
-ZotMeal consists of a Next.JS frontend with a shared backend. A summary of the libraries used in each are listed below.
+PeterPlate consists of a Next.JS frontend with a shared backend. A summary of the libraries used in each are listed below.
 
 ### Frontend
 
 - [Next.js](https://nextjs.org) - Full-stack React framework used for the website.
 - [shad/cn](https://ui.shadcn.com/) - A library of fully customizable, plug-n-play components for use with React.
-- [Zustand](https://github.com/pmndrs/zustand) - State management library for React apps. 
+- [Zustand](https://github.com/pmndrs/zustand) - State management library for React apps.
 
 ### Backend
+
 - [Drizzle](https://drizzle.dev/) - ORM for Postgres.
 - [AWS](https://aws.amazon.com/) - RDS and Lambda.
 - [Serverless Framework](https://www.serverless.com/) - Framework for cloud resources such as AWS Lambda.
@@ -51,7 +51,7 @@ ZotMeal consists of a Next.JS frontend with a shared backend. A summary of the l
 
 ### Schema ER Diagram
 
-```mermaid 
+```mermaid
 erDiagram
    push_tokens {
       token text
@@ -212,10 +212,10 @@ erDiagram
 
    events ||--|| restaurant : occurs
    events ||--|| restaurant_id_enum : refers
-   
+
    restaurants ||--|| restaurant_id_enum : refers
    restaurants ||--|| restaurant_name_enum : refers
-   
+
 ```
 
 ## Getting Started
@@ -245,14 +245,14 @@ erDiagram
 
 ### Developing
 
-1. Clone the ZotMeal repository from GitHub.
-   `git clone https://github.com/icssc/ZotMeal.git`
+1. Clone the PeterPlate repository from GitHub.
+   `git clone https://github.com/icssc/PeterPlate.git`
 
-2. Navigate to the root directory and change your node version to the one specified in the .nvmrc by running 
+2. Navigate to the root directory and change your node version to the one specified in the .nvmrc by running
    `nvm use` or `fnm use`. In particular, we will be using Node v20.
-   
+
 3. While still in the root directory and install the dependencies by running
-   `cd ZotMeal && pnpm install`
+   `cd PeterPlate && pnpm install`
 
 4. To start a local Postgres container database run the `docker compose up` in the root directory.
    This will automatically set up and run a test database using docker.
@@ -269,24 +269,26 @@ erDiagram
    http://localhost:3000/events.get
    ```
 
-8.  Pull the latest CampusDish data into your local database by `cd`'ing into the `apps/server` directory and running `pnpm run test:daily` or `pnpm run test:weekly`.
+8. Pull the latest CampusDish data into your local database by running `pnpm dev:data`.
 
-9.  View the local website at [http://localhost:8080](http://localhost:8080). As you make changes to the Next.js application, those changes will be automatically
-reflected on the local website.
+9. View the local website at [http://localhost:3000](http://localhost:3000). As you make changes to the Next.js application, those changes will be automatically
+   reflected on the local website.
 
 ### Troubleshooting
 
 Sometimes, you may run into errors when trying to run some of the commands listed above. Here are some things that can help fix this:
 
 Reinstall packages
+
 - Run `rm -force node_modules` and `pnpm install` to reinstall all packages in the project
 
 Ensure Node is correct version
+
 - Node v20 (latest of that version)
 - Check by running `node -v`
 - If not, download/switch to v20, by running:
-   - `fnm install v20` or `nvm install v20`
-   - `fnm use 20` or `nvm use 20`
+  - `fnm install v20` or `nvm install v20`
+  - `fnm use 20` or `nvm use 20`
 
 ### Testing
 
@@ -294,16 +296,10 @@ Run `npx turbo test` at the root of the project.
 
 **Database**
 
-Run the following commands to pull data into your local database. 
+Run the following command to pull data for the week into your local database.
 
 ```sh
-cd apps/server
-
-# For daily test
-pnpm test:daily
-
-# For weekly test
-pnpm test:weekly
+pnpm dev:data
 ```
 
 If you want to check the contents of the database, run the following command in the root directory (while the server is not running).

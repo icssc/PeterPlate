@@ -2,33 +2,49 @@
   "name": "zotmeal",
   "type": "module",
   "private": true,
+  "packageManager": "pnpm@10.0.0",
   "engines": {
-    "node": "20.x"
+    "node": "20.x",
+    "pnpm": "^10.0.0"
   },
   "engineStrict": true,
-  "packageManager": "pnpm@9.6.0",
   "scripts": {
     "build": "turbo build",
     "clean": "git clean -xdf node_modules",
     "clean:workspaces": "turbo clean",
-    "db:push": "pnpm -F db db:push",
+    "cron:daily": "pnpm -F @zotmeal/server test:daily",
+    "cron:weekly": "pnpm -F @zotmeal/server test:weekly",
+    "db:generate": "pnpm -F db db:generate",
+    "db:migrate": "pnpm -F db db:migrate",
     "db:studio": "pnpm --filter db run db:studio",
     "db:dump": "pg_dump -h icssc.cf3yrjegcna8.us-east-1.rds.amazonaws.com -U zotmeal_prod -W -O -x zotmeal > ./docker/db/zotmeal.sql",
-    "dev": "turbo dev --parallel --filter=./apps/next --filter=./apps/server",
-    "dev:next": "next dev --port 8080",
+    "dev": "turbo dev --filter=./apps/next",
     "dev:graphql": "turbo dev --filter=./packages/graphql",
+    "dev:data": "pnpm -F @zotmeal/server test:weekly",
+    "deploy": "npx sst deploy --stage production",
+    "deploy:dev": "npx sst deploy --stage dev",
     "format": "turbo format --continue -- --cache --cache-location node_modules/.cache/.prettiercache",
     "format:fix": "turbo format --continue -- --write --cache --cache-location node_modules/.cache/.prettiercache",
     "lint": "turbo lint --continue -- --cache --cache-location node_modules/.cache/.eslintcache",
     "lint:fix": "turbo lint --continue -- --fix --cache --cache-location node_modules/.cache/.eslintcache",
     "lint:ws": "pnpm dlx sherif@latest",
     "postinstall": "pnpm lint:ws",
+    "sst:dev": "npx sst dev",
     "typecheck": "turbo typecheck"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.3.8",
+    "@commitlint/cli": "^20.2.0",
+    "@commitlint/config-conventional": "^20.2.0",
     "@turbo/gen": "catalog:",
     "@zotmeal/prettier-config": "workspace:*",
+    "aws-cdk-lib": "^2.170.0",
+    "constructs": "^10.4.2",
+    "devmoji": "^2.3.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
     "prettier": "catalog:",
+    "sst": "^3.0.0",
     "ts-node": "catalog:",
     "turbo": "catalog:",
     "typescript": "catalog:"
@@ -39,7 +55,9 @@
       "@auth/core": "0.20.0"
     }
   },
-  "dependencies": {
-    "find-up": "^8.0.0"
+  "lint-staged": {
+    "*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}": [
+      "biome check --write --no-errors-on-unmatched"
+    ]
   }
 }

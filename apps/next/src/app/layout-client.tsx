@@ -1,11 +1,11 @@
 "use client";
-import { useState } from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { httpBatchLink } from '@trpc/client';
-import { trpc } from '../utils/trpc';
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { httpBatchLink } from "@trpc/client";
+import { useState } from "react";
 import superjson from "superjson";
 import Toolbar from "@/components/ui/toolbar";
-import { DateProvider } from '@/context/date-context'; 
+import { DateProvider } from "@/context/date-context";
+import { trpc } from "../utils/trpc";
 
 export function RootClient({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
@@ -13,7 +13,8 @@ export function RootClient({ children }: { children: React.ReactNode }) {
     trpc.createClient({
       links: [
         httpBatchLink({
-          url: process.env.POSTGRES_DB_URL || 'http://localhost:3000',
+          url:
+            process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/trpc",
           transformer: superjson,
           async headers() {
             return {
@@ -22,7 +23,7 @@ export function RootClient({ children }: { children: React.ReactNode }) {
           },
         }),
       ],
-    })
+    }),
   );
 
   return (

@@ -3,17 +3,13 @@ import { createDrizzle, pool, restaurantNames } from "@zotmeal/db";
 
 import { logger } from "../../../logger";
 import { env } from "../env";
-import { ssl } from "../ssl";
 
 const connectionString = env.DATABASE_URL;
 
 export const main = async (_event, _context) => {
   try {
     logger.info("Start update daily job...");
-    const db = createDrizzle({
-      connectionString,
-      ssl,
-    });
+    const db = createDrizzle({ connectionString });
 
     const results = await Promise.allSettled(
       restaurantNames.map((restaurant) => daily(db, new Date(), restaurant)),

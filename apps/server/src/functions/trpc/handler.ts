@@ -1,5 +1,8 @@
-import { awsLambdaRequestHandler } from "@trpc/server/adapters/aws-lambda";
-import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from "aws-lambda";
+import {
+  awsLambdaRequestHandler,
+} from "@trpc/server/adapters/aws-lambda";
+import type { AnyRouter } from "@trpc/server";
+import { APIGatewayProxyEventV2, Context } from "aws-lambda";
 
 import { appRouter, createTRPCContext } from "@zotmeal/api";
 
@@ -12,37 +15,32 @@ const createContext = (
     connectionString: process.env.DATABASE_URL,
   });
 
-  const trpcHandler = awsLambdaRequestHandler({
-  router: appRouter,
+// type Context = Awaited<ReturnType<typeof createContext>>;
+
+const trpcHandler = awsLambdaRequestHandler({
+  router: appRouter as unknown as AnyRouter,
   createContext,
 });
 
 export const handler = async (
-  event: APIGatewayProxyEventV2
-): Promise<APIGatewayProxyResultV2> => {
-
-  const path = 
-    event.rawPath || 
-    event.requestContext?.http?.path || 
-    event.pathParameters?.proxy ||
-    "";
-  
-  // Block requests to /api/auth/* or /auth/*
-  if (path.includes("/api/auth") || path.includes("/auth")) {
-    console.log("Blocked auth route:", path);
+  event: APIGatewayProxyEventV2,
+  context: Context,
+) => {
+  // Handle OPTIONS requests for CORS preflight
+  if (event.requestContext.http.method === "OPTIONS") {
     return {
-      statusCode: 404,
-      body: JSON.stringify({ 
-        error: "Not found - auth routes are handled separately" 
-      }),
+      statusCode: 200,
       headers: {
-        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": event.headers.origin || "*",
+        "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
+        "Access-Control-Allow-Headers": "content-type,x-trpc-source",
+        "Access-Control-Max-Age": "86400",
       },
+      body: "",
     };
   }
 
-  return trpcHandler(event, {} as any);
-
+  return trpcHandler(event, context);
 };
 
-export const main = handler
+export const main = handler;

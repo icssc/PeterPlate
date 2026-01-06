@@ -25,6 +25,7 @@ export const favorites = pgTable(
   (table) => {
     return {
       pk: primaryKey({
+        name: "pins_pk",
         columns: [table.userId, table.dishId],
       }),
     };
@@ -52,4 +53,3 @@ export const favoritesRelations = relations(favorites, ({ one }) => ({
  */
 export type InsertFavorite = typeof favorites.$inferInsert;
 export type SelectFavorite = typeof favorites.$inferSelect;
-
