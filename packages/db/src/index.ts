@@ -4,7 +4,6 @@ import pg, { type Pool as PoolType } from "pg";
 
 const { Pool } = pg;
 
-import * as schema from "./schema";
 
 export const pool = (config: PoolConfig): PoolType => new Pool(config);
 
@@ -24,3 +23,7 @@ export const createDrizzle = (config: PoolConfig, logger?: boolean) =>
 
 export type Drizzle = ReturnType<typeof createDrizzle>;
 export * from "./schema";
+
+export const db = createDrizzle({
+  connectionString: process.env.DATABASE_URL,
+});

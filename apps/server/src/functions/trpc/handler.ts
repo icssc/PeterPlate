@@ -1,6 +1,5 @@
 import {
   awsLambdaRequestHandler,
-  CreateAWSLambdaContextOptions,
 } from "@trpc/server/adapters/aws-lambda";
 import type { AnyRouter } from "@trpc/server";
 import { APIGatewayProxyEventV2, Context } from "aws-lambda";
@@ -8,7 +7,6 @@ import { APIGatewayProxyEventV2, Context } from "aws-lambda";
 import { appRouter, createTRPCContext } from "@zotmeal/api";
 
 const createContext = (
-  _opts: CreateAWSLambdaContextOptions<APIGatewayProxyEventV2>,
 ) =>
   createTRPCContext({
     headers: new Headers({

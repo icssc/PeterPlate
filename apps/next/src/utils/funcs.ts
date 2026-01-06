@@ -10,11 +10,8 @@ const ANTEAT_ADDY: string = "4001+Mesa+Rd%2C+Irvine%2C+CA%2C+92617";
  * @returns The title-cased string.
  */
 function toTitleCase(str: string): string {
-  return str
-    .toLowerCase()
-    .split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
+  if (!str) return ""; // Return empty string if undefined/null
+  return str.toLowerCase().replace(/\b\w/g, s => s.toUpperCase());
 }
 
 // Internal keyword lists for enhanceDescription function.

@@ -2,10 +2,10 @@
  * Props for the {@link SidebarDivider} component.
  */
 interface SidebarDividerProps {
-    /**
-     * The title text to display for the divider.
-     */
-    title: string;
+  /**
+   * The title text to display for the divider.
+   */
+  title: string;
 }
 
 /**
@@ -13,8 +13,8 @@ interface SidebarDividerProps {
  * @param {SidebarDividerProps} props - The properties for the sidebar divider.
  * @returns {JSX.Element} A span element styled as a section divider with a title.
  */
-export default function SidebarDivider({title} : SidebarDividerProps): JSX.Element {
-    return (
-        <span className="text-sm text-zinc-600 mt-4">{title}</span>
-    )
+export default function SidebarDivider({
+  title,
+}: SidebarDividerProps): JSX.Element {
+  return <span className="text-sm text-zinc-600 mt-4">{title}</span>;
 }

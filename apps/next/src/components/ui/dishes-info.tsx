@@ -7,6 +7,8 @@ import MealDividerSkeleton from "./skeleton/meal-divider-skeleton"
 import { DishInfo } from "@zotmeal/api";
 import MealDivider from "./meal-divider";
 import { sortCategoryKeys } from "@/utils/funcs";
+import { useFavorites } from "@/hooks/useFavorites";
+
 
 /**
  * Props for the {@link DishesInfo} component.
@@ -15,21 +17,21 @@ interface DishesInfoProps {
   /**
    * An array of `DishInfo` objects to be displayed.
    */
-  dishes: DishInfo[],
+  dishes: DishInfo[];
   /**
    * A boolean indicating whether the data is currently being loaded.
    * If true, skeleton loaders will be displayed.
    */
-  isLoading: boolean,
+  isLoading: boolean;
   /**
    * A boolean indicating whether an error occurred while fetching data.
    * If true, an error message will be displayed.
    */
-  isError: boolean,
+  isError: boolean;
   /**
    * An optional error message string to display if `isError` is true.
    */
-  errorMessage?: string
+  errorMessage?: string;
 }
 
 /**
@@ -40,12 +42,23 @@ interface DishesInfoProps {
  * @returns {JSX.Element} The rendered list of dishes, or corresponding state UI (loading, error, empty).
  */
 export default function DishesInfo({
-  dishes, 
-  isLoading, 
-  isError, 
-  errorMessage
-} : DishesInfoProps): JSX.Element { 
+  dishes,
+  isLoading,
+  isError,
+  errorMessage,
+}: DishesInfoProps): JSX.Element {
   // Sort the dishes by category string
+  const {
+    favoriteIds,
+    isLoadingFavorites,
+    toggleFavorite,
+    isFavoritePending,
+  } = useFavorites();
+
+  const favoriteDishIds = favoriteIds ?? [];
+  const onToggleFavorite = toggleFavorite;
+  const isFavoritesLoading = isLoadingFavorites;
+  
   let categoryMap: {[dishCategory : string]: DishInfo[]} = {};
   dishes.forEach((dish) => {
     if (dish.category in categoryMap)
@@ -84,7 +97,15 @@ export default function DishesInfo({
                   <React.Fragment key={`${categoryString}`}>
                     <MealDivider title={categoryString} />
                     {categoryMap[categoryString].map(dish => 
-                      <FoodCard key={dish.id} {... dish}/>
+                      <FoodCard
+                        key={dish.id}
+                        {... dish}
+                        isFavorited={favoriteDishIds?.includes(dish.id)}
+                        favoriteIsLoading={
+                          !!isFavoritesLoading || !!isFavoritePending?.(dish.id)
+                        }
+                        onToggleFavorite={onToggleFavorite}
+                      />
                     )}
                   </React.Fragment>
                 )
