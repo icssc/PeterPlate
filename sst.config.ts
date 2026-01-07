@@ -89,6 +89,7 @@ export default $config({
       path: "apps/next",
       environment: {
         NEXT_PUBLIC_API_URL: api.url,
+        DATABASE_URL: process.env.DATABASE_URL!,
       },
       cachePolicy: "50ea56d0-b7b0-4bf7-9ab8-0f7f9a0d03d5",
       domain: {
