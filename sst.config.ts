@@ -73,7 +73,7 @@ export default $config({
       },
     });
 
-    new sst.aws.Cron("Weekly", {
+    const weeklyCron = new sst.aws.Cron("Weekly", {
       schedule: "cron(0 0 ? * 1 *)", // Run at 00:00 on Sunday
       job: {
         handler: "apps/server/src/functions/cron/weekly.main",
@@ -101,9 +101,9 @@ export default $config({
       },
     });
 
-    // Seed database on deployment by invoking Daily cron
-    new aws.lambda.Invocation("DailySeed", {
-      functionName: dailyCron.nodes.function.name,
+    // Seed database on deployment by invoking Weekly cron
+    new aws.lambda.Invocation("WeeklySeed", {
+      functionName: weeklyCron.nodes.function.name,
       input: JSON.stringify({}),
     });
 
