@@ -1,10 +1,15 @@
-import { upsertRating, getAverageRating, getUserRating, getUserRatedDishes, deleteRating } from "@api/ratings/services";
-import { upsertUser } from "@api/users/services";
+import {
+  deleteRating,
+  getAverageRating,
+  getUserRatedDishes,
+  getUserRating,
+  upsertRating,
+} from "@api/ratings/services";
 import { createTRPCRouter, publicProcedure } from "@api/trpc";
+import { upsertUser } from "@api/users/services";
 import { TRPCError } from "@trpc/server";
-import { z } from "zod";
-
 import { dishes, RatingSchema } from "@zotmeal/db";
+import { z } from "zod";
 
 const getDishProcedure = publicProcedure
   .input(z.object({ id: z.string() }))
@@ -37,7 +42,13 @@ const rateDishProcedure = publicProcedure
       });
 
     // 2. Create user if they don't exist
-    await upsertUser(db, { id: input.userId, name: "Anonymous" });
+    await upsertUser(db, {
+      id: input.userId,
+      name: "Anonymous",
+      email: `anonymous-${input.userId}@zotmeal.com`,
+      emailVerified: false,
+      image: "",
+    });
 
     // 3. Upsert the rating
     await upsertRating(db, input);
@@ -51,7 +62,6 @@ const getAverageRatingProcedure = publicProcedure
   .query(async ({ ctx: { db }, input }) => {
     return await getAverageRating(db, input.dishId);
   });
-
 
 const getUserRatedDishesProcedure = publicProcedure
   .input(z.object({ userId: z.string() }))
@@ -70,16 +80,16 @@ const getUserRatedDishesProcedure = publicProcedure
   });
 
 const deleteRatingProcedure = publicProcedure
-  .input(z.object({ 
-    userId: z.string(), 
-    dishId: z.string() 
-  }))
+  .input(
+    z.object({
+      userId: z.string(),
+      dishId: z.string(),
+    }),
+  )
   .mutation(async ({ ctx: { db }, input }) => {
     await deleteRating(db, input.userId, input.dishId);
     return { success: true };
   });
-
-
 
 export const dishRouter = createTRPCRouter({
   get: getDishProcedure,

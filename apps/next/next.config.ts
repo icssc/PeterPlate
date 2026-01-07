@@ -6,9 +6,6 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   images: {
     remotePatterns: [
       {
@@ -21,13 +18,13 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  webpack: (config) => {
+  /* webpack: (config) => {
     config.resolve.alias = {
       ...config.resolve.alias,
       "@api": path.resolve(__dirname, "../../packages/api/src"),
     };
     return config;
-  },
+  }, */
 };
 
 export default nextConfig;

@@ -22,7 +22,13 @@ describe("upsertUserProcedure", () => {
   // Maybe not necessary
   apiTest("should not upsert an invalid user", async ({ api, expect }) => {
     await expect(
-      api.user.upsert({ id: 1 as unknown as string, name: "Peter" }),
+      api.user.upsert({
+        id: 1 as unknown as string,
+        name: "Peter",
+        email: "panteater@uci.edu",
+        emailVerified: false,
+        image: "",
+      }),
     ).rejects.toThrow();
   });
 });
