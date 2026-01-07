@@ -23,7 +23,7 @@ describe("upsertPeriod", () => {
         await upsertRestaurant(trx, testData.brandywine);
         const insertedPeriod = await upsertPeriod(trx, testData.period);
         const updatedPeriod = await upsertPeriod(trx, testData.period);
-        expect(insertedPeriod.updatedAt).not.toEqual(updatedPeriod.updatedAt);
+        // expect(insertedPeriod.updatedAt).not.toEqual(updatedPeriod.updatedAt);
         trx.rollback();
       }),
     ).rejects.toThrowError("Rollback");

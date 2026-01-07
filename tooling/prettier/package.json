@@ -17,6 +17,7 @@
     "prettier-plugin-tailwindcss": "catalog:"
   },
   "devDependencies": {
+    "@types/minimatch": "^6.0.0",
     "@zotmeal/tsconfig": "workspace:*",
     "typescript": "catalog:"
   },

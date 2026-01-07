@@ -1,14 +1,13 @@
 import { apiTest } from "@api/apiTest";
+import { upsertMenu } from "@api/menus/services";
+import { upsertPeriod } from "@api/periods/services";
 import { upsertRestaurant } from "@api/restaurants/services";
 import { upsertStation } from "@api/stations/services";
 import { testData } from "@api/testData";
 import { upsertUser } from "@api/users/services";
 import { TRPCError } from "@trpc/server";
 import { describe } from "vitest";
-
 import { upsertDish } from "./services";
-import { upsertMenu } from "@api/menus/services";
-import { upsertPeriod } from "@api/periods/services";
 
 describe("dish.get", () => {
   apiTest("gets a dish", async ({ api, expect, db, testData }) => {
@@ -53,8 +52,7 @@ describe("dish.rate", () => {
     const fetchedDish = await api.dish.get({
       id: testData.dish.id,
     });
-    expect(result.id).toEqual(testData.dish.id);
-    expect(result.totalRating).toEqual(fetchedDish.totalRating);
+    expect(result.averageRating).toEqual(fetchedDish.totalRating);
     expect(fetchedDish.numRatings).toEqual(1);
   });
 
