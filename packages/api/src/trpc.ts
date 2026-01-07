@@ -10,6 +10,8 @@
 // import type { Session } from "@zotmeal/auth";
 // import { auth } from "@zotmeal/auth";
 
+// import { Expo } from "expo-server-sdk";
+import type { PoolConfig } from "pg";
 import { initTRPC } from "@trpc/server";
 import { createDrizzle } from "@zotmeal/db";
 // import { Expo } from "expo-server-sdk";

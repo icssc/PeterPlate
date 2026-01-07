@@ -24,10 +24,10 @@
     "with-env": "dotenv -e ../../.env --"
   },
   "dependencies": {
-    "@neondatabase/serverless": "catalog:",
+    "@neondatabase/serverless": "^1.0.2",
     "dotenv-cli": "catalog:",
     "drizzle-dbml-generator": "catalog:",
-    "drizzle-orm": "catalog:",
+    "drizzle-orm": "^0.45.1",
     "drizzle-zod": "catalog:",
     "pg": "catalog:",
     "pino": "catalog:",
@@ -40,7 +40,7 @@
     "@zotmeal/eslint-config": "workspace:*",
     "@zotmeal/prettier-config": "workspace:*",
     "@zotmeal/tsconfig": "workspace:*",
-    "drizzle-kit": "catalog:",
+    "drizzle-kit": "^0.31.8",
     "eslint": "catalog:",
     "prettier": "catalog:",
     "typescript": "catalog:"

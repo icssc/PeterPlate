@@ -27,33 +27,37 @@ export const AEMEventListSchema = z.object({
 export const GetLocationRecipesDailySchema = z.object({
   data: z.object({
     getLocationRecipes: z.object({
-      locationRecipesMap: z.object({
-        stationSkuMap: z.array(
-          z.object({
-            id: z.number(),
-            skus: z.array(z.string()).nonempty(),
-          }),
-        ),
-      }),
-      products: z.object({
-        items: z.array(
-          z.object({
-            sku: z.string(),
-            name: z.string(),
-            images: z.array(
-              z.object({
-                url: z.string(),
-              }),
-            ),
-            attributes: z.array(
-              z.object({
-                name: z.string(),
-                value: z.union([z.string(), z.array(z.string())]),
-              }),
-            ),
-          }),
-        ),
-      }),
+      locationRecipesMap: z
+        .object({
+          stationSkuMap: z.array(
+            z.object({
+              id: z.number(),
+              skus: z.array(z.string()).nonempty(),
+            }),
+          ),
+        })
+        .nullable(),
+      products: z
+        .object({
+          items: z.array(
+            z.object({
+              sku: z.string(),
+              name: z.string(),
+              images: z.array(
+                z.object({
+                  url: z.string(),
+                }),
+              ),
+              attributes: z.array(
+                z.object({
+                  name: z.string(),
+                  value: z.union([z.string(), z.array(z.string())]),
+                }),
+              ),
+            }),
+          ),
+        })
+        .nullable(),
     }),
   }),
 });
