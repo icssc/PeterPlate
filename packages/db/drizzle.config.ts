@@ -1,12 +1,11 @@
-import { defineConfig } from "drizzle-kit";
 import { config } from "dotenv";
+import { defineConfig } from "drizzle-kit";
 import { join } from "path";
 
 // Get current file's directory
 config({ path: join(process.cwd(), ".env") });
 
 if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL is not set");
-
 
 export default defineConfig({
   dialect: "postgresql",
@@ -26,8 +25,11 @@ export default defineConfig({
     "./src/schema/restaurants.ts",
     "./src/schema/stations.ts",
     "./src/schema/users.ts",
-    "./src/schema/auth-schema.ts"
+    "./src/schema/auth-schema.ts",
   ],
+  migrations: {
+    schema: "public",
+  },
   dbCredentials: { url: process.env.DATABASE_URL, ssl: false },
   verbose: !process.env.CI,
 });
