@@ -40,7 +40,6 @@ describe("getUser", () => {
     await expect(
       db.transaction(async (trx) => {
         const insertedUser = await upsertUser(trx, testData.user);
-        console.log("insertedUser:", insertedUser);
         const fetchedUser = await getUser(trx, testData.user.id);
         expect(fetchedUser).toBeDefined();
         expect(fetchedUser?.id).toBe(testData.user.id);
