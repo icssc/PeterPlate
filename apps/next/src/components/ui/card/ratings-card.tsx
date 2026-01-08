@@ -7,8 +7,11 @@ import { formatFoodName, getFoodIcon } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
 import InteractiveStarRating from "../interactive-star-rating";
 import { DishInfo } from "@zotmeal/api";
-import { Dialog, DialogTrigger } from "../shadcn/dialog"; // use shadcn Dialog
+import { Dialog, DialogTrigger } from "../shadcn/dialog";
+import { Drawer, DrawerTrigger } from "../shadcn/drawer";
+import FoodDrawerContent from "../food-drawer-content";
 import FoodDialogContent from "../food-dialog-content";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 interface RatingsCardProps {
   food: DishInfo & {
@@ -65,7 +68,9 @@ const RatingsCardContent = React.forwardRef<
 RatingsCardContent.displayName = "RatingsCardContent";
 
 export default function RatingsCard({ food, userId }: RatingsCardProps) {
+  const isDesktop = useMediaQuery("(min-width: 768px)");
   const utils = trpc.useUtils();
+  
   const deleteRatingMutation = trpc.dish.deleteRating.useMutation({
     onSuccess: () => {
       utils.dish.rated.invalidate();
@@ -81,19 +86,32 @@ export default function RatingsCard({ food, userId }: RatingsCardProps) {
     }
   };
 
-  return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <RatingsCardContent
-          food={food}
-          handleDelete={handleDelete}
-          deleteLoading={deleteRatingMutation.isLoading}
-          userId={userId}
-        />
-      </DialogTrigger>
-      <FoodDialogContent dish={food} userId={userId} />
-    </Dialog>
-    // TODO: use drawer instead of dialog for mobile screens
-    // see food-card.tsx
-  );
+  if (isDesktop)
+    return (
+      <Dialog>
+        <DialogTrigger asChild>
+          <RatingsCardContent
+            food={food}
+            handleDelete={handleDelete}
+            deleteLoading={deleteRatingMutation.isLoading}
+            userId={userId}
+          />
+        </DialogTrigger>
+        <FoodDialogContent dish={food} userId={userId} />
+      </Dialog>
+    );
+  else
+    return (
+      <Drawer>
+        <DrawerTrigger asChild>
+          <RatingsCardContent
+            food={food}
+            handleDelete={handleDelete}
+            deleteLoading={deleteRatingMutation.isLoading}
+            userId={userId}
+          />
+        </DrawerTrigger>
+        <FoodDrawerContent dish={food} userId={userId} />
+      </Drawer>
+    );
 }
