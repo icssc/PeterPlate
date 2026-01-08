@@ -7,7 +7,7 @@ import { trpc } from "@/utils/trpc";
 import { useSession } from "@/utils/auth-client";
 import { useRouter } from "next/navigation";
 
-export default function Nutrition() {
+export default function MealTracker() {
   const router = useRouter();
   const { data: session, isPending } = useSession();
   const user = session?.user;
