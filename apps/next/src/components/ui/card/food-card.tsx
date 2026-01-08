@@ -13,7 +13,7 @@ import { Drawer, DrawerTrigger } from "../shadcn/drawer";
 import FoodDrawerContent from "../food-drawer-content";
 import { trpc } from "@/utils/trpc";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-import { useSession } from "@/utils/auth-client"; 
+// import { useSession } from "@/utils/auth-client"; 
 
 /**
  * Props for the FoodCardContent component.
@@ -35,6 +35,7 @@ interface FoodCardContentProps extends React.HTMLAttributes<HTMLDivElement> {
    * Handler invoked when a user toggles the favorite button.
    */
   onToggleFavorite?: (dishId: string, currentlyFavorite: boolean) => void;
+  userid?: string
 }
 
 /**
@@ -45,12 +46,9 @@ interface FoodCardContentProps extends React.HTMLAttributes<HTMLDivElement> {
 const FoodCardContent = React.forwardRef<
   HTMLDivElement,
   FoodCardContentProps
->(({ dish, isFavorited, favoriteDisabled, onToggleFavorite, className, ...divProps }, ref) => {
+>(({ dish, isFavorited, favoriteDisabled, onToggleFavorite, userid, className, ...divProps }, ref) => {
     const IconComponent = getFoodIcon(dish.name) ?? Utensils;
 
-    const { data: session, isPending } = useSession();
-    const user = session?.user;
-  
     /**
      * Fetches the average rating and rating count for the dish.
      */
@@ -85,14 +83,14 @@ const FoodCardContent = React.forwardRef<
     e.stopPropagation(); 
     
     // use toast or sonner to replace alert
-    if (!user?.id) {
+    if (!userid) {
       alert("You must be logged in to track meals");
       return;
     }
 
     logMealMutation.mutate({
       dishId: dish.id,
-      userId: user.id,
+      userId: userid,
       dishName: dish.name,
       servings: 1, // Default to 1 serving (TODO: add ability to manually input servings. Maybe a popup will ask to input a multiple of 0.5)
     });
@@ -105,8 +103,8 @@ const FoodCardContent = React.forwardRef<
     event.stopPropagation();
     
     // use toast or sonner to replace alert
-    if (!user?.id) {
-      alert("You must be logged in to track meals");
+    if (!userid) {
+      alert("You must be logged in to favorite meals");
       return;
     }
 
@@ -201,12 +199,14 @@ interface FoodCardProps extends DishInfo {
   favoriteIsLoading?: boolean;
   /** Handler to toggle the favorite state. */
   onToggleFavorite?: (dishId: string, currentlyFavorite: boolean) => void;
+  userid?: string
 }
 
 export default function FoodCard({
   isFavorited = false,
   favoriteIsLoading = false,
   onToggleFavorite,
+  userid,
   ...dish
 }: FoodCardProps): JSX.Element {
   const isDesktop = useMediaQuery("(min-width: 768px)");
@@ -234,6 +234,7 @@ export default function FoodCard({
             isFavorited={isFavorited}
             favoriteDisabled={favoriteIsLoading}
             onToggleFavorite={onToggleFavorite}
+            userid={userid}
           />
         </DrawerTrigger>
         <FoodDrawerContent {...dish} />

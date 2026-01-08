@@ -109,6 +109,7 @@ export default function DishesInfo({
                           !!isFavoritesLoading || !!isFavoritePending?.(dish.id)
                         }
                         onToggleFavorite={onToggleFavorite}
+                        userid={user?.id}
                       />
                     )}
                   </React.Fragment>
