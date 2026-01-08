@@ -4,14 +4,32 @@ import MealDivider from "@/components/ui/meal-divider";
 import { trpc } from "@/utils/trpc";
 import Image from "next/image";
 import RatingsCard from "@/components/ui/card/ratings-card";
+import { useRouter } from "next/navigation";
+import { useSession } from "@/utils/auth-client";
+import { useEffect } from "react";
 
 export default function RatedFoods() {
+  const router = useRouter();
+  const { data: session, isPending } = useSession();
+  const user = session?.user;
+
+  useEffect(() => {
+    // TODO: use sonner or toast instead of alerts
+    // to avoid duplicate warning
+    if (!isPending && !user?.id) {
+      alert("You must be logged in to track meals");
+      router.push("/");
+    }
+  }, [user]);
+
   const {
     data: ratedFoods,
     isLoading,
     error,
   } = trpc.dish.rated.useQuery({
-    userId: "default-user",
+    userId: user?.id
+  }, {
+    enabled: !!user?.id
   });
 
   return (
@@ -43,7 +61,7 @@ export default function RatedFoods() {
             <>
               {ratedFoods && ratedFoods.length > 0 ? (
                 ratedFoods.map((food: (typeof ratedFoods)[number]) => (
-                  <RatingsCard key={`${food.id}|${food.ratedAt}`} food={food} />
+                  <RatingsCard key={`${food.id}|${food.ratedAt}`} food={food} userId={user?.id} />
                 ))
               ) : (
                 <p className="text-center text-zinc-700 py-5">

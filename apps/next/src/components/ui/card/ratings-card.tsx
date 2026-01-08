@@ -15,6 +15,7 @@ interface RatingsCardProps {
     rating: number;
     ratedAt: string | Date;
   };
+  userId?: string;
 }
 
 const RatingsCardContent = React.forwardRef<
@@ -23,8 +24,9 @@ const RatingsCardContent = React.forwardRef<
     food: RatingsCardProps["food"];
     handleDelete: (e: React.MouseEvent) => Promise<void>;
     deleteLoading: boolean;
+    userId?: string
   } & React.HTMLAttributes<HTMLDivElement>
->(({ food, handleDelete, deleteLoading, ...divProps }, ref) => {
+>(({ food, handleDelete, deleteLoading, userId, ...divProps }, ref) => {
   const IconComponent = getFoodIcon(food.name) ?? Utensils;
 
   return (
@@ -45,7 +47,7 @@ const RatingsCardContent = React.forwardRef<
               className="flex flex-row items-center ml-4 gap-4"
               onClick={(e) => e.stopPropagation()} // keep stars/delete interactive
             >
-              <InteractiveStarRating dishId={food.id} />
+              <InteractiveStarRating dishId={food.id} userId={userId} />
               <button
                 onClick={handleDelete}
                 disabled={deleteLoading}
@@ -62,12 +64,12 @@ const RatingsCardContent = React.forwardRef<
 });
 RatingsCardContent.displayName = "RatingsCardContent";
 
-export default function RatingsCard({ food }: RatingsCardProps) {
+export default function RatingsCard({ food, userId }: RatingsCardProps) {
   const utils = trpc.useUtils();
   const deleteRatingMutation = trpc.dish.deleteRating.useMutation({
     onSuccess: () => {
       utils.dish.rated.invalidate();
-      utils.dish.getUserRating.invalidate({ userId: "default-user", dishId: food.id });
+      utils.dish.getUserRating.invalidate({ userId, dishId: food.id });
       utils.dish.getAverageRating.invalidate({ dishId: food.id });
     },
   });
@@ -75,7 +77,7 @@ export default function RatingsCard({ food }: RatingsCardProps) {
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (window.confirm("Delete this rating?")) {
-      await deleteRatingMutation.mutateAsync({ userId: "default-user", dishId: food.id });
+      await deleteRatingMutation.mutateAsync({ userId, dishId: food.id });
     }
   };
 
@@ -86,9 +88,12 @@ export default function RatingsCard({ food }: RatingsCardProps) {
           food={food}
           handleDelete={handleDelete}
           deleteLoading={deleteRatingMutation.isLoading}
+          userId={userId}
         />
       </DialogTrigger>
-      <FoodDialogContent {...food} />
+      <FoodDialogContent dish={food} userId={userId} />
     </Dialog>
+    // TODO: use drawer instead of dialog for mobile screens
+    // see food-card.tsx
   );
 }

@@ -9,19 +9,21 @@ const DEFAULT_USER_ID = "default-user"; // replace with real user ID when auth i
 
 interface InteractiveStarRatingProps {
   dishId: string;
+  userId?: string;
 }
 
-export default function InteractiveStarRating({
-  dishId,
-}: InteractiveStarRatingProps) {
-  const [userRating, setUserRating] = useState<number | undefined>(undefined);
+export default function InteractiveStarRating({ dishId, userId }: InteractiveStarRatingProps) {
+  const [userRating, setUserRating] = useState<number | undefined>(0);
   const [hoverRating, setHoverRating] = useState<number | null>(null);
 
-  const { rateDish } = useRatings();
+  const { rateDish } = useRatings(userId);
 
   const { data: existingRating } = trpc.user.getUserRating.useQuery(
-    { userId: DEFAULT_USER_ID, dishId },
-    { staleTime: 5 * 60 * 1000 },
+    { userId, dishId },
+    {
+      enabled: !!userId, 
+      staleTime: 5 * 60 * 1000
+    },
   );
 
   useEffect(() => {
@@ -31,6 +33,12 @@ export default function InteractiveStarRating({
   }, [existingRating]);
 
   const handleStarClick = (stars: number) => {
+    // use toast or sonner to replace alert
+    if (!userId) {
+      alert("You must be logged in to rate meals");
+      return;
+    }
+
     // clicking the same rating gives a 0
     const newRating = stars === userRating ? 0 : stars;
     setUserRating(newRating);

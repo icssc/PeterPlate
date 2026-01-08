@@ -31,7 +31,8 @@ import { useRatings } from "@/hooks/useRatings";
 import { trpc } from "@/utils/trpc";
 import InteractiveStarRating from "./interactive-star-rating";
 
-export default function FoodDrawerContent(dish: DishInfo) {
+export default function FoodDrawerContent( {dish, userId }: {dish: DishInfo; userId?: string}) {
+
   const ingredientsAvailable: boolean = dish.ingredients != null 
     && dish.ingredients.length > 0;
   const caloricInformationAvailable: boolean = dish.nutritionInfo.calories != null
@@ -86,7 +87,7 @@ export default function FoodDrawerContent(dish: DishInfo) {
             </div>
             {/* Interactive rating stars */}
             <div className="flex gap-2 ml-1 pt-0.5">
-              <InteractiveStarRating dishId={dish.id} />
+              <InteractiveStarRating dishId={dish.id} userId={userId} />
             </div>
             <DrawerDescription className="text-black text-left px-1 py-2 ">
               {enhanceDescription(dish.name, dish.description)}

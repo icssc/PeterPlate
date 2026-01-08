@@ -56,9 +56,6 @@ const FoodCardContent = React.forwardRef<
       { dishId: dish.id },
       { staleTime: 5 * 60 * 1000 },
     );
-    /**
-     * fetch above
-     */
 
     const averageRating = ratingData?.averageRating ?? 0;
     const ratingCount = ratingData?.ratingCount ?? 0;
@@ -220,9 +217,10 @@ export default function FoodCard({
             isFavorited={isFavorited}
             favoriteDisabled={favoriteIsLoading}
             onToggleFavorite={onToggleFavorite}
+            userid={userid}
           />
         </DialogTrigger>
-        <FoodDialogContent {...dish} />
+        <FoodDialogContent dish={dish} userId={userid} />
       </Dialog>
     );
   else
@@ -237,7 +235,7 @@ export default function FoodCard({
             userid={userid}
           />
         </DrawerTrigger>
-        <FoodDrawerContent {...dish} />
+        <FoodDrawerContent dish={dish} userId={userid} />
       </Drawer>
     );
 }
