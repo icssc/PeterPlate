@@ -4,17 +4,33 @@ import FoodCard from "@/components/ui/card/food-card";
 import FoodCardSkeleton from "@/components/ui/skeleton/food-card-skeleton";
 import { DEFAULT_USER_ID } from "@/config/user";
 import { useFavorites } from "@/hooks/useFavorites";
+import { useSession } from "@/utils/auth-client";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 type FavoriteEntry = ReturnType<typeof useFavorites>["favorites"][number];
 
 export default function MyFavoritesPage() {
+  const router = useRouter();
+  const { data: session, isPending } = useSession();
+  const user = session?.user;
+
+  useEffect(() => {
+    // TODO: use sonner or toast instead of alerts
+    // to avoid duplicate warning
+    if (!isPending && !user?.id) {
+      alert("You must be logged in to track meals");
+      router.push("/");
+    }
+  }, [user]);
+
   const {
     favorites,
     isLoadingFavorites,
     favoritesError,
     toggleFavorite,
     isFavoritePending,
-  } = useFavorites(DEFAULT_USER_ID);
+  } = useFavorites(user?.id);
 
   const hasFavorites = favorites.length > 0;
 

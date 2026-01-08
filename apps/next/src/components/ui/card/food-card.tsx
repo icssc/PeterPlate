@@ -84,6 +84,7 @@ const FoodCardContent = React.forwardRef<
   const handleLogMeal = (e: React.MouseEvent) => {
     e.stopPropagation(); 
     
+    // use toast or sonner to replace alert
     if (!user?.id) {
       alert("You must be logged in to track meals");
       return;
@@ -103,6 +104,12 @@ const FoodCardContent = React.forwardRef<
     event.preventDefault();
     event.stopPropagation();
     
+    // use toast or sonner to replace alert
+    if (!user?.id) {
+      alert("You must be logged in to track meals");
+      return;
+    }
+
     if (favoriteDisabled || !onToggleFavorite) return;
     onToggleFavorite(dish.id, Boolean(isFavorited));
   };

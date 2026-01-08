@@ -8,6 +8,7 @@ import { DishInfo } from "@zotmeal/api";
 import MealDivider from "./meal-divider";
 import { sortCategoryKeys } from "@/utils/funcs";
 import { useFavorites } from "@/hooks/useFavorites";
+import { useSession } from "@/utils/auth-client";
 
 
 /**
@@ -47,18 +48,21 @@ export default function DishesInfo({
   isError,
   errorMessage,
 }: DishesInfoProps): JSX.Element {
-  // Sort the dishes by category string
+  const { data: session, isPending } = useSession();
+  const user = session?.user;
+
   const {
     favoriteIds,
     isLoadingFavorites,
     toggleFavorite,
     isFavoritePending,
-  } = useFavorites();
+  } = useFavorites(user?.id);
 
   const favoriteDishIds = favoriteIds ?? [];
   const onToggleFavorite = toggleFavorite;
   const isFavoritesLoading = isLoadingFavorites;
-  
+
+  // Sort the dishes by category string
   let categoryMap: {[dishCategory : string]: DishInfo[]} = {};
   dishes.forEach((dish) => {
     if (dish.category in categoryMap)
