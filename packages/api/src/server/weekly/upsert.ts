@@ -128,7 +128,7 @@ export async function upsertMenusForWeek(
 
   if (dishesToUpsert.length > 0) {
     logger.info(`[weekly] Upserting ${dishesToUpsert.length} dishes...`);
-    Promise.allSettled(
+    await Promise.allSettled(
       dishesToUpsert.map(async d =>
         await parseAndUpsertDish(db, 
           restaurantInfo, 
