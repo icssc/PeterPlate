@@ -90,7 +90,7 @@ const NutritionBreakdown = ({ dateString, mealsEaten }: Props) => {
       </div>
       <div className="meal-history">
         {mealsEaten && mealsEaten.map((meal) => (
-          <div key={meal.userId + meal.dishId} className="flex items-center justify-between gap-4 rounded-lg border p-4 mb-3">
+          <div key={meal.id} className="flex items-center justify-between gap-4 rounded-lg border p-4 mb-3">
             <div className="flex flex-col">
               <h3 className="font-medium">{meal.servings} serving{meal.servings > 1 ? 's' : ''} of {meal.dishName}</h3>
               <p className="text-sm text-muted-foreground">

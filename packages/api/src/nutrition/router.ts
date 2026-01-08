@@ -50,6 +50,7 @@ export const nutritionRouter = createTRPCRouter({
         const meals = await ctx.db
           .select({
             // from logged_meals table
+            id: loggedMeals.id,
             userId: loggedMeals.userId,
             dishId: loggedMeals.dishId,
             dishName: loggedMeals.dishName,
