@@ -44,7 +44,7 @@
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
     "prettier": "catalog:",
-    "sst": "^3.0.0",
+    "sst": "3.17.25",
     "ts-node": "catalog:",
     "turbo": "catalog:",
     "typescript": "catalog:"
