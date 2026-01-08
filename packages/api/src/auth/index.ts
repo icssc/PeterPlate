@@ -13,7 +13,7 @@ if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL is not set");
 export const auth = betterAuth({
   debug: true,
   secret: process.env.NEXT_PUBLIC_BETTER_AUTH_SECRET,
-  baseURL: "http://localhost:8080",
+  baseURL: process.env.NEXT_PUBLIC_BASE_URL,
   socialProviders: {
     google: {
       clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,

@@ -4,15 +4,28 @@ import type { SelectLoggedMeal } from "@zotmeal/db";
 import { useEffect, useMemo, useState } from "react";
 import NutritionBreakdown from "@/components/ui/nutrition-breakdown";
 import { trpc } from "@/utils/trpc";
+import { useSession } from "@/utils/auth-client";
+import { useRouter } from "next/navigation";
 
-const DUMMY_USER_ID = "TEST_USER";
+export default function MealTracker() {
+  const router = useRouter();
+  const { data: session, isPending } = useSession();
+  const user = session?.user;
 
-export default function Nutrition() {
+  useEffect(() => {
+    // TODO: use sonner or toast instead of alerts
+    // to avoid duplicate warning
+    if (!isPending && !user?.id) {
+      alert("You must be logged in to track meals");
+      router.push("/");
+    }
+  }, [user]);
+
   const {
     data: meals,
     isLoading,
     error,
-  } = trpc.nutrition.getMealsInLastWeek.useQuery({ userId: DUMMY_USER_ID });
+  } = trpc.nutrition.getMealsInLastWeek.useQuery({ userId: user?.id });
   const [activeDayIndex, setActiveDayIndex] = useState<number | null>(null);
 
   const mealsGroupedByDay = useMemo(() => {
@@ -47,7 +60,7 @@ export default function Nutrition() {
     activeDayIndex !== null ? mealsGroupedByDay[activeDayIndex] : null;
 
   return (
-    <div className="cols-container h-screen flex">
+    <div className="cols-container min-h-screen flex">
       <div className="mt-12 w-[300px] border-r p-4 flex flex-col gap-2">
         {mealsGroupedByDay.map((day, index) => (
           <button

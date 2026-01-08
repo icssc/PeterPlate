@@ -13,9 +13,7 @@ import { Drawer, DrawerTrigger } from "../shadcn/drawer";
 import FoodDrawerContent from "../food-drawer-content";
 import { trpc } from "@/utils/trpc";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-
-// TODO: remove this variable and get the currently signed in user through session
-const DUMMY_USER_ID = "TEST_USER";
+// import { useSession } from "@/utils/auth-client"; 
 
 /**
  * Props for the FoodCardContent component.
@@ -37,6 +35,7 @@ interface FoodCardContentProps extends React.HTMLAttributes<HTMLDivElement> {
    * Handler invoked when a user toggles the favorite button.
    */
   onToggleFavorite?: (dishId: string, currentlyFavorite: boolean) => void;
+  userid?: string
 }
 
 /**
@@ -47,9 +46,9 @@ interface FoodCardContentProps extends React.HTMLAttributes<HTMLDivElement> {
 const FoodCardContent = React.forwardRef<
   HTMLDivElement,
   FoodCardContentProps
->(({ dish, isFavorited, favoriteDisabled, onToggleFavorite, className, ...divProps }, ref) => {
+>(({ dish, isFavorited, favoriteDisabled, onToggleFavorite, userid, className, ...divProps }, ref) => {
     const IconComponent = getFoodIcon(dish.name) ?? Utensils;
-  
+
     /**
      * Fetches the average rating and rating count for the dish.
      */
@@ -57,9 +56,6 @@ const FoodCardContent = React.forwardRef<
       { dishId: dish.id },
       { staleTime: 5 * 60 * 1000 },
     );
-    /**
-     * fetch above
-     */
 
     const averageRating = ratingData?.averageRating ?? 0;
     const ratingCount = ratingData?.ratingCount ?? 0;
@@ -83,15 +79,15 @@ const FoodCardContent = React.forwardRef<
   const handleLogMeal = (e: React.MouseEvent) => {
     e.stopPropagation(); 
     
-    if (!DUMMY_USER_ID) {
-      //TODO: Replace this with a shad/cn sonner or equivalent.
+    // use toast or sonner to replace alert
+    if (!userid) {
       alert("You must be logged in to track meals");
       return;
     }
 
     logMealMutation.mutate({
       dishId: dish.id,
-      userId: DUMMY_USER_ID,
+      userId: userid,
       dishName: dish.name,
       servings: 1, // Default to 1 serving (TODO: add ability to manually input servings. Maybe a popup will ask to input a multiple of 0.5)
     });
@@ -103,6 +99,12 @@ const FoodCardContent = React.forwardRef<
     event.preventDefault();
     event.stopPropagation();
     
+    // use toast or sonner to replace alert
+    if (!userid) {
+      alert("You must be logged in to favorite meals");
+      return;
+    }
+
     if (favoriteDisabled || !onToggleFavorite) return;
     onToggleFavorite(dish.id, Boolean(isFavorited));
   };
@@ -127,8 +129,11 @@ const FoodCardContent = React.forwardRef<
                   {/* Average rating display - grey outline star */}
                     <div className="flex gap-1 items-center">
                       <Star
-                        className="w-4 h-4 stroke-zinc-200"
-                        strokeWidth={1}
+                        className={`w-4 h-4 ${
+                          averageRating > 0
+                          ? "fill-amber-400 stroke-amber-400"
+                          : "stroke-zinc-200"
+                        } strokeWidth={1}`}
                       />
                       <span className="text-zinc-400 text-sm">
                         {averageRating.toFixed(1)} ({ratingCount})
@@ -194,12 +199,14 @@ interface FoodCardProps extends DishInfo {
   favoriteIsLoading?: boolean;
   /** Handler to toggle the favorite state. */
   onToggleFavorite?: (dishId: string, currentlyFavorite: boolean) => void;
+  userid?: string
 }
 
 export default function FoodCard({
   isFavorited = false,
   favoriteIsLoading = false,
   onToggleFavorite,
+  userid,
   ...dish
 }: FoodCardProps): JSX.Element {
   const isDesktop = useMediaQuery("(min-width: 768px)");
@@ -213,9 +220,10 @@ export default function FoodCard({
             isFavorited={isFavorited}
             favoriteDisabled={favoriteIsLoading}
             onToggleFavorite={onToggleFavorite}
+            userid={userid}
           />
         </DialogTrigger>
-        <FoodDialogContent {...dish} />
+        <FoodDialogContent dish={dish} userId={userid} />
       </Dialog>
     );
   else
@@ -227,9 +235,10 @@ export default function FoodCard({
             isFavorited={isFavorited}
             favoriteDisabled={favoriteIsLoading}
             onToggleFavorite={onToggleFavorite}
+            userid={userid}
           />
         </DrawerTrigger>
-        <FoodDrawerContent {...dish} />
+        <FoodDrawerContent dish={dish} userId={userid} />
       </Drawer>
     );
 }
