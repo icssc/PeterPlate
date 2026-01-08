@@ -60,7 +60,7 @@ export default function MealTracker() {
     activeDayIndex !== null ? mealsGroupedByDay[activeDayIndex] : null;
 
   return (
-    <div className="cols-container h-screen flex">
+    <div className="cols-container min-h-screen flex">
       <div className="mt-12 w-[300px] border-r p-4 flex flex-col gap-2">
         {mealsGroupedByDay.map((day, index) => (
           <button

@@ -129,8 +129,11 @@ const FoodCardContent = React.forwardRef<
                   {/* Average rating display - grey outline star */}
                     <div className="flex gap-1 items-center">
                       <Star
-                        className="w-4 h-4 stroke-zinc-200"
-                        strokeWidth={1}
+                        className={`w-4 h-4 ${
+                          averageRating > 0
+                          ? "fill-amber-400 stroke-amber-400"
+                          : "stroke-zinc-200"
+                        } strokeWidth={1}`}
                       />
                       <span className="text-zinc-400 text-sm">
                         {averageRating.toFixed(1)} ({ratingCount})
