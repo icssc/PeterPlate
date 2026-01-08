@@ -11,6 +11,11 @@ import SidebarDivider from "./sidebar-divider";
 import { Settings2, CalendarFold, LogOut, House, Info, Pin, Trophy, StarIcon, Heart, Star, User, NotebookPen, Carrot } from "lucide-react";
 import { useSession, signOut } from "@/utils/auth-client"; // BetterAuth React hook
 
+// Dark mode
+import { useEffect, useState } from "react";
+import { useTheme } from "next-themes";
+import { Moon, Sun } from "lucide-react";
+
 /**
  * `SidebarContent` is a presentational component that renders the main content
  * displayed within the application's sidebar.
