@@ -39,6 +39,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Clear Pulumi cache
+        run: |
+          rm -rf ~/.pulumi
+          rm -rf ~/.sst/bin
+
+      - name: Verify Pulumi version
+        run: pulumi version
+
       - name: Setup Node.js and pnpm
         uses: ./.github/actions/setup-node-and-pnpm
 

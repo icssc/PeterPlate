@@ -180,8 +180,8 @@ importers:
         specifier: 'catalog:'
         version: 3.3.1
       sst:
-        specifier: '3.12'
-        version: 3.12.6
+        specifier: ~3.17.25
+        version: 3.17.25
       ts-node:
         specifier: 'catalog:'
         version: 10.9.2(@swc/core@1.8.0(@swc/helpers@0.5.15))(@types/node@25.0.3)(typescript@5.6.2)
@@ -7096,33 +7096,48 @@ packages:
     resolution: {integrity: sha512-r1X4KsBGedJqo7h8F5c4Ybpcr5RjyP+aWIG007uBPRjmdQWfEiVLzSK71Zji1B9sKxwaCvD8y8cwSkYrlLiRRg==}
     engines: {node: '>=10.16.0'}
 
-  sst-darwin-arm64@3.12.6:
-    resolution: {integrity: sha512-+97rmMpvEayh3H4HIpuFjK75gS3gXVkhV562uKVLFr7yJp+bz7hu+y2ifY3CA8hQhUEKc7hhkrxL00b30LwuCw==}
+  sst-darwin-arm64@3.17.25:
+    resolution: {integrity: sha512-g6Bft4SNVnuZnk1uI0icWiLH5yqboqfk2Jhn1cvE9cXCiiPzX6usSAAKAzvPAO9sUDqYnL6dMT6KgFVmKo53Kw==}
     cpu: [arm64]
     os: [darwin]
 
-  sst-darwin-x64@3.12.6:
-    resolution: {integrity: sha512-0vznzjH+P1shwtAwGgLxGNHG+OgCxGeGJ1Mg86pPdVjj8Dfz2KQXSXVzljtAGxhj/OX/PVn4Y+1H1SIPe9WPXA==}
+  sst-darwin-x64@3.17.25:
+    resolution: {integrity: sha512-WGpjYAaWNpMJeYANASgxOjbIAspRg1NbTSC3DakkCBFos6pJ09QYIXgXYbNeEhYALEmaoaSEaMuXbQ//cq71Jg==}
     cpu: [x64]
     os: [darwin]
 
-  sst-linux-arm64@3.12.6:
-    resolution: {integrity: sha512-5vRAamJdhBF7eM9WmySmlHi6S79I6B0jJFS17mLg2vI0Rd+Al2By7yPZbXwNUzpEuVMg1HpNwl+JpegcyDwAaA==}
+  sst-linux-arm64@3.17.25:
+    resolution: {integrity: sha512-nrJ3D5j58ss5AT0VSCIi2DtClTAphyZFIbc9VDGQfaD/4bJ5Uldg9knRWnq6C4EWPAofpuGtMsOl8Ntwksa1Og==}
     cpu: [arm64]
     os: [linux]
 
-  sst-linux-x64@3.12.6:
-    resolution: {integrity: sha512-kLUMlJsyXK4J0E0Ky5AcSDdMeWN2QrbfnANRUvYjAZUQdhNykz5Nr5JpUHi42I2mCb5km3AHeUoCTTCCnqocVw==}
+  sst-linux-x64@3.17.25:
+    resolution: {integrity: sha512-BNaOEU3mwGuIMT8frQRFfDlb8/5Z0Wq4HVfw+a8M5tnEotvUr7692oH6jzOFEkfCsdEsrRBEPfrNLvNfZO7PKQ==}
     cpu: [x64]
     os: [linux]
 
-  sst-linux-x86@3.12.6:
-    resolution: {integrity: sha512-j7WkeFjCA6Pa6XgTXwBDXm0rfJIMHT74srLuo4s/8e6LB2MhNUH+qtyKiBCtJDLfPni8dWOiT3BUMj3Cv9gVBg==}
+  sst-linux-x86@3.17.25:
+    resolution: {integrity: sha512-4wcnoXuFM9wew9yj8QcfqUxkjyVncezs4BSE1bCy2zoVHI1p2T13YAtGRFaWLAuyBy6YxrXK/SO1Rm0CqMX0yg==}
     cpu: [x86]
     os: [linux]
 
-  sst@3.12.6:
-    resolution: {integrity: sha512-bizm/7qag4+ap2FzXK2l/AeUtRtHDmsQRY556abbYScpcgMMJLchpsP6E9q27ceg1VzOyAw0M9ocNmJN1OeeTg==}
+  sst-win32-arm64@3.17.25:
+    resolution: {integrity: sha512-4BsgY4RNXkcSbdbDMKDxn70+HPYslQTL8IVVSL2sf/trCqH9eoLyS6qR+2dU2LQJp4oxIl5FbX9mIli6U6+vnQ==}
+    cpu: [arm64]
+    os: [win32]
+
+  sst-win32-x64@3.17.25:
+    resolution: {integrity: sha512-awU34Bvpm0Z+3k9d2f6DOaKfEBdmbyKIckLrrhGkQmchQ3N2e/ZU9frLpKlDrNpsLCER9eTPHTUUv7fxLFPt+w==}
+    cpu: [x64]
+    os: [win32]
+
+  sst-win32-x86@3.17.25:
+    resolution: {integrity: sha512-1vmUYMnb1ALrjnyQ3yz8EwGevYD33OaCxAXlE0e7BOSSTAAFBYy1JlgRJYvhJdTxcg/xT3q8QXIgeyk5oCUxhw==}
+    cpu: [x86]
+    os: [win32]
+
+  sst@3.17.25:
+    resolution: {integrity: sha512-WSXsr1gaRDbipLCxKIGVRpemt/f/rYXxArNQbZngmW1irkdxagjZRbqdtcXqARW1wlGCvE8Nf7bveiYjlDWkYA==}
     hasBin: true
 
   stable-hash@0.0.4:
@@ -12274,7 +12289,7 @@ snapshots:
       '@next/eslint-plugin-next': 16.1.1
       eslint: 9.21.0(jiti@2.6.1)
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.8.3(eslint-plugin-import@2.32.0)(eslint@9.21.0(jiti@2.6.1))
+      eslint-import-resolver-typescript: 3.8.3(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.52.0(eslint@9.21.0(jiti@2.6.1))(typescript@5.8.2))(eslint@9.21.0(jiti@2.6.1)))(eslint@9.21.0(jiti@2.6.1))
       eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.52.0(eslint@9.21.0(jiti@2.6.1))(typescript@5.8.2))(eslint-import-resolver-typescript@3.8.3)(eslint@9.21.0(jiti@2.6.1))
       eslint-plugin-jsx-a11y: 6.10.2(eslint@9.21.0(jiti@2.6.1))
       eslint-plugin-react: 7.37.4(eslint@9.21.0(jiti@2.6.1))
@@ -12306,7 +12321,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-import-resolver-typescript@3.8.3(eslint-plugin-import@2.32.0)(eslint@9.21.0(jiti@2.6.1)):
+  eslint-import-resolver-typescript@3.8.3(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.52.0(eslint@9.21.0(jiti@2.6.1))(typescript@5.8.2))(eslint@9.21.0(jiti@2.6.1)))(eslint@9.21.0(jiti@2.6.1)):
     dependencies:
       '@nolyfill/is-core-module': 1.0.39
       debug: 4.4.3
@@ -12321,14 +12336,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.12.1(@typescript-eslint/parser@8.52.0(eslint@9.21.0(jiti@2.6.1))(typescript@5.8.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.8.3)(eslint@9.21.0(jiti@2.6.1)):
+  eslint-module-utils@2.12.1(@typescript-eslint/parser@8.52.0(eslint@9.21.0(jiti@2.6.1))(typescript@5.8.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.8.3(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.52.0(eslint@9.21.0(jiti@2.6.1))(typescript@5.8.2))(eslint@9.21.0(jiti@2.6.1)))(eslint@9.21.0(jiti@2.6.1)))(eslint@9.21.0(jiti@2.6.1)):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
       '@typescript-eslint/parser': 8.52.0(eslint@9.21.0(jiti@2.6.1))(typescript@5.8.2)
       eslint: 9.21.0(jiti@2.6.1)
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.8.3(eslint-plugin-import@2.32.0)(eslint@9.21.0(jiti@2.6.1))
+      eslint-import-resolver-typescript: 3.8.3(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.52.0(eslint@9.21.0(jiti@2.6.1))(typescript@5.8.2))(eslint@9.21.0(jiti@2.6.1)))(eslint@9.21.0(jiti@2.6.1))
     transitivePeerDependencies:
       - supports-color
 
@@ -12380,7 +12395,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 9.21.0(jiti@2.6.1)
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.1(@typescript-eslint/parser@8.52.0(eslint@9.21.0(jiti@2.6.1))(typescript@5.8.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.8.3)(eslint@9.21.0(jiti@2.6.1))
+      eslint-module-utils: 2.12.1(@typescript-eslint/parser@8.52.0(eslint@9.21.0(jiti@2.6.1))(typescript@5.8.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.8.3(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.52.0(eslint@9.21.0(jiti@2.6.1))(typescript@5.8.2))(eslint@9.21.0(jiti@2.6.1)))(eslint@9.21.0(jiti@2.6.1)))(eslint@9.21.0(jiti@2.6.1))
       hasown: 2.0.2
       is-core-module: 2.16.1
       is-glob: 4.0.3
@@ -15021,22 +15036,31 @@ snapshots:
       cpu-features: 0.0.10
       nan: 2.22.0
 
-  sst-darwin-arm64@3.12.6:
+  sst-darwin-arm64@3.17.25:
     optional: true
 
-  sst-darwin-x64@3.12.6:
+  sst-darwin-x64@3.17.25:
     optional: true
 
-  sst-linux-arm64@3.12.6:
+  sst-linux-arm64@3.17.25:
     optional: true
 
-  sst-linux-x64@3.12.6:
+  sst-linux-x64@3.17.25:
     optional: true
 
-  sst-linux-x86@3.12.6:
+  sst-linux-x86@3.17.25:
     optional: true
 
-  sst@3.12.6:
+  sst-win32-arm64@3.17.25:
+    optional: true
+
+  sst-win32-x64@3.17.25:
+    optional: true
+
+  sst-win32-x86@3.17.25:
+    optional: true
+
+  sst@3.17.25:
     dependencies:
       aws-sdk: 2.1692.0
       aws4fetch: 1.0.18
@@ -15044,11 +15068,14 @@ snapshots:
       opencontrol: 0.0.6
       openid-client: 5.6.4
     optionalDependencies:
-      sst-darwin-arm64: 3.12.6
-      sst-darwin-x64: 3.12.6
-      sst-linux-arm64: 3.12.6
-      sst-linux-x64: 3.12.6
-      sst-linux-x86: 3.12.6
+      sst-darwin-arm64: 3.17.25
+      sst-darwin-x64: 3.17.25
+      sst-linux-arm64: 3.17.25
+      sst-linux-x64: 3.17.25
+      sst-linux-x86: 3.17.25
+      sst-win32-arm64: 3.17.25
+      sst-win32-x64: 3.17.25
+      sst-win32-x86: 3.17.25
     transitivePeerDependencies:
       - supports-color
 
