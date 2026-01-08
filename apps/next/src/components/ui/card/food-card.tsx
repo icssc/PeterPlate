@@ -13,9 +13,7 @@ import { Drawer, DrawerTrigger } from "../shadcn/drawer";
 import FoodDrawerContent from "../food-drawer-content";
 import { trpc } from "@/utils/trpc";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-
-// TODO: remove this variable and get the currently signed in user through session
-const DUMMY_USER_ID = "TEST_USER";
+import { useSession } from "@/utils/auth-client"; 
 
 /**
  * Props for the FoodCardContent component.
@@ -49,6 +47,9 @@ const FoodCardContent = React.forwardRef<
   FoodCardContentProps
 >(({ dish, isFavorited, favoriteDisabled, onToggleFavorite, className, ...divProps }, ref) => {
     const IconComponent = getFoodIcon(dish.name) ?? Utensils;
+
+    const { data: session, isPending } = useSession();
+    const user = session?.user;
   
     /**
      * Fetches the average rating and rating count for the dish.
@@ -83,15 +84,14 @@ const FoodCardContent = React.forwardRef<
   const handleLogMeal = (e: React.MouseEvent) => {
     e.stopPropagation(); 
     
-    if (!DUMMY_USER_ID) {
-      //TODO: Replace this with a shad/cn sonner or equivalent.
+    if (!user?.id) {
       alert("You must be logged in to track meals");
       return;
     }
 
     logMealMutation.mutate({
       dishId: dish.id,
-      userId: DUMMY_USER_ID,
+      userId: user.id,
       dishName: dish.name,
       servings: 1, // Default to 1 serving (TODO: add ability to manually input servings. Maybe a popup will ask to input a multiple of 0.5)
     });

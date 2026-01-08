@@ -2,9 +2,6 @@ import { trpc } from "@/utils/trpc";
 import { SelectLoggedMeal } from "../../../../../packages/db/src/schema";
 import { ProgressDonut } from "../progress-donut";
 
-// TODO: remove this variable and get the currently signed in user through session
-const DUMMY_USER_ID = "TEST_USER";
-
 interface NutritionData {
   calories: number,
   protein_g: number,
@@ -66,12 +63,6 @@ const NutritionBreakdown = ({ dateString, mealsEaten }: Props) => {
   const removeBtnOnClick = (e: React.MouseEvent, userId: string | null, dishId: string | null) => {
     e.preventDefault();
     if (!userId || !dishId) return;
-
-    if (!DUMMY_USER_ID) {
-      //TODO: Replace this with a shad/cn sonner or equivalent.
-      alert("You must be logged in to track meals");
-      return;
-    }
 
     deleteLoggedMealMutation.mutate({ userId, dishId });
   };

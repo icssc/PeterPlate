@@ -4,15 +4,28 @@ import type { SelectLoggedMeal } from "@zotmeal/db";
 import { useEffect, useMemo, useState } from "react";
 import NutritionBreakdown from "@/components/ui/nutrition-breakdown";
 import { trpc } from "@/utils/trpc";
-
-const DUMMY_USER_ID = "TEST_USER";
+import { useSession } from "@/utils/auth-client";
+import { useRouter } from "next/navigation";
 
 export default function Nutrition() {
+  const router = useRouter();
+  const { data: session, isPending } = useSession();
+  const user = session?.user;
+
+  useEffect(() => {
+    // TODO: use sonner or toast instead of alerts
+    // to avoid duplicate warning
+    if (!isPending && !user?.id) {
+      alert("You must be logged in to track meals");
+      router.push("/");
+    }
+  }, [user]);
+
   const {
     data: meals,
     isLoading,
     error,
-  } = trpc.nutrition.getMealsInLastWeek.useQuery({ userId: DUMMY_USER_ID });
+  } = trpc.nutrition.getMealsInLastWeek.useQuery({ userId: user?.id });
   const [activeDayIndex, setActiveDayIndex] = useState<number | null>(null);
 
   const mealsGroupedByDay = useMemo(() => {
