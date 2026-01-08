@@ -2,7 +2,6 @@
 
 import FoodCard from "@/components/ui/card/food-card";
 import FoodCardSkeleton from "@/components/ui/skeleton/food-card-skeleton";
-import { DEFAULT_USER_ID } from "@/config/user";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useSession } from "@/utils/auth-client";
 import { useRouter } from "next/navigation";
@@ -69,6 +68,7 @@ export default function MyFavoritesPage() {
                   isFavorited
                   favoriteIsLoading={isFavoritePending?.(favorite.dishId)}
                   onToggleFavorite={toggleFavorite}
+                  userid={user?.id}
                 />
               ))}
             </div>
