@@ -90,8 +90,14 @@ export default function Toolbar(): JSX.Element {
 
     return (
       <div 
-        className="w-full h-18 absolute flex items-center justify-between px-4 py-2 
-          bg-zinc-50 bg-opacity-45 backdrop-blur-md z-10">
+        className="
+            absolute z-10 flex w-full items-center justify-between
+            px-4 py-2
+            bg-background/60 text-foreground
+            backdrop-blur-md
+            border-b border-border
+          "
+      >
         <Link href="/">
           <Image
             className="rounded-full cursor-pointer"
