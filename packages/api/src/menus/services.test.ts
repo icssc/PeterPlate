@@ -38,14 +38,15 @@ describe("getDateList", () => {
   apiTest("gets list of pickable dates", async ({ expect, db }) => {
     const res = await getPickableDates(db);
     if (res) {
-      res.forEach(d => {
+      res.forEach((d) => {
         expect(d).toBeInstanceOf(Date);
-      })
+        // Ensure dates are normalized to Noon UTC to avoid timezone shifting
+        expect(d.getUTCHours()).toBe(12);
+      });
 
       // check dates are unique and asc
       for (let i = 1; i < res.length; i++)
-        expect(res[i]!.getTime())
-          .toBeGreaterThan(res[i - 1]!.getTime());
+        expect(res[i]!.getTime()).toBeGreaterThan(res[i - 1]!.getTime());
     }
   });
-})
+});

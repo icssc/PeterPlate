@@ -41,6 +41,7 @@ export default function Toolbar(): JSX.Element {
 
   useEffect(() => {
     if (dateRes) {
+      console.log("Pickable Dates (Front):", dateRes);
       setEnabledDates(dateRes);
       setCalendarRange({
         earliest: dateRes[0],
