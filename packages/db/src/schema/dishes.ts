@@ -1,9 +1,12 @@
 import { relations } from "drizzle-orm";
 import { integer, pgTable, text } from "drizzle-orm/pg-core";
 
-import { dietRestrictions, InsertDietRestriction } from "./dietRestrictions";
+import {
+  dietRestrictions,
+  type InsertDietRestriction,
+} from "./dietRestrictions";
 import { dishesToMenus, menus } from "./menus";
-import { InsertNutritionInfo, nutritionInfos } from "./nutritionInfos";
+import { type InsertNutritionInfo, nutritionInfos } from "./nutritionInfos";
 import { stations } from "./stations";
 import { metadataColumns } from "./utils";
 

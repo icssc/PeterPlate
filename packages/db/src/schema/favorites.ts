@@ -53,4 +53,3 @@ export const favoritesRelations = relations(favorites, ({ one }) => ({
  */
 export type InsertFavorite = typeof favorites.$inferInsert;
 export type SelectFavorite = typeof favorites.$inferSelect;
-

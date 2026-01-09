@@ -1,8 +1,7 @@
-import { pgTable, text, time, date, primaryKey } from "drizzle-orm/pg-core";
-
-import { metadataColumns } from "./utils";
+import { date, pgTable, primaryKey, text, time } from "drizzle-orm/pg-core";
 import { restaurantIdEnum } from "./enums";
 import { restaurants } from "./restaurants";
+import { metadataColumns } from "./utils";
 
 export const periods = pgTable(
   "periods",

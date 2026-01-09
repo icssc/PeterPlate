@@ -1,5 +1,12 @@
 import { Utensils } from "lucide-react";
-import { foodIconKeywords, foodIcons, HallEnum, LucideIconComponent, numToMonth, preferredCategoryOrder } from "./types";
+import {
+  foodIconKeywords,
+  foodIcons,
+  HallEnum,
+  type LucideIconComponent,
+  numToMonth,
+  preferredCategoryOrder,
+} from "./types";
 
 const BWINE_ADDY: string = "557+E+Peltason Dr%2C+Irvine%2C+CA%2C+92617";
 const ANTEAT_ADDY: string = "4001+Mesa+Rd%2C+Irvine%2C+CA%2C+92617";
@@ -11,25 +18,81 @@ const ANTEAT_ADDY: string = "4001+Mesa+Rd%2C+Irvine%2C+CA%2C+92617";
  */
 function toTitleCase(str: string): string {
   if (!str) return ""; // Return empty string if undefined/null
-  return str.toLowerCase().replace(/\b\w/g, s => s.toUpperCase());
+  return str.toLowerCase().replace(/\b\w/g, (s) => s.toUpperCase());
 }
 
 // Internal keyword lists for enhanceDescription function.
-const fruitKeywords = ["strawberry", "strawberries", "banana", "apple",
-  "orange", "grapes", "melon", "berries", "cantaloupe", "pineapple", "peach",
-  "pear"];
+const fruitKeywords = [
+  "strawberry",
+  "strawberries",
+  "banana",
+  "apple",
+  "orange",
+  "grapes",
+  "melon",
+  "berries",
+  "cantaloupe",
+  "pineapple",
+  "peach",
+  "pear",
+];
 const preparedFruitKeywords = ["cubed", "sliced", "diced fruit", "medley"];
-const healthyKeywords = ["oats", "chia", "yogurt", "quinoa", "salad",
-  "vegetable", "tofu", "bean", "lentil", "oatmeal", "cream of wheat", "kale",
-  "farro"];
-const comfortingKeywords = ["soup", "stew", "pasta", "rice bowl",
-  "mashed potatoes", "casserole", "curry", "chicken", "bacon", "sausage",
-  "egg roll", "burger"];
-const bakeryKeywords = ["muffin", "croissant", "scone", "bagel", "bread",
-  "fries", "pizza", "cake", "cookie", "pastry"];
-const toppingKeywords = ["lettuce", "carrots", "croutons", "spinach",
-  "bell peppers", "cucumbers", "beans", "tomato", "cheese", "onion", "pickle",
-  "olive", "mushroom"];
+const healthyKeywords = [
+  "oats",
+  "chia",
+  "yogurt",
+  "quinoa",
+  "salad",
+  "vegetable",
+  "tofu",
+  "bean",
+  "lentil",
+  "oatmeal",
+  "cream of wheat",
+  "kale",
+  "farro",
+];
+const comfortingKeywords = [
+  "soup",
+  "stew",
+  "pasta",
+  "rice bowl",
+  "mashed potatoes",
+  "casserole",
+  "curry",
+  "chicken",
+  "bacon",
+  "sausage",
+  "egg roll",
+  "burger",
+];
+const bakeryKeywords = [
+  "muffin",
+  "croissant",
+  "scone",
+  "bagel",
+  "bread",
+  "fries",
+  "pizza",
+  "cake",
+  "cookie",
+  "pastry",
+];
+const toppingKeywords = [
+  "lettuce",
+  "carrots",
+  "croutons",
+  "spinach",
+  "bell peppers",
+  "cucumbers",
+  "beans",
+  "tomato",
+  "cheese",
+  "onion",
+  "pickle",
+  "olive",
+  "mushroom",
+];
 
 /**
  * Enhances a dish description with more engaging text based on keywords.
@@ -38,7 +101,10 @@ const toppingKeywords = ["lettuce", "carrots", "croutons", "spinach",
  * @param description The original description of the dish (can be null or undefined).
  * @returns An enhanced description string.
  */
-function enhanceDescription(dish: string, description: string | null | undefined): string {
+function enhanceDescription(
+  dish: string,
+  description: string | null | undefined,
+): string {
   if (!description || description.trim() === "") {
     description = dish;
   }
@@ -46,32 +112,39 @@ function enhanceDescription(dish: string, description: string | null | undefined
   let lowerDesc = description.toLowerCase();
   const lowerDish = dish.toLowerCase();
 
-  if (fruitKeywords.some(keyword => lowerDesc === keyword || lowerDesc === keyword + 's')) {
+  if (
+    fruitKeywords.some(
+      (keyword) => lowerDesc === keyword || lowerDesc === `${keyword}s`,
+    )
+  ) {
     return `Fresh and simple ${lowerDesc}. A light and healthy choice.`;
   }
 
-  if (preparedFruitKeywords.some(keyword => lowerDesc.includes(keyword)) && fruitKeywords.some(keyword => lowerDesc.includes(keyword))) {
+  if (
+    preparedFruitKeywords.some((keyword) => lowerDesc.includes(keyword)) &&
+    fruitKeywords.some((keyword) => lowerDesc.includes(keyword))
+  ) {
     return `Refreshing ${lowerDesc}. Perfect for a quick energy boost.`;
   }
 
-  if (bakeryKeywords.some(keyword => lowerDish.includes(keyword))) {
-    let addPrefix: boolean = !lowerDesc.includes("freshly baked");
-    if (addPrefix) lowerDesc = "Freshly prepared " + lowerDesc;
-    else lowerDesc = lowerDesc[0].toUpperCase() + lowerDesc.slice(1);
+  if (bakeryKeywords.some((keyword) => lowerDish.includes(keyword))) {
+    const addPrefix: boolean = !lowerDesc.includes("freshly baked");
+    if (addPrefix) lowerDesc = `Freshly prepared ${lowerDesc}`;
+    else lowerDesc = `${lowerDesc[0].toUpperCase()}${lowerDesc.slice(1)}`;
 
     return `${lowerDesc}. A perfect treat.`;
   }
 
-  if (comfortingKeywords.some(keyword => lowerDish.includes(keyword))) {
+  if (comfortingKeywords.some((keyword) => lowerDish.includes(keyword))) {
     return `Warm and comforting ${lowerDesc}. A satisfying classic.`;
   }
 
-  if (healthyKeywords.some(keyword => lowerDish.includes(keyword))) {
+  if (healthyKeywords.some((keyword) => lowerDish.includes(keyword))) {
     return `A nutritious choice: ${lowerDesc}. Packed with wholesome ingredients.`;
   }
 
-  if (toppingKeywords.some(keyword => lowerDish.includes(keyword))) {
-    return `Enjoy ${lowerDesc} as a tasty topping or by itself.`
+  if (toppingKeywords.some((keyword) => lowerDish.includes(keyword))) {
+    return `Enjoy ${lowerDesc} as a tasty topping or by itself.`;
   }
 
   if (description.length < 40) {
@@ -79,7 +152,7 @@ function enhanceDescription(dish: string, description: string | null | undefined
   }
 
   // Return original if no rules match or it's already reasonably descriptive
-  return description.endsWith('.') ? description : (description + '.');
+  return description.endsWith(".") ? description : description + ".";
 }
 
 /**
@@ -90,10 +163,14 @@ function enhanceDescription(dish: string, description: string | null | undefined
 function getDayWithSuffix(day: number): string {
   if (day > 3 && day < 21) return `${day}th`; // for 4th to 20th
   switch (day % 10) {
-    case 1:  return `${day}st`;
-    case 2:  return `${day}nd`;
-    case 3:  return `${day}rd`;
-    default: return `${day}th`;
+    case 1:
+      return `${day}st`;
+    case 2:
+      return `${day}nd`;
+    case 3:
+      return `${day}rd`;
+    default:
+      return `${day}th`;
   }
 }
 
@@ -115,9 +192,8 @@ function dateToString(startDate: Date, endDate: Date): string {
  * @returns A string representation of the minutes, padded with a zero if needed.
  */
 function padMinutes(minutes: number): string {
-  let str: string = minutes+"";
-  while (str.length < 2)
-    str = "0" + str
+  let str: string = `${minutes}`;
+  while (str.length < 2) str = `0${str}`;
   return str;
 }
 
@@ -127,10 +203,10 @@ function padMinutes(minutes: number): string {
  * @returns A formatted time string.
  */
 function timeToString(date: Date): string {
-  let hours: number = date.getHours();
-  let isAfterNoon: boolean = hours > 12;
+  const hours: number = date.getHours();
+  const isAfterNoon: boolean = hours > 12;
 
-  return `${isAfterNoon ? hours - 12 : hours}:${padMinutes(date.getMinutes())}${isAfterNoon ? "pm" : "am"}`
+  return `${isAfterNoon ? hours - 12 : hours}:${padMinutes(date.getMinutes())}${isAfterNoon ? "pm" : "am"} `;
 }
 
 /**
@@ -141,15 +217,20 @@ function timeToString(date: Date): string {
  * @param time The date and time of the event.
  * @returns A URL string for creating a Google Calendar event.
  */
-function generateGCalLink(title: string, desc: string, location: HallEnum, time: Date): string {
-  let date: string = `${time.getFullYear()}${(time.getUTCMonth() + 1).toString().padStart(2, '0')}${time.getUTCDate().toString().padStart(2, '0')}T${time.getUTCHours().toString().padStart(2, '0')}${time.getUTCMinutes().toString().padStart(2, '0')}${time.getUTCSeconds().toString().padStart(2, '0')}Z`;
+function generateGCalLink(
+  title: string,
+  desc: string,
+  location: HallEnum,
+  time: Date,
+): string {
+  const date: string = `${time.getFullYear()}${(time.getUTCMonth() + 1).toString().padStart(2, "0")}${time.getUTCDate().toString().padStart(2, "0")}T${time.getUTCHours().toString().padStart(2, "0")}${time.getUTCMinutes().toString().padStart(2, "0")}${time.getUTCSeconds().toString().padStart(2, "0")} Z`;
 
-  
-  let link: string = `https://www.google.com/calendar/render?action=TEMPLATE` +
-  `&text=${location == HallEnum.ANTEATERY ? "Anteatery" : "Brandywine"}:+${title.replace(/\s+/g, "+")}` +
-  `&details=${desc.replace(/\s+/g, "+")}` +
-  `&location=${location == HallEnum.ANTEATERY ? ANTEAT_ADDY : BWINE_ADDY}` +
-  `&dates=${date}/${date}`;
+  const link: string =
+    `https://www.google.com/calendar/render?action=TEMPLATE` +
+    `&text=${location === HallEnum.ANTEATERY ? "Anteatery" : "Brandywine"}:+${title.replace(/\s+/g, "+")}` +
+    `&details=${desc.replace(/\s+/g, "+")}` +
+    `&location=${location === HallEnum.ANTEATERY ? ANTEAT_ADDY : BWINE_ADDY}` +
+    `&dates=${date}/${date}`;
 
   return link;
 }
@@ -161,28 +242,30 @@ function generateGCalLink(title: string, desc: string, location: HallEnum, time:
  * @returns A Date object representing the converted time in America/Los_Angeles timezone.
  */
 function utcToPacificTime(utcTimeString: string): Date {
-  const [hours, minutes, seconds] = utcTimeString.split(':').map(Number);
+  const [hours, minutes, seconds] = utcTimeString.split(":").map(Number);
   const utcDate = new Date();
   utcDate.setUTCHours(hours);
   utcDate.setUTCMinutes(minutes);
   utcDate.setUTCSeconds(seconds);
   utcDate.setMilliseconds(0);
 
-  const pacificDate = new Date(utcDate.toLocaleString('en-US', { timeZone: 'America/Los_Angeles'}))
+  const pacificDate = new Date(
+    utcDate.toLocaleString("en-US", { timeZone: "America/Los_Angeles" }),
+  );
 
-  return pacificDate
+  return pacificDate;
 }
 
 /**
- * Converts a military time string (HH:MM:SS) 
+ * Converts a military time string (HH:MM:SS)
  * in 24-hr clock format to a Date object in Pacific Time.
  * The date part of the returned Date object will be the current date.
  * @param militaryTime The 24-hr time string in "HH:MM:SS" format.
  * @returns A Date object representing the converted time in America/Los_Angeles timezone.
  */
 function militaryToStandard(militaryTime: string): Date {
-  const [hrs, mins, secs] = militaryTime.split(':').map(Number);
-  
+  const [hrs, mins, secs] = militaryTime.split(":").map(Number);
+
   const date = new Date();
   date.setHours(hrs, mins, secs, 0);
   return date;
@@ -195,15 +278,19 @@ function militaryToStandard(militaryTime: string): Date {
  * @returns A formatted string representing the time range.
  */
 function formatOpenCloseTime(openTime: Date, closeTime: Date): string {
-  let openTimeIsAfternoon: boolean = openTime.getHours() > 12;
-  let closeTimeIsAfternoon: boolean = closeTime.getHours() > 12;
+  const openTimeIsAfternoon: boolean = openTime.getHours() > 12;
+  const closeTimeIsAfternoon: boolean = closeTime.getHours() > 12;
 
-  let openTimeHours: number = openTimeIsAfternoon ? openTime.getHours() - 12 : openTime.getHours();
-  let closeTimeHours: number = closeTimeIsAfternoon ? closeTime.getHours() - 12 : closeTime.getHours();
-  let openTimeMinutes: string = padMinutes(openTime.getMinutes())
-  let closeTimeMinutes: string = padMinutes(closeTime.getMinutes())
+  const openTimeHours: number = openTimeIsAfternoon
+    ? openTime.getHours() - 12
+    : openTime.getHours();
+  const closeTimeHours: number = closeTimeIsAfternoon
+    ? closeTime.getHours() - 12
+    : closeTime.getHours();
+  const openTimeMinutes: string = padMinutes(openTime.getMinutes());
+  const closeTimeMinutes: string = padMinutes(closeTime.getMinutes());
 
-  return `${openTimeHours}:${openTimeMinutes}${openTimeIsAfternoon ? 'p' : 'a'}-${closeTimeHours}:${closeTimeMinutes}${closeTimeIsAfternoon ? 'p' : 'a'}`
+  return `${openTimeHours}:${openTimeMinutes}${openTimeIsAfternoon ? "p" : "a"}-${closeTimeHours}:${closeTimeMinutes}${closeTimeIsAfternoon ? "p" : "a"}`;
 }
 
 /**
@@ -212,8 +299,9 @@ function formatOpenCloseTime(openTime: Date, closeTime: Date): string {
  * @returns A formatted, human-readable nutrient label.
  */
 const formatNutrientLabel = (nutrient: string) => {
-    const label = nutrient.replace(/(Mg|G)$/, ""); 
-    return label.replace(/([A-Z])/g, " $1")
+  const label = nutrient.replace(/(Mg|G)$/, "");
+  return label
+    .replace(/([A-Z])/g, " $1")
     .replace(/^./, (char) => char.toUpperCase())
     .trim();
 };
@@ -259,7 +347,7 @@ const formatNutrientValue = (field: string, valueRaw: string | Date | null) => {
     default:
       return valueRaw;
   }
-}
+};
 
 /**
  * Formats a food name for display.
@@ -271,16 +359,19 @@ const formatNutrientValue = (field: string, valueRaw: string | Date | null) => {
 const formatFoodName = (name: string): string => {
   if (!name) return "";
 
-  let formattedName = name.replace(/(®)([a-zA-Z])/g, '$1 $2');
+  let formattedName = name.replace(/(®)([a-zA-Z])/g, "$1 $2");
   formattedName = toTitleCase(formattedName);
-  formattedName = formattedName.replace(/-(\w)/g, (match, char) => '-' + char.toUpperCase());
+  formattedName = formattedName.replace(
+    /-(\w)/g,
+    (_match, char) => `-${char.toUpperCase()}`,
+  );
   formattedName = formattedName.replace(/'(\w)/g, (match, char) => {
-    if (char.toLowerCase() === 's') return match;
-    return '\'' + char.toUpperCase(); 
+    if (char.toLowerCase() === "s") return match;
+    return `'${char.toUpperCase()}`;
   });
-  formattedName = formattedName.replace(/Ozw/g, 'Oz');
-  formattedName = formattedName.replace(/\(\s+/g, '(');
-  formattedName = formattedName.replace(/\s+\)/g, ')');
+  formattedName = formattedName.replace(/Ozw/g, "Oz");
+  formattedName = formattedName.replace(/\(\s+/g, "(");
+  formattedName = formattedName.replace(/\s+\)/g, ")");
 
   return formattedName;
 };
@@ -291,25 +382,21 @@ const formatFoodName = (name: string): string => {
  * @param keys An array of category name strings.
  * @returns A new array with category keys sorted according to the preferred order and then alphabetically.
  */
-function sortCategoryKeys(keys: string[]) : string[] {
+function sortCategoryKeys(keys: string[]): string[] {
   return keys.sort((a, b) => {
-    const aLower = a.toLowerCase().trim()
-    const bLower = b.toLowerCase().trim()
+    const aLower = a.toLowerCase().trim();
+    const bLower = b.toLowerCase().trim();
 
-    const aIdx = preferredCategoryOrder.indexOf(aLower)
-    const bIdx = preferredCategoryOrder.indexOf(bLower)
+    const aIdx = preferredCategoryOrder.indexOf(aLower);
+    const bIdx = preferredCategoryOrder.indexOf(bLower);
 
-    if (aIdx !== -1 && bIdx !== -1)
-      return aIdx - bIdx;
-    if (aIdx !== -1)
-      return aIdx;
-    if (bIdx !== -1)
-      return bIdx;
+    if (aIdx !== -1 && bIdx !== -1) return aIdx - bIdx;
+    if (aIdx !== -1) return aIdx;
+    if (bIdx !== -1) return bIdx;
 
     // If neither in order, use alphabetic order
-    return aLower.localeCompare(bLower)
-  })
-
+    return aLower.localeCompare(bLower);
+  });
 }
 
 /**
@@ -322,7 +409,7 @@ function sortCategoryKeys(keys: string[]) : string[] {
 function getFoodIcon(dishName: string): LucideIconComponent {
   const defaultFoodIcon: LucideIconComponent = Utensils;
 
-  if (!dishName || dishName.trim() == '') {
+  if (!dishName || dishName.trim() === "") {
     return defaultFoodIcon;
   }
 
@@ -330,35 +417,38 @@ function getFoodIcon(dishName: string): LucideIconComponent {
 
   for (let i = 0; i < foodIconKeywords.length; ++i)
     for (const keyword of foodIconKeywords[i])
-      if (lowerDish.includes(keyword))
-        return foodIcons[i];
-  
+      if (lowerDish.includes(keyword)) return foodIcons[i];
+
   return defaultFoodIcon;
 }
 
 /**
- *  Returns whether or not a and b fall on the same calendar day. 
+ *  Returns whether or not a and b fall on the same calendar day.
  * @param a a date to compare
  * @param b the other date to compare
  * @returns a boolean
  */
 function isSameDay(a: Date, b: Date): boolean {
-  return a.getFullYear() == b.getFullYear()
-         && a.getMonth() == b.getMonth()
-         && a.getDay() == b.getDay()
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
 }
 
-export {toTitleCase, 
-        dateToString, 
-        generateGCalLink, 
-        timeToString, 
-        enhanceDescription,
-        utcToPacificTime,
-        militaryToStandard,
-        formatOpenCloseTime,
-        formatNutrientLabel,
-        formatNutrientValue,
-        formatFoodName,
-        sortCategoryKeys,
-        getFoodIcon,
-        isSameDay}
+export {
+  toTitleCase,
+  dateToString,
+  generateGCalLink,
+  timeToString,
+  enhanceDescription,
+  utcToPacificTime,
+  militaryToStandard,
+  formatOpenCloseTime,
+  formatNutrientLabel,
+  formatNutrientValue,
+  formatFoodName,
+  sortCategoryKeys,
+  getFoodIcon,
+  isSameDay,
+};
