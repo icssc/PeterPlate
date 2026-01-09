@@ -6,6 +6,7 @@ import { trpc } from "../utils/trpc";
 import superjson from "superjson";
 import Toolbar from "@/components/ui/toolbar";
 import { DateProvider } from "@/context/date-context";
+import { ThemeProvider } from "next-themes";
 
 export function RootClient({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
@@ -27,13 +28,20 @@ export function RootClient({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <trpc.Provider client={trpcClient} queryClient={queryClient}>
-      <QueryClientProvider client={queryClient}>
-        <DateProvider>
-          <Toolbar />
-          {children}
-        </DateProvider>
-      </QueryClientProvider>
-    </trpc.Provider>
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+    >
+      <trpc.Provider client={trpcClient} queryClient={queryClient}>
+        <QueryClientProvider client={queryClient}>
+          <DateProvider>
+            <Toolbar />
+            {children}
+          </DateProvider>
+        </QueryClientProvider>
+      </trpc.Provider>
+    </ThemeProvider>
   );
 }
