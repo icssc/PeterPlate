@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 10, "column": 0}, "map": {"version":3,"sources":["file:///Users/samikabhatkar/Downloads/workspace/ZotMeal/zotmeal/packages/ui/src/button.tsx"],"sourcesContent":["\"use client\";\n\nimport { ReactNode } from \"react\";\n\ninterface ButtonProps {\n  children: ReactNode;\n  className?: string;\n  appName: string;\n}\n\nexport const Button = ({ children, className, appName }: ButtonProps) => {\n  return (\n    <button\n      className={className}\n      onClick={() => alert(`Hello from your ${appName} app!`)}\n    >\n      {children}\n    </button>\n  );\n};\n"],"names":[],"mappings":";;;;;AAAA;;AAUO,MAAM,SAAS,CAAC,EAAE,QAAQ,EAAE,SAAS,EAAE,OAAO,EAAe;IAClE,qBACE,mYAAC;QACC,WAAW;QACX,SAAS,IAAM,MAAM,CAAC,gBAAgB,EAAE,QAAQ,KAAK,CAAC;kBAErD;;;;;;AAGP","debugId":null}}]
+}
