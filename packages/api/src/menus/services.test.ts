@@ -1,7 +1,7 @@
 import { apiTest } from "@api/apiTest";
 import { upsertPeriod } from "@api/periods/services";
 import { upsertRestaurant } from "@api/restaurants/services";
-import { describe, it } from "vitest";
+import { describe } from "vitest";
 
 import { getPickableDates, upsertMenu } from "./services";
 
@@ -46,7 +46,9 @@ describe("getDateList", () => {
 
       // check dates are unique and asc
       for (let i = 1; i < res.length; i++)
-        expect(res[i]!.getTime()).toBeGreaterThan(res[i - 1]!.getTime());
+        expect(res[i]?.getTime() ?? 0).toBeGreaterThan(
+          res[i - 1]?.getTime() ?? 0,
+        );
     }
   });
 });

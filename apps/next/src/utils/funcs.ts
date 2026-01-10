@@ -114,7 +114,7 @@ function enhanceDescription(
 
   if (
     fruitKeywords.some(
-      (keyword) => lowerDesc === keyword || lowerDesc === keyword + "s",
+      (keyword) => lowerDesc === keyword || lowerDesc === `${keyword}s`,
     )
   ) {
     return `Fresh and simple ${lowerDesc}. A light and healthy choice.`;
@@ -129,8 +129,8 @@ function enhanceDescription(
 
   if (bakeryKeywords.some((keyword) => lowerDish.includes(keyword))) {
     const addPrefix: boolean = !lowerDesc.includes("freshly baked");
-    if (addPrefix) lowerDesc = "Freshly prepared " + lowerDesc;
-    else lowerDesc = lowerDesc[0].toUpperCase() + lowerDesc.slice(1);
+    if (addPrefix) lowerDesc = `Freshly prepared ${lowerDesc}`;
+    else lowerDesc = `${lowerDesc[0].toUpperCase()}${lowerDesc.slice(1)}`;
 
     return `${lowerDesc}. A perfect treat.`;
   }
@@ -192,8 +192,8 @@ function dateToString(startDate: Date, endDate: Date): string {
  * @returns A string representation of the minutes, padded with a zero if needed.
  */
 function padMinutes(minutes: number): string {
-  let str: string = minutes + "";
-  while (str.length < 2) str = "0" + str;
+  let str: string = `${minutes}`;
+  while (str.length < 2) str = `0${str}`;
   return str;
 }
 
@@ -206,7 +206,7 @@ function timeToString(date: Date): string {
   const hours: number = date.getHours();
   const isAfterNoon: boolean = hours > 12;
 
-  return `${isAfterNoon ? hours - 12 : hours}:${padMinutes(date.getMinutes())}${isAfterNoon ? "pm" : "am"}`;
+  return `${isAfterNoon ? hours - 12 : hours}:${padMinutes(date.getMinutes())}${isAfterNoon ? "pm" : "am"} `;
 }
 
 /**
@@ -223,7 +223,7 @@ function generateGCalLink(
   location: HallEnum,
   time: Date,
 ): string {
-  const date: string = `${time.getFullYear()}${(time.getUTCMonth() + 1).toString().padStart(2, "0")}${time.getUTCDate().toString().padStart(2, "0")}T${time.getUTCHours().toString().padStart(2, "0")}${time.getUTCMinutes().toString().padStart(2, "0")}${time.getUTCSeconds().toString().padStart(2, "0")}Z`;
+  const date: string = `${time.getFullYear()}${(time.getUTCMonth() + 1).toString().padStart(2, "0")}${time.getUTCDate().toString().padStart(2, "0")}T${time.getUTCHours().toString().padStart(2, "0")}${time.getUTCMinutes().toString().padStart(2, "0")}${time.getUTCSeconds().toString().padStart(2, "0")} Z`;
 
   const link: string =
     `https://www.google.com/calendar/render?action=TEMPLATE` +
@@ -363,7 +363,7 @@ const formatFoodName = (name: string): string => {
   formattedName = toTitleCase(formattedName);
   formattedName = formattedName.replace(
     /-(\w)/g,
-    (_match, char) => "-" + char.toUpperCase(),
+    (_match, char) => `-${char.toUpperCase()}`,
   );
   formattedName = formattedName.replace(/'(\w)/g, (match, char) => {
     if (char.toLowerCase() === "s") return match;
