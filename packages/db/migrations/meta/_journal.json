@@ -19,17 +19,9 @@
     {
       "idx": 2,
       "version": "7",
-<<<<<<< HEAD
       "when": 1767871562814,
-=======
-      "when": 1767814942396,
->>>>>>> dev
       "tag": "0002_zotmeal",
       "breakpoints": true
     }
   ]
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> dev
