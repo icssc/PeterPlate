@@ -1,6 +1,6 @@
+import { join } from "node:path";
 import { config } from "dotenv";
 import { defineConfig } from "drizzle-kit";
-import { join } from "path";
 
 // Get current file's directory
 config({ path: join(process.cwd(), ".env") });

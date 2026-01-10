@@ -1,7 +1,5 @@
 import { upsert } from "@api/utils";
 import { TRPCError } from "@trpc/server";
-import { format } from "date-fns";
-
 import type {
   Drizzle,
   InsertRestaurant,
@@ -15,6 +13,7 @@ import type {
   SelectStation,
 } from "@zotmeal/db";
 import { restaurants } from "@zotmeal/db";
+import { formatInTimeZone } from "date-fns-tz";
 
 export const upsertRestaurant = async (
   db: Drizzle,
@@ -61,7 +60,11 @@ export async function getRestaurantsByDate(
     with: {
       /** Get menus that correspond to the given date. */
       menus: {
-        where: (menus, { eq }) => eq(menus.date, format(date, "yyyy-MM-dd")),
+        where: (menus, { eq }) =>
+          eq(
+            menus.date,
+            formatInTimeZone(date, "America/Los_Angeles", "yyyy-MM-dd"),
+          ),
         with: {
           period: true,
           dishesToMenus: {
