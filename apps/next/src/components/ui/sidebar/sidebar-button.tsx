@@ -61,3 +61,5 @@ export default function SidebarButton({Icon, title, href, deactivated} : Sidebar
       )
 
 }
+
+
