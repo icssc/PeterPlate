@@ -63,7 +63,10 @@ const EventCardContent = React.forwardRef<
 >(({ props, ...divProps }, ref) => {
   return (
     <div ref={ref} {...divProps}>
-      <Card className="cursor-pointer hover:shadow-lg transition">
+      <Card
+        className="cursor-pointer hover:shadow-lg transition"
+        sx={{ borderRadius: "16px" }}
+      >
         <CardContent className="flex items-center h-full w-full pt-6 gap-3 flex-wrap">
           <Image
             src={props.imgSrc}
@@ -112,18 +115,33 @@ EventCardContent.displayName = "EventCardContent";
  * @returns {JSX.Element} A React component representing an event card.
  */
 export default function EventCard(props: EventInfo): React.JSX.Element {
-  // error appears when just using JSX.Element, added React. to fix
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const [open, setOpen] = React.useState(false);
 
-  const handleOpen = () => setOpen(true); // I couldn't find a MUI diaglog trigger component so handling open state manually
+  const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
   if (isDesktop)
     return (
       <>
         <EventCardContent props={props} onClick={handleOpen} />
-        <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
+        <Dialog
+          open={open}
+          onClose={handleClose}
+          maxWidth={false}
+          slotProps={{
+            paper: {
+              sx: {
+                width: "460px",
+                maxWidth: "90vw",
+                margin: 2,
+                padding: 0,
+                overflow: "hidden",
+                borderRadius: "6px",
+              },
+            },
+          }}
+        >
           <EventDialogContent {...props} />
         </Dialog>
       </>
@@ -137,7 +155,6 @@ export default function EventCard(props: EventInfo): React.JSX.Element {
           open={open}
           onClose={handleClose}
           sx={{
-            // custom styles to match previous drawer appearance
             "& .MuiDrawer-paper": {
               borderTopLeftRadius: "10px",
               borderTopRightRadius: "10px",

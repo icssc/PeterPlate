@@ -94,7 +94,7 @@ export default function RatingsCard({ food }: RatingsCardProps) {
     }
   };
 
-  const handleOpen = () => setOpen(true);
+  const handleOpen = () => setOpen(true); // no dialog trigger component in MUI so handling manually
   const handleClose = () => setOpen(false);
 
   return (
@@ -105,7 +105,23 @@ export default function RatingsCard({ food }: RatingsCardProps) {
         deleteLoading={deleteRatingMutation.isLoading}
         onClick={handleOpen}
       />
-      <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        maxWidth={false}
+        slotProps={{
+          paper: {
+            sx: {
+              width: "460px",
+              maxWidth: "90vw",
+              margin: 2,
+              padding: 0,
+              overflow: "hidden",
+              borderRadius: "6px",
+            },
+          },
+        }}
+      >
         <FoodDialogContent {...food} />
       </Dialog>
     </>

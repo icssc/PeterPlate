@@ -236,7 +236,23 @@ export default function FoodCard({
           onToggleFavorite={onToggleFavorite}
           onClick={handleOpen}
         />
-        <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
+        <Dialog
+          open={open}
+          onClose={handleClose}
+          maxWidth={false} // disabled MUI's width presets
+          slotProps={{
+            paper: {
+              sx: {
+                width: "460px", // match max-w-md
+                maxWidth: "90vw",
+                margin: 2,
+                padding: 0,
+                overflow: "hidden",
+                borderRadius: "6px",
+              },
+            },
+          }}
+        >
           <FoodDialogContent {...dish} />
         </Dialog>
       </>
