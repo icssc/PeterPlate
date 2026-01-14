@@ -30,7 +30,8 @@ export default function EventDrawerContent(
       <Box sx={{ padding: "20px 24px 24px" }} className="flex flex-col gap-2">
         <Typography
           variant="h4"
-          className="text-3xl font-semibold leading-tight tracking-normal text-left"
+          sx={{ fontWeight: 600 }}
+          className="text-3xl leading-tight tracking-normal text-left"
         >
           {props.name}
         </Typography>

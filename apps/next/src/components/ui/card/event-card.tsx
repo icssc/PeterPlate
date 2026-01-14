@@ -154,6 +154,18 @@ export default function EventCard(props: EventInfo): React.JSX.Element {
           anchor="bottom"
           open={open}
           onClose={handleClose}
+          slotProps={{
+            paper: {
+              sx: {
+                width: "460px",
+                maxWidth: "90vw",
+                margin: 2,
+                overflow: "hidden",
+                borderRadius: "6px",
+              },
+            },
+          }}
+
           sx={{
             "& .MuiDrawer-paper": {
               borderTopLeftRadius: "10px",

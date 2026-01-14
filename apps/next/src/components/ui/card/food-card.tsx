@@ -271,6 +271,19 @@ export default function FoodCard({
           anchor="bottom"
           open={open}
           onClose={handleClose}
+          slotProps={{
+            paper: {
+              sx: {
+                width: "460px",
+                maxWidth: "90vw",
+                margin: 2,
+                padding: 0,
+                overflow: "hidden",
+                borderRadius: "6px",
+              },
+            },
+          }}
+
           sx={{
             "& .MuiDrawer-paper": {
               borderTopLeftRadius: "10px",
