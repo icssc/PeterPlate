@@ -2,7 +2,7 @@
 
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import MenuIcon from "@mui/icons-material/Menu";
-import { AppBar, Button, Drawer, IconButton, Menu, MenuItem, Toolbar } from "@mui/material";
+import { AppBar, Button, IconButton, Menu, MenuItem, Toolbar } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -215,10 +215,8 @@ export default function Header(): JSX.Element {
                 </Toolbar>
             </AppBar>
 
-            {/* MUI Drawer for Sidebar */}
-            <Drawer anchor="right" open={drawerOpen} onClose={toggleDrawer}>
-                <SidebarContent />
-            </Drawer>
+            {/* MUI Drawer for Sidebar - now controlled by SidebarContent */}
+            <SidebarContent open={drawerOpen} onClose={toggleDrawer} />
         </>
     );
 }

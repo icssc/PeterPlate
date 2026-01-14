@@ -1,4 +1,4 @@
-import { Button } from "../shadcn/button"
+import { ButtonBase } from "@mui/material";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 
@@ -25,6 +25,10 @@ interface SidebarButtonProps {
    * and will not navigate to the `href`.
    */
   deactivated?: boolean;
+  /**
+   * Optional callback to close the sidebar drawer after navigation
+   */
+  onClose?: () => void;
 }
 
 /**
@@ -35,16 +39,21 @@ interface SidebarButtonProps {
  * @param {SidebarButtonProps} props - The properties for the sidebar button.
  * @returns {JSX.Element} The rendered sidebar button component.
  */
-export default function SidebarButton({ Icon, title, href, deactivated }: SidebarButtonProps): JSX.Element {
+export default function SidebarButton({ Icon, title, href, deactivated, onClose }: SidebarButtonProps): JSX.Element {
   return (
-    <Button variant={deactivated ? "deactivated" : "ghost"} className="justify-between [&_svg]:size-5" asChild>
-      <Link href={deactivated ? "#" : href}>
-        <div className="flex gap-3 items-center">
-          <Icon className="stroke-1" />
-          <span className="text-md">{title}</span>
-        </div>
-        <ChevronRight className="stroke-1" />
-      </Link>
-    </Button>
+    <ButtonBase
+      component={Link}
+      href={deactivated ? "#" : href}
+      onClick={onClose}
+      disabled={deactivated}
+      className="justify-between [&_svg]:size-5"
+      style={{ width: "100%", padding: "8px 16px" }}
+    >
+      <div className="flex gap-3 items-center">
+        <Icon className="stroke-1" />
+        <span className="text-md">{title}</span>
+      </div>
+      <ChevronRight className="stroke-1" />
+    </ButtonBase>
   );
 }
