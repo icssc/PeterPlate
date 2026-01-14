@@ -92,7 +92,7 @@ export default function FoodDrawerContent(dish: DishInfo): React.JSX.Element {
       </Box>
 
       <Box className="px-4 flex-1 min-h-0 flex flex-col">
-        <h1 className="text-2xl text-center font-bold mb-2">Nutrients</h1>
+        <h1 className="text-2xl text-left font-bold mb-2">Nutrients</h1>
         <div
           className="flex-1 grid grid-cols-2 gap-x-4 w-full px-2 text-black mb-4 overflow-y-auto auto-rows-max"
           id="nutrient-content"
