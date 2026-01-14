@@ -1,1 +1,0 @@
-self.__NEXT_FONT_MANIFEST="{\n  \"app\": {\n    \"[project]/ZotMeal/zotmeal/apps/web/app/page\": [\n      \"static/media/GeistVF-s.p.4c3c0b96.woff\",\n      \"static/media/GeistMonoVF-s.p.2cee7d16.woff\"\n    ]\n  },\n  \"appUsingSizeAdjust\": true,\n  \"pages\": {},\n  \"pagesUsingSizeAdjust\": false\n}"
