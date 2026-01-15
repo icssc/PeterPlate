@@ -8,11 +8,15 @@ import { cn } from "@/utils/tw";
 import { Dialog, DialogTrigger } from "../shadcn/dialog";
 import FoodDialogContent from "../food-dialog-content"
 import { Card, CardContent } from "../shadcn/card"; 
-import { CirclePlus, Heart, Star, Utensils } from "lucide-react";
+import { CirclePlus, Heart, Star, Utensils, Minus, Plus, Trash2, Check } from "lucide-react";
 import { Drawer, DrawerTrigger } from "../shadcn/drawer";
 import FoodDrawerContent from "../food-drawer-content";
 import { trpc } from "@/utils/trpc";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { toast } from "sonner";
+import { useSession } from "@/utils/auth-client";
+import { Popover, PopoverContent, PopoverTrigger } from "../shadcn/popover";
+import { Button } from "../shadcn/button";
 
 // TODO: remove this variable and get the currently signed in user through session
 const DUMMY_USER_ID = "TEST_USER";
@@ -50,6 +54,9 @@ const FoodCardContent = React.forwardRef<
 >(({ dish, isFavorited, favoriteDisabled, onToggleFavorite, className, ...divProps }, ref) => {
     const IconComponent = getFoodIcon(dish.name) ?? Utensils;
   
+    // check if user is signed in andshow  error if not signed in before attempting to add meal
+    const { data: session } = useSession();
+    const user = session?.user;
     /**
      * Fetches the average rating and rating count for the dish.
      */
@@ -61,6 +68,15 @@ const FoodCardContent = React.forwardRef<
      * fetch above
      */
 
+    // When a user adds a meal to their log, they should be able to adjust the quantity and/or remove the item from their log by clicking the button on the card
+    const { data: loggedMeals } = trpc.nutrition.getMealsInLastWeek.useQuery(
+      { userId: user?.id ?? "" },
+      { enabled: !!user?.id, staleTime: 30 * 1000 }
+    );
+    
+    const loggedMeal = loggedMeals?.find(meal => meal.dishId === dish.id);
+    const isLogged = !!loggedMeal;
+
     const averageRating = ratingData?.averageRating ?? 0;
     const ratingCount = ratingData?.ratingCount ?? 0;
 
@@ -71,30 +87,96 @@ const FoodCardContent = React.forwardRef<
   const utils = trpc.useUtils();
   const logMealMutation = trpc.nutrition.logMeal.useMutation({
     onSuccess: () => {
-      //TODO: Replace this with a shad/cn sonner or equivalent.
-      alert(`Added ${formatFoodName(dish.name)} to your log`);
+      // show toast notification when meal is successfully added to log
+      toast.success(`Added ${formatFoodName(dish.name)} to your log`);
       utils.nutrition.invalidate();
     },
-    onError: (error: Error) => {
-      console.error(error.message);
+    onError: (error) => {
+      console.error(error);
+      toast.error("Failed to add meal to your log");
+    }
+  });
+
+  const deleteMealMutation = trpc.nutrition.deleteLoggedMeal.useMutation({
+    onSuccess: () => {
+      toast.success(`Removed ${formatFoodName(dish.name)} from your log`);
+      utils.nutrition.invalidate();
+    },
+    onError: (error) => {
+      console.error(error);
+      toast.error("Failed to remove meal from your log");
     }
   });
 
   const handleLogMeal = (e: React.MouseEvent) => {
     e.stopPropagation(); 
     
-    if (!DUMMY_USER_ID) {
-      //TODO: Replace this with a shad/cn sonner or equivalent.
-      alert("You must be logged in to track meals");
+    // Give the user a proper error when they've not signed in before attempting to add a meal
+    if (!user?.id) {
+      toast.error("You must be signed in to track meals. Please sign in to continue.");
+      return;
+    }
+
+    // If meal is already logged, the popover will handle the interaction
+    if (isLogged) {
       return;
     }
 
     logMealMutation.mutate({
       dishId: dish.id,
-      userId: DUMMY_USER_ID,
+      userId: user.id,
       dishName: dish.name,
-      servings: 1, // Default to 1 serving (TODO: add ability to manually input servings. Maybe a popup will ask to input a multiple of 0.5)
+      servings: 1,
     });
+  };
+
+  const handleAdjustQuantity = (newServings: number) => {
+    if (!user?.id || !loggedMeal) return;
+    
+    // Servings are multiples of 0.5
+    if (newServings < 0.5) {
+      toast.error("Minimum serving size is 0.5");
+      return;
+    }
+    
+    // Delete and insert again with new servings
+    deleteMealMutation.mutate(
+      { userId: user.id, dishId: dish.id },
+      {
+        onSuccess: () => {
+          logMealMutation.mutate({
+            dishId: dish.id,
+            userId: user.id,
+            dishName: dish.name,
+            servings: newServings,
+          });
+        }
+      }
+    );
+  };
+
+  const handleRemoveMeal = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!user?.id) return;
+    
+    deleteMealMutation.mutate({
+      userId: user.id,
+      dishId: dish.id,
+    });
+  };
+
+  const handleIncreaseQuantity = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!loggedMeal) return;
+    const newServings = loggedMeal.servings + 0.5;
+    handleAdjustQuantity(newServings);
+  };
+
+  const handleDecreaseQuantity = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!loggedMeal) return;
+    const newServings = Math.max(0.5, loggedMeal.servings - 0.5);
+    handleAdjustQuantity(newServings);
   };
 
   const handleFavoriteClick = (
@@ -136,10 +218,65 @@ const FoodCardContent = React.forwardRef<
                   </div>
                 </div>
               </div>
-              {/*//TODO: Add user feedback on clicking button (e.g. changing Icon, making it green) */}
-              <button onClick={handleLogMeal}>
-                <CirclePlus/>
-              </button>
+              {/* Show quantity controls if logged, otherwise show add button */}
+              {isLogged && user?.id ? (
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button 
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-green-600 hover:text-green-700 transition-colors"
+                      aria-label="Adjust meal quantity"
+                    >
+                      <Check className="w-5 h-5" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-64" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex flex-col gap-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">{formatFoodName(dish.name)}</span>
+                        <span className="text-xs text-muted-foreground">{loggedMeal.servings} serving{loggedMeal.servings !== 1 ? 's' : ''}</span>
+                      </div>
+                      <div className="flex items-center justify-between gap-2">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={handleDecreaseQuantity}
+                          disabled={loggedMeal.servings <= 0.5}
+                          className="h-8 w-8"
+                        >
+                          <Minus className="h-4 w-4" />
+                        </Button>
+                        <span className="flex-1 text-center font-medium">{loggedMeal.servings}</span>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={handleIncreaseQuantity}
+                          className="h-8 w-8"
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={handleRemoveMeal}
+                        className="w-full"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Remove from log
+                      </Button>
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              ) : (
+                <button 
+                  onClick={handleLogMeal}
+                  aria-label="Add meal to log"
+                  className="hover:text-green-600 transition-colors"
+                >
+                  <CirclePlus className="w-5 h-5" />
+                </button>
+              )}
             </div>
             <div className="flex items-start">
               <button

@@ -6,6 +6,7 @@ import { trpc } from "../utils/trpc";
 import superjson from "superjson";
 import Toolbar from "@/components/ui/toolbar";
 import { DateProvider } from "@/context/date-context";
+import { Toaster } from "sonner";
 
 export function RootClient({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
@@ -32,6 +33,7 @@ export function RootClient({ children }: { children: React.ReactNode }) {
         <DateProvider>
           <Toolbar />
           {children}
+          <Toaster />
         </DateProvider>
       </QueryClientProvider>
     </trpc.Provider>
