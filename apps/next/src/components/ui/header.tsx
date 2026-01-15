@@ -150,7 +150,7 @@ export default function Header(): JSX.Element {
                         </Button>
                         <Button
                             component={Link}
-                            href="/meal-tracker"
+                            href="/nutrition"
                             sx={{
                                 color: "#1f2937",
                                 textTransform: "none",
