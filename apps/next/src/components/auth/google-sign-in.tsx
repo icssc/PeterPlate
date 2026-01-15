@@ -7,8 +7,8 @@ import { Button } from "../ui/shadcn/button";
 export function GoogleSignInButton() {
   const handleSignIn = async () => {
     try {
-      const result = await authClient.signIn.social({
-        provider: "google",
+      const result = await authClient.signIn.oauth2({
+        providerId: "icssc",
       });
       
       console.log("Sign in result:", result);
