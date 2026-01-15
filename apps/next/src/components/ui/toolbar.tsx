@@ -1,20 +1,20 @@
+import { PanelRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { PanelRight } from "lucide-react";
-import { Button } from "./shadcn/button";
-import { Sheet, SheetTrigger } from "./shadcn/sheet";
-import SidebarContent from "./sidebar/sidebar-content";
-import { DatePicker } from "./shadcn/date-picker";
+import { useEffect, useState } from "react";
 import { useDate } from "@/context/date-context";
 import { trpc } from "@/utils/trpc"; // Import tRPC hook
-import { useEffect, useState } from "react";
-import { DateList } from "../../../../../packages/db/src/schema";
+import type { DateList } from "../../../../../packages/db/src/schema";
+import { Button } from "./shadcn/button";
+import { DatePicker } from "./shadcn/date-picker";
+import { Sheet, SheetTrigger } from "./shadcn/sheet";
+import SidebarContent from "./sidebar/sidebar-content";
 
 /** Dates to restrict calendar navigation. */
 export type CalendarRange = {
-  earliest: Date,
-  latest: Date,
-}
+  earliest: Date;
+  latest: Date;
+};
 
 /**
  * Renders the main toolbar for the application.
@@ -31,23 +31,24 @@ export type CalendarRange = {
  */
 export default function Toolbar(): JSX.Element {
   const { selectedDate, setSelectedDate } = useDate();
-  const [enabledDates, setEnabledDates] = useState<DateList>([new Date()]);  // default: enable today
+  const [enabledDates, setEnabledDates] = useState<DateList>([new Date()]); // default: enable today
   const [calendarRange, setCalendarRange] = useState<CalendarRange>({
     earliest: new Date(),
     latest: new Date(),
-  });  // default: restrict to today
+  }); // default: restrict to today
 
-  const { data: dateRes } = trpc.pickableDates.useQuery()
-  
+  const { data: dateRes } = trpc.pickableDates.useQuery();
+
   useEffect(() => {
     if (dateRes) {
+      console.log("Pickable Dates (Front):", dateRes);
       setEnabledDates(dateRes);
       setCalendarRange({
         earliest: dateRes[0],
-        latest: dateRes[dateRes.length-1]
+        latest: dateRes[dateRes.length - 1],
       });
     }
-  }, [dateRes])
+  }, [dateRes]);
 
   /**
    * Handles the date selection event from the `DatePicker` component.
@@ -88,41 +89,36 @@ export default function Toolbar(): JSX.Element {
     }
   };
 
-    return (
-      <div 
-        className="
-            absolute z-10 flex w-full items-center justify-between
-            px-4 py-2
-            bg-background/60 text-foreground
-            backdrop-blur-md
-            border-b border-border
-          "
-      >
-        <Link href="/">
-          <Image
-            className="rounded-full cursor-pointer"
-            src="/Zotmeal-Logo.webp" 
-            alt="Zotmeal's Logo: a beige anteater with a bushy tail sitting next to an anthill."
-            width={40}
-            height={40}
+  return (
+    <div
+      className="w-full h-18 absolute flex items-center justify-between px-4 py-2 
+          bg-zinc-50 bg-opacity-45 backdrop-blur-md z-10"
+    >
+      <Link href="/">
+        <Image
+          className="rounded-full cursor-pointer"
+          src="/Zotmeal-Logo.webp"
+          alt="Zotmeal's Logo: a beige anteater with a bushy tail sitting next to an anthill."
+          width={40}
+          height={40}
+        />
+      </Link>
+      <Sheet>
+        <div className="flex gap-4 items-center">
+          <DatePicker
+            date={selectedDate}
+            onSelect={handleDateSelect}
+            enabledDates={enabledDates}
+            range={calendarRange}
           />
-        </Link>
-        <Sheet>
-          <div className="flex gap-4 items-center">
-            <DatePicker
-              date={selectedDate}
-              onSelect={handleDateSelect}
-              enabledDates={enabledDates}
-              range={calendarRange}
-            />
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <PanelRight />
-              </Button>
-            </SheetTrigger>
-            <SidebarContent />
-          </div>
-        </Sheet>
-      </div>
-    )
+          <SheetTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <PanelRight />
+            </Button>
+          </SheetTrigger>
+          <SidebarContent />
+        </div>
+      </Sheet>
+    </div>
+  );
 }
