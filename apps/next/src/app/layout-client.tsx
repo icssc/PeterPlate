@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink } from "@trpc/client";
 import { trpc } from "../utils/trpc";
 import superjson from "superjson";
-import Header from "@/components/ui/header";
+import Toolbar from "@/components/ui/toolbar";
 import { DateProvider } from "@/context/date-context";
 
 export function RootClient({ children }: { children: React.ReactNode }) {
