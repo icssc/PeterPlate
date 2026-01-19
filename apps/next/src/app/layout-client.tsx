@@ -30,7 +30,7 @@ export function RootClient({ children }: { children: React.ReactNode }) {
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
         <DateProvider>
-          <Header />
+          <Toolbar />
           {children}
         </DateProvider>
       </QueryClientProvider>
