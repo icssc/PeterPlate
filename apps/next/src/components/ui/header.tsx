@@ -10,19 +10,6 @@ import { GoogleSignInButton } from "@/components/auth/google-sign-in";
 import { useSession } from "@/utils/auth-client";
 import SidebarContent from "./sidebar/sidebar-content";
 
-/**
- * Renders the main header for the application.
- *
- * The header includes:
- * - A clickable application logo that navigates to the homepage ("/")
- * - Navigation links: Dining Halls, Events, Favorites, Ratings, Tracker
- * - User authentication display:
- *   - When logged in: Shows username and sidebar toggle button
- *   - When logged out: Shows sign-in button
- * - A sidebar drawer that opens when the menu button is clicked
- *
- * @returns {JSX.Element} The rendered header component.
- */
 export default function Header(): JSX.Element {
     const { data: session, isPending } = useSession();
     const user = session?.user;
@@ -45,17 +32,11 @@ export default function Header(): JSX.Element {
         <>
             <AppBar
                 position="absolute"
-                sx={{
-                    bgcolor: "rgba(250, 250, 250, 0.45)",
-                    backdropFilter: "blur(12px)",
-                    boxShadow: "none",
-                    borderBottom: "1px solid rgba(0, 0, 0, 0.08)",
-                }}
+                className="!bg-[rgba(250,250,250,0.45)] backdrop-blur-[12px] shadow-none border-b border-[rgba(0,0,0,0.08)]"
             >
-                <Toolbar sx={{ justifyContent: "space-between", px: 2, py: 1 }}>
-                    {/* Left: Logo */}
-                    <div style={{ flex: "0 0 auto", display: "flex", alignItems: "center" }}>
-                        <Link href="/" style={{ display: "flex", alignItems: "center" }}>
+                <Toolbar className="justify-between px-4 py-2">
+                    <div className="flex-none flex items-center">
+                        <Link href="/" className="flex items-center">
                             <Image
                                 className="rounded-full cursor-pointer"
                                 src="/Zotmeal-Logo.webp"
@@ -66,18 +47,11 @@ export default function Header(): JSX.Element {
                         </Link>
                     </div>
 
-                    {/* Center: Navigation Links */}
-                    <nav style={{ flex: "1 1 auto", display: "flex", gap: "0", justifyContent: "space-evenly" }}>
+                    <nav className="flex-1 flex gap-0 justify-evenly">
                         <Button
                             onClick={handleDiningHallsClick}
                             endIcon={<ArrowDropDownIcon fontSize="small" />}
-                            sx={{
-                                color: "#1f2937",
-                                textTransform: "none",
-                                fontSize: "14px",
-                                fontWeight: 500,
-                                "&:hover": { bgcolor: "rgba(0, 0, 0, 0.04)" },
-                            }}
+                            className="!text-[#1f2937] !normal-case !text-sm !font-medium hover:!bg-[rgba(0,0,0,0.04)]"
                         >
                             Dining Halls
                         </Button>
@@ -112,68 +86,39 @@ export default function Header(): JSX.Element {
                         <Button
                             component={Link}
                             href="/events"
-                            sx={{
-                                color: "#1f2937",
-                                textTransform: "none",
-                                fontSize: "14px",
-                                fontWeight: 500,
-                                "&:hover": { bgcolor: "rgba(0, 0, 0, 0.04)" },
-                            }}
+                            className="!text-[#1f2937] !normal-case !text-sm !font-medium hover:!bg-[rgba(0,0,0,0.04)]"
                         >
                             Events
                         </Button>
                         <Button
                             component={Link}
                             href="/my-favorites"
-                            sx={{
-                                color: "#1f2937",
-                                textTransform: "none",
-                                fontSize: "14px",
-                                fontWeight: 500,
-                                "&:hover": { bgcolor: "rgba(0, 0, 0, 0.04)" },
-                            }}
+                            className="!text-[#1f2937] !normal-case !text-sm !font-medium hover:!bg-[rgba(0,0,0,0.04)]"
                         >
                             Favorites
                         </Button>
                         <Button
                             component={Link}
                             href="/ratings"
-                            sx={{
-                                color: "#1f2937",
-                                textTransform: "none",
-                                fontSize: "14px",
-                                fontWeight: 500,
-                                "&:hover": { bgcolor: "rgba(0, 0, 0, 0.04)" },
-                            }}
+                            className="!text-[#1f2937] !normal-case !text-sm !font-medium hover:!bg-[rgba(0,0,0,0.04)]"
                         >
                             Ratings
                         </Button>
                         <Button
                             component={Link}
                             href="/nutrition"
-                            sx={{
-                                color: "#1f2937",
-                                textTransform: "none",
-                                fontSize: "14px",
-                                fontWeight: 500,
-                                "&:hover": { bgcolor: "rgba(0, 0, 0, 0.04)" },
-                            }}
+                            className="!text-[#1f2937] !normal-case !text-sm !font-medium hover:!bg-[rgba(0,0,0,0.04)]"
                         >
                             Tracker
                         </Button>
                     </nav>
 
-                    {/* Right: User info or Sign in */}
-                    <div style={{ flex: "0 0 auto", display: "flex", alignItems: "center", gap: "16px" }}>
+                    <div className="flex-none flex items-center gap-4">
                         {isPending ? (
-                            // Render placeholder during loading to match client hydration
                             <>
-                                <div style={{ width: "100px", height: "20px" }} />
+                                <div className="w-24 h-5" />
                                 <IconButton
-                                    sx={{
-                                        color: "#1f2937",
-                                        "&:hover": { bgcolor: "rgba(0, 0, 0, 0.04)" },
-                                    }}
+                                    className="!text-[#1f2937] hover:!bg-[rgba(0,0,0,0.04)]"
                                     aria-label="Open sidebar"
                                     disabled
                                 >
@@ -182,29 +127,23 @@ export default function Header(): JSX.Element {
                             </>
                         ) : user ? (
                             <>
-                                <span style={{ fontSize: "14px", color: "#1f2937", fontWeight: 500 }}>
+                                <span className="text-sm text-gray-800 font-medium">
                                     {user.name || user.email || "User"}
                                 </span>
                                 <IconButton
                                     onClick={toggleDrawer}
-                                    sx={{
-                                        color: "#1f2937",
-                                        "&:hover": { bgcolor: "rgba(0, 0, 0, 0.04)" },
-                                    }}
+                                    className="!text-[#1f2937] hover:!bg-[rgba(0,0,0,0.04)]"
                                     aria-label="Open sidebar"
                                 >
                                     <MenuIcon />
                                 </IconButton>
                             </>
                         ) : (
-                            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                            <div className="flex items-center gap-2">
                                 <GoogleSignInButton />
                                 <IconButton
                                     onClick={toggleDrawer}
-                                    sx={{
-                                        color: "#1f2937",
-                                        "&:hover": { bgcolor: "rgba(0, 0, 0, 0.04)" },
-                                    }}
+                                    className="!text-[#1f2937] hover:!bg-[rgba(0,0,0,0.04)]"
                                     aria-label="Open sidebar"
                                 >
                                     <MenuIcon />
@@ -215,7 +154,6 @@ export default function Header(): JSX.Element {
                 </Toolbar>
             </AppBar>
 
-            {/* MUI Drawer for Sidebar - now controlled by SidebarContent */}
             <SidebarContent open={drawerOpen} onClose={toggleDrawer} />
         </>
     );
