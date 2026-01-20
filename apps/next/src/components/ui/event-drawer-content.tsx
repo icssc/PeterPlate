@@ -7,12 +7,6 @@ import { HallEnum } from "@/utils/types";
 import type { EventInfo } from "./card/event-card";
 import { Button } from "./shadcn/button";
 import {
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "./shadcn/dialog";
-import {
   DrawerContent,
   DrawerDescription,
   DrawerHeader,
