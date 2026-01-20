@@ -1,0 +1,1 @@
+ALTER TABLE "logged_meals" ADD CONSTRAINT "servings_is_valid" CHECK ((("logged_meals"."servings" * 2) % 1 = 0) AND ("logged_meals"."servings" >= 0.5));
