@@ -113,25 +113,20 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
 import Link from "next/link";
 import {
   Box,
   Drawer,
   Typography,
   Avatar,
-  Button,
   IconButton,
-  Stack,
   Divider,
+  Stack,
 } from "@mui/material";
-import {
-  LogOut,
-  User,
-} from "lucide-react";
+import { LogOut, User } from "lucide-react";
 
-import SidebarButton from "./sidebar-button"; // MUI version
-import SidebarDivider from "./sidebar-divider"; // Can be MUI Typography
+import SidebarButton from "./sidebar-button";
+import SidebarDivider from "./sidebar-divider";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in";
 import { useSession, signOut } from "@/utils/auth-client";
 
@@ -145,7 +140,6 @@ export default function SidebarContent({
   onClose,
 }: SidebarContentProps): JSX.Element {
   const { data: session, isPending } = useSession();
-  // const [sidebarOpen, setSidebarOpen] = useState(true)
   const user = session?.user;
 
   const handleSignOut = async () => {
@@ -159,37 +153,31 @@ export default function SidebarContent({
 
   return (
     <Drawer anchor="right" open={open} onClose={onClose}>
-      <Box
-        width={280}
-        height="100%"
-        display="flex"
-        flexDirection="column"
-        justifyContent="space-between"
-        p={2}
-      >
+      <Box className="flex h-full w-[280px] flex-col justify-between p-4">
         {/* Top */}
-        <Stack spacing={1}>
+        <Stack className="space-y-2">
           {/* Header */}
-          <Stack direction="row" spacing={1.5} alignItems="center">
+          <Stack direction="row" className="items-center gap-3">
             <Image
               src="/ZotMeal-Logo.webp"
               width={32}
               height={32}
               alt="ZotMeal Logo"
             />
-            <Typography variant="h6">
+
+            <Typography variant="h6" className="font-semibold">
               ZotMeal{" "}
               <Typography
                 component="span"
                 variant="body2"
-                color="text.secondary"
+                className="text-gray-500"
               >
                 v0.1 (preview)
               </Typography>
             </Typography>
           </Stack>
 
-          <Divider sx={{ my: 1 }} />
+          <Divider className="my-2" />
 
           <SidebarDivider title="Account" />
 
@@ -206,23 +194,13 @@ export default function SidebarContent({
           {!isPending && !user && <GoogleSignInButton />}
 
           {!isPending && user && (
-            <Box
-              display="flex"
-              alignItems="center"
-              justifyContent="space-between"
-              p={1}
-              borderRadius={1}
-              sx={{
-                "&:hover": {
-                  backgroundColor: "action.hover",
-                },
-              }}
-            >
-              <Stack direction="row" spacing={1.5} alignItems="center">
+            <Box className="flex items-center justify-between rounded-md p-2 hover:bg-gray-100">
+              <Stack direction="row" className="items-center gap-3">
                 <Avatar
                   src={user.image || "/peter.webp"}
                   alt={user.name || "User"}
                   variant="rounded"
+                  className="h-10 w-10"
                 >
                   {user.name?.[0]?.toUpperCase() ||
                     user.email?.[0]?.toUpperCase() ||
@@ -230,10 +208,13 @@ export default function SidebarContent({
                 </Avatar>
 
                 <Box>
-                  <Typography fontWeight={600}>
+                  <Typography className="font-semibold leading-tight">
                     {user.name || "User"}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography
+                    variant="body2"
+                    className="text-gray-500"
+                  >
                     {user.email || ""}
                   </Typography>
                 </Box>
@@ -243,6 +224,7 @@ export default function SidebarContent({
                 onClick={handleSignOut}
                 aria-label="Log out"
                 size="small"
+                className="hover:bg-gray-200"
               >
                 <LogOut size={18} />
               </IconButton>
