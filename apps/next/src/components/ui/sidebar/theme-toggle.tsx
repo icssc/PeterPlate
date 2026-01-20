@@ -14,29 +14,26 @@ export function ThemeToggle() {
   if (!mounted) return null;
 
   const isDark = (theme === "system" ? resolvedTheme : theme) === "dark";
+  const toggleTheme = () => setTheme(isDark ? "light" : "dark");
 
   return (
     <Button
+      type="button"
       variant="ghost"
-      className="justify-between [&_svg]:size-5"
-      asChild
+      className="w-full justify-between [&_svg]:size-5"
+      onClick={toggleTheme}
     >
-      <button
-        type="button"
-        onClick={() => setTheme(isDark ? "light" : "dark")}
-      >
-        <div className="flex gap-3 items-center">
-          {isDark ? <Sun className="stroke-1" /> : <Moon className="stroke-1" />}
-          <span className="text-md">{isDark ? "Light mode" : "Dark mode"}</span>
-        </div>
+      <div className="flex gap-3 items-center">
+        {isDark ? <Sun className="stroke-1" /> : <Moon className="stroke-1" />}
+        <span className="text-md">{isDark ? "Light mode" : "Dark mode"}</span>
+      </div>
 
-        <Switch
-          checked={isDark}
-          onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
-          onClick={(e) => e.stopPropagation()}
-          className="translate-y-[1px]"
-        />
-      </button>
+      <Switch
+        checked={isDark}
+        onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
+        onClick={(e) => e.stopPropagation()}
+        className="translate-y-[1px]"
+      />
     </Button>
   );
 }
