@@ -1,3 +1,4 @@
+import { account } from './../../../db/src/schema/auth-schema';
 import { betterAuth } from "better-auth";
 import { genericOAuth } from "better-auth/plugins";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
@@ -17,7 +18,6 @@ export const auth = betterAuth({
   baseURL: process.env.NEXT_PUBLIC_BASE_URL,
   plugins: [
     genericOAuth({
-      
       config: [
         {
           providerId: "icssc",
@@ -26,10 +26,10 @@ export const auth = betterAuth({
           scopes: ["openid", "profile", "email"],
           pkce: true,
           mapProfileToUser: (profile) => {
-            console.log("Profile:", profile);
             return {
               name: profile.name,
               email: profile.email,
+              image: profile.picture,
             };
           },
         },
