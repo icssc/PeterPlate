@@ -10,6 +10,7 @@ import SidebarButton from "./sidebar-button";
 import SidebarDivider from "./sidebar-divider";
 import { Settings2, CalendarFold, LogOut, House, Info, Pin, Trophy, StarIcon, Heart, Star, User, NotebookPen, Carrot } from "lucide-react";
 import { useSession, signOut } from "@/utils/auth-client"; // BetterAuth React hook
+import { ThemeToggle } from "./theme-toggle";
 
 /**
  * `SidebarContent` is a presentational component that renders the main content
@@ -66,6 +67,7 @@ export default function SidebarContent(): JSX.Element {
           <SidebarButton Icon={NotebookPen} title="My Meal Tracker" href="/meal-tracker" deactivated/>
 
           <SidebarDivider title="Miscellaneous"/>
+          <ThemeToggle />
           <SidebarButton Icon={Settings2} title="Settings" href="/settings" deactivated/>
           <SidebarButton Icon={Info} title="About" href="/about"/>
         </div>
@@ -75,7 +77,7 @@ export default function SidebarContent(): JSX.Element {
         
         {/* User profile is user logged in*/}
         {!isPending && user && (
-          <div className="flex p-2 items-center justify-between rounded-md hover:bg-zinc-100 transition-colors" id="sheet-bottom">
+          <div className="flex p-2 items-center justify-between rounded-md hover:bg-muted-100 transition-colors" id="sheet-bottom">
             <div className="flex gap-3 items-center">
               <Avatar className="rounded-md">
                 <AvatarImage 
