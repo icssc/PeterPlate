@@ -36,10 +36,10 @@ const RatingsCardContent = React.forwardRef<
         <CardContent sx={{ padding: "0 !important" }}>
           <div className="flex justify-between items-center h-full p-6">
             <div className="flex items-center gap-6">
-              <IconComponent className="w-10 h-10 text-slate-700" />
+              <IconComponent className="w-10 h-10 text-foreground" />
               <div className="flex flex-col">
                 <strong>{formatFoodName(food.name)}</strong>
-                <span className="text-zinc-400 text-xs mt-1">
+                <span className="text-muted-foreground text-xs mt-1">
                   Rated {new Date(food.ratedAt).toLocaleDateString()}
                 </span>
               </div>
