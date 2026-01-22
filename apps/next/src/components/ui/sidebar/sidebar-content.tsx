@@ -11,22 +11,33 @@ import {
   Divider,
   Stack,
 } from "@mui/material";
-import { LogOut, User } from "lucide-react";
-
 import SidebarButton from "./sidebar-button";
 import SidebarDivider from "./sidebar-divider";
+import { Settings2, CalendarFold, LogOut, House, Info, Pin, Trophy, StarIcon, Heart, Star, User, NotebookPen, Carrot } from "lucide-react";
+import { useSession, signOut } from "@/utils/auth-client"; // BetterAuth React hook
 import { GoogleSignInButton } from "@/components/auth/google-sign-in";
-import { useSession, signOut } from "@/utils/auth-client";
+import { ThemeToggle } from "./theme-toggle";
 
 interface SidebarContentProps {
   open: boolean;
   onClose: () => void;
 }
 
+/**
+ * `SidebarContent` is a presentational component that renders the main content
+ * displayed within the application's sidebar.
+ *
+ * It includes:
+ * - A header section with the application logo and title.
+ * - Navigation links using {@link SidebarButton} and section separators using {@link SidebarDivider}.
+ * - A user profile section at the bottom with an avatar, user details, and a logout button.
+ * @returns {JSX.Element} The rendered content for the sidebar.
+ */
 export default function SidebarContent({
   open,
   onClose,
 }: SidebarContentProps): JSX.Element {
+  // Get session data using BetterAuth's React hook
   const { data: session, isPending } = useSession();
   const user = session?.user;
 
@@ -79,6 +90,7 @@ export default function SidebarContent({
 
         {/* Bottom */}
         <Box>
+          <ThemeToggle />
           {!isPending && !user && <GoogleSignInButton />}
 
           {!isPending && user && (
