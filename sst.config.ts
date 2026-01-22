@@ -11,6 +11,13 @@ function getDomain() {
   throw new Error("Invalid stage");
 }
 
+function getClientId() {
+  if ($app.stage === "production" || $app.stage.match(/^staging-(\d+)$/))
+    return "peterplate";
+  
+  return "peterplate-dev";
+}
+
 export default $config({
   app(input) {
     return {
@@ -27,6 +34,7 @@ export default $config({
   },
   async run() {
     const domain = getDomain();
+    const clientId = getClientId();
 
     const api = new sst.aws.ApiGatewayV2("Api", {
       cors: {
@@ -48,6 +56,7 @@ export default $config({
         DATABASE_URL: process.env.DATABASE_URL!,
         BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET!,
         BETTER_AUTH_URL: `https://${domain}`,
+        AUTH_CLIENT_ID: clientId,
         NODE_ENV: process.env.NODE_ENV || "development",
       },
     });
@@ -93,6 +102,7 @@ export default $config({
         NEXT_PUBLIC_API_URL: api.url,
         DATABASE_URL: process.env.DATABASE_URL!,
         BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET!,
+        AUTH_CLIENT_ID: clientId,
         BETTER_AUTH_URL: `https://${domain}`,
       },
       cachePolicy: "50ea56d0-b7b0-4bf7-9ab8-0f7f9a0d03d5",

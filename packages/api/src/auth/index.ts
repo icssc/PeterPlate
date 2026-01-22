@@ -21,7 +21,7 @@ export const auth = betterAuth({
       config: [
         {
           providerId: "icssc",
-          clientId: "peterplate-dev",
+          clientId: process.env.AUTH_CLIENT_ID || "peterplate-dev",
           discoveryUrl: "https://auth.icssc.club/.well-known/openid-configuration",
           scopes: ["openid", "profile", "email"],
           pkce: true,
