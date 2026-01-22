@@ -9,7 +9,7 @@ export const AEMEventListSchema = z.object({
           title: z.string().min(1),
           subtitle: z.string().min(1),
           description: z.object({
-            markdown: z.string(),
+            markdown: z.string().nullable(),
           }),
           startDate: z.string().date().nullable(),
           endDate: z.string().date().nullable(),

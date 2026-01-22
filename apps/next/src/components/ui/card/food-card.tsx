@@ -115,7 +115,7 @@ const FoodCardContent = React.forwardRef<
         <CardContent>
           <div className="flex justify-between h-full pt-6">
             <div className="flex items-center gap-6 w-full">
-              {IconComponent && <IconComponent className="w-10 h-10 text-slate-700" />}
+              {IconComponent && <IconComponent className="w-10 h-10 text-foreground" />}
               <div className="flex flex-col">
                 <strong>{formatFoodName(dish.name)}</strong>
                 <div className="flex gap-2 items-center">

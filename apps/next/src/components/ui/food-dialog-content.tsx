@@ -86,19 +86,19 @@ export default function FoodDialogContent({ dish, userId } : {
               {/* Interactive rating stars - right aligned */}
               <InteractiveStarRating dishId={dish.id} userId={userId} />
             </div>
-            <div className="px-4 flex items-center gap-2 text-zinc-500">
+            <div className="px-4 flex items-center gap-2 text-muted-foreground">
               <span>{!caloricInformationAvailable ? "-" : `${Math.round(parseFloat(dish.nutritionInfo.calories ?? "0"))} cal`} • {toTitleCase(dish.restaurant)}</span>
               {dish.dietRestriction.isVegetarian && <AllergenBadge variant={"vegetarian"}/>}
               {dish.dietRestriction.isVegan && <AllergenBadge variant={"vegan"}/>}
               {dish.dietRestriction.isGlutenFree && <AllergenBadge variant={"gluten_free"}/>}
               {dish.dietRestriction.isKosher && <AllergenBadge variant={"kosher"}/>}
             </div>
-            <DialogDescription className="text-black px-4">
+            <DialogDescription className="px-4 text-muted-foreground">
               {enhanceDescription(dish.name, dish.description)}
             </DialogDescription>
             <div>
               <h1 className="px-4 text-2xl font-bold">Nutrients</h1>
-              <div className="grid grid-cols-2 gap-x-4 w-full px-4 text-black mb-4" id="nutrient-content">
+              <div className="grid grid-cols-2 gap-x-4 w-full px-4 px-4 text-foreground mb-4" id="nutrient-content">
                 {caloricInformationAvailable && Object.keys(dish.nutritionInfo)
                   .filter(key => recognizedNutrients.includes(key))
                   .map(nutrient => {
@@ -135,7 +135,7 @@ export default function FoodDialogContent({ dish, userId } : {
                 }
               </div>
               {!caloricInformationAvailable &&
-                <h2 className="text-center w-full my-10 text-sm text-zinc-600">
+                <h2 className="text-center w-full my-10 text-sm text-muted-foreground">
                   Nutritional information not available.
                 </h2> 
               }
