@@ -17,12 +17,14 @@ export const auth = betterAuth({
   baseURL: process.env.NEXT_PUBLIC_BASE_URL,
   plugins: [
     genericOAuth({
+      
       config: [
         {
           providerId: "icssc",
           clientId: "peterplate-dev",
           discoveryUrl: "https://auth.icssc.club/.well-known/openid-configuration",
           scopes: ["openid", "profile", "email"],
+          pkce: true,
           mapProfileToUser: (profile) => {
             console.log("Profile:", profile);
             return {
