@@ -49,7 +49,7 @@ interface FoodCardContentProps extends React.HTMLAttributes<HTMLDivElement> {
 const FoodCardContent = React.forwardRef<
   HTMLDivElement,
   FoodCardContentProps
->(({ dish, isFavorited, favoriteDisabled, onToggleFavorite, isSimplified, className, ...divProps }, ref) => {
+>(({ dish, isFavorited, favoriteDisabled, onToggleFavorite, isSimplified = false, className, ...divProps }, ref) => {
     const IconComponent = getFoodIcon(dish.name) ?? Utensils;
 
     /**
