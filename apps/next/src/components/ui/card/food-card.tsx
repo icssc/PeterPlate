@@ -35,6 +35,10 @@ interface FoodCardContentProps extends React.HTMLAttributes<HTMLDivElement> {
    * Handler invoked when a user toggles the favorite button.
    */
   onToggleFavorite?: (dishId: string, currentlyFavorite: boolean) => void;
+  /** 
+   * Whether to render a simplified version of the card (e.g., for compact views).
+   */
+  isSimplified?: boolean;
 }
 
 /**
@@ -42,18 +46,10 @@ interface FoodCardContentProps extends React.HTMLAttributes<HTMLDivElement> {
  * It shows the food's name, icon, calories, and a placeholder rating.
  * This component is intended to be used as a trigger for a dialog showing more details.
  */
-const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
-  (
-    {
-      dish,
-      isFavorited,
-      favoriteDisabled,
-      onToggleFavorite,
-      className,
-      ...divProps
-    },
-    ref,
-  ) => {
+const FoodCardContent = React.forwardRef<
+  HTMLDivElement,
+  FoodCardContentProps
+>(({ dish, isFavorited, favoriteDisabled, onToggleFavorite, isSimplified, className, ...divProps }, ref) => {
     const IconComponent = getFoodIcon(dish.name) ?? Utensils;
 
     /**
