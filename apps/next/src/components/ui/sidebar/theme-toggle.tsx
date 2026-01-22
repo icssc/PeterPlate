@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { Switch } from "@/components/ui/switch";
-import { Button } from "../shadcn/button";
 import { Moon, Sun } from "lucide-react";
 
 export function ThemeToggle() {
@@ -17,15 +16,20 @@ export function ThemeToggle() {
   const toggleTheme = () => setTheme(isDark ? "light" : "dark");
 
   return (
-    <Button
-      type="button"
-      variant="ghost"
-      className="w-full justify-between [&_svg]:size-5"
+    <div
+      role="button"
       onClick={toggleTheme}
+      className="flex w-full items-center justify-between px-3 py-2 rounded-md transition-colors cursor-pointer select-none hover:bg-accent hover:text-accent-foreground group"
     >
       <div className="flex gap-3 items-center">
-        {isDark ? <Sun className="stroke-1" /> : <Moon className="stroke-1" />}
-        <span className="text-md">{isDark ? "Light mode" : "Dark mode"}</span>
+        {isDark ? (
+          <Sun className="stroke-1 size-5" />
+        ) : (
+          <Moon className="stroke-1 size-5" />
+        )}
+        <span className="text-md font-medium">
+          {isDark ? "Light mode" : "Dark mode"}
+        </span>
       </div>
 
       <Switch
@@ -34,6 +38,6 @@ export function ThemeToggle() {
         onClick={(e) => e.stopPropagation()}
         className="translate-y-[1px]"
       />
-    </Button>
+    </div>
   );
 }
