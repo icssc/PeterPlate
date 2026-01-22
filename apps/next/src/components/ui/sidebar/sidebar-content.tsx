@@ -89,7 +89,7 @@ export default function SidebarContent({
         </Stack>
 
         {/* Bottom */}
-        <Box>
+        <Stack className="space-y-2">
           <ThemeToggle />
           {!isPending && !user && <GoogleSignInButton />}
 
@@ -130,7 +130,7 @@ export default function SidebarContent({
               </IconButton>
             </Box>
           )}
-        </Box>
+        </Stack>
       </Box>
     </Drawer>
   );
