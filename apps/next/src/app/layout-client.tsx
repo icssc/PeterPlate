@@ -10,7 +10,16 @@ import { DateProvider } from "@/context/date-context";
 import { ThemeProvider } from "next-themes";
 
 export function RootClient({ children }: { children: React.ReactNode }) {
-  const [queryClient] = useState(() => new QueryClient());
+  const [queryClient] = useState(() => new QueryClient({
+    defaultOptions: {
+      queries: {
+        // 5m defualt stale time
+        staleTime: 5 * 60 * 1000,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false
+      }
+    }
+  }));
   const [trpcClient] = useState(() =>
     trpc.createClient({
       links: [
