@@ -16,6 +16,10 @@ body {
   text-transform: none !important;
 }
 
+body.MuiModal-open {
+  padding-right: 0 !important;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
