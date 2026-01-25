@@ -118,7 +118,6 @@ const FoodCardContent = React.forwardRef<
           >
             <CardContent sx={{ padding: "0 !important" }}>
               <div className="flex justify-between items-center h-full p-4">
-                {/* Left side: Title, rating, description */}
                 <div className="flex flex-col gap-1" >
                   <span className="font-bold text-base text-sky-700">
                     {formatFoodName(dish.name)}
@@ -138,7 +137,9 @@ const FoodCardContent = React.forwardRef<
                     </p>
                   )}
                 </div>
-                {/* Right side: Favorite button */}
+                <button onClick={handleLogMeal}>
+                  <CirclePlus />
+                </button>
                 <div className="flex items-center">
                   <button
                     type="button"
@@ -215,7 +216,7 @@ const FoodCardContent = React.forwardRef<
                   </div>
                 </div>
                 {/*//TODO: Add user feedback on clicking button (e.g. changing Icon, making it green) */}
-                <button onClick={handleLogMeal}>
+                <button>
                   <CirclePlus />
                 </button>
               </div>
