@@ -96,17 +96,19 @@ export default function DishesInfo({
                 sortCategoryKeys(Object.keys(categoryMap)).map(categoryString => 
                   <React.Fragment key={`${categoryString}`}>
                     <MealDivider title={categoryString} />
-                    {categoryMap[categoryString].map(dish => 
-                      <FoodCard
-                        key={dish.id}
-                        {... dish}
-                        isFavorited={favoriteDishIds?.includes(dish.id)}
-                        favoriteIsLoading={
-                          !!isFavoritesLoading || !!isFavoritePending?.(dish.id)
-                        }
-                        onToggleFavorite={onToggleFavorite}
-                      />
-                    )}
+                    <div className="flex flex-wrap gap-4">
+                      {categoryMap[categoryString].map(dish => 
+                        <FoodCard
+                          key={dish.id}
+                          {... dish}
+                          isFavorited={favoriteDishIds?.includes(dish.id)}
+                          favoriteIsLoading={
+                            !!isFavoritesLoading || !!isFavoritePending?.(dish.id)
+                          }
+                          onToggleFavorite={onToggleFavorite}
+                        />
+                      )}
+                    </div>
                   </React.Fragment>
                 )
             )}
