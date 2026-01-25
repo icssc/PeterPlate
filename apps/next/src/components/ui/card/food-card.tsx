@@ -49,7 +49,7 @@ interface FoodCardContentProps extends React.HTMLAttributes<HTMLDivElement> {
 const FoodCardContent = React.forwardRef<
   HTMLDivElement,
   FoodCardContentProps
->(({ dish, isFavorited, favoriteDisabled, onToggleFavorite, isSimplified = true, className, ...divProps }, ref) => {
+>(({ dish, isFavorited, favoriteDisabled, onToggleFavorite, isSimplified = false, className, ...divProps }, ref) => {
     const IconComponent = getFoodIcon(dish.name) ?? Utensils;
 
     /**
@@ -176,51 +176,47 @@ const FoodCardContent = React.forwardRef<
     }
     
     return (
-      <div ref={ref} {...divProps} className={cn("w-full", className)}>
+      <div ref={ref} {...divProps} className={cn("w-full max-w-md", className)}>
         <Card
           className="cursor-pointer hover:shadow-lg transition w-full border"
-          sx={{ borderRadius: "16px" }}
+          sx={{ borderRadius: "12px" }}
         >
           <CardContent sx={{ padding: "0 !important" }}>
-            <div className="flex justify-between h-full p-6">
-              <div className="flex items-center gap-6 w-full">
+            <div className="flex justify-between h-full p-4">
+              <div className="flex items-start gap-4 w-full">
                 {IconComponent && (
-                  <IconComponent className="w-10 h-10 text-slate-700" />
+                  <IconComponent className="w-16 h-16 text-slate-700 flex-shrink-0" />
                 )}
-                <div className="flex flex-col">
-                  <strong>{formatFoodName(dish.name)}</strong>
-                  <div className="flex gap-2 items-center">
-                    <span>
-                      {dish.nutritionInfo.calories == null
-                        ? "-"
-                        : `${Math.round(parseFloat(dish.nutritionInfo.calories))} cal`}
-                    </span>
-                    {dish.restaurant && (
-                      <>
-                        <span className="text-zinc-400">•</span>
-                        <span className="text-zinc-500">
-                          {toTitleCase(dish.restaurant)}
+                <div className="flex flex-col gap-1">
+                  <span className="font-bold text-base text-sky-700">
+                    {formatFoodName(dish.name)}
+                  </span>
+                  <div className="flex gap-2 items-center text-slate-700 text-sm">
+                      <div className="flex gap-2 items-center text-slate-900 text-sm font-normal">
+                        <span>
+                          {dish.nutritionInfo.calories == null
+                            ? "-"
+                            : `${Math.round(parseFloat(dish.nutritionInfo.calories))} cal`}
                         </span>
-                      </>
-                    )}
-                    {/* Average rating display - grey outline star */}
+                      </div>
                     <div className="flex gap-1 items-center">
                       <Star
-                        className="w-4 h-4 stroke-zinc-200"
-                        strokeWidth={1}
+                        className="w-4 h-4 stroke-gray-500"
+                        strokeWidth={1.5}
                       />
-                      <span className="text-zinc-400 text-sm">
+                      <span>
                         {averageRating.toFixed(1)} ({ratingCount})
                       </span>
                     </div>
                   </div>
+                  {dish.description && (
+                    <p className="text-slate-900 text-sm font-normal">
+                      {dish.description}
+                    </p>
+                  )}
                 </div>
-                {/*//TODO: Add user feedback on clicking button (e.g. changing Icon, making it green) */}
-                <button onClick={handleLogMeal}>
-                  <CirclePlus />
-                </button>
               </div>
-              <div className="flex items-start">
+              <div className="flex items-center">
                 <button
                   type="button"
                   aria-label={
@@ -232,10 +228,10 @@ const FoodCardContent = React.forwardRef<
                   disabled={favoriteDisabled}
                   onClick={handleFavoriteClick}
                   className={cn(
-                    "rounded-full p-2 transition",
+                    "rounded-full p-1 transition",
                     favoriteDisabled
                       ? "opacity-60"
-                      : "hover:bg-rose-50 hover:text-rose-600",
+                      : "hover:bg-rose-50",
                   )}
                 >
                   <Heart
@@ -243,7 +239,7 @@ const FoodCardContent = React.forwardRef<
                       "w-5 h-5",
                       isFavorited
                         ? "fill-rose-500 stroke-rose-500"
-                        : "stroke-zinc-500",
+                        : "stroke-zinc-400",
                     )}
                   />
                 </button>
