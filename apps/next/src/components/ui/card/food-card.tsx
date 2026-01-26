@@ -79,7 +79,7 @@ const FoodCardContent = React.forwardRef<
   const handleLogMeal = (e: React.MouseEvent) => {
     e.stopPropagation(); 
     
-    // use toast or sonner to replace alert
+    // TODO: use [MUI snackbar](https://mui.com/material-ui/react-snackbar/) to warn users.
     if (!userid) {
       alert("You must be logged in to track meals");
       return;
@@ -99,7 +99,7 @@ const FoodCardContent = React.forwardRef<
     event.preventDefault();
     event.stopPropagation();
     
-    // use toast or sonner to replace alert
+   // TODO: use [MUI snackbar](https://mui.com/material-ui/react-snackbar/) to warn users of 
     if (!userid) {
       alert("You must be logged in to favorite meals");
       return;

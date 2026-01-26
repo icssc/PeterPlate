@@ -15,8 +15,7 @@ export default function MyFavoritesPage() {
   const user = session?.user;
 
   useEffect(() => {
-    // TODO: use sonner or toast instead of alerts
-    // to avoid duplicate warning
+    // TODO: use [MUI snackbar](https://mui.com/material-ui/react-snackbar/) to warn users.
     if (!isPending && !user?.id) {
       alert("You must be logged in to track meals");
       router.push("/");
