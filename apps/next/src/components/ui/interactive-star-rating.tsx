@@ -36,7 +36,7 @@ export default function InteractiveStarRating({ dishId }: InteractiveStarRatingP
   const handleStarClick = (stars: number) => {
     // TODO: use [MUI snackbar](https://mui.com/material-ui/react-snackbar/) to warn users. 
     if (!userId) {
-      alert("You must be logged in to rate meals");
+      alert("Login to rate meals!");
       return;
     }
 

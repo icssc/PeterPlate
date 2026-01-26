@@ -5,31 +5,29 @@ import { trpc } from "@/utils/trpc";
 import Image from "next/image";
 import RatingsCard from "@/components/ui/card/ratings-card";
 import { useRouter } from "next/navigation";
-import { useSession } from "@/utils/auth-client";
 import { useEffect } from "react";
+import { useUserStore } from "@/context/useUserStore";
 
 export default function RatedFoods() {
   const router = useRouter();
-  const { data: session, isPending } = useSession();
-  const user = session?.user;
+  const userId = useUserStore((s) => s.userId);
 
   useEffect(() => {
-    // TODO: use sonner or toast instead of alerts
-    // to avoid duplicate warning
-    if (!isPending && !user?.id) {
-      alert("You must be logged in to track meals");
+    // TODO: use [MUI snackbar](https://mui.com/material-ui/react-snackbar/) to warn users of issue
+    if (!userId) {
+      alert("Login to rate meals!");
       router.push("/");
     }
-  }, [user]);
+  }, [userId]);
 
   const {
     data: ratedFoods,
     isLoading,
     error,
   } = trpc.dish.rated.useQuery({
-    userId: user?.id
+    userId: userId!
   }, {
-    enabled: !!user?.id
+    enabled: !!userId
   });
 
   return (
@@ -61,7 +59,7 @@ export default function RatedFoods() {
             <>
               {ratedFoods && ratedFoods.length > 0 ? (
                 ratedFoods.map((food: (typeof ratedFoods)[number]) => (
-                  <RatingsCard key={`${food.id}|${food.ratedAt}`} food={food} userId={user?.id} />
+                  <RatingsCard key={`${food.id}|${food.ratedAt}`} food={food} />
                 ))
               ) : (
                 <p className="text-center text-zinc-700 py-5">

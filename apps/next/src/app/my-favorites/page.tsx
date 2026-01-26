@@ -2,8 +2,8 @@
 
 import FoodCard from "@/components/ui/card/food-card";
 import FoodCardSkeleton from "@/components/ui/skeleton/food-card-skeleton";
+import { useUserStore } from "@/context/useUserStore";
 import { useFavorites } from "@/hooks/useFavorites";
-import { useSession } from "@/utils/auth-client";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -11,16 +11,15 @@ type FavoriteEntry = ReturnType<typeof useFavorites>["favorites"][number];
 
 export default function MyFavoritesPage() {
   const router = useRouter();
-  const { data: session, isPending } = useSession();
-  const user = session?.user;
+  const userId = useUserStore((s) => s.userId);
 
   useEffect(() => {
     // TODO: use [MUI snackbar](https://mui.com/material-ui/react-snackbar/) to warn users.
-    if (!isPending && !user?.id) {
-      alert("You must be logged in to track meals");
+    if (!userId) {
+      alert("Login to favorite meals!");
       router.push("/");
     }
-  }, [user]);
+  }, [userId]);
 
   const {
     favorites,
@@ -28,7 +27,7 @@ export default function MyFavoritesPage() {
     favoritesError,
     toggleFavorite,
     isFavoritePending,
-  } = useFavorites(user?.id);
+  } = useFavorites(userId!);
 
   const hasFavorites = favorites.length > 0;
 
@@ -67,7 +66,6 @@ export default function MyFavoritesPage() {
                   isFavorited
                   favoriteIsLoading={isFavoritePending?.(favorite.dishId)}
                   onToggleFavorite={toggleFavorite}
-                  userid={user?.id}
                 />
               ))}
             </div>

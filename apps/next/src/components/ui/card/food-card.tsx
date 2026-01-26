@@ -11,6 +11,7 @@ import { CirclePlus, Heart, Star, Utensils } from "lucide-react";
 import FoodDrawerContent from "../food-drawer-content";
 import { trpc } from "@/utils/trpc";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { useUserStore } from "@/context/useUserStore";
 
 /**
  * Props for the FoodCardContent component.
@@ -32,7 +33,6 @@ interface FoodCardContentProps extends React.HTMLAttributes<HTMLDivElement> {
    * Handler invoked when a user toggles the favorite button.
    */
   onToggleFavorite?: (dishId: string, currentlyFavorite: boolean) => void;
-  userid?: string
 }
 
 /**
@@ -43,7 +43,8 @@ interface FoodCardContentProps extends React.HTMLAttributes<HTMLDivElement> {
 const FoodCardContent = React.forwardRef<
   HTMLDivElement,
   FoodCardContentProps
->(({ dish, isFavorited, favoriteDisabled, onToggleFavorite, userid, className, ...divProps }, ref) => {
+>(({ dish, isFavorited, favoriteDisabled, onToggleFavorite, className, ...divProps }, ref) => {
+  const userId = useUserStore((s) => s.userId);
     const IconComponent = getFoodIcon(dish.name) ?? Utensils;
 
     /**
@@ -77,14 +78,14 @@ const FoodCardContent = React.forwardRef<
     e.stopPropagation(); 
     
     // TODO: use [MUI snackbar](https://mui.com/material-ui/react-snackbar/) to warn users.
-    if (!userid) {
-      alert("You must be logged in to track meals");
+    if (!userId) {
+      alert("Login to track meals!");
       return;
     }
 
     logMealMutation.mutate({
       dishId: dish.id,
-      userId: userid,
+      userId: userId,
       dishName: dish.name,
       servings: 1, // Default to 1 serving (TODO: add ability to manually input servings. Maybe a popup will ask to input a multiple of 0.5)
     });
@@ -97,8 +98,8 @@ const FoodCardContent = React.forwardRef<
     event.stopPropagation();
     
    // TODO: use [MUI snackbar](https://mui.com/material-ui/react-snackbar/) to warn users of 
-    if (!userid) {
-      alert("You must be logged in to favorite meals");
+    if (!userId) {
+      alert("Login to favorite meals!");
       return;
     }
 
@@ -208,14 +209,12 @@ interface FoodCardProps extends DishInfo {
   favoriteIsLoading?: boolean;
   /** Handler to toggle the favorite state. */
   onToggleFavorite?: (dishId: string, currentlyFavorite: boolean) => void;
-  userid?: string
 }
 
 export default function FoodCard({
   isFavorited = false,
   favoriteIsLoading = false,
   onToggleFavorite,
-  userid,
   ...dish
 }: FoodCardProps): React.JSX.Element {
   const isDesktop = useMediaQuery("(min-width: 768px)");
@@ -232,7 +231,6 @@ export default function FoodCard({
           isFavorited={isFavorited}
           favoriteDisabled={favoriteIsLoading}
           onToggleFavorite={onToggleFavorite}
-            userid={userid}
           onClick={handleOpen}
         />
         <Dialog
@@ -252,7 +250,7 @@ export default function FoodCard({
             },
           }}
         >
-          <FoodDialogContent dish={dish} userId={userid} />
+          <FoodDialogContent dish={dish} />
         </Dialog>
       </>
     );
@@ -264,7 +262,6 @@ export default function FoodCard({
           isFavorited={isFavorited}
           favoriteDisabled={favoriteIsLoading}
           onToggleFavorite={onToggleFavorite}
-            userid={userid}
           onClick={handleOpen}
         />
         <Drawer
@@ -293,7 +290,7 @@ export default function FoodCard({
             },
           }}
         >
-          <FoodDrawerContent dish={dish} userId={userid} />
+          <FoodDrawerContent dish={dish} />
         </Drawer>
       </>
     );

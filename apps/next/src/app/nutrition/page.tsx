@@ -4,27 +4,26 @@ import type { SelectLoggedMeal } from "@zotmeal/db";
 import { useEffect, useMemo, useState } from "react";
 import NutritionBreakdown from "@/components/ui/nutrition-breakdown";
 import { trpc } from "@/utils/trpc";
-import { useSession } from "@/utils/auth-client";
 import { useRouter } from "next/navigation";
+import { useUserStore } from "@/context/useUserStore";
 
 export default function MealTracker() {
   const router = useRouter();
-  const { data: session, isPending } = useSession();
-  const user = session?.user;
+  const userId = useUserStore((s) => s.userId);
 
   useEffect(() => {
     // TODO: use [MUI snackbar](https://mui.com/material-ui/react-snackbar/) to warn users of issue
-    if (!isPending && !user?.id) {
-      alert("You must be logged in to track meals");
+    if (!userId) {
+      alert("Login to track meals!");
       router.push("/");
     }
-  }, [user]);
+  }, [userId]);
 
   const {
     data: meals,
     isLoading,
     error,
-  } = trpc.nutrition.getMealsInLastWeek.useQuery({ userId: user?.id });
+  } = trpc.nutrition.getMealsInLastWeek.useQuery({ userId: userId! });
   const [activeDayIndex, setActiveDayIndex] = useState<number | null>(null);
 
   const mealsGroupedByDay = useMemo(() => {

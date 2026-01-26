@@ -8,7 +8,7 @@ import { DishInfo } from "@zotmeal/api";
 import MealDivider from "./meal-divider";
 import { sortCategoryKeys } from "@/utils/funcs";
 import { useFavorites } from "@/hooks/useFavorites";
-import { useSession } from "@/utils/auth-client";
+import { useUserStore } from "@/context/useUserStore";
 
 
 /**
@@ -48,15 +48,14 @@ export default function DishesInfo({
   isError,
   errorMessage,
 }: DishesInfoProps): JSX.Element {
-  const { data: session, isPending } = useSession();
-  const user = session?.user;
+  const userId = useUserStore((s) => s.userId);
 
   const {
     favoriteIds,
     isLoadingFavorites,
     toggleFavorite,
     isFavoritePending,
-  } = useFavorites(user?.id);
+  } = useFavorites(userId!);
 
   const favoriteDishIds = favoriteIds ?? [];
   const onToggleFavorite = toggleFavorite;
@@ -109,7 +108,6 @@ export default function DishesInfo({
                           !!isFavoritesLoading || !!isFavoritePending?.(dish.id)
                         }
                         onToggleFavorite={onToggleFavorite}
-                        userid={user?.id}
                       />
                     )}
                   </React.Fragment>
