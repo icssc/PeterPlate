@@ -11,7 +11,6 @@ import { CirclePlus, Heart, Star, Utensils } from "lucide-react";
 import FoodDrawerContent from "../food-drawer-content";
 import { trpc } from "@/utils/trpc";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-// import { useSession } from "@/utils/auth-client"; 
 
 /**
  * Props for the FoodCardContent component.
