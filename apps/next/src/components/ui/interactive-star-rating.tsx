@@ -4,22 +4,23 @@ import { useState, useEffect } from "react";
 import { Star } from "lucide-react";
 import { useRatings } from "@/hooks/useRatings";
 import { trpc } from "@/utils/trpc";
-
-const DEFAULT_USER_ID = "default-user"; // replace with real user ID when auth is set up
+import { useUserStore } from "@/context/useUserStore";
 
 interface InteractiveStarRatingProps {
   dishId: string;
-  userId?: string;
 }
 
-export default function InteractiveStarRating({ dishId, userId }: InteractiveStarRatingProps) {
+export default function InteractiveStarRating({ dishId }: InteractiveStarRatingProps) {
+  const userId = useUserStore((s) => s.userId);
   const [userRating, setUserRating] = useState<number | undefined>(0);
   const [hoverRating, setHoverRating] = useState<number | null>(null);
 
-  const { rateDish } = useRatings(userId);
+  const { rateDish } = useRatings(userId!);
+
+  console.log(userId)
 
   const { data: existingRating } = trpc.user.getUserRating.useQuery(
-    { userId, dishId },
+    { userId: userId!, dishId },
     {
       enabled: !!userId, 
       staleTime: 5 * 60 * 1000

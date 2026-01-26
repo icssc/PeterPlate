@@ -38,6 +38,8 @@ export function RootClient({ children }: { children: React.ReactNode }) {
     }),
   );
 
+  // syncs better auth session 
+  // with zustand user store
   const { data: session, isPending } = useSession();
   const setUserId = useUserStore((s) => s.setUserId);
   const clearUser = useUserStore((s) => s.clearUser);

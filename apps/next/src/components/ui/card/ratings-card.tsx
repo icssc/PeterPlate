@@ -9,13 +9,13 @@ import InteractiveStarRating from "../interactive-star-rating";
 import { DishInfo } from "@zotmeal/api";
 import FoodDialogContent from "../food-dialog-content";
 import { cn } from "@/utils/tw";
+import { useUserStore } from "@/context/useUserStore";
 
 interface RatingsCardProps {
   food: DishInfo & {
     rating: number;
     ratedAt: string | Date;
   };
-  userId?: string;
 }
 
 const RatingsCardContent = React.forwardRef<
@@ -24,9 +24,8 @@ const RatingsCardContent = React.forwardRef<
     food: RatingsCardProps["food"];
     handleDelete: (e: React.MouseEvent) => Promise<void>;
     deleteLoading: boolean;
-    userId?: string
   } & React.HTMLAttributes<HTMLDivElement>
->(({ food, handleDelete, deleteLoading, className, userId, ...divProps }, ref) => {
+>(({ food, handleDelete, deleteLoading, className, ...divProps }, ref) => {
   const IconComponent = getFoodIcon(food.name) ?? Utensils;
 
   return (
@@ -50,7 +49,7 @@ const RatingsCardContent = React.forwardRef<
               className="flex flex-row items-center ml-4 gap-4"
               onClick={(e) => e.stopPropagation()} // keep stars/delete interactive
             >
-              <InteractiveStarRating dishId={food.id} userId={userId} />
+              <InteractiveStarRating dishId={food.id} />
               <IconButton
                 onClick={handleDelete}
                 disabled={deleteLoading}
@@ -72,9 +71,9 @@ const RatingsCardContent = React.forwardRef<
 });
 RatingsCardContent.displayName = "RatingsCardContent";
 
-export default function RatingsCard({ food, userId }: RatingsCardProps) {
+export default function RatingsCard({ food }: RatingsCardProps) {
+  const userId = useUserStore((s) => s.userId);
   const [open, setOpen] = React.useState(false);
-  const isDesktop = useMediaQuery("(min-width: 768px)");
   const utils = trpc.useUtils();
   
   const deleteRatingMutation = trpc.dish.deleteRating.useMutation({
@@ -102,7 +101,6 @@ export default function RatingsCard({ food, userId }: RatingsCardProps) {
         handleDelete={handleDelete}
         deleteLoading={deleteRatingMutation.isLoading}
         onClick={handleOpen}
-        userId={userId}
       />
       <Dialog
         open={open}
@@ -121,7 +119,7 @@ export default function RatingsCard({ food, userId }: RatingsCardProps) {
           },
         }}
       >
-        <FoodDialogContent {...food} userId={userId} />
+        <FoodDialogContent dish={food} />
       </Dialog>
     </>
   );

@@ -16,7 +16,7 @@ import { toTitleCase, enhanceDescription } from "@/utils/funcs";
 import { AllergenBadge } from "./allergen-badge";
 import InteractiveStarRating from "./interactive-star-rating";
 
-export default function FoodDrawerContent( {dish, userId }: {dish: DishInfo; userId?: string}) {
+export default function FoodDrawerContent({ dish }: { dish: DishInfo }) {
 
   const ingredientsAvailable: boolean = dish.ingredients != null 
     && dish.ingredients.length > 0;
@@ -84,7 +84,7 @@ export default function FoodDrawerContent( {dish, userId }: {dish: DishInfo; use
 
           {/* Interactive rating stars */}
           <div className="flex gap-2 pt-0.5">
-            <InteractiveStarRating dishId={dish.id} userId={userId} />
+            <InteractiveStarRating dishId={dish.id} />
           </div>
 
           <p className="text-black leading-relaxed">
