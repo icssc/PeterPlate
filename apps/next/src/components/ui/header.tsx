@@ -13,11 +13,22 @@ import SidebarContent from "./sidebar/sidebar-content";
 export default function Header(): JSX.Element {
     const { data: session, isPending } = useSession();
     const user = session?.user;
-    const [drawerOpen, setDrawerOpen] = useState(false);
+    // const [drawerOpen, setDrawerOpen] = useState(false);
+    const [profileAnchor, setProfileAnchor] = useState<null | HTMLElement>(null);
+    const profileOpen = Boolean(profileAnchor);
     const [diningHallsAnchor, setDiningHallsAnchor] = useState<null | HTMLElement>(null);
 
-    const toggleDrawer = () => {
-        setDrawerOpen(!drawerOpen);
+    // const toggleDrawer = () => {
+    //     setDrawerOpen(!drawerOpen);
+    // };
+
+
+    const handleProfileOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setProfileAnchor(event.currentTarget);
+    };
+
+    const handleProfileClose = () => {
+    setProfileAnchor(null);
     };
 
     const handleDiningHallsClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -131,7 +142,7 @@ export default function Header(): JSX.Element {
                                     {user.name || user.email || "User"}
                                 </span>
                                 <IconButton
-                                    onClick={toggleDrawer}
+                                    onClick={handleProfileOpen}
                                     className="!text-[#1f2937] hover:!bg-[rgba(0,0,0,0.04)]"
                                     aria-label="Open sidebar"
                                 >
@@ -142,7 +153,7 @@ export default function Header(): JSX.Element {
                             <div className="flex items-center gap-2">
                                 <GoogleSignInButton />
                                 <IconButton
-                                    onClick={toggleDrawer}
+                                    onClick={handleProfileOpen}
                                     className="!text-[#1f2937] hover:!bg-[rgba(0,0,0,0.04)]"
                                     aria-label="Open sidebar"
                                 >
@@ -154,7 +165,29 @@ export default function Header(): JSX.Element {
                 </Toolbar>
             </AppBar>
 
-            <SidebarContent open={drawerOpen} onClose={toggleDrawer} />
+            {/* <SidebarContent open={drawerOpen} onClose={toggleDrawer} /> */}
+            <Menu
+                anchorEl={profileAnchor}
+                open={profileOpen}
+                onClose={handleProfileClose}
+                anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: "right",
+                }}
+                transformOrigin={{
+                    vertical: "top",
+                    horizontal: "right",
+                }}
+                PaperProps={{
+                    sx: {
+                    width: 320,
+                    borderRadius: 3,
+                    mt: 1,
+                    },
+                }}
+                >
+                <SidebarContent onClose={handleProfileClose} />
+            </Menu>
         </>
     );
 }
