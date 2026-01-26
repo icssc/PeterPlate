@@ -1,17 +1,14 @@
 "use client";
 
 import React from "react";
-import { Card, CardContent } from "../shadcn/card";
+import { Card, CardContent, Dialog, IconButton } from "@mui/material";
 import { Utensils, Trash2 } from "lucide-react";
 import { formatFoodName, getFoodIcon } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
 import InteractiveStarRating from "../interactive-star-rating";
 import { DishInfo } from "@zotmeal/api";
-import { Dialog, DialogTrigger } from "../shadcn/dialog";
-import { Drawer, DrawerTrigger } from "../shadcn/drawer";
-import FoodDrawerContent from "../food-drawer-content";
 import FoodDialogContent from "../food-dialog-content";
-import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { cn } from "@/utils/tw";
 
 interface RatingsCardProps {
   food: DishInfo & {
@@ -29,14 +26,17 @@ const RatingsCardContent = React.forwardRef<
     deleteLoading: boolean;
     userId?: string
   } & React.HTMLAttributes<HTMLDivElement>
->(({ food, handleDelete, deleteLoading, userId, ...divProps }, ref) => {
+>(({ food, handleDelete, deleteLoading, className, userId, ...divProps }, ref) => {
   const IconComponent = getFoodIcon(food.name) ?? Utensils;
 
   return (
-    <div ref={ref} {...divProps} className="w-full"> {}
-      <Card className="cursor-pointer hover:shadow-lg transition w-full">
-        <CardContent>
-          <div className="flex justify-between items-center h-full pt-6">
+    <div ref={ref} {...divProps} className={cn("w-full", className)}>
+      <Card
+        className="cursor-pointer hover:shadow-lg transition w-full border"
+        sx={{ borderRadius: "16px" }}
+      >
+        <CardContent sx={{ padding: "0 !important" }}>
+          <div className="flex justify-between items-center h-full p-6">
             <div className="flex items-center gap-6">
               <IconComponent className="w-10 h-10 text-foreground" />
               <div className="flex flex-col">
@@ -51,13 +51,18 @@ const RatingsCardContent = React.forwardRef<
               onClick={(e) => e.stopPropagation()} // keep stars/delete interactive
             >
               <InteractiveStarRating dishId={food.id} userId={userId} />
-              <button
+              <IconButton
                 onClick={handleDelete}
                 disabled={deleteLoading}
                 title="Delete Rating"
+                size="small"
+                className={cn(
+                  "text-gray-400 hover:text-red-500 transition",
+                  deleteLoading && "opacity-60",
+                )}
               >
-                <Trash2 className="w-4 h-4 text-muted-foreground hover:text-rose-500" />
-              </button>
+                <Trash2 className="w-4 h-4" />
+              </IconButton>
             </div>
           </div>
         </CardContent>
@@ -68,6 +73,7 @@ const RatingsCardContent = React.forwardRef<
 RatingsCardContent.displayName = "RatingsCardContent";
 
 export default function RatingsCard({ food, userId }: RatingsCardProps) {
+  const [open, setOpen] = React.useState(false);
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const utils = trpc.useUtils();
   
@@ -86,32 +92,37 @@ export default function RatingsCard({ food, userId }: RatingsCardProps) {
     }
   };
 
-  if (isDesktop)
-    return (
-      <Dialog>
-        <DialogTrigger asChild>
-          <RatingsCardContent
-            food={food}
-            handleDelete={handleDelete}
-            deleteLoading={deleteRatingMutation.isLoading}
-            userId={userId}
-          />
-        </DialogTrigger>
-        <FoodDialogContent dish={food} userId={userId} />
+  const handleOpen = () => setOpen(true); // no dialog trigger component in MUI so handling manually
+  const handleClose = () => setOpen(false);
+
+  return (
+    <>
+      <RatingsCardContent
+        food={food}
+        handleDelete={handleDelete}
+        deleteLoading={deleteRatingMutation.isLoading}
+        onClick={handleOpen}
+        userId={userId}
+      />
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        maxWidth={false}
+        slotProps={{
+          paper: {
+            sx: {
+              width: "460px",
+              maxWidth: "90vw",
+              margin: 2,
+              padding: 0,
+              overflow: "hidden",
+              borderRadius: "6px",
+            },
+          },
+        }}
+      >
+        <FoodDialogContent {...food} userId={userId} />
       </Dialog>
-    );
-  else
-    return (
-      <Drawer>
-        <DrawerTrigger asChild>
-          <RatingsCardContent
-            food={food}
-            handleDelete={handleDelete}
-            deleteLoading={deleteRatingMutation.isLoading}
-            userId={userId}
-          />
-        </DrawerTrigger>
-        <FoodDrawerContent dish={food} userId={userId} />
-      </Drawer>
-    );
+    </>
+  );
 }

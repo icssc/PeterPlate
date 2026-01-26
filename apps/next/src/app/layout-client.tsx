@@ -5,11 +5,21 @@ import { httpBatchLink } from "@trpc/client";
 import { trpc } from "../utils/trpc";
 import superjson from "superjson";
 import Toolbar from "@/components/ui/toolbar";
+import Header from "@/components/ui/header";
 import { DateProvider } from "@/context/date-context";
 import { ThemeProvider } from "next-themes";
 
 export function RootClient({ children }: { children: React.ReactNode }) {
-  const [queryClient] = useState(() => new QueryClient());
+  const [queryClient] = useState(() => new QueryClient({
+    defaultOptions: {
+      queries: {
+        // 5m defualt stale time
+        staleTime: 5 * 60 * 1000,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false
+      }
+    }
+  }));
   const [trpcClient] = useState(() =>
     trpc.createClient({
       links: [
@@ -37,7 +47,7 @@ export function RootClient({ children }: { children: React.ReactNode }) {
       <trpc.Provider client={trpcClient} queryClient={queryClient}>
         <QueryClientProvider client={queryClient}>
           <DateProvider>
-            <Toolbar />
+            <Header />
             {children}
           </DateProvider>
         </QueryClientProvider>
