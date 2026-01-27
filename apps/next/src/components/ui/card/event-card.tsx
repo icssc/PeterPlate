@@ -74,7 +74,7 @@ const EventCardContent = React.forwardRef<
             width={0}
             height={0}
             sizes="100vw"
-            className="w-full sm:w-[300px] md:w-[200px] h-auto rounded-sm"
+            className="w-full sm:w-[300px] md:w-[200px] h-auto rounded-sm mx-auto sm:mx-0"
           />
           <div className="flex flex-col gap-1 h-full" id="event-card-content">
             <div className="flex flex-row gap-2">

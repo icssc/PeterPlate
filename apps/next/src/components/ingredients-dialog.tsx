@@ -9,7 +9,7 @@ interface IngredientsDialogProps {
 export default function IngredientsDialog({
   name,
   ingredients,
-}: IngredientsDialogProps): JSX.Element {
+}: IngredientsDialogProps): React.JSX.Element {
   const [open, setOpen] = useState(false);
 
   const handleOpen = () => setOpen(true);

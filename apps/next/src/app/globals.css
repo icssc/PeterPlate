@@ -20,6 +20,9 @@ body {
 .font-poppins {
   font-family: 'Poppins', sans-serif;
 }
+body {
+  padding-right: 0 !important;
+}
 
 @layer base {
   :root {

@@ -276,7 +276,7 @@ export default function FoodCard({
                 margin: 2,
                 padding: 0,
                 overflow: "hidden",
-                borderRadius: "6px",
+                borderRadius: "16px",
               },
             },
           }}
