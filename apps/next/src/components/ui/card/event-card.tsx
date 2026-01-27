@@ -74,7 +74,7 @@ const EventCardContent = React.forwardRef<
             width={0}
             height={0}
             sizes="100vw"
-            className="w-full sm:w-[300px] md:w-[200px] h-auto rounded-sm mx-auto sm:mx-0"
+            className="w-full sm:w-[300px] md:w-[200px] h-auto rounded-sm"
           />
           <div className="flex flex-col gap-1 h-full" id="event-card-content">
             <div className="flex flex-row gap-2">
@@ -132,6 +132,7 @@ export default function EventCard(props: EventInfo): React.JSX.Element {
           slotProps={{
             paper: {
               sx: {
+                width: "460px",
                 maxWidth: "90vw",
                 margin: 2,
                 padding: 0,
@@ -156,6 +157,7 @@ export default function EventCard(props: EventInfo): React.JSX.Element {
           slotProps={{
             paper: {
               sx: {
+                width: "460px",
                 maxWidth: "90vw",
                 margin: 2,
                 overflow: "hidden",
