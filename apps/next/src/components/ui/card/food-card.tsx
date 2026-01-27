@@ -176,7 +176,7 @@ const FoodCardContent = React.forwardRef<
     }
     
     return (
-      <div ref={ref} {...divProps} className={cn("w-full max-w-md", className)}>
+      <div ref={ref} {...divProps} className={cn("w-80 flex-shrink-0", className)}>
         <Card
           className="cursor-pointer hover:shadow-lg transition w-full border"
           sx={{ borderRadius: "12px" }}
@@ -192,13 +192,13 @@ const FoodCardContent = React.forwardRef<
                     {formatFoodName(dish.name)}
                   </span>
                   <div className="flex gap-2 items-center text-slate-700 text-sm">
-                      <div className="flex gap-2 items-center text-slate-900 text-sm font-normal">
-                        <span>
-                          {dish.nutritionInfo.calories == null
-                            ? "-"
-                            : `${Math.round(parseFloat(dish.nutritionInfo.calories))} cal`}
-                        </span>
-                      </div>
+                    <div className="flex gap-2 items-center text-slate-900 text-sm font-normal">
+                      <span>
+                        {dish.nutritionInfo.calories == null
+                          ? "-"
+                          : `${Math.round(parseFloat(dish.nutritionInfo.calories))} cal`}
+                      </span>
+                    </div>
                     <div className="flex gap-1 items-center">
                       <Star
                         className="w-4 h-4 stroke-gray-500"
