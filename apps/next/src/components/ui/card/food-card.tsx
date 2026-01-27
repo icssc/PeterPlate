@@ -176,7 +176,7 @@ const FoodCardContent = React.forwardRef<
     }
     
     return (
-      <div ref={ref} {...divProps} className={cn("w-80 flex-shrink-0", className)}>
+      <div ref={ref} {...divProps} className={cn("max-w-xs flex-shrink-0", className)}>
         <Card
           className="cursor-pointer hover:shadow-lg transition w-full border"
           sx={{ borderRadius: "12px" }}
