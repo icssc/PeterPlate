@@ -42,7 +42,7 @@ export default function FoodDrawerContent({ dish }: { dish: DishInfo }) {
   ]);
 
   return (
-    <Box className="max-h-[95vh] flex flex-col">
+    <Box className="max-h-[95vh] flex flex-col font-poppins">
       <Box className="pb-4">
         <Image
           src={"/zm-card-header.webp"}
@@ -53,7 +53,7 @@ export default function FoodDrawerContent({ dish }: { dish: DishInfo }) {
         />
         <Box className="px-4 pt-4 flex flex-col gap-2">
           <div className="flex items-center justify-between">
-            <h2 className="text-3xl font-semibold leading-tight tracking-normal">
+            <h2 className="text-3xl font-bold leading-tight tracking-normal text-sky-700">
               {formatFoodName(dish.name)}
             </h2>
             <Pin className="stroke-zinc-500" />
@@ -61,10 +61,10 @@ export default function FoodDrawerContent({ dish }: { dish: DishInfo }) {
 
           <div className="flex flex-wrap items-center gap-2 text-zinc-500">
             <span className="whitespace-nowrap">
+              {toTitleCase(dish.restaurant)} •{" "}
               {!caloricInformationAvailable
                 ? "-"
-                : `${Math.round(parseFloat(dish.nutritionInfo.calories ?? "0"))} cal`}{" "}
-              • {toTitleCase(dish.restaurant)}
+                : `${Math.round(parseFloat(dish.nutritionInfo.calories ?? "0"))} cal`}
             </span>
             <div className="flex items-center gap-2 flex-wrap">
               {dish.dietRestriction.isVegetarian && (
@@ -118,10 +118,24 @@ export default function FoodDrawerContent({ dish }: { dish: DishInfo }) {
                         : "max-h-8 opacity-100 py-0.5", // Conditional styles for collapse/expand
                     )}
                   >
-                    <strong className="col-span-1 text-left">
+                    <strong
+                      className={cn(
+                        "col-span-1 text-left",
+                        (nutrientKey === "transFatG" ||
+                          nutrientKey === "saturatedFatG") &&
+                          "text-gray-500 pl-4",
+                      )}
+                    >
                       {formatNutrientLabel(nutrientKey)}
                     </strong>
-                    <span className="col-span-1 text-right">
+                    <span
+                      className={cn(
+                        "col-span-1 text-right",
+                        (nutrientKey === "transFatG" ||
+                          nutrientKey === "saturatedFatG") &&
+                          "text-gray-500",
+                      )}
+                    >
                       {value == null
                         ? "-"
                         : `${String(formattedValue)} ${nutrientToUnit[nutrientKey]}`}
