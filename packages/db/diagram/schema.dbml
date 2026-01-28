@@ -1,11 +1,37 @@
 enum restaurant_id_enum {
-  3056
-  3314
+  anteatery
+  brandywine
 }
 
 enum restaurant_name_enum {
   anteatery
   brandywine
+}
+
+table account {
+  id text [pk, not null]
+  accountId text [not null]
+  providerId text [not null]
+  userId text [not null]
+  accessToken text
+  refreshToken text
+  idToken text
+  accessTokenExpiresAt timestamp
+  refreshTokenExpiresAt timestamp
+  scope text
+  password text
+  createdAt timestamp [not null, default: `now()`]
+  updatedAt timestamp [not null, default: `now()`]
+}
+
+table contributors {
+  login text [pk, not null]
+  avatar_url text [not null]
+  contributions integer [not null]
+  name text
+  bio text [default: 'ZotMeal Contributor']
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp
 }
 
 table diet_restrictions {
@@ -33,13 +59,22 @@ table diet_restrictions {
 table dishes {
   id text [pk, not null]
   station_id text [not null]
+  menu_id text [not null]
   name text [not null]
   description text [not null]
+  ingredients text [default: 'Ingredient Statement Not Available']
   category text [not null, default: 'Other']
   num_ratings integer [not null, default: 0]
   total_rating integer [not null, default: 0]
   created_at timestamp [not null, default: `now()`]
   updated_at timestamp
+
+  indexes {
+    station_id [name: 'dishes_station_id_idx']
+    menu_id [name: 'dishes_menu_id_idx']
+    name [name: 'dishes_name_idx']
+    category [name: 'dishes_category_idx']
+  }
 }
 
 table dishes_to_menus {
@@ -57,58 +92,18 @@ table events {
   restaurant_id restaurant_id_enum [not null]
   short_description text
   long_description text
-  start timestamp [not null]
-  end timestamp [not null]
+  start timestamp
+  end timestamp
   created_at timestamp [not null, default: `now()`]
   updated_at timestamp
 
   indexes {
     (title, restaurant_id, start) [pk]
+    restaurant_id [name: 'events_restaurant_id_idx']
   }
 }
 
-table menus {
-  id text [pk, not null]
-  period_id text [not null]
-  date date [not null]
-  restaurant_id restaurant_id_enum [not null]
-  price text [not null]
-  created_at timestamp [not null, default: `now()`]
-  updated_at timestamp
-}
-
-table nutrition_infos {
-  dish_id text [pk, not null]
-  serving_size text
-  serving_unit text
-  calories text
-  total_fat_g text
-  trans_fat_g text
-  saturated_fat_g text
-  cholesterol_mg text
-  sodium_mg text
-  total_carbs_g text
-  dietary_fiber_g text
-  sugars_mg text
-  protein_g text
-  vitamin_a_iu text
-  vitamin_c_iu text
-  calcium_mg text
-  iron_mg text
-  created_at timestamp [not null, default: `now()`]
-  updated_at timestamp
-}
-
-table periods {
-  id text [pk, not null]
-  start time [not null]
-  end time [not null]
-  name text [not null]
-  created_at timestamp [not null, default: `now()`]
-  updated_at timestamp
-}
-
-table pins {
+table favorites {
   user_id text [not null]
   dish_id text [not null]
   created_at timestamp [not null, default: `now()`]
@@ -119,6 +114,76 @@ table pins {
   }
 }
 
+table logged_meals {
+  user_id text [not null]
+  dish_id text [not null]
+  dish_name text [not null]
+  servings real [not null, default: 1]
+  eaten_at timestamp [not null, default: `now()`]
+
+  indexes {
+    (user_id, dish_id) [pk]
+    
+  }
+}
+
+table menus {
+  id text [pk, not null]
+  period_id text [not null]
+  date date [not null]
+  restaurant_id restaurant_id_enum [not null]
+  price "numeric(6, 2)"
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp
+
+  indexes {
+    (restaurant_id, date) [name: 'menus_restaurant_date_idx']
+    restaurant_id [name: 'menus_restaurant_id_idx']
+    date [name: 'menus_date_idx']
+    period_id [name: 'menus_period_id_idx']
+    
+    
+  }
+}
+
+table nutrition_infos {
+  dish_id text [pk, not null]
+  serving_size text
+  serving_unit text
+  calories "numeric(10, 2)"
+  total_fat_g "numeric(10, 2)"
+  trans_fat_g "numeric(10, 2)"
+  saturated_fat_g "numeric(10, 2)"
+  cholesterol_mg "numeric(10, 2)"
+  sodium_mg "numeric(10, 2)"
+  total_carbs_g "numeric(10, 2)"
+  dietary_fiber_g "numeric(10, 2)"
+  sugars_g "numeric(10, 2)"
+  protein_g "numeric(10, 2)"
+  calcium "numeric(10, 2)"
+  iron "numeric(10, 2)"
+  vitamin_a "numeric(10, 2)"
+  vitamin_c "numeric(10, 2)"
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp
+}
+
+table periods {
+  id text [not null]
+  date date [not null]
+  restaurant_id restaurant_id_enum [not null]
+  start time [not null]
+  end time [not null]
+  name text [not null]
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp
+
+  indexes {
+    (id, date, restaurant_id) [pk]
+    (restaurant_id, date) [name: 'periods_restaurant_date_idx']
+  }
+}
+
 table push_tokens {
   token text [pk, not null]
 }
@@ -126,7 +191,7 @@ table push_tokens {
 table ratings {
   user_id text [not null]
   dish_id text [not null]
-  rating smallint [not null]
+  rating real [not null]
   created_at timestamp [not null, default: `now()`]
   updated_at timestamp
 
@@ -142,19 +207,46 @@ table restaurants {
   updated_at timestamp
 }
 
+table session {
+  id text [pk, not null]
+  expiresAt timestamp [not null]
+  token text [not null, unique]
+  createdAt timestamp [not null, default: `now()`]
+  updatedAt timestamp [not null, default: `now()`]
+  ipAddress text
+  userAgent text
+  userId text [not null]
+}
+
 table stations {
   id text [pk, not null]
   name text [not null]
   restaurant_id restaurant_id_enum [not null]
   created_at timestamp [not null, default: `now()`]
   updated_at timestamp
+
+  indexes {
+    restaurant_id [name: 'stations_restaurant_id_idx']
+  }
 }
 
 table users {
   id text [pk, not null]
   name text [not null]
+  email text [not null, unique]
+  emailVerified boolean [not null, default: false]
+  image text
   created_at timestamp [not null, default: `now()`]
   updated_at timestamp
+}
+
+table verification {
+  id text [pk, not null]
+  identifier text [not null]
+  value text [not null]
+  expiresAt timestamp [not null]
+  createdAt timestamp [default: `now()`]
+  updatedAt timestamp [default: `now()`]
 }
 
 ref: dishes.station_id > stations.id
@@ -169,13 +261,13 @@ ref: dishes_to_menus.menu_id > menus.id
 
 ref: events.restaurant_id > restaurants.id
 
+ref: favorites.dish_id - dishes.id
+
+ref: favorites.user_id > users.id
+
 ref: menus.restaurant_id > restaurants.id
 
-ref: menus.period_id - periods.id
-
-ref: pins.dish_id - dishes.id
-
-ref: pins.user_id > users.id
+ref: menus.(period_id, date) - periods.(id, date)
 
 ref: ratings.dish_id - dishes.id
 

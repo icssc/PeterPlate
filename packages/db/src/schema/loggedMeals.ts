@@ -22,7 +22,7 @@ export const loggedMeals = pgTable("logged_meals", {
     servingsIsValid: check(
       "servings_is_valid",
       // Must be >= 0.5 AND a multiple of 0.5
-      sql`((${table.servings} * 2) % 1 = 0) AND (${table.servings} >= 0.5)`
+      sql`((${table.servings} * 2) = floor(${table.servings} * 2)) AND (${table.servings} >= 0.5)`
     )
   })
 );
