@@ -9,11 +9,11 @@ import type {
   InsertStation,
   InsertUser,
 } from "@zotmeal/db";
-import { restaurantIds } from "@zotmeal/db";
+import { getRestaurantId } from "@zotmeal/db";
 import { addDays, format } from "date-fns";
 
-const brandywineId = restaurantIds[0];
-const anteateryId = restaurantIds[1];
+const anteateryId = getRestaurantId("anteatery");
+const brandywineId = getRestaurantId("brandywine");
 const dishId = "dish1";
 const menuId = "menu1";
 const stationId = "station1";
@@ -67,19 +67,19 @@ const dish = {
     servingSize: "350",
     servingUnit: "grams",
     calories: "560",
-    totalFatG: "21g",
-    transFatG: "0g",
-    saturatedFatG: "4g",
-    cholesterolMg: "125mg",
-    sodiumMg: "650mg",
-    totalCarbsG: "45g",
-    dietaryFiberG: "6g",
-    sugarsG: "5g",
-    proteinG: "45g",
-    vitaminAIU: "25%",
-    vitaminCIU: "30%",
-    calciumMg: "4%",
-    ironMg: "15%",
+    totalFatG: "21",
+    transFatG: "0",
+    saturatedFatG: "4",
+    cholesterolMg: "125",
+    sodiumMg: "650",
+    totalCarbsG: "45",
+    dietaryFiberG: "6",
+    sugarsG: "5",
+    proteinG: "45",
+    vitaminAIU: "25",
+    vitaminCIU: "30",
+    calciumMg: "4",
+    ironMg: "15",
   },
 } as const satisfies InsertDishWithRelations;
 
@@ -88,14 +88,14 @@ const menu = {
   restaurantId: brandywineId,
   date: format(new Date(), "yyyy-MM-dd"),
   periodId,
-  price: "13",
+  price: "13.00",
 } as const satisfies InsertMenu;
 
 const period = {
   id: periodId,
   name: "breakfast",
   date: format(new Date(), "yyyy-MM-dd"),
-  restaurantId: "3056",
+  restaurantId: anteateryId,
   startTime: "08:00:00",
   endTime: "10:00:00",
 } as const satisfies InsertPeriod;

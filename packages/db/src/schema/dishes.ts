@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { integer, pgTable, text } from "drizzle-orm/pg-core";
+import { index, integer, pgTable, text } from "drizzle-orm/pg-core";
 
 import {
   dietRestrictions,
@@ -10,31 +10,40 @@ import { type InsertNutritionInfo, nutritionInfos } from "./nutritionInfos";
 import { stations } from "./stations";
 import { metadataColumns } from "./utils";
 
-export const dishes = pgTable("dishes", {
-  id: text("id").primaryKey(),
-  stationId: text("station_id")
-    .notNull()
-    .references(() => stations.id, {
-      onDelete: "restrict",
-      onUpdate: "cascade",
-    }),
-  menuId: text("menu_id")
-    .notNull()
-    .references(() => menus.id, {
-      onDelete: "restrict",
-      onUpdate: "cascade",
-    }),
-  name: text("name").notNull(),
-  description: text("description").notNull(),
-  ingredients: text("ingredients").default(
-    "Ingredient Statement Not Available",
-  ),
-  /** Defaults to "Other" if not specified. */
-  category: text("category").notNull().default("Other"),
-  numRatings: integer("num_ratings").default(0).notNull(),
-  totalRating: integer("total_rating").default(0).notNull(),
-  ...metadataColumns,
-});
+export const dishes = pgTable(
+  "dishes",
+  {
+    id: text("id").primaryKey(),
+    stationId: text("station_id")
+      .notNull()
+      .references(() => stations.id, {
+        onDelete: "restrict",
+        onUpdate: "cascade",
+      }),
+    menuId: text("menu_id")
+      .notNull()
+      .references(() => menus.id, {
+        onDelete: "restrict",
+        onUpdate: "cascade",
+      }),
+    name: text("name").notNull(),
+    description: text("description").notNull(),
+    ingredients: text("ingredients").default(
+      "Ingredient Statement Not Available",
+    ),
+    /** Defaults to "Other" if not specified. */
+    category: text("category").notNull().default("Other"),
+    numRatings: integer("num_ratings").default(0).notNull(),
+    totalRating: integer("total_rating").default(0).notNull(),
+    ...metadataColumns,
+  },
+  (table) => ({
+    stationIdx: index("dishes_station_id_idx").on(table.stationId),
+    menuIdx: index("dishes_menu_id_idx").on(table.menuId),
+    nameIdx: index("dishes_name_idx").on(table.name),
+    categoryIdx: index("dishes_category_idx").on(table.category),
+  }),
+);
 
 export const dishRelations = relations(dishes, ({ one, many }) => ({
   dishesToMenus: many(dishesToMenus),

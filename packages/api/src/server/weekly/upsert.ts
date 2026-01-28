@@ -135,7 +135,7 @@ export async function upsertMenusForWeek(
             id: menuIdHash,
             periodId: periodId.toString(),
             date: dateString,
-            price: "???", // NOTE: Not sure if this was ever provided in the API..
+            price: null,
             restaurantId,
           });
 

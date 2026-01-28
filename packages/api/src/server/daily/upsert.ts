@@ -63,7 +63,7 @@ export async function upsertMenusForDate(
         id: menuIdHash,
         periodId: period.id.toString(),
         date: dateString,
-        price: "???", // NOTE: Not sure if this was ever provided in the API..
+        price: null, // NOTE: Not sure if this was ever provided in the API..
         restaurantId
       });
 
