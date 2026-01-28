@@ -52,7 +52,6 @@ export async function parseAndUpsertDish(
   
   await upsertDish(db, {
     ...currentDish,
-    menuId: menuIdHash,
     dietRestriction,
     nutritionInfo: dish.nutritionInfo,
   })

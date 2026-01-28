@@ -142,7 +142,7 @@ export async function upsertMenusForWeek(
           for (const dish of dishes) {
             if (dish.name !== "UNIDENTIFIED") {
               dishesToUpsert.push({
-                dish: { ...dish, menuId: menuIdHash },
+                dish,
                 menuId: menuIdHash,
               });
             }

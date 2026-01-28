@@ -5,7 +5,7 @@ import {
   dietRestrictions,
   type InsertDietRestriction,
 } from "./dietRestrictions";
-import { dishesToMenus, menus } from "./menus";
+import { dishesToMenus } from "./menus";
 import { type InsertNutritionInfo, nutritionInfos } from "./nutritionInfos";
 import { stations } from "./stations";
 import { metadataColumns } from "./utils";
@@ -17,12 +17,6 @@ export const dishes = pgTable(
     stationId: text("station_id")
       .notNull()
       .references(() => stations.id, {
-        onDelete: "restrict",
-        onUpdate: "cascade",
-      }),
-    menuId: text("menu_id")
-      .notNull()
-      .references(() => menus.id, {
         onDelete: "restrict",
         onUpdate: "cascade",
       }),
@@ -39,7 +33,6 @@ export const dishes = pgTable(
   },
   (table) => ({
     stationIdx: index("dishes_station_id_idx").on(table.stationId),
-    menuIdx: index("dishes_menu_id_idx").on(table.menuId),
     nameIdx: index("dishes_name_idx").on(table.name),
     categoryIdx: index("dishes_category_idx").on(table.category),
   }),

@@ -73,7 +73,7 @@ export async function upsertMenusForDate(
           if (dish.name == "UNIDENTIFIED")
             return;
 
-          parseAndUpsertDish(db, restaurantInfo, {...dish, menuId: menuIdHash}, menuIdHash);
+          parseAndUpsertDish(db, restaurantInfo, dish, menuIdHash);
         })
       )
     })

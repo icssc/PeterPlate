@@ -59,7 +59,6 @@ table diet_restrictions {
 table dishes {
   id text [pk, not null]
   station_id text [not null]
-  menu_id text [not null]
   name text [not null]
   description text [not null]
   ingredients text [default: 'Ingredient Statement Not Available']
@@ -71,7 +70,6 @@ table dishes {
 
   indexes {
     station_id [name: 'dishes_station_id_idx']
-    menu_id [name: 'dishes_menu_id_idx']
     name [name: 'dishes_name_idx']
     category [name: 'dishes_category_idx']
   }
