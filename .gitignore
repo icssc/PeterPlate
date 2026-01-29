@@ -54,9 +54,5 @@ apps/expo-rewrite/expo-env.d.ts
 .sst
 .open-next
 
-## SST
-.sst
-.open-next
-
 ## Next.js
 .next
