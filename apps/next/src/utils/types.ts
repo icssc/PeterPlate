@@ -1,4 +1,5 @@
-import { Drumstick, EggFried, LucideProps, Pizza, Salad, Soup, Sandwich, IceCreamBowl, Dessert, Cookie, Croissant, CakeSlice, Wheat, Apple, FishSymbol} from "lucide-react";
+import { Drumstick, EggAlt, LucideProps, LocalPizza, Salad, SoupKitchen, LunchDining, Icecream, Cookie, BakeryDining, Cake, Wheat, apple, SetMeal } from "@mui/icons-material";
+//import { Drumstick, EggFried, LucideProps, Pizza, Salad, Soup, Sandwich, IceCreamBowl, Dessert, Cookie, Croissant, CakeSlice, Wheat, Apple, FishSymbol} from "lucide-react";
 import { ForwardRefExoticComponent, RefAttributes } from "react";
 
 /**
@@ -297,20 +298,20 @@ export type LucideIconComponent =
  * `getFoodIcon` uses this array to return the matched icon component.
  */
 let foodIcons: LucideIconComponent[] = [
-  CakeSlice,
-  Croissant,
+  Cake,
+  BakeryDining,
   Cookie,
   Dessert,
-  IceCreamBowl,
+  Icecream,
   Apple,
-  Soup,
-  EggFried,
-  Pizza,
-  Sandwich,
+  SoupKitchen,
+  EggAlt,
+  LocalPizza,
+  LunchDining,
   Salad,
   Drumstick,
   Wheat,
-  FishSymbol
+  SetMeal
 ];
 
 
