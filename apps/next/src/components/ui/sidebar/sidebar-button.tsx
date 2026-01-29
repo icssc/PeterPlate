@@ -1,5 +1,5 @@
 import { Button } from "../shadcn/button"
-import { ChevronRight } from "lucide-react";
+import { ChevronRight } from "@mui/icons-material";
 import Link from "next/link";
 import { SheetClose } from "../shadcn/sheet";
 

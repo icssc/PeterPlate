@@ -1,4 +1,4 @@
-import { PanelRight } from "lucide-react";
+import { ViewSidebar } from "@mui/icons-material";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -113,7 +113,7 @@ export default function Toolbar(): JSX.Element {
           />
           <SheetTrigger asChild>
             <Button variant="ghost" size="icon">
-              <PanelRight />
+              <ViewSidebar />
             </Button>
           </SheetTrigger>
           <SidebarContent />

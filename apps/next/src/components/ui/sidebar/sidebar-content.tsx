@@ -8,7 +8,7 @@ import { Button } from "../shadcn/button";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in";
 import SidebarButton from "./sidebar-button";
 import SidebarDivider from "./sidebar-divider";
-import { Settings2, CalendarFold, LogOut, House, Info, Pin, Trophy, StarIcon, Heart, Star, User, NotebookPen, Carrot } from "lucide-react";
+import { Settings, CalendarToday, Logout, House, Info, Pin, EmojiEvents, StarBorder, FavoriteBorder, Star, Person, EditNote, EggAlt } from "@mui/icons-material";
 import { useSession, signOut } from "@/utils/auth-client"; // BetterAuth React hook
 
 /**
@@ -55,18 +55,18 @@ export default function SidebarContent(): JSX.Element {
           </div>
           <SidebarDivider title="Dining Hall Info"/>
           <SidebarButton Icon={House} title="Home" href="/"/>
-          <SidebarButton Icon={CalendarFold} title="Events" href="/events"/>
-          <SidebarButton Icon={Trophy} title="Most Liked" href="/leaderboard" deactivated/>
-          <SidebarButton Icon={Carrot} title="Nutrition" href="/nutrition"/>
+          <SidebarButton Icon={CalendarToday} title="Events" href="/events"/>
+          <SidebarButton Icon={EmojiEvents} title="Most Liked" href="/leaderboard" deactivated/>
+          <SidebarButton Icon={EggAlt} title="Nutrition" href="/nutrition"/>
 
           <SidebarDivider title="Account"/>
-          <SidebarButton Icon={User} title="My Account" href="/account"/>
-          <SidebarButton Icon={Star} title="My Ratings" href="/ratings"/>
-          <SidebarButton Icon={Heart} title="My Favorites" href="/my-favorites"/>
-          <SidebarButton Icon={NotebookPen} title="My Meal Tracker" href="/meal-tracker" deactivated/>
+          <SidebarButton Icon={Person} title="My Account" href="/account"/>
+          <SidebarButton Icon={StarBorder} title="My Ratings" href="/ratings"/>
+          <SidebarButton Icon={FavoriteBorder} title="My Favorites" href="/my-favorites"/>
+          <SidebarButton Icon={EditNote} title="My Meal Tracker" href="/meal-tracker" deactivated/>
 
           <SidebarDivider title="Miscellaneous"/>
-          <SidebarButton Icon={Settings2} title="Settings" href="/settings" deactivated/>
+          <SidebarButton Icon={Settings} title="Settings" href="/settings" deactivated/>
           <SidebarButton Icon={Info} title="About" href="/about"/>
         </div>
 
@@ -101,7 +101,7 @@ export default function SidebarContent(): JSX.Element {
               onClick={handleSignOut}
               aria-label="Log out"
             >
-              <LogOut/>
+              <Logout/>
             </Button>
           </div>
         )}

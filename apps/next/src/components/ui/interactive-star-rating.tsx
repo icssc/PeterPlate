@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Star } from "lucide-react";
+import { StarBorder } from "@mui/icons-material";
 import { useRatings } from "@/hooks/useRatings";
 import { trpc } from "@/utils/trpc";
 
@@ -74,19 +74,19 @@ export default function InteractiveStarRating({
             />
 
             {fillAmount === 0 && (
-              <Star
+              <StarBorder
                 className="w-7 h-7 stroke-zinc-400 hover:stroke-amber-400 transition-colors"
                 strokeWidth={1}
               />
             )}
             {fillAmount === 0.5 && (
               <>
-                <Star
+                <StarBorder
                   className="w-7 h-7 stroke-amber-400 absolute"
                   strokeWidth={1}
                 />
                 <div className="overflow-hidden w-1/2">
-                  <Star
+                  <StarBorder
                     className="w-7 h-7 fill-amber-400 stroke-amber-400"
                     strokeWidth={1}
                   />
@@ -94,7 +94,7 @@ export default function InteractiveStarRating({
               </>
             )}
             {fillAmount === 1 && (
-              <Star
+              <StarBorder
                 className="w-7 h-7 fill-amber-400 stroke-amber-400"
                 strokeWidth={1}
               />

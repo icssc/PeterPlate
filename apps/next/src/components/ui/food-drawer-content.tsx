@@ -1,6 +1,6 @@
 "use client"; // Need state for toggling nutrient visibility
 
-import { Pin, Star } from "lucide-react";
+import { PinDrop, StarBorder } from "@mui/icons-material";
 import {
   DialogHeader,
   DialogTitle,
@@ -72,7 +72,7 @@ export default function FoodDrawerContent(dish: DishInfo) {
                 <DrawerTitle className="text-3xl">
                   {formatFoodName(dish.name)}
                 </DrawerTitle>
-                <Pin className="stroke-zinc-500" />
+                <PinDrop className="stroke-zinc-500" />
               </div>
             </div>
             <div className="flex items-center gap-2 text-zinc-500 px-1">
