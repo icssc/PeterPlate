@@ -6,6 +6,7 @@ import { DishInfo } from "@zotmeal/api";
 import { formatFoodName, getFoodIcon, toTitleCase } from "@/utils/funcs";
 import { cn } from "@/utils/tw";
 import { Dialog, Card, CardContent, Drawer } from "@mui/material";
+import Image from "next/image";
 import FoodDialogContent from "../food-dialog-content";
 import { CirclePlus, Heart, Star, Utensils } from "lucide-react";
 import FoodDrawerContent from "../food-drawer-content";
@@ -55,6 +56,9 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
     ref,
   ) => {
     const IconComponent = getFoodIcon(dish.name) ?? Utensils;
+    // Backend weekly job and shared types use `image` for media URLs; support it here.
+    const image =
+      (dish as DishInfo & { image?: string | null }).image ?? null;
 
     /**
      * Fetches the average rating and rating count for the dish.
@@ -81,7 +85,7 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
         alert(`Added ${formatFoodName(dish.name)} to your log`);
         utils.nutrition.invalidate();
       },
-      onError: (error: Error) => {
+      onError: (error) => {
         console.error(error.message);
       },
     });
@@ -122,8 +126,18 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
           <CardContent sx={{ padding: "0 !important" }}>
             <div className="flex justify-between h-full p-6">
               <div className="flex items-center gap-6 w-full">
-                {IconComponent && (
-                  <IconComponent className="w-10 h-10 text-slate-700" />
+                {image ? (
+                  <Image
+                    src={image}
+                    alt={formatFoodName(dish.name)}
+                    width={40}
+                    height={40}
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                ) : (
+                  IconComponent && (
+                    <IconComponent className="w-10 h-10 text-slate-700" />
+                  )
                 )}
                 <div className="flex flex-col">
                   <strong>{formatFoodName(dish.name)}</strong>

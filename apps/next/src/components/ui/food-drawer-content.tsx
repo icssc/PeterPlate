@@ -1,7 +1,7 @@
 "use client"; // Need state for toggling nutrient visibility
 
 import { Button, Box } from "@mui/material";
-import { Pin } from "lucide-react";
+import { Pin, Utensils } from "lucide-react";
 import Image from "next/image";
 import React, { useState } from "react";
 import { cn } from "@/utils/tw";
@@ -10,6 +10,7 @@ import {
   formatFoodName,
   formatNutrientLabel,
   formatNutrientValue,
+  getFoodIcon,
 } from "@/utils/funcs";
 import { DishInfo } from "@zotmeal/api";
 import { toTitleCase, enhanceDescription } from "@/utils/funcs";
@@ -39,16 +40,26 @@ export default function FoodDrawerContent(dish: DishInfo): React.JSX.Element {
     "ironMg",
   ]);
 
+  // Meal images are exposed as `image` on the dish object.
+  const { image } = dish as DishInfo & { image?: string | null };
+  const IconComponent = getFoodIcon(dish.name) ?? Utensils;
+
   return (
     <Box className="max-h-[95vh] flex flex-col">
       <Box className="pb-4">
-        <Image
-          src={"/zm-card-header.webp"}
-          alt={"An image of zotmeal logo."}
-          width={1200}
-          height={700}
-          className="w-full h-32 object-cover"
-        />
+        {image ? (
+          <Image
+            src={image}
+            alt={formatFoodName(dish.name)}
+            width={1200}
+            height={700}
+            className="w-full h-32 object-cover"
+          />
+        ) : (
+          <Box className="w-full h-32 flex items-center justify-center bg-slate-100">
+            <IconComponent className="w-12 h-12 text-slate-700" />
+          </Box>
+        )}
         <Box className="px-4 pt-4 flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <h2 className="text-3xl font-semibold leading-tight tracking-normal">

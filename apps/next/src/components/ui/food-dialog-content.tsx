@@ -9,12 +9,14 @@ import {
   formatFoodName,
   formatNutrientLabel,
   formatNutrientValue,
+  getFoodIcon,
 } from "@/utils/funcs";
 import { DishInfo } from "@zotmeal/api";
 import { toTitleCase, enhanceDescription } from "@/utils/funcs";
 import { AllergenBadge } from "./allergen-badge";
 import IngredientsDialog from "../ingredients-dialog";
 import InteractiveStarRating from "./interactive-star-rating";
+import { Utensils } from "lucide-react";
 
 /**
  * `FoodDialogContent` renders the detailed view of a food item (dish) within a dialog.
@@ -53,15 +55,25 @@ export default function FoodDialogContent(dish: DishInfo): React.JSX.Element {
     dish.nutritionInfo.calories != null &&
     dish.nutritionInfo.calories.length > 0;
 
+  // Meal images are exposed as `image` on the dish object.
+  const { image } = dish as DishInfo & { image?: string | null };
+  const IconComponent = getFoodIcon(dish.name) ?? Utensils;
+
   return (
     <>
-      <Image
-        src={"/zm-card-header.webp"}
-        alt={"An image of zotmeal logo."}
-        width={1200}
-        height={700}
-        className="w-full h-40 object-cover"
-      />
+      {image ? (
+        <Image
+          src={image}
+          alt={formatFoodName(dish.name)}
+          width={1200}
+          height={700}
+          className="w-full h-40 object-cover"
+        />
+      ) : (
+        <div className="w-full h-40 flex items-center justify-center bg-slate-100">
+          <IconComponent className="w-12 h-12 text-slate-700" />
+        </div>
+      )}
       <div className="max-w-lg mx-auto w-full">
         <DialogContent sx={{ padding: "0 !important" }}>
           <div className="flex flex-col gap-6 pb-6 pt-4">
