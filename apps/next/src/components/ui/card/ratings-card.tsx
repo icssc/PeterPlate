@@ -1,14 +1,14 @@
 "use client";
 
+import { Delete, Restaurant } from "@mui/icons-material";
+import type { DishInfo } from "@zotmeal/api";
 import React from "react";
-import { Card, CardContent } from "../shadcn/card";
-import { Utensils, Trash2 } from "lucide-react";
 import { formatFoodName, getFoodIcon } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
-import InteractiveStarRating from "../interactive-star-rating";
-import { DishInfo } from "@zotmeal/api";
-import { Dialog, DialogTrigger } from "../shadcn/dialog"; // use shadcn Dialog
 import FoodDialogContent from "../food-dialog-content";
+import InteractiveStarRating from "../interactive-star-rating";
+import { Card, CardContent } from "../shadcn/card";
+import { Dialog, DialogTrigger } from "../shadcn/dialog"; // use shadcn Dialog
 
 interface RatingsCardProps {
   food: DishInfo & {
@@ -25,10 +25,12 @@ const RatingsCardContent = React.forwardRef<
     deleteLoading: boolean;
   } & React.HTMLAttributes<HTMLDivElement>
 >(({ food, handleDelete, deleteLoading, ...divProps }, ref) => {
-  const IconComponent = getFoodIcon(food.name) ?? Utensils;
+  const IconComponent = getFoodIcon(food.name) ?? Restaurant;
 
   return (
-    <div ref={ref} {...divProps} className="w-full"> {}
+    <div ref={ref} {...divProps} className="w-full">
+      {" "}
+      {}
       <Card className="cursor-pointer hover:shadow-lg transition w-full">
         <CardContent>
           <div className="flex justify-between items-center h-full pt-6">
@@ -51,7 +53,7 @@ const RatingsCardContent = React.forwardRef<
                 disabled={deleteLoading}
                 title="Delete Rating"
               >
-                <Trash2 className="w-4 h-4 text-gray-400 hover:text-red-500" />
+                <Delete className="w-4 h-4 text-gray-400 hover:text-red-500" />
               </button>
             </div>
           </div>
@@ -67,7 +69,10 @@ export default function RatingsCard({ food }: RatingsCardProps) {
   const deleteRatingMutation = trpc.dish.deleteRating.useMutation({
     onSuccess: () => {
       utils.dish.rated.invalidate();
-      utils.dish.getUserRating.invalidate({ userId: "default-user", dishId: food.id });
+      utils.dish.getUserRating.invalidate({
+        userId: "default-user",
+        dishId: food.id,
+      });
       utils.dish.getAverageRating.invalidate({ dishId: food.id });
     },
   });
@@ -75,7 +80,10 @@ export default function RatingsCard({ food }: RatingsCardProps) {
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (window.confirm("Delete this rating?")) {
-      await deleteRatingMutation.mutateAsync({ userId: "default-user", dishId: food.id });
+      await deleteRatingMutation.mutateAsync({
+        userId: "default-user",
+        dishId: food.id,
+      });
     }
   };
 
