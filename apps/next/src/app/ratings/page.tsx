@@ -4,14 +4,30 @@ import MealDivider from "@/components/ui/meal-divider";
 import { trpc } from "@/utils/trpc";
 import Image from "next/image";
 import RatingsCard from "@/components/ui/card/ratings-card";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useUserStore } from "@/context/useUserStore";
 
 export default function RatedFoods() {
+  const router = useRouter();
+  const userId = useUserStore((s) => s.userId);
+
+  useEffect(() => {
+    // TODO: use [MUI snackbar](https://mui.com/material-ui/react-snackbar/) to warn users of issue
+    if (!userId) {
+      alert("Login to rate meals!");
+      router.push("/");
+    }
+  }, [userId]);
+
   const {
     data: ratedFoods,
     isLoading,
     error,
   } = trpc.dish.rated.useQuery({
-    userId: "default-user",
+    userId: userId!
+  }, {
+    enabled: !!userId
   });
 
   return (

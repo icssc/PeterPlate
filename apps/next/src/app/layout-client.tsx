@@ -1,13 +1,14 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink } from "@trpc/client";
 import { trpc } from "../utils/trpc";
 import superjson from "superjson";
-import Toolbar from "@/components/ui/toolbar";
 import Header from "@/components/ui/header";
 import { DateProvider } from "@/context/date-context";
 import { ThemeProvider } from "next-themes";
+import { useSession } from "@/utils/auth-client";
+import { useUserStore } from "@/context/useUserStore";
 
 export function RootClient({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient({
@@ -36,6 +37,22 @@ export function RootClient({ children }: { children: React.ReactNode }) {
       ],
     }),
   );
+
+  // syncs better auth session 
+  // with zustand user store
+  const { data: session, isPending } = useSession();
+  const setUserId = useUserStore((s) => s.setUserId);
+  const clearUser = useUserStore((s) => s.clearUser);
+
+  useEffect(() => {
+    if (isPending) return;
+
+    if (session?.user) {
+      setUserId(session.user.id);
+    } else {
+      clearUser();
+    }
+  }, [session, isPending, setUserId, clearUser]);
 
   return (
     <ThemeProvider
