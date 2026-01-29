@@ -36,7 +36,7 @@ interface FoodCardContentProps extends React.HTMLAttributes<HTMLDivElement> {
    */
   onToggleFavorite?: (dishId: string, currentlyFavorite: boolean) => void;
   /** 
-   * Whether to render a simplified version of the card (e.g., for compact views).
+   * Whether to render a simplified version of the card.
    */
   isSimplified?: boolean;
 }
@@ -192,7 +192,7 @@ const FoodCardContent = React.forwardRef<
                     {formatFoodName(dish.name)}
                   </span>
                   <div className="flex gap-2 items-center text-slate-700 text-sm">
-                    <div className="flex gap-2 items-center text-slate-900 text-sm font-normal">
+                    <div className="text-slate-900 font-normal">
                       <span>
                         {dish.nutritionInfo.calories == null
                           ? "-"
