@@ -24,7 +24,6 @@ CREATE TABLE IF NOT EXISTS "account" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "session" (
-CREATE TABLE IF NOT EXISTS "session" (
 	"id" text PRIMARY KEY NOT NULL,
 	"expiresAt" timestamp NOT NULL,
 	"token" text NOT NULL,
@@ -36,7 +35,6 @@ CREATE TABLE IF NOT EXISTS "session" (
 	CONSTRAINT "session_token_unique" UNIQUE("token")
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "verification" (
 CREATE TABLE IF NOT EXISTS "verification" (
 	"id" text PRIMARY KEY NOT NULL,
 	"identifier" text NOT NULL,

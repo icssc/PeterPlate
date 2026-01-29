@@ -23,12 +23,8 @@
       }
     ],
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "@api/*": [
-        "../../packages/api/src/*"
-      ]
+      "@/*": ["./src/*"],
+      "@api/*": ["../../packages/api/src/*"]
     }
   },
   "include": [
