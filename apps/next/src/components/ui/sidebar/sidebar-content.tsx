@@ -85,6 +85,7 @@ export default function SidebarContent({
             title="My Account"
             href="/account"
             onClose={onClose}
+            deactivated={!user}
           />
         </Stack>
 

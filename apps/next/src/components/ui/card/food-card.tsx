@@ -11,9 +11,7 @@ import { CirclePlus, Heart, Star, Utensils } from "lucide-react";
 import FoodDrawerContent from "../food-drawer-content";
 import { trpc } from "@/utils/trpc";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-
-// TODO: remove this variable and get the currently signed in user through session
-const DUMMY_USER_ID = "TEST_USER";
+import { useUserStore } from "@/context/useUserStore";
 
 /**
  * Props for the FoodCardContent component.
@@ -59,9 +57,6 @@ const FoodCardContent = React.forwardRef<
       { dishId: dish.id },
       { staleTime: 5 * 60 * 1000 },
     );
-    /**
-     * fetch above
-     */
 
     const averageRating = ratingData?.averageRating ?? 0;
     const ratingCount = ratingData?.ratingCount ?? 0;
@@ -82,32 +77,38 @@ const FoodCardContent = React.forwardRef<
       },
     });
 
-    const handleLogMeal = (e: React.MouseEvent) => {
-      e.stopPropagation();
+  const handleLogMeal = (e: React.MouseEvent) => {
+    e.stopPropagation(); 
+    
+    // TODO: use [MUI snackbar](https://mui.com/material-ui/react-snackbar/) to warn users.
+    if (!userId) {
+      alert("Login to track meals!");
+      return;
+    }
 
-      if (!DUMMY_USER_ID) {
-        //TODO: Replace this with a shad/cn sonner or equivalent.
-        alert("You must be logged in to track meals");
-        return;
-      }
+    logMealMutation.mutate({
+      dishId: dish.id,
+      userId: userId,
+      dishName: dish.name,
+      servings: 1, // Default to 1 serving (TODO: add ability to manually input servings. Maybe a popup will ask to input a multiple of 0.5)
+    });
+  };
 
-      logMealMutation.mutate({
-        dishId: dish.id,
-        userId: DUMMY_USER_ID,
-        dishName: dish.name,
-        servings: 1, // Default to 1 serving (TODO: add ability to manually input servings. Maybe a popup will ask to input a multiple of 0.5)
-      });
-    };
+  const handleFavoriteClick = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => {
+    event.preventDefault();
+    event.stopPropagation();
+    
+   // TODO: use [MUI snackbar](https://mui.com/material-ui/react-snackbar/) to warn users of 
+    if (!userId) {
+      alert("Login to favorite meals!");
+      return;
+    }
 
-    const handleFavoriteClick = (
-      event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-    ) => {
-      event.preventDefault();
-      event.stopPropagation();
-
-      if (favoriteDisabled || !onToggleFavorite) return;
-      onToggleFavorite(dish.id, Boolean(isFavorited));
-    };
+    if (favoriteDisabled || !onToggleFavorite) return;
+    onToggleFavorite(dish.id, Boolean(isFavorited));
+  };
 
     if (isSimplified) {
       return (
@@ -311,7 +312,7 @@ export default function FoodCard({
             },
           }}
         >
-          <FoodDialogContent {...dish} />
+          <FoodDialogContent dish={dish} />
         </Dialog>
       </>
     );
@@ -351,7 +352,7 @@ export default function FoodCard({
             },
           }}
         >
-          <FoodDrawerContent {...dish} />
+          <FoodDrawerContent dish={dish} />
         </Drawer>
       </>
     );

@@ -16,10 +16,12 @@ import { toTitleCase, enhanceDescription } from "@/utils/funcs";
 import { AllergenBadge } from "./allergen-badge";
 import InteractiveStarRating from "./interactive-star-rating";
 
-export default function FoodDrawerContent(dish: DishInfo): React.JSX.Element {
-  const caloricInformationAvailable: boolean =
-    dish.nutritionInfo.calories != null &&
-    dish.nutritionInfo.calories.length > 0;
+export default function FoodDrawerContent({ dish }: { dish: DishInfo }) {
+
+  const ingredientsAvailable: boolean = dish.ingredients != null 
+    && dish.ingredients.length > 0;
+  const caloricInformationAvailable: boolean = dish.nutritionInfo.calories != null
+    && dish.nutritionInfo.calories.length > 0;
 
   // State to control nutrient visibility
   const [showAllNutrients, setShowAllNutrients] = useState(false);
