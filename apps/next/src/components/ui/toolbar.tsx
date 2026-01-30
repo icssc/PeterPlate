@@ -23,6 +23,8 @@ export default function Toolbar(): JSX.Element {
   const user = session?.user;
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [diningHallsAnchor, setDiningHallsAnchor] = useState<null | HTMLElement>(null);
+  const [foodCourtsAnchor, setFoodCourtsAnchor] = useState<null | HTMLElement>(null);
+
   // const { selectedDate, setSelectedDate } = useDate();
   // const [enabledDates, setEnabledDates] = useState<DateList>([new Date()]);
   // const [calendarRange, setCalendarRange] = useState<CalendarRange>({
@@ -60,25 +62,13 @@ export default function Toolbar(): JSX.Element {
   //   }
   // };
 
-  const toggleDrawer = () => {
-    setDrawerOpen(!drawerOpen);
-  };
-
-  const handleDiningHallsClick = (event: React.MouseEvent<HTMLElement>) => {
-    setDiningHallsAnchor(event.currentTarget);
-  };
-
-  const handleDiningHallsClose = () => {
-    setDiningHallsAnchor(null);
-  };
-
   return (
     <>
       <AppBar
         position="absolute"
-        className="!bg-white shadow-none border-b border-[rgba(0,0,0,0.08)]"
+        className="!bg-transparent !shadow-none hover:!bg-black/30 transition-colors duration-300"
       >
-        <MuiToolbar className="justify-between px-4 py-2">
+        <MuiToolbar className="justify-between px-4 py-1">
           <div className="flex-none flex items-center">
             <Link href="/" className="flex items-center gap-2">
               <Image
@@ -88,73 +78,80 @@ export default function Toolbar(): JSX.Element {
                 width={40}
                 height={40}
               />
-              <span className="text-sky-700 font-poppins font-bold text-[28px] leading-[24px]">PeterPlate</span>
+              <span className="text-white font-poppins font-bold text-[28px] leading-[24px]">PeterPlate</span>
             </Link>
           </div>
 
           <nav className="flex-1 flex gap-0 justify-evenly">
             <Button
-              onClick={handleDiningHallsClick}
+              onClick={(event: React.MouseEvent<HTMLElement>) => setDiningHallsAnchor(event.currentTarget)}
               endIcon={<ArrowDropDownIcon fontSize="small" />}
-              className="!text-[#1f2937] !normal-case !text-[16px] !font-medium hover:!bg-[rgba(0,0,0,0.04)]"
+              className="!text-white !normal-case !text-[16px] !font-medium hover:!bg-[rgba(0,0,0,0.04)]"
             >
               Dining Halls
             </Button>
             <Menu
               anchorEl={diningHallsAnchor}
               open={Boolean(diningHallsAnchor)}
-              onClose={handleDiningHallsClose}
-              anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "left",
-              }}
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "left",
-              }}
+              onClose={() => setDiningHallsAnchor(null)}
             >
               <MenuItem
                 component={Link}
-                href="/?hall=brandywine"
-                onClick={handleDiningHallsClose}
+                href="/"
+                onClick={() => setDiningHallsAnchor(null)}
               >
                 Brandywine
               </MenuItem>
               <MenuItem
                 component={Link}
-                href="/?hall=anteatery"
-                onClick={handleDiningHallsClose}
+                href="/"
+                onClick={() => setDiningHallsAnchor(null)}
               >
                 Anteatery
               </MenuItem>
             </Menu>
+
+            <Button
+              onClick={(event: React.MouseEvent<HTMLElement>) => setFoodCourtsAnchor(event.currentTarget)}
+              endIcon={<ArrowDropDownIcon fontSize="small" />}
+              className="!text-white !normal-case !text-[16px] !font-medium hover:!bg-[rgba(0,0,0,0.04)]"
+            >
+              Food Courts
+            </Button>
+            <Menu
+              anchorEl={foodCourtsAnchor}
+              open={Boolean(foodCourtsAnchor)}
+              onClose={() => setFoodCourtsAnchor(null)}
+            >
+              <MenuItem
+                component={Link}
+                href="/"
+                onClick={() => setFoodCourtsAnchor(null)}
+              >
+                Food court 1
+              </MenuItem>
+              <MenuItem
+                component={Link}
+                href="/"
+                onClick={() => setFoodCourtsAnchor(null)}
+              >
+                Food court 2
+              </MenuItem>
+            </Menu>
+
             <Button
               component={Link}
               href="/events"
-              className="!text-[#1f2937] !normal-case !text-[16px] !font-medium hover:!bg-[rgba(0,0,0,0.04)]"
+              className="!text-white !normal-case !text-[16px] !font-medium hover:!bg-[rgba(0,0,0,0.04)]"
             >
               Events
             </Button>
             <Button
               component={Link}
-              href="/my-favorites"
-              className="!text-[#1f2937] !normal-case !text-[16px] !font-medium hover:!bg-[rgba(0,0,0,0.04)]"
-            >
-              Favorites
-            </Button>
-            <Button
-              component={Link}
               href="/ratings"
-              className="!text-[#1f2937] !normal-case !text-[16px] !font-medium hover:!bg-[rgba(0,0,0,0.04)]"
+              className="!text-white !normal-case !text-[16px] !font-medium hover:!bg-[rgba(0,0,0,0.04)]"
             >
-              Ratings
-            </Button>
-            <Button
-              component={Link}
-              href="/nutrition"
-              className="!text-[#1f2937] !normal-case !text-[16px] !font-medium hover:!bg-[rgba(0,0,0,0.04)]"
-            >
-              Tracker
+              My Foods
             </Button>
           </nav>
 
@@ -163,11 +160,11 @@ export default function Toolbar(): JSX.Element {
               <div className="w-10 h-10" />
             ) : user ? (
               <IconButton
-                onClick={toggleDrawer}
+                onClick={() => setDrawerOpen(!drawerOpen)}
                 className="!p-0"
                 aria-label="Open sidebar"
               >
-                <img
+                <Image
                   src={user.image || "/default-avatar.png"}
                   alt={user.name || "User profile"}
                   className="w-10 h-10 rounded-full"
@@ -180,7 +177,7 @@ export default function Toolbar(): JSX.Element {
         </MuiToolbar>
       </AppBar>
 
-      <SidebarContent open={drawerOpen} onClose={toggleDrawer} />
+      <SidebarContent open={drawerOpen} onClose={() => setDrawerOpen(!drawerOpen)} />
     </>
   );
 }
