@@ -4,15 +4,26 @@ import type { SelectLoggedMeal } from "@zotmeal/db";
 import { useEffect, useMemo, useState } from "react";
 import NutritionBreakdown from "@/components/ui/nutrition-breakdown";
 import { trpc } from "@/utils/trpc";
+import { useRouter } from "next/navigation";
+import { useUserStore } from "@/context/useUserStore";
 
-const DUMMY_USER_ID = "TEST_USER";
+export default function MealTracker() {
+  const router = useRouter();
+  const userId = useUserStore((s) => s.userId);
 
-export default function Nutrition() {
+  useEffect(() => {
+    // TODO: use [MUI snackbar](https://mui.com/material-ui/react-snackbar/) to warn users of issue
+    if (!userId) {
+      alert("Login to track meals!");
+      router.push("/");
+    }
+  }, [userId]);
+
   const {
     data: meals,
     isLoading,
     error,
-  } = trpc.nutrition.getMealsInLastWeek.useQuery({ userId: DUMMY_USER_ID });
+  } = trpc.nutrition.getMealsInLastWeek.useQuery({ userId: userId! });
   const [activeDayIndex, setActiveDayIndex] = useState<number | null>(null);
 
   const mealsGroupedByDay = useMemo(() => {
@@ -47,7 +58,7 @@ export default function Nutrition() {
     activeDayIndex !== null ? mealsGroupedByDay[activeDayIndex] : null;
 
   return (
-    <div className="cols-container h-screen flex">
+    <div className="cols-container min-h-screen flex">
       <div className="mt-12 w-[300px] border-r p-4 flex flex-col gap-2">
         {mealsGroupedByDay.map((day, index) => (
           <button

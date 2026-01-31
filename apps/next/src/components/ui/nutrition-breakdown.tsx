@@ -2,9 +2,6 @@ import { trpc } from "@/utils/trpc";
 import { SelectLoggedMeal } from "../../../../../packages/db/src/schema";
 import { ProgressDonut } from "../progress-donut";
 
-// TODO: remove this variable and get the currently signed in user through session
-const DUMMY_USER_ID = "TEST_USER";
-
 interface NutritionData {
   calories: number,
   protein_g: number,
@@ -67,12 +64,6 @@ const NutritionBreakdown = ({ dateString, mealsEaten }: Props) => {
     e.preventDefault();
     if (!userId || !dishId) return;
 
-    if (!DUMMY_USER_ID) {
-      //TODO: Replace this with a shad/cn sonner or equivalent.
-      alert("You must be logged in to track meals");
-      return;
-    }
-
     deleteLoggedMealMutation.mutate({ userId, dishId });
   };
 
@@ -99,7 +90,7 @@ const NutritionBreakdown = ({ dateString, mealsEaten }: Props) => {
       </div>
       <div className="meal-history">
         {mealsEaten && mealsEaten.map((meal) => (
-          <div key={meal.userId + meal.dishId} className="flex items-center justify-between gap-4 rounded-lg border p-4 mb-3">
+          <div key={meal.id} className="flex items-center justify-between gap-4 rounded-lg border p-4 mb-3">
             <div className="flex flex-col">
               <h3 className="font-medium">{meal.servings} serving{meal.servings > 1 ? 's' : ''} of {meal.dishName}</h3>
               <p className="text-sm text-muted-foreground">

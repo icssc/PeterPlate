@@ -4,7 +4,9 @@ import { users } from "./users";
 import { dishes } from "./dishes";
 
 export const loggedMeals = pgTable("logged_meals", {
-  // composite primary key (userId, dishId)  
+  // no composite key to allow
+  // multiple logs of same meal
+  id: uuid("id").defaultRandom().primaryKey(),
   userId: text("user_id").notNull()
       .references(() => users.id, {
         onDelete: "cascade"
@@ -18,7 +20,6 @@ export const loggedMeals = pgTable("logged_meals", {
     eatenAt: timestamp("eaten_at").defaultNow().notNull(),
   },
   (table) => ({
-    pk: primaryKey({columns: [table.userId, table.dishId]}),
     servingsIsValid: check(
       "servings_is_valid",
       // Must be >= 0.5 AND a multiple of 0.5

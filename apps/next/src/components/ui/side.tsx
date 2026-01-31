@@ -16,7 +16,7 @@ import { useDate } from "@/context/date-context";
 import { ArrowRightLeft, RefreshCw } from "lucide-react";
 import { Button } from "./shadcn/button";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-import { useHallDerived, useHallStore } from "@/hooks/useHallDerived";
+import { useHallDerived, useHallStore } from "@/context/useHallStore";
 
 
 /**
