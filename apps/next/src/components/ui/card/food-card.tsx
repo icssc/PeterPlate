@@ -200,7 +200,7 @@ const FoodCardContent = React.forwardRef<
                           : `${Math.round(parseFloat(dish.nutritionInfo.calories))} cal`}
                       </span>
                     </div>
-                    <div className="flex gap-1 items-center">
+                    <div className="flex gap-1 items-center text-gray-500">
                       <Star
                         className="w-4 h-4 stroke-gray-500"
                         strokeWidth={1.5}
