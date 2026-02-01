@@ -86,7 +86,7 @@ export default function ProfileMenuContent({
         Edit Preferences
       </MenuItem>
 
-      <MenuItem onClick={onClose}>
+      <MenuItem component={Link} href="/about" onClick={onClose}>
         <Info size={18} style={{ marginRight: 12 }} />
         About PeterPlate
       </MenuItem>
