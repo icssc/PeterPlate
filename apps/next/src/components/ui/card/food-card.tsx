@@ -184,7 +184,7 @@ const FoodCardContent = React.forwardRef<
           sx={{ borderRadius: "12px" }}
         >
           <CardContent sx={{ padding: "0 !important" }}>
-            <div className="flex justify-between h-full p-4">
+            <div className="flex justify-between h-full p-4 gap-4">
               <div className="flex items-center gap-4 w-full">
                 {IconComponent && (
                   <IconComponent className="w-12 h-12 text-slate-700 flex-shrink-0" />
