@@ -5,7 +5,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import { AppBar, Button, IconButton, Menu, MenuItem, Toolbar } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in";
 import { useSession } from "@/utils/auth-client";
 import SidebarContent from "./sidebar/sidebar-content";
@@ -38,6 +38,20 @@ export default function Header(): JSX.Element {
     const handleDiningHallsClose = () => {
         setDiningHallsAnchor(null);
     };
+
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            if (document.hidden) {
+            setProfileAnchor(null);
+            }
+        };
+
+        document.addEventListener("visibilitychange", handleVisibilityChange);
+
+        return () => {
+            document.removeEventListener("visibilitychange", handleVisibilityChange);
+        };
+        }, []);
 
     return (
         <>
