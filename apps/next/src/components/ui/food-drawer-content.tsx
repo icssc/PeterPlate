@@ -42,7 +42,7 @@ export default function FoodDrawerContent({ dish }: { dish: DishInfo }) {
   ]);
 
   return (
-    <Box className="max-h-[95vh] flex flex-col font-poppins">
+    <Box className="max-h-[95vh] flex flex-col">
       <Box className="pb-4">
         <Image
           src={"/zm-card-header.webp"}
