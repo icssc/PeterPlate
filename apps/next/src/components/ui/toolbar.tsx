@@ -167,6 +167,8 @@ export default function Toolbar(): JSX.Element {
                 <Image
                   src={user.image || "/default-avatar.png"}
                   alt={user.name || "User profile"}
+                  width={40}
+                  height={40}
                   className="w-10 h-10 rounded-full"
                 />
               </IconButton>

@@ -1,4 +1,4 @@
-"use client"; 
+"use client";
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
@@ -6,7 +6,7 @@ import { Tabs, TabsList, TabsTrigger } from "./shadcn/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./shadcn/select";
 import { DiningHallStatus } from "./status";
 import DishesInfo from "./dishes-info";
-import { HallEnum, HallStatusEnum, MealTimeEnum} from "@/utils/types";
+import { HallEnum, HallStatusEnum, MealTimeEnum } from "@/utils/types";
 import { trpc } from "@/utils/trpc"; // Import tRPC hook
 import { RestaurantInfo } from "@zotmeal/api"; // Import types
 import { toTitleCase, utcToPacificTime, formatOpenCloseTime, isSameDay, militaryToStandard } from "@/utils/funcs";
@@ -141,35 +141,36 @@ export default function Side({ hall, toggleHall }: SideProps): JSX.Element {
       ? { src: "/anteatery.webp", alt: "Anteatery dining hall" }
       : { src: "/brandywine.webp", alt: "Brandywine dining hall" };
 
-    return (
-      <div className="z-0 flex flex-col h-full overflow-x-hidden">
-        <div className="relative w-full min-h-[20vh] max-h-[30vh] h-2/5">
-          <Image 
-            className="object-cover object-bottom"
-            src={hero.src}
-            alt={hero.alt}
-            // width={2000}
-            // height={2000}
-            fill
-            priority 
-          />
-          {!isDesktop && toggleHall && (
-            <Button
-              variant="outline"
-              size="icon"
-              className="absolute top-[68px] right-3 rounded-full bg-white shadow-md"
-              onClick={() => toggleHall()}
-            >
-              <ArrowRightLeft className="text-black-500 w-5 h-5" />
-            </Button>
-          )}
-        </div>
-        
-        <div className="p-5 flex flex-col flex-grow h-1" id="side-content"> 
-          <div className="flex flex-col gap-4 sm:gap-6 items-center">
-            <div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-4 w-full">
-              {isLoading && <SelectSkeleton/>}
-              {!isLoading && !isError && 
+  return (
+    <div className="z-0 flex flex-col h-full overflow-x-hidden">
+      <div className="relative w-full min-h-[20vh] max-h-[30vh] h-2/5">
+        <Image
+          className="object-cover object-bottom"
+          src={hero.src}
+          alt={hero.alt}
+          // width={2000}
+          // height={2000}
+          fill
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/65 to-transparent" />
+        {!isDesktop && toggleHall && (
+          <Button
+            variant="outline"
+            size="icon"
+            className="absolute top-[68px] right-3 rounded-full bg-white shadow-md"
+            onClick={() => toggleHall()}
+          >
+            <ArrowRightLeft className="text-black-500 w-5 h-5" />
+          </Button>
+        )}
+      </div>
+
+      <div className="p-5 flex flex-col flex-grow h-1" id="side-content">
+        <div className="flex flex-col gap-4 sm:gap-6 items-center">
+          <div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-4 w-full">
+            {isLoading && <SelectSkeleton />}
+            {!isLoading && !isError &&
               <div>
                 <Select
                   value={selectedPeriod}
@@ -181,7 +182,7 @@ export default function Side({ hall, toggleHall }: SideProps): JSX.Element {
                   <SelectContent>
                     {periods.map((time) => {
                       const mealTimeKey = time.toLowerCase();
-                      const periodTimes = availablePeriodTimes[mealTimeKey]; 
+                      const periodTimes = availablePeriodTimes[mealTimeKey];
 
                       return (
                         <SelectItem key={time} value={mealTimeKey}>
@@ -197,52 +198,52 @@ export default function Side({ hall, toggleHall }: SideProps): JSX.Element {
                   </SelectContent>
                 </Select>
               </div>}
-              {!isLoading && !isError && openTime && closeTime && // Ensure openTime and closeTime are defined
+            {!isLoading && !isError && openTime && closeTime && // Ensure openTime and closeTime are defined
               <div className="flex justify-center sm:justify-start">
                 <DiningHallStatus
                   status={derivedHallStatus}
-                  openTime={openTime.toLocaleTimeString(undefined, {hour: '2-digit', minute: '2-digit'})}
-                  closeTime={closeTime.toLocaleTimeString(undefined, {hour: '2-digit', minute: '2-digit'})}
+                  openTime={openTime.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
+                  closeTime={closeTime.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
                 />
               </div>}
-            </div>
-            {!isLoading && !isError && stations.length > 0 && (
-              <Tabs
-                value={selectedStation}
-                onValueChange={(value) => setSelectedStation(value || '')}
-                className="flex w-full justify-center" 
-              >
-                <div className="overflow-x-auto">
-                  <TabsList className="mx-auto">
-                      {stations.map((station => {
-                        return (
-                          <TabsTrigger key={station.name} value={station.name.toLowerCase()}>
-                            {toTitleCase(station.name)}
-                          </TabsTrigger>
-                        )
-                      }))}
-                  </TabsList>
-                </div>
-              </Tabs>
-            )}
-            {isLoading && <TabsSkeleton/> /* Tab Skeleton */}
-            {!isLoading && !isError && stations.length === 0 && selectedPeriod && (
-                 <p className="text-center text-gray-500 py-2">No stations found for {toTitleCase(selectedPeriod)}.</p>
-            )}
-            {!isLoading && !isError && stations.length === 0 && !selectedPeriod && (
-                 <p className="text-center text-gray-500 py-2">No stations found.</p>
-            )}
           </div>
-
-          <DishesInfo 
-            dishes={dishes}
-            isLoading={isLoading}
-            isError={isError || (!isLoading && !hallData)} 
-            errorMessage={error?.message ?? (!isLoading && !hallData ? `Data not available for ${HallEnum[hall]}.` : undefined)}
-          />
+          {!isLoading && !isError && stations.length > 0 && (
+            <Tabs
+              value={selectedStation}
+              onValueChange={(value) => setSelectedStation(value || '')}
+              className="flex w-full justify-center"
+            >
+              <div className="overflow-x-auto">
+                <TabsList className="mx-auto">
+                  {stations.map((station => {
+                    return (
+                      <TabsTrigger key={station.name} value={station.name.toLowerCase()}>
+                        {toTitleCase(station.name)}
+                      </TabsTrigger>
+                    )
+                  }))}
+                </TabsList>
+              </div>
+            </Tabs>
+          )}
+          {isLoading && <TabsSkeleton /> /* Tab Skeleton */}
+          {!isLoading && !isError && stations.length === 0 && selectedPeriod && (
+            <p className="text-center text-gray-500 py-2">No stations found for {toTitleCase(selectedPeriod)}.</p>
+          )}
+          {!isLoading && !isError && stations.length === 0 && !selectedPeriod && (
+            <p className="text-center text-gray-500 py-2">No stations found.</p>
+          )}
         </div>
+
+        <DishesInfo
+          dishes={dishes}
+          isLoading={isLoading}
+          isError={isError || (!isLoading && !hallData)}
+          errorMessage={error?.message ?? (!isLoading && !hallData ? `Data not available for ${HallEnum[hall]}.` : undefined)}
+        />
       </div>
-    )
+    </div>
+  )
 }
 
 /**
