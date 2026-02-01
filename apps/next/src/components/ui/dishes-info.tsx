@@ -33,6 +33,10 @@ interface DishesInfoProps {
    * An optional error message string to display if `isError` is true.
    */
   errorMessage?: string;
+  /**
+   * Whether to display dishes in compact/simplified view.
+   */
+  isCompactView?: boolean;
 }
 
 /**
@@ -47,6 +51,7 @@ export default function DishesInfo({
   isLoading,
   isError,
   errorMessage,
+  isCompactView = false,
 }: DishesInfoProps): JSX.Element {
   const userId = useUserStore((s) => s.userId);
 
@@ -109,6 +114,7 @@ export default function DishesInfo({
                             !!isFavoritesLoading || !!isFavoritePending?.(dish.id)
                           }
                           onToggleFavorite={onToggleFavorite}
+                          isSimplified={isCompactView}
                         />
                       )}
                     </div>

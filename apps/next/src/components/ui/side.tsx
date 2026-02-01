@@ -13,7 +13,7 @@ import { toTitleCase, utcToPacificTime, formatOpenCloseTime, isSameDay, military
 import TabsSkeleton from "./skeleton/tabs-skeleton";
 import SelectSkeleton from "./skeleton/select-skeleton";
 import { useDate } from "@/context/date-context";
-import { ArrowRightLeft, RefreshCw } from "lucide-react";
+import { ArrowRightLeft, Grid3x2, Menu } from "lucide-react";
 import { Button } from "./shadcn/button";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useHallDerived, useHallStore } from "@/context/useHallStore";
@@ -81,6 +81,7 @@ export default function Side({ hall, toggleHall }: SideProps): JSX.Element {
   /** UI state */
   const [selectedPeriod, setSelectedPeriod] = useState("");
   const [selectedStation, setSelectedStation] = useState("");
+  const [isCompactView, setIsCompactView] = useState(false);
 
   /** Sync selectedPeriod with derived periods */
   useEffect(() => {
@@ -232,6 +233,38 @@ export default function Side({ hall, toggleHall }: SideProps): JSX.Element {
             {!isLoading && !isError && stations.length === 0 && !selectedPeriod && (
                  <p className="text-center text-gray-500 py-2">No stations found.</p>
             )}
+            
+            {/* View Toggle Buttons */}
+            {!isLoading && !isError && dishes.length > 0 && (
+              <div className="flex gap-2 w-full justify-end">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsCompactView(false)}
+                  className={`px-4 py-1 flex items-center justify-center ${
+                    !isCompactView 
+                      ? "bg-sky-700 text-white border-sky-700 hover:bg-sky-700 hover:text-white" 
+                      : "border-sky-700 text-slate-900 hover:bg-sky-50 hover:text-slate-900"
+                  }`}
+                >
+                  <Menu className="mr-1" />
+                  Card View
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsCompactView(true)}
+                  className={`px-4 py-1 flex items-center justify-center ${
+                    isCompactView 
+                      ? "bg-sky-700 text-white border-sky-700 hover:bg-sky-700 hover:text-white" 
+                      : "border-sky-700 text-slate-900 hover:bg-sky-50 hover:text-slate-900"
+                  }`}
+                >
+                  <Grid3x2 className="mr-1" />
+                  Compact View
+                </Button>
+              </div>
+            )}
           </div>
 
           <DishesInfo 
@@ -239,6 +272,7 @@ export default function Side({ hall, toggleHall }: SideProps): JSX.Element {
             isLoading={isLoading}
             isError={isError || (!isLoading && !hallData)} 
             errorMessage={error?.message ?? (!isLoading && !hallData ? `Data not available for ${HallEnum[hall]}.` : undefined)}
+            isCompactView={isCompactView}
           />
         </div>
       </div>

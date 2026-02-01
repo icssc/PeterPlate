@@ -272,12 +272,15 @@ interface FoodCardProps extends DishInfo {
   favoriteIsLoading?: boolean;
   /** Handler to toggle the favorite state. */
   onToggleFavorite?: (dishId: string, currentlyFavorite: boolean) => void;
+  /** Whether to render a simplified version of the card. */
+  isSimplified?: boolean;
 }
 
 export default function FoodCard({
   isFavorited = false,
   favoriteIsLoading = false,
   onToggleFavorite,
+  isSimplified = false,
   ...dish
 }: FoodCardProps): React.JSX.Element {
   const isDesktop = useMediaQuery("(min-width: 768px)");
@@ -294,6 +297,7 @@ export default function FoodCard({
           isFavorited={isFavorited}
           favoriteDisabled={favoriteIsLoading}
           onToggleFavorite={onToggleFavorite}
+          isSimplified={isSimplified}
           onClick={handleOpen}
         />
         <Dialog
@@ -325,6 +329,7 @@ export default function FoodCard({
           isFavorited={isFavorited}
           favoriteDisabled={favoriteIsLoading}
           onToggleFavorite={onToggleFavorite}
+          isSimplified={isSimplified}
           onClick={handleOpen}
         />
         <Drawer
