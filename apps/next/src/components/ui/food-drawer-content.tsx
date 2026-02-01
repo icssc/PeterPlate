@@ -1,7 +1,6 @@
 "use client"; // Need state for toggling nutrient visibility
 
 import { Button, Box } from "@mui/material";
-import { Pin } from "lucide-react";
 import Image from "next/image";
 import React, { useState } from "react";
 import { cn } from "@/utils/tw";
@@ -17,11 +16,11 @@ import { AllergenBadge } from "./allergen-badge";
 import InteractiveStarRating from "./interactive-star-rating";
 
 export default function FoodDrawerContent({ dish }: { dish: DishInfo }) {
-
-  const ingredientsAvailable: boolean = dish.ingredients != null 
-    && dish.ingredients.length > 0;
-  const caloricInformationAvailable: boolean = dish.nutritionInfo.calories != null
-    && dish.nutritionInfo.calories.length > 0;
+  const ingredientsAvailable: boolean =
+    dish.ingredients != null && dish.ingredients.length > 0;
+  const caloricInformationAvailable: boolean =
+    dish.nutritionInfo.calories != null &&
+    dish.nutritionInfo.calories.length > 0;
 
   // State to control nutrient visibility
   const [showAllNutrients, setShowAllNutrients] = useState(false);
@@ -56,7 +55,6 @@ export default function FoodDrawerContent({ dish }: { dish: DishInfo }) {
             <h2 className="text-3xl font-bold leading-tight tracking-normal text-sky-700">
               {formatFoodName(dish.name)}
             </h2>
-            <Pin className="stroke-zinc-500" />
           </div>
 
           <div className="flex flex-wrap items-center gap-2 text-zinc-500">
