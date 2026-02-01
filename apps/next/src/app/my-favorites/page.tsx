@@ -2,19 +2,32 @@
 
 import FoodCard from "@/components/ui/card/food-card";
 import FoodCardSkeleton from "@/components/ui/skeleton/food-card-skeleton";
-import { DEFAULT_USER_ID } from "@/config/user";
+import { useUserStore } from "@/context/useUserStore";
 import { useFavorites } from "@/hooks/useFavorites";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 type FavoriteEntry = ReturnType<typeof useFavorites>["favorites"][number];
 
 export default function MyFavoritesPage() {
+  const router = useRouter();
+  const userId = useUserStore((s) => s.userId);
+
+  useEffect(() => {
+    // TODO: use [MUI snackbar](https://mui.com/material-ui/react-snackbar/) to warn users.
+    if (!userId) {
+      alert("Login to favorite meals!");
+      router.push("/");
+    }
+  }, [userId]);
+
   const {
     favorites,
     isLoadingFavorites,
     favoritesError,
     toggleFavorite,
     isFavoritePending,
-  } = useFavorites(DEFAULT_USER_ID);
+  } = useFavorites(userId!);
 
   const hasFavorites = favorites.length > 0;
 

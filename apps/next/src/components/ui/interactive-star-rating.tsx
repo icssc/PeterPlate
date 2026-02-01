@@ -4,24 +4,27 @@ import { useState, useEffect } from "react";
 import { Star } from "lucide-react";
 import { useRatings } from "@/hooks/useRatings";
 import { trpc } from "@/utils/trpc";
-
-const DEFAULT_USER_ID = "default-user"; // replace with real user ID when auth is set up
+import { useUserStore } from "@/context/useUserStore";
 
 interface InteractiveStarRatingProps {
   dishId: string;
 }
 
-export default function InteractiveStarRating({
-  dishId,
-}: InteractiveStarRatingProps) {
-  const [userRating, setUserRating] = useState<number | undefined>(undefined);
+export default function InteractiveStarRating({ dishId }: InteractiveStarRatingProps) {
+  const userId = useUserStore((s) => s.userId);
+  const [userRating, setUserRating] = useState<number | undefined>(0);
   const [hoverRating, setHoverRating] = useState<number | null>(null);
 
-  const { rateDish } = useRatings();
+  const { rateDish } = useRatings(userId!);
+
+  console.log(userId)
 
   const { data: existingRating } = trpc.user.getUserRating.useQuery(
-    { userId: DEFAULT_USER_ID, dishId },
-    { staleTime: 5 * 60 * 1000 },
+    { userId: userId!, dishId },
+    {
+      enabled: !!userId, 
+      staleTime: 5 * 60 * 1000
+    },
   );
 
   useEffect(() => {
@@ -31,6 +34,12 @@ export default function InteractiveStarRating({
   }, [existingRating]);
 
   const handleStarClick = (stars: number) => {
+    // TODO: use [MUI snackbar](https://mui.com/material-ui/react-snackbar/) to warn users. 
+    if (!userId) {
+      alert("Login to rate meals!");
+      return;
+    }
+
     // clicking the same rating gives a 0
     const newRating = stars === userRating ? 0 : stars;
     setUserRating(newRating);

@@ -9,6 +9,7 @@ import InteractiveStarRating from "../interactive-star-rating";
 import { DishInfo } from "@zotmeal/api";
 import FoodDialogContent from "../food-dialog-content";
 import { cn } from "@/utils/tw";
+import { useUserStore } from "@/context/useUserStore";
 
 interface RatingsCardProps {
   food: DishInfo & {
@@ -71,15 +72,14 @@ const RatingsCardContent = React.forwardRef<
 RatingsCardContent.displayName = "RatingsCardContent";
 
 export default function RatingsCard({ food }: RatingsCardProps) {
+  const userId = useUserStore((s) => s.userId);
   const [open, setOpen] = React.useState(false);
   const utils = trpc.useUtils();
+  
   const deleteRatingMutation = trpc.dish.deleteRating.useMutation({
     onSuccess: () => {
       utils.dish.rated.invalidate();
-      utils.dish.getUserRating.invalidate({
-        userId: "default-user",
-        dishId: food.id,
-      });
+      utils.dish.getUserRating.invalidate({ userId, dishId: food.id });
       utils.dish.getAverageRating.invalidate({ dishId: food.id });
     },
   });
@@ -87,10 +87,7 @@ export default function RatingsCard({ food }: RatingsCardProps) {
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (window.confirm("Delete this rating?")) {
-      await deleteRatingMutation.mutateAsync({
-        userId: "default-user",
-        dishId: food.id,
-      });
+      await deleteRatingMutation.mutateAsync({ userId, dishId: food.id });
     }
   };
 
@@ -122,7 +119,7 @@ export default function RatingsCard({ food }: RatingsCardProps) {
           },
         }}
       >
-        <FoodDialogContent {...food} />
+        <FoodDialogContent dish={food} />
       </Dialog>
     </>
   );

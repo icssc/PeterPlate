@@ -29,7 +29,7 @@ import InteractiveStarRating from "./interactive-star-rating";
  * @param {DishInfo} dish - The dish data to display. See {@link DishInfo} (from `@zotmeal/api`) for detailed property descriptions.
  * @returns {JSX.Element} The rendered content for the food item dialog.
  */
-export default function FoodDialogContent(dish: DishInfo): React.JSX.Element {
+export default function FoodDialogContent({ dish } : { dish: DishInfo }) {
   const [showAllNutrients, setShowAllNutrients] = useState(false);
   const initialNutrients = [
     "calories",
@@ -76,7 +76,6 @@ export default function FoodDialogContent(dish: DishInfo): React.JSX.Element {
                   </h2>
                   {/* <Pin className="stroke-zinc-500"/> */}
                 </div>
-                {/* Interactive rating stars - right aligned */}
                 <InteractiveStarRating dishId={dish.id} />
               </div>
               <div className="px-4 flex flex-wrap items-center gap-2 text-zinc-500">
