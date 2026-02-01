@@ -180,9 +180,17 @@ export default function Header(): JSX.Element {
                 }}
                 PaperProps={{
                     sx: {
-                    width: 320,
-                    borderRadius: 3,
+                    backgroundColor: "transparent",
+                    boxShadow: "none",
+                    padding: 0,
+                    width: 357,
+                    // borderRadius: 3,
                     mt: 1,
+                    },
+                }}
+                MenuListProps={{
+                    sx: {
+                        padding: 0
                     },
                 }}
                 >
