@@ -44,10 +44,18 @@ interface FoodCardContentProps extends React.HTMLAttributes<HTMLDivElement> {
  * It shows the food's name, icon, calories, and a placeholder rating.
  * This component is intended to be used as a trigger for a dialog showing more details.
  */
-const FoodCardContent = React.forwardRef<
-  HTMLDivElement,
-  FoodCardContentProps
->(({ dish, isFavorited, favoriteDisabled, onToggleFavorite, isSimplified = false, className, ...divProps }, ref) => {
+const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
+  (
+    { dish, 
+      isFavorited, 
+      favoriteDisabled, 
+      onToggleFavorite, 
+      isSimplified = false, 
+      className, 
+      ...divProps 
+    }, 
+    ref,
+  ) => {
     const userId = useUserStore((state) => state.userId);
     const IconComponent = getFoodIcon(dish.name) ?? Utensils;
 
