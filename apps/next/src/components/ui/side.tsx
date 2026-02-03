@@ -13,7 +13,7 @@ import { toTitleCase, utcToPacificTime, formatOpenCloseTime, isSameDay, military
 import TabsSkeleton from "./skeleton/tabs-skeleton";
 import SelectSkeleton from "./skeleton/select-skeleton";
 import { useDate } from "@/context/date-context";
-import { ArrowRightLeft, RefreshCw } from "lucide-react";
+import { SyncAlt, Refresh } from "@mui/icons-material"
 import { Button } from "./shadcn/button";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useHallDerived, useHallStore } from "@/context/useHallStore";
@@ -161,7 +161,7 @@ export default function Side({ hall, toggleHall }: SideProps): JSX.Element {
             className="absolute top-[68px] right-3 rounded-full bg-white shadow-md"
             onClick={() => toggleHall()}
           >
-            <ArrowRightLeft className="text-black-500 w-5 h-5" />
+            <SyncAlt className="text-black-500 w-5 h-5" />
           </Button>
         )}
       </div>
@@ -256,13 +256,12 @@ export default function Side({ hall, toggleHall }: SideProps): JSX.Element {
  * @returns {string} The key/name of the current or default meal period.
  */
 function getCurrentPeriod(selectedDate: Date, periods: { [periodName: string]: [Date, Date] }): string {
-  for (let key in periods) {
-    let periodBegin: Date = periods[key][0];
-    let periodEnd: Date = periods[key][1];
+  for (const key in periods) {
+    const periodBegin: Date = periods[key][0];
+    const periodEnd: Date = periods[key][1];
 
     if (selectedDate >= periodBegin && selectedDate <= periodEnd)
       return key;
-
   }
 
   return Object.keys(periods)[0];

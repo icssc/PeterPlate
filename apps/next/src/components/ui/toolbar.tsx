@@ -1,16 +1,12 @@
 "use client";
 
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import MenuIcon from "@mui/icons-material/Menu";
 import { AppBar, Button, IconButton, Menu, MenuItem, Toolbar as MuiToolbar } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in";
 import { useSession } from "@/utils/auth-client";
-import { useDate } from "@/context/date-context";
-import { trpc } from "@/utils/trpc";
-import type { DateList } from "../../../../../packages/db/src/schema";
 import SidebarContent from "./sidebar/sidebar-content";
 
 export type CalendarRange = {
@@ -18,7 +14,7 @@ export type CalendarRange = {
   latest: Date;
 };
 
-export default function Toolbar(): JSX.Element {
+export default function Toolbar(): React.JSX.Element {
   const { data: session, isPending } = useSession();
   const user = session?.user;
   const [drawerOpen, setDrawerOpen] = useState(false);
