@@ -61,7 +61,7 @@ export default function FoodDialogContent({ dish }: { dish: DishInfo }) {
     { staleTime: 5 * 60 * 1000 },
   );
   const averageRating = ratingData?.averageRating ?? 0;
-  const ratingCount = ratingData?.ratingCount ?? 0;
+  // const ratingCount = ratingData?.ratingCount ?? 0;
 
   return (
     <div className="font-poppins">

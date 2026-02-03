@@ -16,6 +16,13 @@ body {
   text-transform: none !important;
 }
 
+.MuiButton-root {
+  font-family: inherit !important;
+  text-transform: none !important;
+}
+
+
+
 @layer base {
   :root {
     --background: 0 0% 100%;
