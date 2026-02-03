@@ -1,4 +1,4 @@
-import { Dialog, Button } from "@mui/material";
+import { Button, Dialog } from "@mui/material";
 import { useState } from "react";
 
 interface IngredientsDialogProps {

@@ -1,23 +1,24 @@
 "use client"; // Need state for toggling nutrient visibility
 
-import { Button, Box } from "@mui/material";
+import { Box, Button } from "@mui/material";
+import type { DishInfo } from "@zotmeal/api";
 import Image from "next/image";
-import React, { useState } from "react";
-import { cn } from "@/utils/tw";
-import { nutrientToUnit } from "@/utils/types";
+import { useState } from "react";
 import {
+  enhanceDescription,
   formatFoodName,
   formatNutrientLabel,
   formatNutrientValue,
+  toTitleCase,
 } from "@/utils/funcs";
-import { DishInfo } from "@zotmeal/api";
-import { toTitleCase, enhanceDescription } from "@/utils/funcs";
+import { cn } from "@/utils/tw";
+import { nutrientToUnit } from "@/utils/types";
 import { AllergenBadge } from "./allergen-badge";
 import InteractiveStarRating from "./interactive-star-rating";
 
 export default function FoodDrawerContent({ dish }: { dish: DishInfo }) {
-  const ingredientsAvailable: boolean =
-    dish.ingredients != null && dish.ingredients.length > 0;
+  // const ingredientsAvailable: boolean =
+  //   dish.ingredients != null && dish.ingredients.length > 0;
   const caloricInformationAvailable: boolean =
     dish.nutritionInfo.calories != null &&
     dish.nutritionInfo.calories.length > 0;

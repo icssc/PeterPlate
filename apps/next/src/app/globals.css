@@ -16,6 +16,11 @@ body {
   text-transform: none !important;
 }
 
+.MuiButton-root {
+  font-family: inherit !important;
+  text-transform: none !important;
+}
+
 
 
 @layer base {
@@ -82,8 +87,6 @@ body {
     @apply bg-background text-foreground;
   }
 }
-
-
 
 @layer base {
   * {

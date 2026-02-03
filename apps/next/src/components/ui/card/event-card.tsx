@@ -1,15 +1,15 @@
 "use client";
 
-import React from "react";
-import { HallEnum } from "@/utils/types";
-import { dateToString, toTitleCase } from "@/utils/funcs";
-import { Dialog, Card, CardContent, Drawer } from "@mui/material";
+import { AccessTime, PinDrop } from "@mui/icons-material";
+import { Card, CardContent, Dialog, Drawer } from "@mui/material";
 import Image from "next/image";
-import EventDialogContent from "../event-dialog-content";
-import OngoingBadge from "../ongoing-badge";
-import { Clock, MapPinned } from "lucide-react";
+import React from "react";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { dateToString, toTitleCase } from "@/utils/funcs";
+import { HallEnum } from "@/utils/types";
+import EventDialogContent from "../event-dialog-content";
 import EventDrawerContent from "../event-drawer-content";
+import OngoingBadge from "../ongoing-badge";
 
 /**
  * Defines the structure for event information used by event-related components.
@@ -86,11 +86,11 @@ const EventCardContent = React.forwardRef<
               id="event-card-subheader"
             >
               <div className="flex gap-1">
-                <Clock className="stroke-zinc-400" />
+                <AccessTime className="stroke-zinc-400" />
                 <p>{dateToString(props.startTime, props.endTime)}</p>
               </div>
               <div className="flex gap-1">
-                <MapPinned />
+                <PinDrop />
                 <p>{toTitleCase(HallEnum[props.location])}</p>
               </div>
             </div>

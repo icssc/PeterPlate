@@ -1,22 +1,23 @@
 "use client"; // Need state for toggling nutrient visibility
 
-import { DialogContent, Button } from "@mui/material";
+import { StarBorder } from "@mui/icons-material";
+import { Button, DialogContent } from "@mui/material";
+import type { DishInfo } from "@zotmeal/api";
 import Image from "next/image";
 import React, { useState } from "react";
-import { cn } from "@/utils/tw";
-import { nutrientToUnit } from "@/utils/types";
 import {
+  enhanceDescription,
   formatFoodName,
   formatNutrientLabel,
   formatNutrientValue,
+  toTitleCase,
 } from "@/utils/funcs";
-import { DishInfo } from "@zotmeal/api";
-import { toTitleCase, enhanceDescription } from "@/utils/funcs";
-import { AllergenBadge } from "./allergen-badge";
-import IngredientsDialog from "../ingredients-dialog";
-import InteractiveStarRating from "./interactive-star-rating";
 import { trpc } from "@/utils/trpc";
-import { Star } from "lucide-react";
+import { cn } from "@/utils/tw";
+import { nutrientToUnit } from "@/utils/types";
+import IngredientsDialog from "../ingredients-dialog";
+import { AllergenBadge } from "./allergen-badge";
+import InteractiveStarRating from "./interactive-star-rating";
 
 /**
  * `FoodDialogContent` renders the detailed view of a food item (dish) within a dialog.
@@ -31,7 +32,7 @@ import { Star } from "lucide-react";
  * @param {DishInfo} dish - The dish data to display. See {@link DishInfo} (from `@zotmeal/api`) for detailed property descriptions.
  * @returns {JSX.Element} The rendered content for the food item dialog.
  */
-export default function FoodDialogContent({ dish } : { dish: DishInfo }) {
+export default function FoodDialogContent({ dish }: { dish: DishInfo }) {
   const [showAllNutrients, setShowAllNutrients] = useState(false);
   const initialNutrients = [
     "calories",
@@ -60,7 +61,7 @@ export default function FoodDialogContent({ dish } : { dish: DishInfo }) {
     { staleTime: 5 * 60 * 1000 },
   );
   const averageRating = ratingData?.averageRating ?? 0;
-  const ratingCount = ratingData?.ratingCount ?? 0;
+  // const ratingCount = ratingData?.ratingCount ?? 0;
 
   return (
     <div className="font-poppins">
@@ -89,7 +90,10 @@ export default function FoodDialogContent({ dish } : { dish: DishInfo }) {
               </div>
               <div className="px-4 flex flex-wrap items-center gap-2 text-zinc-500">
                 <span className="whitespace-nowrap flex items-center gap-1">
-                  <Star className="w-4 h-4 stroke-zinc-400" strokeWidth={1.5} />
+                  <StarBorder
+                    className="w-4 h-4 stroke-zinc-400"
+                    strokeWidth={1.5}
+                  />
                   {averageRating.toFixed(1)} • {toTitleCase(dish.restaurant)} •{" "}
                   {!caloricInformationAvailable
                     ? "-"
@@ -196,7 +200,7 @@ export default function FoodDialogContent({ dish } : { dish: DishInfo }) {
                   {ingredientsAvailable && (
                     <IngredientsDialog
                       name={dish.name}
-                      ingredients={dish.ingredients!}
+                      ingredients={dish.ingredients ?? ""}
                     />
                   )}
                   {!ingredientsAvailable && (
