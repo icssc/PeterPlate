@@ -1,6 +1,18 @@
-import { Drumstick, EggAlt, LucideProps, LocalPizza, Salad, SoupKitchen, LunchDining, Icecream, Cookie, BakeryDining, Cake, Wheat, apple, SetMeal } from "@mui/icons-material";
-//import { Drumstick, EggFried, LucideProps, Pizza, Salad, Soup, Sandwich, IceCreamBowl, Dessert, Cookie, Croissant, CakeSlice, Wheat, Apple, FishSymbol} from "lucide-react";
-import { ForwardRefExoticComponent, RefAttributes } from "react";
+import { 
+  EggAlt,
+  LocalPizza,
+  SoupKitchen,
+  LunchDining,
+  Icecream,
+  Cookie,
+  BakeryDining,
+  Cake,
+  Grass,
+  Apple,
+  SetMeal, 
+  KebabDining
+} from "@mui/icons-material";
+import type { SvgIconComponent } from "@mui/icons-material";
 
 /**
  * Defines background color classes for different hall statuses.
@@ -104,7 +116,7 @@ const preferredCategoryOrder: string[] = [
 /**
  * Keywords associated with meat-based dishes. Used by `getFoodIcon`.
  */
-let meatKeywords: Set<string> = new Set<string>([
+const meatKeywords: Set<string> = new Set<string>([
   'chicken',
   'ham',
   'beef',
@@ -122,7 +134,7 @@ let meatKeywords: Set<string> = new Set<string>([
 /**
  * Keywords associated with pastries. Used by `getFoodIcon`.
  */
-let pastryKeywords: Set<string> = new Set<string>([
+const pastryKeywords: Set<string> = new Set<string>([
   'cinnamon',
   'pastry',
   'muffin'
@@ -132,7 +144,7 @@ let pastryKeywords: Set<string> = new Set<string>([
  * Keywords associated with fruits. Used by `getFoodIcon`.
  * NOTE: "strawberr" and "cranberr" are partial to catch variations.
  */
-let fruitKeywords: Set<string> = new Set<string>([
+const fruitKeywords: Set<string> = new Set<string>([
   'strawberr',
   'orange',
   'cranberr',
@@ -146,28 +158,28 @@ let fruitKeywords: Set<string> = new Set<string>([
 /**
  * Keywords associated with cookies. Used by `getFoodIcon`.
  */
-let cookieKeywords: Set<string> = new Set<string>([
+const cookieKeywords: Set<string> = new Set<string>([
   'cookie'
 ]);
 
 /**
  * Keywords associated with croissants. Used by `getFoodIcon`.
  */
-let croissantKeywords: Set<string> = new Set<string>([
+const croissantKeywords: Set<string> = new Set<string>([
   'croissant'
 ]);
 
 /**
  * Keywords associated with cakes. Used by `getFoodIcon`.
  */
-let cakeKeywords: Set<string> = new Set<string>([
+const cakeKeywords: Set<string> = new Set<string>([
   'cake'
 ]);
 
 /**
  * Keywords associated with sandwiches and burgers. Used by `getFoodIcon`.
  */
-let sandwichKeywords: Set<string> = new Set<string>([
+const sandwichKeywords: Set<string> = new Set<string>([
   'sandwich',
   'melt',
   'burger',
@@ -175,7 +187,7 @@ let sandwichKeywords: Set<string> = new Set<string>([
   'panini'
 ]);
 
-let pizzaKeywords: Set<string> = new Set<string>([
+const pizzaKeywords: Set<string> = new Set<string>([
   'pizza',
   'flatbread',
   'stromboli'
@@ -184,17 +196,17 @@ let pizzaKeywords: Set<string> = new Set<string>([
 /**
  * Keywords associated with egg-based dishes. Used by `getFoodIcon`.
  */
-let eggKeywords: Set<string> = new Set<string>([
+const eggKeywords: Set<string> = new Set<string>([
   'egg',
-  'omelette'
+  'omeconstte'
 ]);
 
 /**
  * Keywords associated with salads and vegetables. Used by `getFoodIcon`.
  */
-let saladKeywords: Set<string> = new Set<string>([
+const saladKeywords: Set<string> = new Set<string>([
   'tomato',
-  'lettuce',
+  'consttuce',
   'onion',
   'greens',
   'coleslaw',
@@ -216,7 +228,7 @@ let saladKeywords: Set<string> = new Set<string>([
 /**
  * Keywords associated with grains and breads. Used by `getFoodIcon`.
  */
-let grainAndBreadKeywords: Set<string> = new Set<string>([
+const grainAndBreadKeywords: Set<string> = new Set<string>([
   'bread',
   'farro',
   'crouton',
@@ -229,7 +241,7 @@ let grainAndBreadKeywords: Set<string> = new Set<string>([
 /**
  * Keywords associated with soups, cereals, and pasta dishes. Used by `getFoodIcon`.
  */
-let soupKeywords: Set<string> = new Set<string>([
+const soupKeywords: Set<string> = new Set<string>([
   'oatmeal',
   'soup',
   'cereal',
@@ -244,7 +256,7 @@ let soupKeywords: Set<string> = new Set<string>([
 /**
  * Keywords associated with ice cream and similar desserts. Used by `getFoodIcon`.
  */
-let iceCreamKeywords: Set<string> = new Set<string>([
+const iceCreamKeywords: Set<string> = new Set<string>([
   'cream',
   'yogurt',
   'sorbet',
@@ -254,7 +266,7 @@ let iceCreamKeywords: Set<string> = new Set<string>([
 /**
  * Keywords associated with fish and seafood. Used by `getFoodIcon`.
  */
-let fishKeywords: Set<string> = new Set<string>([
+const fishKeywords: Set<string> = new Set<string>([
   'fish',
   'tilapia',
   'tuna',
@@ -268,7 +280,7 @@ let fishKeywords: Set<string> = new Set<string>([
  * general ones (e.g., `meatKeywords`) to ensure, for instance, that a "hamburger"
  * gets a sandwich/burger icon rather than a generic meat icon.
  */
-let foodIconKeywords: Set<string>[] = [
+const foodIconKeywords: Set<string>[] = [
   cakeKeywords,
   croissantKeywords,
   cookieKeywords,
@@ -286,31 +298,24 @@ let foodIconKeywords: Set<string>[] = [
 ]
 
 /**
- * Represents a Lucide React icon component.
- * This type is used for icon components imported from the `lucide-react` library.
- */
-export type LucideIconComponent = 
-  ForwardRefExoticComponent<LucideProps & RefAttributes<SVGSVGElement>>;
-
-/**
- * An array of Lucide React icon components. The order of icons in this array
+ * An array of Icon components. The order of icons in this array
  * directly corresponds to the order of `foodIconKeywords` sets.
  * `getFoodIcon` uses this array to return the matched icon component.
  */
-let foodIcons: LucideIconComponent[] = [
+const foodIcons: SvgIconComponent[] = [
   Cake,
   BakeryDining,
   Cookie,
-  Dessert,
+  BakeryDining,
   Icecream,
   Apple,
   SoupKitchen,
   EggAlt,
   LocalPizza,
   LunchDining,
-  Salad,
-  Drumstick,
-  Wheat,
+  Grass,
+  KebabDining,
+  Grass,
   SetMeal
 ];
 

@@ -1,16 +1,16 @@
 import { ButtonBase } from "@mui/material";
-import { ChevronRight } from "@mui/icons-material";
+import { ChevronRight, SvgIconComponent } from "@mui/icons-material";
 import Link from "next/link";
 
 /**
  * Props for the {@link SidebarButton} component.
  */
-interface SidebarButtonProps {
+export interface SidebarButtonProps {
   /**
    * The icon component to display on the left side of the button.
    * Should be a React component type, e.g., a Lucide icon.
    */
-  Icon: React.ElementType;
+  Icon: SvgIconComponent;
   /**
    * The text label for the button.
    */
@@ -46,7 +46,7 @@ export default function SidebarButton({ Icon, title, href, deactivated, onClose 
       href={deactivated ? "#" : href}
       onClick={onClose}
       disabled={deactivated}
-      className="justify-between [&_svg]:size-5"
+      className="!justify-between [&_svg]:size-5"
       style={{ width: "100%", padding: "8px 16px" }}
     >
       <div className="flex gap-3 items-center">

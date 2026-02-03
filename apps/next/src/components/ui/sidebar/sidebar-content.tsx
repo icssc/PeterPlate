@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import {
   Box,
   Drawer,
@@ -11,17 +10,94 @@ import {
   Divider,
   Stack,
 } from "@mui/material";
-import SidebarButton from "./sidebar-button";
+import SidebarButton, { type SidebarButtonProps } from "./sidebar-button";
 import SidebarDivider from "./sidebar-divider";
-import { Settings, CalendarToday, Logout, House, Info, Pin, EmojiEvents, StarBorder, FavoriteBorder, Star, Person, EditNote, EggAlt } from "@mui/icons-material";
+import { Settings, CalendarToday, House, Info, EmojiEvents, StarBorder, FavoriteBorder, Person, EditNote, EggAlt } from "@mui/icons-material";
 import { useSession, signOut } from "@/utils/auth-client"; // BetterAuth React hook
 import { GoogleSignInButton } from "@/components/auth/google-sign-in";
 import { ThemeToggle } from "./theme-toggle";
+import type React from "react";
 
 interface SidebarContentProps {
   open: boolean;
   onClose: () => void;
 }
+
+type SidebarSection = {
+  title: string,
+  buttons: SidebarButtonProps[];
+};
+
+const SIDEBAR_CONTENT_MAP: SidebarSection[] = [
+  {
+    title: "Dining Hall Info",
+    buttons: [
+      { 
+        Icon: House, 
+        title: "Home", 
+        href: "/" 
+      },
+      { 
+        Icon: CalendarToday,
+        title: "Events",
+        href: "/events" 
+      },
+      { 
+        Icon: EmojiEvents, 
+        title: "Most Liked", 
+        href: "/leaderboard",
+        deactivated: true
+      },
+      { 
+        Icon: EggAlt, 
+        title: "Nutrition", 
+        href: "/nutrition" 
+      }
+    ]
+  },
+  {
+    title: "Account", 
+    buttons: [
+      { 
+        Icon: Person,
+        title: "My Account",
+        href: "/account",
+      },
+      { 
+        Icon: StarBorder,
+        title: "My Ratings",
+        href: "/ratings",
+      },
+      { 
+        Icon: FavoriteBorder,
+        title: "My Favorites",
+        href: "/my-favorites",
+      },
+      { 
+        Icon: EditNote,
+        title: "My Meal Tracker",
+        href: "/meal-tracker",
+        deactivated: true,
+      }
+    ]
+  },
+  {
+    title: "Miscellaneous",
+    buttons: [
+      { 
+        Icon: Settings, 
+        title: "Settings",
+        href: "/settings", 
+        deactivated: true 
+      },
+      { 
+        Icon: Info, 
+        title: "About", 
+        href: "/about", 
+      }
+    ]
+  }
+]
 
 /**
  * `SidebarContent` is a presentational component that renders the main content
@@ -36,7 +112,7 @@ interface SidebarContentProps {
 export default function SidebarContent({
   open,
   onClose,
-}: SidebarContentProps): JSX.Element {
+}: SidebarContentProps): React.JSX.Element {
   // Get session data using BetterAuth's React hook
   const { data: session, isPending } = useSession();
   const user = session?.user;
@@ -63,67 +139,6 @@ export default function SidebarContent({
               height={32}
               alt="ZotMeal Logo"
             />
-<<<<<<< HEAD
-            <SheetTitle>
-              <span>ZotMeal </span>
-              <span className="text-sm font-normal">v0.1 (preview)</span>
-            </SheetTitle>
-          </div>
-          <SidebarDivider title="Dining Hall Info"/>
-          <SidebarButton Icon={House} title="Home" href="/"/>
-          <SidebarButton Icon={CalendarToday} title="Events" href="/events"/>
-          <SidebarButton Icon={EmojiEvents} title="Most Liked" href="/leaderboard" deactivated/>
-          <SidebarButton Icon={EggAlt} title="Nutrition" href="/nutrition"/>
-
-          <SidebarDivider title="Account"/>
-          <SidebarButton Icon={Person} title="My Account" href="/account"/>
-          <SidebarButton Icon={StarBorder} title="My Ratings" href="/ratings"/>
-          <SidebarButton Icon={FavoriteBorder} title="My Favorites" href="/my-favorites"/>
-          <SidebarButton Icon={EditNote} title="My Meal Tracker" href="/meal-tracker" deactivated/>
-
-          <SidebarDivider title="Miscellaneous"/>
-          <SidebarButton Icon={Settings} title="Settings" href="/settings" deactivated/>
-          <SidebarButton Icon={Info} title="About" href="/about"/>
-        </div>
-
-        {/* Sign in Button if user not logged in  */}
-        {!isPending && !user && <GoogleSignInButton />}
-        
-        {/* User profile is user logged in*/}
-        {!isPending && user && (
-          <div className="flex p-2 items-center justify-between rounded-md hover:bg-zinc-100 transition-colors" id="sheet-bottom">
-            <div className="flex gap-3 items-center">
-              <Avatar className="rounded-md">
-                <AvatarImage 
-                  src={user.image || "/peter.webp"} 
-                  alt={`@${user.name || 'user'}`}
-                />
-                <AvatarFallback>
-                  {user.name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || "U"}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex flex-col" id="user-info">
-                <strong id="user-name">
-                  {user.name || "User"}
-                </strong>
-                <span className="text-sm" id="user-email">
-                  {user.email || ""}
-                </span>
-              </div>
-            </div>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={handleSignOut}
-              aria-label="Log out"
-            >
-              <Logout/>
-            </Button>
-          </div>
-        )}
-      </div>
-    </SheetContent>
-=======
 
             <Typography variant="h6" className="font-semibold">
               ZotMeal{" "}
@@ -139,15 +154,18 @@ export default function SidebarContent({
 
           <Divider className="my-2" />
 
-          <SidebarDivider title="Account" />
+          {SIDEBAR_CONTENT_MAP.map(section =>
+            <div key={section.title}>
+              <SidebarDivider title={section.title}/> 
+              {section.buttons.map(button =>
+                <SidebarButton
+                  key={button.title}
+                  {...button}
+                />
+              )}
+            </div>
+          )}
 
-          <SidebarButton
-            Icon={User}
-            title="My Account"
-            href="/account"
-            onClose={onClose}
-            deactivated={!user}
-          />
         </Stack>
 
         {/* Bottom */}
@@ -195,6 +213,5 @@ export default function SidebarContent({
         </Stack>
       </Box>
     </Drawer>
->>>>>>> dev
   );
 }

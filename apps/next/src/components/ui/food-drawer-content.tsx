@@ -1,19 +1,9 @@
 "use client"; // Need state for toggling nutrient visibility
 
-<<<<<<< HEAD
-import { PinDrop, StarBorder } from "@mui/icons-material";
-import {
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogContent,
-} from "./shadcn/dialog";
-=======
+import { PinDrop } from "@mui/icons-material";
 import { Button, Box } from "@mui/material";
-import { Pin } from "lucide-react";
->>>>>>> dev
 import Image from "next/image";
-import React, { useState } from "react";
+import { useState } from "react";
 import { cn } from "@/utils/tw";
 import { nutrientToUnit } from "@/utils/types";
 import {
@@ -28,8 +18,8 @@ import InteractiveStarRating from "./interactive-star-rating";
 
 export default function FoodDrawerContent({ dish }: { dish: DishInfo }) {
 
-  const ingredientsAvailable: boolean = dish.ingredients != null 
-    && dish.ingredients.length > 0;
+  // const ingredientsAvailable: boolean = dish.ingredients != null 
+  //   && dish.ingredients.length > 0;
   const caloricInformationAvailable: boolean = dish.nutritionInfo.calories != null
     && dish.nutritionInfo.calories.length > 0;
 
@@ -52,43 +42,6 @@ export default function FoodDrawerContent({ dish }: { dish: DishInfo }) {
   ]);
 
   return (
-<<<<<<< HEAD
-    <DrawerContent className="max-h-[95vh] flex flex-col">
-      <DrawerHeader>
-        <div className="flex flex-col gap-3">
-          <Image
-            src={"/zm-card-header.webp"}
-            alt={"An image of zotmeal logo."}
-            width={1200}
-            height={700}
-            className="w-full h-20 object-cover"
-          />
-          <div className="flex flex-col gap-1">
-            <div className="flex gap-12 px-1" id="food-header-info">
-              <div className="flex w-full items-center justify-between">
-                <DrawerTitle className="text-3xl">
-                  {formatFoodName(dish.name)}
-                </DrawerTitle>
-                <PinDrop className="stroke-zinc-500" />
-              </div>
-            </div>
-            <div className="flex items-center gap-2 text-zinc-500 px-1">
-              <span>{caloricInformationAvailable &&
-                `${Math.round(parseFloat(dish.nutritionInfo.calories ?? "0"))} cal • `} {toTitleCase(dish.restaurant)}
-              </span>
-              {dish.dietRestriction.isVegetarian && <AllergenBadge variant={"vegetarian"}/>}
-              {dish.dietRestriction.isVegan && <AllergenBadge variant={"vegan"}/>}
-              {dish.dietRestriction.isGlutenFree && <AllergenBadge variant={"gluten_free"}/>}
-              {dish.dietRestriction.isKosher && <AllergenBadge variant={"kosher"}/>}
-            </div>
-            {/* Interactive rating stars */}
-            <div className="flex gap-2 ml-1 pt-0.5">
-              <InteractiveStarRating dishId={dish.id} />
-            </div>
-            <DrawerDescription className="text-black text-left px-1 py-2 ">
-              {enhanceDescription(dish.name, dish.description)}
-            </DrawerDescription>
-=======
     <Box className="max-h-[95vh] flex flex-col">
       <Box className="pb-4">
         <Image
@@ -103,10 +56,8 @@ export default function FoodDrawerContent({ dish }: { dish: DishInfo }) {
             <h2 className="text-3xl font-semibold leading-tight tracking-normal">
               {formatFoodName(dish.name)}
             </h2>
-            <Pin className="stroke-zinc-500" />
->>>>>>> dev
+            <PinDrop className="stroke-zinc-500"/>
           </div>
-
           <div className="flex flex-wrap items-center gap-2 text-zinc-500">
             <span className="whitespace-nowrap">
               {!caloricInformationAvailable
