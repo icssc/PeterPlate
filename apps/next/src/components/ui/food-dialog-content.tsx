@@ -15,6 +15,8 @@ import { toTitleCase, enhanceDescription } from "@/utils/funcs";
 import { AllergenBadge } from "./allergen-badge";
 import IngredientsDialog from "../ingredients-dialog";
 import InteractiveStarRating from "./interactive-star-rating";
+import { trpc } from "@/utils/trpc";
+import { Star } from "lucide-react";
 
 /**
  * `FoodDialogContent` renders the detailed view of a food item (dish) within a dialog.
@@ -53,8 +55,15 @@ export default function FoodDialogContent({ dish } : { dish: DishInfo }) {
     dish.nutritionInfo.calories != null &&
     dish.nutritionInfo.calories.length > 0;
 
+  const { data: ratingData } = trpc.dish.getAverageRating.useQuery(
+    { dishId: dish.id },
+    { staleTime: 5 * 60 * 1000 },
+  );
+  const averageRating = ratingData?.averageRating ?? 0;
+  const ratingCount = ratingData?.ratingCount ?? 0;
+
   return (
-    <>
+    <div className="font-poppins">
       <Image
         src={"/zm-card-header.webp"}
         alt={"An image of zotmeal logo."}
@@ -63,7 +72,7 @@ export default function FoodDialogContent({ dish } : { dish: DishInfo }) {
         className="w-full h-40 object-cover"
       />
       <div className="max-w-lg mx-auto w-full">
-        <DialogContent sx={{ padding: "0 !important" }}>
+        <DialogContent sx={{ padding: "0 16px !important" }}>
           <div className="flex flex-col gap-6 pb-6 pt-4">
             <div className="flex flex-col gap-2">
               <div
@@ -71,7 +80,7 @@ export default function FoodDialogContent({ dish } : { dish: DishInfo }) {
                 id="food-header-info"
               >
                 <div className="flex gap-3 items-center">
-                  <h2 className="text-3xl font-semibold leading-tight tracking-normal">
+                  <h2 className="text-3xl font-bold leading-tight tracking-normal text-sky-700">
                     {formatFoodName(dish.name)}
                   </h2>
                   {/* <Pin className="stroke-zinc-500"/> */}
@@ -79,11 +88,12 @@ export default function FoodDialogContent({ dish } : { dish: DishInfo }) {
                 <InteractiveStarRating dishId={dish.id} />
               </div>
               <div className="px-4 flex flex-wrap items-center gap-2 text-zinc-500">
-                <span className="whitespace-nowrap">
+                <span className="whitespace-nowrap flex items-center gap-1">
+                  <Star className="w-4 h-4 stroke-zinc-400" strokeWidth={1.5} />
+                  {averageRating.toFixed(1)} • {toTitleCase(dish.restaurant)} •{" "}
                   {!caloricInformationAvailable
                     ? "-"
-                    : `${Math.round(parseFloat(dish.nutritionInfo.calories ?? "0"))} cal`}{" "}
-                  • {toTitleCase(dish.restaurant)}
+                    : `${Math.round(parseFloat(dish.nutritionInfo.calories ?? "0"))} cal`}
                 </span>
                 <div className="flex items-center gap-2 flex-wrap">
                   {dish.dietRestriction.isVegetarian && (
@@ -106,7 +116,7 @@ export default function FoodDialogContent({ dish } : { dish: DishInfo }) {
               <div>
                 <h1 className="px-4 text-2xl font-bold">Nutrients</h1>
                 <div
-                  className="grid grid-cols-2 gap-x-4 w-full px-4 text-black mb-4"
+                  className="grid grid-cols-2 gap-x-4 w-full px-4 text-black mb-4 max-h-64 overflow-y-auto"
                   id="nutrient-content"
                 >
                   {caloricInformationAvailable &&
@@ -133,10 +143,24 @@ export default function FoodDialogContent({ dish } : { dish: DishInfo }) {
                                 : "max-h-8 opacity-100 py-0.5", // Conditional styles for collapse/expand
                             )}
                           >
-                            <strong className="col-span-1">
+                            <strong
+                              className={cn(
+                                "col-span-1",
+                                (nutrientKey === "transFatG" ||
+                                  nutrientKey === "saturatedFatG") &&
+                                  "text-gray-500 pl-4",
+                              )}
+                            >
                               {formatNutrientLabel(nutrientKey)}
                             </strong>
-                            <span className="col-span-1 text-right">
+                            <span
+                              className={cn(
+                                "col-span-1 text-right",
+                                (nutrientKey === "transFatG" ||
+                                  nutrientKey === "saturatedFatG") &&
+                                  "text-gray-500",
+                              )}
+                            >
                               {value == null
                                 ? "-"
                                 : `${String(formattedValue)} ${nutrientToUnit[nutrientKey]}`}
@@ -190,6 +214,6 @@ export default function FoodDialogContent({ dish } : { dish: DishInfo }) {
           </div>
         </DialogContent>
       </div>
-    </>
+    </div>
   );
 }

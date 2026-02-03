@@ -25,7 +25,7 @@ export default function EventDrawerContent(
         alt={props.alt}
         width={600}
         height={600}
-        className="w-full h-auto max-h-64 object-contain"
+        className="w-full h-auto max-h-64 object-cover"
       />
       <Box sx={{ padding: "20px 24px 24px" }} className="flex flex-col gap-2">
         <Typography

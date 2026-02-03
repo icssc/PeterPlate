@@ -165,7 +165,6 @@ export default function EventCard(props: EventInfo): React.JSX.Element {
               },
             },
           }}
-
           sx={{
             "& .MuiDrawer-paper": {
               borderTopLeftRadius: "10px",

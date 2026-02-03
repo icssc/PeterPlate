@@ -236,16 +236,16 @@ export default function FoodCard({
         <Dialog
           open={open}
           onClose={handleClose}
-          maxWidth={false} // disabled MUI's width presets
+          maxWidth={false}
           slotProps={{
             paper: {
               sx: {
-                width: "460px", // match max-w-md
+                width: "460px",
                 maxWidth: "90vw",
                 margin: 2,
                 padding: 0,
                 overflow: "hidden",
-                borderRadius: "6px",
+                borderRadius: "16px",
               },
             },
           }}
@@ -276,11 +276,10 @@ export default function FoodCard({
                 margin: 2,
                 padding: 0,
                 overflow: "hidden",
-                borderRadius: "6px",
+                borderRadius: "16px",
               },
             },
           }}
-
           sx={{
             "& .MuiDrawer-paper": {
               borderTopLeftRadius: "10px",
