@@ -18,6 +18,8 @@ import { nutrientToUnit } from "@/utils/types";
 import IngredientsDialog from "../ingredients-dialog";
 import { AllergenBadge } from "./allergen-badge";
 import InteractiveStarRating from "./interactive-star-rating";
+import { trpc } from "@/utils/trpc";
+import { Star } from "lucide-react";
 
 /**
  * `FoodDialogContent` renders the detailed view of a food item (dish) within a dialog.
