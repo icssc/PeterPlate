@@ -1,11 +1,12 @@
 import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import PinDropOutlinedIcon from "@mui/icons-material/PinDropOutlined";
+import { Button, DialogContent } from "@mui/material";
 import Image from "next/image";
-import { DialogContent, Button } from "@mui/material";
-import type { EventInfo } from "./card/event-card";
+import type React from "react";
+import { dateToString, generateGCalLink, toTitleCase } from "@/utils/funcs";
 import { HallEnum } from "@/utils/types";
-import { toTitleCase, dateToString, generateGCalLink } from "@/utils/funcs";
+import type { EventInfo } from "./card/event-card";
 
 /**
  * `EventDialogContent` renders the detailed view of an event within a dialog.
