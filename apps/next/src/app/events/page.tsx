@@ -19,10 +19,10 @@ export default function Events() {
   // Sort events by start time if data is available
   const sortedEvents = upcomingEvents
     ? [...upcomingEvents].sort((a, b) => {
-        const dateA = new Date(a.start);
-        const dateB = new Date(b.start);
-        return dateA.getTime() - dateB.getTime();
-      })
+      const dateA = new Date(a.start);
+      const dateB = new Date(b.start);
+      return dateA.getTime() - dateB.getTime();
+    })
     : [];
 
   const now = new Date();
@@ -44,13 +44,16 @@ export default function Events() {
   return (
     <div className="max-w-full h-screen">
       <div className="z-0 flex flex-col h-full overflow-x-hidden">
-        <Image
-          className="object-cover w-full min-h-80 max-h-80"
-          src="/uci.webp"
-          alt="An Image of UCI's signage."
-          width={2000}
-          height={2000}
-        />
+        <div className="relative w-full min-h-80 max-h-80">
+          <div className="absolute inset-0 bg-gradient-to-b from-black/65 to-transparent" />
+          <Image
+            className="object-cover w-full h-full"
+            src="/uci.webp"
+            alt="An Image of UCI's signage."
+            width={2000}
+            height={2000}
+          />
+        </div>
         <div
           className="flex flex-col gap-4 justify-center w-full p-5 sm:px-12 sm:py-8"
           id="event-scroll"

@@ -4,7 +4,7 @@ import { StarBorder } from "@mui/icons-material";
 import { Button, DialogContent } from "@mui/material";
 import type { DishInfo } from "@zotmeal/api";
 import Image from "next/image";
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   enhanceDescription,
   formatFoodName,

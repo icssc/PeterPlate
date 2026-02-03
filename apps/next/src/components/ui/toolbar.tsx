@@ -1,124 +1,181 @@
-import { ViewSidebar } from "@mui/icons-material";
+"use client";
+
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import { AppBar, Button, IconButton, Menu, MenuItem, Toolbar as MuiToolbar } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { useDate } from "@/context/date-context";
-import { trpc } from "@/utils/trpc"; // Import tRPC hook
-import type { DateList } from "../../../../../packages/db/src/schema";
-import { Button } from "./shadcn/button";
-import { DatePicker } from "./shadcn/date-picker";
-import { Sheet, SheetTrigger } from "./shadcn/sheet";
+import { useState } from "react";
+import { GoogleSignInButton } from "@/components/auth/google-sign-in";
+import { useSession } from "@/utils/auth-client";
 import SidebarContent from "./sidebar/sidebar-content";
 
-/** Dates to restrict calendar navigation. */
 export type CalendarRange = {
   earliest: Date;
   latest: Date;
 };
 
-/**
- * Renders the main toolbar for the application.
- *
- * The toolbar includes:
- * - A clickable application logo (`Image`) wrapped in a `Link` that navigates to the homepage ("/").
- * - A `DatePicker` component to allow users to select a specific date. The selected date
- *   is managed via the `useDate` context.
- * - A `SheetTrigger` (styled as a `Button` with an icon) to open a `Sheet`
- *   which contains the `SidebarContent`.
- *
- * It leverages the `useDate` custom hook to access and update the globally selected date.
- * @returns {JSX.Element} The rendered toolbar component.
- */
-export default function Toolbar(): JSX.Element {
-  const { selectedDate, setSelectedDate } = useDate();
-  const [enabledDates, setEnabledDates] = useState<DateList>([new Date()]); // default: enable today
-  const [calendarRange, setCalendarRange] = useState<CalendarRange>({
-    earliest: new Date(),
-    latest: new Date(),
-  }); // default: restrict to today
+export default function Toolbar(): React.JSX.Element {
+  const { data: session, isPending } = useSession();
+  const user = session?.user;
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [diningHallsAnchor, setDiningHallsAnchor] = useState<null | HTMLElement>(null);
+  const [foodCourtsAnchor, setFoodCourtsAnchor] = useState<null | HTMLElement>(null);
 
-  const { data: dateRes } = trpc.pickableDates.useQuery();
+  // const { selectedDate, setSelectedDate } = useDate();
+  // const [enabledDates, setEnabledDates] = useState<DateList>([new Date()]);
+  // const [calendarRange, setCalendarRange] = useState<CalendarRange>({
+  //   earliest: new Date(),
+  //   latest: new Date(),
+  // });
 
-  useEffect(() => {
-    if (dateRes) {
-      console.log("Pickable Dates (Front):", dateRes);
-      setEnabledDates(dateRes);
-      setCalendarRange({
-        earliest: dateRes[0],
-        latest: dateRes[dateRes.length - 1],
-      });
-    }
-  }, [dateRes]);
+  // const { data: dateRes } = trpc.pickableDates.useQuery();
 
-  /**
-   * Handles the date selection event from the `DatePicker` component.
-   *
-   * This function updates the `selectedDate` in the `DateContext`.
-   * - If the `newDateFromPicker` is the current calendar day ("today"),
-   *   `selectedDate` is set to the current date and time (i.e., `new Date()`).
-   *   This ensures that any application logic relying on the current time of day
-   *   (e.g., determining if a dining hall is currently open) operates correctly.
-   * - If `newDateFromPicker` is a day other than today (past or future),
-   *   `selectedDate` is set to `newDateFromPicker` directly. Typically, date pickers
-   *   return a date set to the beginning of the day (00:00:00), which is suitable
-   *   for viewing schedules or data for an entire specific day.
-   * - If `newDateFromPicker` is `undefined` (e.g., the date selection was cleared),
-   *   `selectedDate` is set to `undefined`.
-   *
-   * @param {Date | undefined} newDateFromPicker - The date selected by the user in the
-   *   `DatePicker`, or `undefined` if the selection was cleared.
-   */
-  const handleDateSelect = (newDateFromPicker: Date | undefined) => {
-    if (newDateFromPicker) {
-      const today = new Date();
-      // Compare year, month, and day. newDateFromPicker is likely at 00:00:00.
-      if (
-        newDateFromPicker.getFullYear() === today.getFullYear() &&
-        newDateFromPicker.getMonth() === today.getMonth() &&
-        newDateFromPicker.getDate() === today.getDate()
-      ) {
-        // It's today. Create a new Date object for "now" to get current time.
-        setSelectedDate(new Date());
-      } else {
-        // It's another day. Use the date from picker (which is at 00:00:00).
-        setSelectedDate(newDateFromPicker);
-      }
-    } else {
-      // Date was cleared in the picker
-      setSelectedDate(undefined);
-    }
-  };
+  // useEffect(() => {  ---  MOVED TO RESTAURANT PAGE
+  //   if (dateRes) {
+  //     console.log("Pickable Dates (Front):", dateRes);
+  //     setEnabledDates(dateRes);
+  //     setCalendarRange({
+  //       earliest: dateRes[0],
+  //       latest: dateRes[dateRes.length - 1],
+  //     });
+  //   }
+  // }, [dateRes]);
+
+  // const handleDateSelect = (newDateFromPicker: Date | undefined) => {
+  //   if (newDateFromPicker) {
+  //     const today = new Date();
+  //     if (
+  //       newDateFromPicker.getFullYear() === today.getFullYear() &&
+  //       newDateFromPicker.getMonth() === today.getMonth() &&
+  //       newDateFromPicker.getDate() === today.getDate()
+  //     ) {
+  //       setSelectedDate(new Date());
+  //     } else {
+  //       setSelectedDate(newDateFromPicker);
+  //     }
+  //   } else {
+  //     setSelectedDate(undefined);
+  //   }
+  // };
 
   return (
-    <div
-      className="w-full h-18 absolute flex items-center justify-between px-4 py-2 
-          bg-zinc-50 bg-opacity-45 backdrop-blur-md z-10"
-    >
-      <Link href="/">
-        <Image
-          className="rounded-full cursor-pointer"
-          src="/Zotmeal-Logo.webp"
-          alt="Zotmeal's Logo: a beige anteater with a bushy tail sitting next to an anthill."
-          width={40}
-          height={40}
-        />
-      </Link>
-      <Sheet>
-        <div className="flex gap-4 items-center">
-          <DatePicker
-            date={selectedDate}
-            onSelect={handleDateSelect}
-            enabledDates={enabledDates}
-            range={calendarRange}
-          />
-          <SheetTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <ViewSidebar />
+    <>
+      <AppBar
+        position="absolute"
+        className="!bg-transparent !shadow-none hover:!bg-black/30 !transition-colors !duration-300"
+      >
+        <MuiToolbar className="justify-between px-4 py-1">
+          <div className="flex-none flex items-center">
+            <Link href="/" className="flex items-center gap-2">
+              <Image
+                className="rounded-full cursor-pointer"
+                src="/Zotmeal-Logo.webp"
+                alt="Zotmeal's Logo: a beige anteater with a bushy tail sitting next to an anthill."
+                width={40}
+                height={40}
+              />
+              <span className="text-white font-poppins font-bold text-[28px] leading-[24px]">PeterPlate</span>
+            </Link>
+          </div>
+
+          <nav className="flex-1 flex gap-0 justify-evenly">
+            <Button
+              onClick={(event: React.MouseEvent<HTMLElement>) => setDiningHallsAnchor(event.currentTarget)}
+              endIcon={<ArrowDropDownIcon fontSize="small" />}
+              className="!text-white !normal-case !text-[16px] !font-medium hover:!bg-[rgba(0,0,0,0.04)]"
+            >
+              Dining Halls
             </Button>
-          </SheetTrigger>
-          <SidebarContent />
-        </div>
-      </Sheet>
-    </div>
+            <Menu
+              anchorEl={diningHallsAnchor}
+              open={Boolean(diningHallsAnchor)}
+              onClose={() => setDiningHallsAnchor(null)}
+            >
+              <MenuItem
+                component={Link}
+                href="/"
+                onClick={() => setDiningHallsAnchor(null)}
+              >
+                Brandywine
+              </MenuItem>
+              <MenuItem
+                component={Link}
+                href="/"
+                onClick={() => setDiningHallsAnchor(null)}
+              >
+                Anteatery
+              </MenuItem>
+            </Menu>
+
+            <Button
+              onClick={(event: React.MouseEvent<HTMLElement>) => setFoodCourtsAnchor(event.currentTarget)}
+              endIcon={<ArrowDropDownIcon fontSize="small" />}
+              className="!text-white !normal-case !text-[16px] !font-medium hover:!bg-[rgba(0,0,0,0.04)]"
+            >
+              Food Courts
+            </Button>
+            <Menu
+              anchorEl={foodCourtsAnchor}
+              open={Boolean(foodCourtsAnchor)}
+              onClose={() => setFoodCourtsAnchor(null)}
+            >
+              <MenuItem
+                component={Link}
+                href="/"
+                onClick={() => setFoodCourtsAnchor(null)}
+              >
+                Food court 1
+              </MenuItem>
+              <MenuItem
+                component={Link}
+                href="/"
+                onClick={() => setFoodCourtsAnchor(null)}
+              >
+                Food court 2
+              </MenuItem>
+            </Menu>
+
+            <Button
+              component={Link}
+              href="/events"
+              className="!text-white !normal-case !text-[16px] !font-medium hover:!bg-[rgba(0,0,0,0.04)]"
+            >
+              Events
+            </Button>
+            <Button
+              component={Link}
+              href="/ratings"
+              className="!text-white !normal-case !text-[16px] !font-medium hover:!bg-[rgba(0,0,0,0.04)]"
+            >
+              My Foods
+            </Button>
+          </nav>
+
+          <div className="flex-none flex items-center gap-4">
+            {isPending ? (
+              <div className="w-10 h-10" />
+            ) : user ? (
+              <IconButton
+                onClick={() => setDrawerOpen(!drawerOpen)}
+                className="!p-0"
+                aria-label="Open sidebar"
+              >
+                <Image
+                  src={user.image || "/default-avatar.png"}
+                  alt={user.name || "User profile"}
+                  width={40}
+                  height={40}
+                  className="w-10 h-10 rounded-full"
+                />
+              </IconButton>
+            ) : (
+              <GoogleSignInButton />
+            )}
+          </div>
+        </MuiToolbar>
+      </AppBar>
+
+      <SidebarContent open={drawerOpen} onClose={() => setDrawerOpen(!drawerOpen)} />
+    </>
   );
 }

@@ -3,7 +3,6 @@ import {
   foodIconKeywords,
   foodIcons,
   HallEnum,
-  type LucideIconComponent,
   numToMonth,
   preferredCategoryOrder,
 } from "./types";
@@ -152,7 +151,7 @@ function enhanceDescription(
   }
 
   // Return original if no rules match or it's already reasonably descriptive
-  return description.endsWith(".") ? description : description + ".";
+  return description.endsWith(".") ? description : `${description}.`;
 }
 
 /**

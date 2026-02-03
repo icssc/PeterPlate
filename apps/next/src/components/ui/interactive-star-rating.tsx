@@ -15,12 +15,12 @@ export default function InteractiveStarRating({ dishId }: InteractiveStarRatingP
   const [userRating, setUserRating] = useState<number | undefined>(0);
   const [hoverRating, setHoverRating] = useState<number | null>(null);
 
-  const { rateDish } = useRatings(userId!);
+  const { rateDish } = useRatings(userId ?? "");
 
   console.log(userId)
 
   const { data: existingRating } = trpc.user.getUserRating.useQuery(
-    { userId: userId!, dishId },
+    { userId: userId ?? "", dishId },
     {
       enabled: !!userId, 
       staleTime: 5 * 60 * 1000
