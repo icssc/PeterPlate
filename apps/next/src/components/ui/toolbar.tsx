@@ -66,7 +66,7 @@ export default function Toolbar(): JSX.Element {
     <>
       <AppBar
         position="absolute"
-        className="!bg-transparent !shadow-none hover:!bg-black/30 transition-colors duration-300"
+        className="!bg-transparent !shadow-none hover:!bg-black/30 !transition-colors !duration-300"
       >
         <MuiToolbar className="justify-between px-4 py-1">
           <div className="flex-none flex items-center">
