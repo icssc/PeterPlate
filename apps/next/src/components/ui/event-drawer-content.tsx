@@ -1,49 +1,58 @@
+import { Box, Typography, Button } from "@mui/material";
+import type { EventInfo } from "./card/event-card";
+import Image from "next/image";
 import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import PinDropOutlinedIcon from "@mui/icons-material/PinDropOutlined";
-import Image from "next/image";
-import { dateToString, generateGCalLink, toTitleCase } from "@/utils/funcs";
 import { HallEnum } from "@/utils/types";
-import type { EventInfo } from "./card/event-card";
-import { Button } from "./shadcn/button";
-import {
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-} from "./shadcn/drawer";
+import { toTitleCase, dateToString, generateGCalLink } from "@/utils/funcs";
 
-export default function EventDrawerContent(props: EventInfo) {
+/**
+ * `EventDrawerContent` renders the detailed view of an event within a drawer (mobile view).
+ * It displays the event's image, name, date/time, location, a long description,
+ * and a button to add the event to Google Calendar.
+ *
+ * This component is typically used as the content for a `Drawer` triggered by an {@link EventCard} on mobile.
+ * @param {EventInfo} props - The event data to display. See {@link EventInfo} for detailed property descriptions.
+ * @returns {JSX.Element} The rendered content for the event drawer.
+ */
+export default function EventDrawerContent(
+  props: EventInfo,
+): React.JSX.Element {
   return (
-    <DrawerContent>
-      <DrawerHeader>
-        <Image
-          src={props.imgSrc}
-          alt={props.alt}
-          width={600}
-          height={600}
-          className="w-full h-48 object-cover"
-        />
-      </DrawerHeader>
-      <div className="px-6">
-        <DrawerTitle className="mb-1 text-2xl">{props.name}</DrawerTitle>
+    <Box>
+      <Image
+        src={props.imgSrc}
+        alt={props.alt}
+        width={600}
+        height={600}
+        className="w-full h-auto max-h-64 object-contain"
+      />
+      <Box sx={{ padding: "20px 24px 24px" }} className="flex flex-col gap-2">
+        <Typography
+          variant="h4"
+          sx={{ fontWeight: 600 }}
+          className="text-3xl leading-tight tracking-normal text-left"
+        >
+          {props.name}
+        </Typography>
         <div
-          className="text-zinc-400 flex flex-col sm:flex-row gap-x-4 gap-y-1 pb-4"
+          className="flex flex-wrap gap-x-2 gap-y-1 text-zinc-400 items-center"
           id="event-card-subheader"
         >
-          <div className="flex gap-1">
+          <div className="flex gap-1 items-center whitespace-nowrap">
             <AccessTimeOutlinedIcon />
             <p>{dateToString(props.startTime, props.endTime)}</p>
           </div>
-          <div className="flex gap-1">
+          <div className="flex gap-1 items-center whitespace-nowrap">
             <PinDropOutlinedIcon />
             <p>{toTitleCase(HallEnum[props.location])}</p>
           </div>
         </div>
-        <DrawerDescription className="mb-8 whitespace-normal">
+        <Typography variant="body2" className="text-sm leading-relaxed mt-2">
           {props.longDesc?.replace(/\u00A0+/g, " ")}
-        </DrawerDescription>
-        <div className="w-full flex items-center justify-center pb-6">
+        </Typography>
+        <div className="w-full flex items-center justify-center pt-4">
           <a
             href={generateGCalLink(
               props.name,
@@ -54,13 +63,16 @@ export default function EventDrawerContent(props: EventInfo) {
             rel="noreferrer"
             target="_blank"
           >
-            <Button className="[&_svg]:size-5">
-              <CalendarTodayOutlinedIcon />
+            <Button
+              variant="contained"
+              className="[&_svg]:size-5 whitespace-nowrap"
+              startIcon={<CalendarTodayOutlinedIcon />}
+            >
               Add to Google Calendar
             </Button>
           </a>
         </div>
-      </div>
-    </DrawerContent>
+      </Box>
+    </Box>
   );
 }

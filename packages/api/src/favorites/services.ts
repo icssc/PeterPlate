@@ -60,18 +60,6 @@ export async function addFavorite(
   userId: string,
   dishId: string,
 ): Promise<SelectFavorite> {
-  await upsert(
-    db,
-    users,
-    {
-      id: userId,
-      name: "Demo User", // Placeholder name
-    },
-    {
-      target: [users.id],
-      set: { id: userId }, // No-op: keep existing data if found
-    },
-  );
   // Check if dish exists
   const dish = await db.query.dishes.findFirst({
     where: (dishes, { eq }) => eq(dishes.id, dishId),
