@@ -1,11 +1,11 @@
-import { Box, Typography, Button } from "@mui/material";
-import type { EventInfo } from "./card/event-card";
-import Image from "next/image";
 import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import PinDropOutlinedIcon from "@mui/icons-material/PinDropOutlined";
+import { Box, Button, Typography } from "@mui/material";
+import Image from "next/image";
+import { dateToString, generateGCalLink, toTitleCase } from "@/utils/funcs";
 import { HallEnum } from "@/utils/types";
-import { toTitleCase, dateToString, generateGCalLink } from "@/utils/funcs";
+import type { EventInfo } from "./card/event-card";
 
 /**
  * `EventDrawerContent` renders the detailed view of an event within a drawer (mobile view).
@@ -26,7 +26,7 @@ export default function EventDrawerContent(
         alt={props.alt}
         width={600}
         height={600}
-        className="w-full h-auto max-h-64 object-contain"
+        className="w-full h-auto max-h-64 object-cover"
       />
       <Box sx={{ padding: "20px 24px 24px" }} className="flex flex-col gap-2">
         <Typography

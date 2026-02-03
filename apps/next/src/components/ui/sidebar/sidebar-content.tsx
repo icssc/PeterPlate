@@ -1,22 +1,34 @@
 "use client";
 
-import Image from "next/image";
 import {
-  Box,
-  Drawer,
-  Typography,
+  CalendarToday,
+  EditNote,
+  EggAlt,
+  EmojiEvents,
+  FavoriteBorder,
+  House,
+  Info,
+  Logout,
+  Person,
+  Settings,
+  StarBorder,
+} from "@mui/icons-material";
+import {
   Avatar,
-  IconButton,
+  Box,
   Divider,
+  Drawer,
+  IconButton,
   Stack,
+  Typography,
 } from "@mui/material";
+import Image from "next/image";
+import type React from "react";
+import { GoogleSignInButton } from "@/components/auth/google-sign-in";
+import { signOut, useSession } from "@/utils/auth-client"; // BetterAuth React hook
 import SidebarButton, { type SidebarButtonProps } from "./sidebar-button";
 import SidebarDivider from "./sidebar-divider";
-import { Settings, CalendarToday, House, Info, EmojiEvents, StarBorder, FavoriteBorder, Person, EditNote, EggAlt } from "@mui/icons-material";
-import { useSession, signOut } from "@/utils/auth-client"; // BetterAuth React hook
-import { GoogleSignInButton } from "@/components/auth/google-sign-in";
 import { ThemeToggle } from "./theme-toggle";
-import type React from "react";
 
 interface SidebarContentProps {
   open: boolean;
@@ -24,7 +36,7 @@ interface SidebarContentProps {
 }
 
 type SidebarSection = {
-  title: string,
+  title: string;
   buttons: SidebarButtonProps[];
 };
 
@@ -32,72 +44,72 @@ const SIDEBAR_CONTENT_MAP: SidebarSection[] = [
   {
     title: "Dining Hall Info",
     buttons: [
-      { 
-        Icon: House, 
-        title: "Home", 
-        href: "/" 
+      {
+        Icon: House,
+        title: "Home",
+        href: "/",
       },
-      { 
+      {
         Icon: CalendarToday,
         title: "Events",
-        href: "/events" 
+        href: "/events",
       },
-      { 
-        Icon: EmojiEvents, 
-        title: "Most Liked", 
+      {
+        Icon: EmojiEvents,
+        title: "Most Liked",
         href: "/leaderboard",
-        deactivated: true
+        deactivated: true,
       },
-      { 
-        Icon: EggAlt, 
-        title: "Nutrition", 
-        href: "/nutrition" 
-      }
-    ]
+      {
+        Icon: EggAlt,
+        title: "Nutrition",
+        href: "/nutrition",
+      },
+    ],
   },
   {
-    title: "Account", 
+    title: "Account",
     buttons: [
-      { 
+      {
         Icon: Person,
         title: "My Account",
         href: "/account",
       },
-      { 
+      {
         Icon: StarBorder,
         title: "My Ratings",
         href: "/ratings",
       },
-      { 
+      {
         Icon: FavoriteBorder,
         title: "My Favorites",
         href: "/my-favorites",
       },
-      { 
+      {
         Icon: EditNote,
         title: "My Meal Tracker",
         href: "/meal-tracker",
         deactivated: true,
-      }
-    ]
+      },
+    ],
   },
   {
     title: "Miscellaneous",
     buttons: [
-      { 
-        Icon: Settings, 
+      {
+        Icon: Settings,
         title: "Settings",
-        href: "/settings", 
-        deactivated: true 
+        href: "/settings",
+        deactivated: true,
       },
-      { 
-        Icon: Info, 
-        title: "About", 
-        href: "/about", 
-      }
-    ]
-  }
-]
+      {
+        Icon: Info,
+        title: "About",
+        href: "/about",
+      },
+    ],
+  },
+];
 
 /**
  * `SidebarContent` is a presentational component that renders the main content
@@ -154,18 +166,14 @@ export default function SidebarContent({
 
           <Divider className="my-2" />
 
-          {SIDEBAR_CONTENT_MAP.map(section =>
+          {SIDEBAR_CONTENT_MAP.map((section) => (
             <div key={section.title}>
-              <SidebarDivider title={section.title}/> 
-              {section.buttons.map(button =>
-                <SidebarButton
-                  key={button.title}
-                  {...button}
-                />
-              )}
+              <SidebarDivider title={section.title} />
+              {section.buttons.map((button) => (
+                <SidebarButton key={button.title} {...button} />
+              ))}
             </div>
-          )}
-
+          ))}
         </Stack>
 
         {/* Bottom */}
@@ -191,10 +199,7 @@ export default function SidebarContent({
                   <Typography className="font-semibold leading-tight">
                     {user.name || "User"}
                   </Typography>
-                  <Typography
-                    variant="body2"
-                    className="text-gray-500"
-                  >
+                  <Typography variant="body2" className="text-gray-500">
                     {user.email || ""}
                   </Typography>
                 </Box>
@@ -206,7 +211,7 @@ export default function SidebarContent({
                 size="small"
                 className="hover:bg-gray-200"
               >
-                <LogOut size={18} />
+                <Logout fontSize="small" />
               </IconButton>
             </Box>
           )}

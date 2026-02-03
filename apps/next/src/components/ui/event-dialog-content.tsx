@@ -27,7 +27,7 @@ export default function EventDialogContent(
         alt={props.alt}
         width={600}
         height={600}
-        className="w-full h-auto max-h-64 object-contain"
+        className="w-full h-auto max-h-72 object-cover"
       />
       <DialogContent
         sx={{ padding: "20px 24px 24px !important" }}

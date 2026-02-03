@@ -6,17 +6,16 @@ import {
   Restaurant,
   StarBorder,
 } from "@mui/icons-material";
-
+import { Card, CardContent, Dialog, Drawer } from "@mui/material";
 import type { DishInfo } from "@zotmeal/api";
+import React from "react";
+import { useUserStore } from "@/context/useUserStore";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { formatFoodName, getFoodIcon, toTitleCase } from "@/utils/funcs";
+import { trpc } from "@/utils/trpc";
 import { cn } from "@/utils/tw";
-import { Dialog, Card, CardContent, Drawer } from "@mui/material";
 import FoodDialogContent from "../food-dialog-content";
 import FoodDrawerContent from "../food-drawer-content";
-import { trpc } from "@/utils/trpc";
-import { useMediaQuery } from "@/hooks/useMediaQuery";
-import { useUserStore } from "@/context/useUserStore";
-import React from "react";
 
 /**
  * Props for the FoodCardContent component.
@@ -45,11 +44,19 @@ interface FoodCardContentProps extends React.HTMLAttributes<HTMLDivElement> {
  * It shows the food's name, icon, calories, and a placeholder rating.
  * This component is intended to be used as a trigger for a dialog showing more details.
  */
-const FoodCardContent = React.forwardRef<
-  HTMLDivElement,
-  FoodCardContentProps
->(({ dish, isFavorited, favoriteDisabled, onToggleFavorite, className, ...divProps }, ref) => {
-  const userId = useUserStore((s) => s.userId);
+const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
+  (
+    {
+      dish,
+      isFavorited,
+      favoriteDisabled,
+      onToggleFavorite,
+      className,
+      ...divProps
+    },
+    ref,
+  ) => {
+    const userId = useUserStore((s) => s.userId);
     const IconComponent = getFoodIcon(dish.name) ?? Restaurant;
 
     /**
@@ -79,38 +86,38 @@ const FoodCardContent = React.forwardRef<
       },
     });
 
-  const handleLogMeal = (e: React.MouseEvent) => {
-    e.stopPropagation(); 
-    
-    // TODO: use [MUI snackbar](https://mui.com/material-ui/react-snackbar/) to warn users.
-    if (!userId) {
-      alert("Login to track meals!");
-      return;
-    }
+    const handleLogMeal = (e: React.MouseEvent) => {
+      e.stopPropagation();
 
-    logMealMutation.mutate({
-      dishId: dish.id,
-      userId: userId,
-      dishName: dish.name,
-      servings: 1, // Default to 1 serving (TODO: add ability to manually input servings. Maybe a popup will ask to input a multiple of 0.5)
-    });
-  }
+      // TODO: use [MUI snackbar](https://mui.com/material-ui/react-snackbar/) to warn users.
+      if (!userId) {
+        alert("Login to track meals!");
+        return;
+      }
 
-  const handleFavoriteClick = (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-  ) => {
-    event.preventDefault();
-    event.stopPropagation();
-    
-   // TODO: use [MUI snackbar](https://mui.com/material-ui/react-snackbar/) to warn users of 
-    if (!userId) {
-      alert("Login to favorite meals!");
-      return;
-    }
+      logMealMutation.mutate({
+        dishId: dish.id,
+        userId: userId,
+        dishName: dish.name,
+        servings: 1, // Default to 1 serving (TODO: add ability to manually input servings. Maybe a popup will ask to input a multiple of 0.5)
+      });
+    };
 
-    if (favoriteDisabled || !onToggleFavorite) return;
-    onToggleFavorite(dish.id, Boolean(isFavorited));
-  };
+    const handleFavoriteClick = (
+      event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    ) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      // TODO: use [MUI snackbar](https://mui.com/material-ui/react-snackbar/) to warn users of
+      if (!userId) {
+        alert("Login to favorite meals!");
+        return;
+      }
+
+      if (favoriteDisabled || !onToggleFavorite) return;
+      onToggleFavorite(dish.id, Boolean(isFavorited));
+    };
 
     return (
       <div ref={ref} {...divProps} className={cn("w-full", className)}>
@@ -145,8 +152,8 @@ const FoodCardContent = React.forwardRef<
                       <StarBorder
                         className={`w-4 h-4 ${
                           averageRating > 0
-                          ? "fill-amber-400 stroke-amber-400"
-                          : "stroke-zinc-200"
+                            ? "fill-amber-400 stroke-amber-400"
+                            : "stroke-zinc-200"
                         }`}
                       />
                       <span className="text-zinc-400 text-sm">
@@ -241,16 +248,16 @@ export default function FoodCard({
         <Dialog
           open={open}
           onClose={handleClose}
-          maxWidth={false} // disabled MUI's width presets
+          maxWidth={false}
           slotProps={{
             paper: {
               sx: {
-                width: "460px", // match max-w-md
+                width: "460px",
                 maxWidth: "90vw",
                 margin: 2,
                 padding: 0,
                 overflow: "hidden",
-                borderRadius: "6px",
+                borderRadius: "16px",
               },
             },
           }}
@@ -281,11 +288,10 @@ export default function FoodCard({
                 margin: 2,
                 padding: 0,
                 overflow: "hidden",
-                borderRadius: "6px",
+                borderRadius: "16px",
               },
             },
           }}
-
           sx={{
             "& .MuiDrawer-paper": {
               borderTopLeftRadius: "10px",

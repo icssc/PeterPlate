@@ -1,5 +1,5 @@
+import { ChevronRight, type SvgIconComponent } from "@mui/icons-material";
 import { ButtonBase } from "@mui/material";
-import { ChevronRight, SvgIconComponent } from "@mui/icons-material";
 import Link from "next/link";
 
 /**
@@ -39,7 +39,13 @@ export interface SidebarButtonProps {
  * @param {SidebarButtonProps} props - The properties for the sidebar button.
  * @returns {JSX.Element} The rendered sidebar button component.
  */
-export default function SidebarButton({ Icon, title, href, deactivated, onClose }: SidebarButtonProps): React.JSX.Element {
+export default function SidebarButton({
+  Icon,
+  title,
+  href,
+  deactivated,
+  onClose,
+}: SidebarButtonProps): React.JSX.Element {
   return (
     <ButtonBase
       component={Link}
