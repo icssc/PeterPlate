@@ -87,7 +87,7 @@ export default function Events() {
                     startTime={event.start}
                     endTime={event.end}
                     location={
-                      event.restaurantId == 3056
+                      event.restaurantId === "anteatery"
                         ? HallEnum.ANTEATERY
                         : HallEnum.BRANDYWINE
                     }
@@ -112,7 +112,7 @@ export default function Events() {
                     startTime={event.start}
                     endTime={event.end}
                     location={
-                      event.restaurantId == 3056
+                      event.restaurantId === "anteatery"
                         ? HallEnum.ANTEATERY
                         : HallEnum.BRANDYWINE
                     }

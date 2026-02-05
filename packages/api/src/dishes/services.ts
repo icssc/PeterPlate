@@ -11,10 +11,10 @@ import {
 export async function upsertDish(
   db: Drizzle,
   { dietRestriction, nutritionInfo, ...dishData }: InsertDishWithRelations,
-): Promise<Omit<InsertDishWithRelations, "menuId" | "stationId">> {
+): Promise<Omit<InsertDishWithRelations, "stationId">> {
   try {
     const result = await db.transaction<
-      Omit<InsertDishWithRelations, "menuId" | "stationId">
+      Omit<InsertDishWithRelations, "stationId">
       >(async (tx) => {
       const upsertedDish = await upsert(tx, dishes, dishData, {
         target: [dishes.id],

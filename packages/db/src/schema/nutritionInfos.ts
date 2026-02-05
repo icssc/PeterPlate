@@ -1,4 +1,4 @@
-import { pgTable, text } from "drizzle-orm/pg-core";
+import { numeric, pgTable, text } from "drizzle-orm/pg-core";
 
 import { dishes } from "./dishes";
 import { metadataColumns } from "./utils";
@@ -12,20 +12,20 @@ export const nutritionInfos = pgTable("nutrition_infos", {
     }),
   servingSize: text("serving_size"),
   servingUnit: text("serving_unit"),
-  calories: text("calories"),
-  totalFatG: text("total_fat_g"),
-  transFatG: text("trans_fat_g"),
-  saturatedFatG: text("saturated_fat_g"),
-  cholesterolMg: text("cholesterol_mg"),
-  sodiumMg: text("sodium_mg"),
-  totalCarbsG: text("total_carbs_g"),
-  dietaryFiberG: text("dietary_fiber_g"),
-  sugarsG: text("sugars_g"),
-  proteinG: text("protein_g"),
-  calciumMg: text("calcium"),
-  ironMg: text("iron"),
-  vitaminAIU: text("vitamin_a"),
-  vitaminCIU: text("vitamin_c"),
+  calories: numeric("calories", { precision: 10, scale: 2 }),
+  totalFatG: numeric("total_fat_g", { precision: 10, scale: 2 }),
+  transFatG: numeric("trans_fat_g", { precision: 10, scale: 2 }),
+  saturatedFatG: numeric("saturated_fat_g", { precision: 10, scale: 2 }),
+  cholesterolMg: numeric("cholesterol_mg", { precision: 10, scale: 2 }),
+  sodiumMg: numeric("sodium_mg", { precision: 10, scale: 2 }),
+  totalCarbsG: numeric("total_carbs_g", { precision: 10, scale: 2 }),
+  dietaryFiberG: numeric("dietary_fiber_g", { precision: 10, scale: 2 }),
+  sugarsG: numeric("sugars_g", { precision: 10, scale: 2 }),
+  proteinG: numeric("protein_g", { precision: 10, scale: 2 }),
+  calciumMg: numeric("calcium", { precision: 10, scale: 2 }),
+  ironMg: numeric("iron", { precision: 10, scale: 2 }),
+  vitaminAIU: numeric("vitamin_a", { precision: 10, scale: 2 }),
+  vitaminCIU: numeric("vitamin_c", { precision: 10, scale: 2 }),
   ...metadataColumns,
 });
 
