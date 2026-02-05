@@ -101,6 +101,7 @@ export async function getRestaurantsByDate(
               dishes: dishesToMenus
                 .map((dishToMenu) => ({
                   ...dishToMenu.dish,
+                  image_url: dishToMenu.dish.image_url ?? null,
                   menuId: menu.id,
                   restaurant: restaurant.name,
                 }))
