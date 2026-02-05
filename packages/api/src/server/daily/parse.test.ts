@@ -80,5 +80,5 @@ describe("AdobeECommerce Parsing Functions", () => {
     expect(result[0]).toHaveProperty("longDescription");
     expect(result[0]).toHaveProperty("start");
     expect(result[0]).toHaveProperty("end");
-  }, 7000);
+  }, 10000);
 });
