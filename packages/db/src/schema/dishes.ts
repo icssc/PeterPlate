@@ -31,6 +31,7 @@ export const dishes = pgTable("dishes", {
   ),
   /** Defaults to "Other" if not specified. */
   category: text("category").notNull().default("Other"),
+  image_url: text("image_url"),
   numRatings: integer("num_ratings").default(0).notNull(),
   totalRating: integer("total_rating").default(0).notNull(),
   ...metadataColumns,

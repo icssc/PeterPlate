@@ -29,6 +29,13 @@
       "when": 1767906969387,
       "tag": "0003_zotmeal",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1768000000000,
+      "tag": "0004_dishes_url",
+      "breakpoints": true
     }
   ]
 }
