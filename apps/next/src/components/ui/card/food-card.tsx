@@ -58,6 +58,11 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
   ) => {
     const userId = useUserStore((s) => s.userId);
     const IconComponent = getFoodIcon(dish.name) ?? Restaurant;
+    const [imageError, setImageError] = React.useState(false);
+    const showImage =
+      typeof dish.image_url === "string" &&
+      dish.image_url.trim() !== "" &&
+      !imageError;
 
     /**
      * Fetches the average rating and rating count for the dish.
@@ -128,8 +133,17 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
           <CardContent sx={{ padding: "0 !important" }}>
             <div className="flex justify-between h-full p-6">
               <div className="flex items-center gap-6 w-full">
-                {IconComponent && (
-                  <IconComponent className="w-10 h-10 text-slate-700" />
+                {showImage ? (
+                  <img
+                    src={dish.image_url ?? ""}
+                    alt=""
+                    className="w-10 h-10 object-cover rounded"
+                    onError={() => setImageError(true)}
+                  />
+                ) : (
+                  IconComponent && (
+                    <IconComponent className="w-10 h-10 text-slate-700" />
+                  )
                 )}
                 <div className="flex flex-col">
                   <strong>{formatFoodName(dish.name)}</strong>
