@@ -15,10 +15,19 @@ export async function upsertDish(
   try {
     const result = await db.transaction<
       Omit<InsertDishWithRelations, "menuId" | "stationId">
-      >(async (tx) => {
+    >(async (tx) => {
+      // Only update image_url when the incoming value is a valid string; do not overwrite existing with null
+      const dishSet = { ...dishData };
+      if (
+        dishSet.image_url == null ||
+        typeof dishSet.image_url !== "string" ||
+        dishSet.image_url.trim() === ""
+      ) {
+        delete dishSet.image_url;
+      }
       const upsertedDish = await upsert(tx, dishes, dishData, {
         target: [dishes.id],
-        set: dishData,
+        set: dishSet,
       });
 
       const upsertedDietRestriction = await upsert(
