@@ -11,7 +11,7 @@ import {
   type InsertDishWithRelations,
   type InsertEvent,
   type RestaurantName,
-} from "@zotmeal/db";
+} from "@peterplate/db";
 import {
   AEMEventListSchema,
   type DiningHallInformation,
@@ -25,7 +25,7 @@ import {
   type MealPeriodWithHours,
   type Schedule,
   type WeekTimes,
-} from "@zotmeal/validators";
+} from "@peterplate/validators";
 import axios, { type AxiosError, type AxiosResponse } from "axios";
 import {
   AEMEventListQuery,

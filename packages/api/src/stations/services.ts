@@ -1,8 +1,8 @@
 import { upsert } from "@api/utils";
 
-import type { Drizzle, InsertStation, RestaurantId } from "@zotmeal/db";
-import { stations } from "@zotmeal/db";
-import { DiningHallInformation } from "@zotmeal/validators";
+import type { Drizzle, InsertStation, RestaurantId } from "@peterplate/db";
+import { stations } from "@peterplate/db";
+import { DiningHallInformation } from "@peterplate/validators";
 import { logger } from "@api/logger";
 
 export const upsertStation = async (db: Drizzle, station: InsertStation) =>
@@ -46,6 +46,6 @@ export async function upsertAllStations(
         reason,
       );
     }
- 
+
 
 }

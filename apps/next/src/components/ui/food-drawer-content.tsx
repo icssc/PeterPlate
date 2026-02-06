@@ -1,7 +1,7 @@
 "use client"; // Need state for toggling nutrient visibility
 
 import { Box, Button } from "@mui/material";
-import type { DishInfo } from "@zotmeal/api";
+import type { DishInfo } from "@peterplate/api";
 import Image from "next/image";
 import { useState } from "react";
 import {
@@ -46,7 +46,7 @@ export default function FoodDrawerContent({ dish }: { dish: DishInfo }) {
       <Box className="pb-4">
         <Image
           src={"/zm-card-header.webp"}
-          alt={"An image of zotmeal logo."}
+          alt={"An image of peterplate logo."}
           width={1200}
           height={700}
           className="w-full h-32 object-cover"
@@ -122,7 +122,7 @@ export default function FoodDrawerContent({ dish }: { dish: DishInfo }) {
                         "col-span-1 text-left",
                         (nutrientKey === "transFatG" ||
                           nutrientKey === "saturatedFatG") &&
-                          "text-gray-500 pl-4",
+                        "text-gray-500 pl-4",
                       )}
                     >
                       {formatNutrientLabel(nutrientKey)}
@@ -132,7 +132,7 @@ export default function FoodDrawerContent({ dish }: { dish: DishInfo }) {
                         "col-span-1 text-right",
                         (nutrientKey === "transFatG" ||
                           nutrientKey === "saturatedFatG") &&
-                          "text-gray-500",
+                        "text-gray-500",
                       )}
                     >
                       {value == null

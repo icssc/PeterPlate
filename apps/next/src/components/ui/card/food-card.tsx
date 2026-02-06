@@ -7,7 +7,7 @@ import {
   StarBorder,
 } from "@mui/icons-material";
 import { Card, CardContent, Dialog, Drawer } from "@mui/material";
-import type { DishInfo } from "@zotmeal/api";
+import type { DishInfo } from "@peterplate/api";
 import React from "react";
 import { useUserStore } from "@/context/useUserStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
@@ -150,11 +150,10 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                     {/* Average rating display - grey outline star */}
                     <div className="flex gap-1 items-center">
                       <StarBorder
-                        className={`w-4 h-4 ${
-                          averageRating > 0
+                        className={`w-4 h-4 ${averageRating > 0
                             ? "fill-amber-400 stroke-amber-400"
                             : "stroke-zinc-200"
-                        }`}
+                          }`}
                       />
                       <span className="text-zinc-400 text-sm">
                         {averageRating.toFixed(1)} ({ratingCount})

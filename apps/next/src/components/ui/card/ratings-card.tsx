@@ -1,7 +1,7 @@
 "use client";
 
 import { Delete, Restaurant } from "@mui/icons-material";
-import type { DishInfo } from "@zotmeal/api";
+import type { DishInfo } from "@peterplate/api";
 import React from "react";
 import { formatFoodName, getFoodIcon } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
@@ -47,7 +47,7 @@ const RatingsCardContent = React.forwardRef<
             </div>
             <div
               className="flex flex-row items-center ml-4 gap-4"
-              onClick={(e) => e.stopPropagation()} 
+              onClick={(e) => e.stopPropagation()}
             >
               <InteractiveStarRating dishId={food.id} />
               <IconButton
@@ -75,7 +75,7 @@ export default function RatingsCard({ food }: RatingsCardProps) {
   const userId = useUserStore((s) => s.userId);
   const [open, setOpen] = React.useState(false);
   const utils = trpc.useUtils();
-  
+
   const deleteRatingMutation = trpc.dish.deleteRating.useMutation({
     onSuccess: () => {
       utils.dish.rated.invalidate();
@@ -87,9 +87,9 @@ export default function RatingsCard({ food }: RatingsCardProps) {
     e.stopPropagation();
     // TODO: Replace this with a MUI dialog instead of relying on browser window.
     if (window.confirm("Delete this rating?")) {
-      await deleteRatingMutation.mutateAsync({ 
-        userId: userId ?? "default-user", 
-        dishId: food.id 
+      await deleteRatingMutation.mutateAsync({
+        userId: userId ?? "default-user",
+        dishId: food.id
       });
     }
   };

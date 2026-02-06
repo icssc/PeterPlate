@@ -8,7 +8,7 @@ import { DiningHallStatus } from "./status";
 import DishesInfo from "./dishes-info";
 import { HallEnum, HallStatusEnum, MealTimeEnum } from "@/utils/types";
 import { trpc } from "@/utils/trpc"; // Import tRPC hook
-import { RestaurantInfo } from "@zotmeal/api"; // Import types
+import { RestaurantInfo } from "@peterplate/api"; // Import types
 import { toTitleCase, utcToPacificTime, formatOpenCloseTime, isSameDay, militaryToStandard } from "@/utils/funcs";
 import TabsSkeleton from "./skeleton/tabs-skeleton";
 import SelectSkeleton from "./skeleton/select-skeleton";
@@ -45,7 +45,7 @@ export default function Side({ hall, toggleHall }: SideProps): JSX.Element {
   const setHallInputs = useHallStore(s => s.setInputs);
 
   /** Fetch data */
-  const { data, isLoading, isError, error } = trpc.zotmeal.useQuery(
+  const { data, isLoading, isError, error } = trpc.peterplate.useQuery(
     { date: selectedDate! },
     { staleTime: 2 * 60 * 60 * 1000 }
   );

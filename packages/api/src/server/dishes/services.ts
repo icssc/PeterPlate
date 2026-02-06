@@ -1,5 +1,5 @@
-import type { Drizzle, InsertDishWithRelations } from "@zotmeal/db";
-import { AllergenKeys, type DiningHallInformation, PreferenceKeys } from "@zotmeal/validators";
+import type { Drizzle, InsertDishWithRelations } from "@peterplate/db";
+import { AllergenKeys, type DiningHallInformation, PreferenceKeys } from "@peterplate/validators";
 import { InsertDishWithModifiedRelations } from "../daily/parse";
 import { upsertDish, upsertDishToMenu } from "@api/dishes/services";
 
@@ -23,9 +23,9 @@ export async function parseAndUpsertDish(
 
   // Parse available allergens and add to diet restriction if present
   AllergenKeys.forEach(key => {
-    const containsKey = 
+    const containsKey =
       `contains${key.replaceAll(" ", "")}` as keyof typeof baseDietRestriction;
-    const allergenCode: number 
+    const allergenCode: number
       = restaurantInfo.allergenIntoleranceCodes[key] ?? -1;
 
     baseDietRestriction[containsKey] = dish.recipeAllergenCodes.has(allergenCode);
@@ -33,9 +33,9 @@ export async function parseAndUpsertDish(
 
   // Parse available preferences and add to diet restriction if present
   PreferenceKeys.forEach(key => {
-    const isKey = 
+    const isKey =
       `is${key.replaceAll(" ", "")}` as keyof typeof baseDietRestriction;
-    const preferenceCode: number 
+    const preferenceCode: number
       = restaurantInfo.menuPreferenceCodes[key] ?? -1;
 
     baseDietRestriction[isKey] = dish.recipePreferenceCodes.has(preferenceCode);
@@ -49,7 +49,7 @@ export async function parseAndUpsertDish(
 
   // Remove sets from dish before upserting
   const { recipeAllergenCodes, recipePreferenceCodes, ...currentDish } = dish;
-  
+
   await upsertDish(db, {
     ...currentDish,
     dietRestriction,

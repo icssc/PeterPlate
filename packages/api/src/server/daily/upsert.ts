@@ -1,13 +1,13 @@
-import { getRestaurantId, type Drizzle, type RestaurantName } from "@zotmeal/db";
+import { getRestaurantId, type Drizzle, type RestaurantName } from "@peterplate/db";
 import { getAdobeEcommerceMenuDaily, getLocationInformation, restaurantUrlMap } from "./parse";
-import { DiningHallInformation } from "@zotmeal/validators";
+import { DiningHallInformation } from "@peterplate/validators";
 import { upsertRestaurant } from "@api/restaurants/services";
 import { upsertAllStations } from "@api/stations/services";
 import { logger } from "@api/logger";
 import { format } from "date-fns";
 import { upsertMenu } from "@api/menus/services";
 import { getCurrentSchedule, upsertPeriods } from "../periods/services";
-import type { MealPeriodWithHours, Schedule } from "@zotmeal/validators";
+import type { MealPeriodWithHours, Schedule } from "@peterplate/validators";
 import { parseAndUpsertDish } from "../dishes/services";
 
 /**
@@ -38,14 +38,14 @@ export async function upsertMenusForDate(
 
   await upsertAllStations(db, restaurantId, restaurantInfo);
 
-  let currentSchedule: Schedule 
+  let currentSchedule: Schedule
     = getCurrentSchedule(restaurantInfo.schedules, date);
- 
+
   // Get relevant periods from schedule that aligns with `date` 
   // and has hours that day
   let relevantPeriods: MealPeriodWithHours[] = currentSchedule.mealPeriods
     .filter(mealPeriod => mealPeriod.openHours[dayOfWeek] && mealPeriod.closeHours[dayOfWeek])
-  
+
   logger.info(`[daily] Upserting ${relevantPeriods.length} periods...`);
   await upsertPeriods(db, restaurantId, dateString, dayOfWeek, relevantPeriods);
 

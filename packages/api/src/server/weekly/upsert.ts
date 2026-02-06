@@ -7,8 +7,8 @@ import {
   getRestaurantId,
   type InsertMenu,
   type RestaurantName,
-} from "@zotmeal/db";
-import type { DiningHallInformation } from "@zotmeal/validators";
+} from "@peterplate/db";
+import type { DiningHallInformation } from "@peterplate/validators";
 import { format } from "date-fns";
 import {
   getAdobeEcommerceMenuWeekly,

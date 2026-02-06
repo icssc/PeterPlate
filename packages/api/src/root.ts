@@ -22,7 +22,7 @@ export const appRouter = createTRPCRouter({
   /** Returns "Hello, world!" */
   hello: publicProcedure.query(() => "Hello, world!"),
   /** Get all information about restaurants on a given date. */
-  zotmeal: publicProcedure.input(z.object({ date: z.date() })).query(
+  peterplate: publicProcedure.input(z.object({ date: z.date() })).query(
     async ({ ctx: { db }, input: { date } }) =>
       await getRestaurantsByDate(db, date).catch((error) => {
         if (error instanceof TRPCError) throw error;
@@ -34,7 +34,7 @@ export const appRouter = createTRPCRouter({
   ),
   /** Get earliest and latest days we currently have meal info for. */
   pickableDates: publicProcedure.query(
-    async ({ctx: { db }}) => 
+    async ({ ctx: { db } }) =>
       await getPickableDates(db).catch((error) => {
         if (error instanceof TRPCError) throw error;
         throw new TRPCError({
@@ -43,9 +43,9 @@ export const appRouter = createTRPCRouter({
         });
       }),
   ),
-  /** Get all current contributors to ZotMeal's GitHub repo. */
-  zotmeal_contributors: publicProcedure.query(
-    async ({ctx: { db }}) => 
+  /** Get all current contributors to PeterPlate's GitHub repo. */
+  peterplate_contributors: publicProcedure.query(
+    async ({ ctx: { db } }) =>
       await getContributors(db).catch((error) => {
         if (error instanceof TRPCError) throw error;
         throw new TRPCError({

@@ -7,8 +7,8 @@ import type {
   SelectFavorite,
   SelectRating,
   SelectUser,
-} from "@zotmeal/db";
-import { users } from "@zotmeal/db";
+} from "@peterplate/db";
+import { users } from "@peterplate/db";
 
 export async function getUser(
   db: Drizzle,

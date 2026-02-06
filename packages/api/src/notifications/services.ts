@@ -7,8 +7,8 @@ import type {
 } from "expo-server-sdk";
 import { Expo } from "expo-server-sdk";
 
-import type { Drizzle } from "@zotmeal/db";
-import { pushTokens } from "@zotmeal/db";
+import type { Drizzle } from "@peterplate/db";
+import { pushTokens } from "@peterplate/db";
 
 // Send Notification to all users which set up a notification id
 export interface Notification {

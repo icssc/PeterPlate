@@ -4,7 +4,7 @@ import React from "react";
 import FoodCard from "./card/food-card"
 import FoodCardSkeleton from "./skeleton/food-card-skeleton"
 import MealDividerSkeleton from "./skeleton/meal-divider-skeleton"
-import { DishInfo } from "@zotmeal/api";
+import { DishInfo } from "@peterplate/api";
 import MealDivider from "./meal-divider";
 import { sortCategoryKeys } from "@/utils/funcs";
 import { useFavorites } from "@/hooks/useFavorites";
@@ -62,7 +62,7 @@ export default function DishesInfo({
   const isFavoritesLoading = isLoadingFavorites;
 
   // Sort the dishes by category string
-  let categoryMap: {[dishCategory : string]: DishInfo[]} = {};
+  let categoryMap: { [dishCategory: string]: DishInfo[] } = {};
   dishes.forEach((dish) => {
     if (dish.category in categoryMap)
       categoryMap[dish.category].push(dish)
@@ -72,16 +72,16 @@ export default function DishesInfo({
 
   return (
     <div className="flex flex-col gap-6 mt-6 px-2 overflow-y-auto 
-      flex-grow h-1" 
+      flex-grow h-1"
       id="food-scroll">
       {isLoading && (
         <>
-          <MealDividerSkeleton/>
-          <FoodCardSkeleton/>
-          <FoodCardSkeleton/>
-          <FoodCardSkeleton/>
-          <MealDividerSkeleton/>
-          <FoodCardSkeleton/>
+          <MealDividerSkeleton />
+          <FoodCardSkeleton />
+          <FoodCardSkeleton />
+          <FoodCardSkeleton />
+          <MealDividerSkeleton />
+          <FoodCardSkeleton />
         </>
       )}
 
@@ -90,29 +90,29 @@ export default function DishesInfo({
       )}
 
       {!isLoading && !isError && (
-        <> 
+        <>
           {dishes.length === 0 ? (
             <p className="text-center text-gray-500 py-4">
               No dishes available for this selection.
             </p>
           ) : (
-                sortCategoryKeys(Object.keys(categoryMap)).map(categoryString => 
-                  <React.Fragment key={`${categoryString}`}>
-                    <MealDivider title={categoryString} />
-                    {categoryMap[categoryString].map(dish => 
-                      <FoodCard
-                        key={dish.id}
-                        {... dish}
-                        isFavorited={favoriteDishIds?.includes(dish.id)}
-                        favoriteIsLoading={
-                          !!isFavoritesLoading || !!isFavoritePending?.(dish.id)
-                        }
-                        onToggleFavorite={onToggleFavorite}
-                      />
-                    )}
-                  </React.Fragment>
-                )
-            )}
+            sortCategoryKeys(Object.keys(categoryMap)).map(categoryString =>
+              <React.Fragment key={`${categoryString}`}>
+                <MealDivider title={categoryString} />
+                {categoryMap[categoryString].map(dish =>
+                  <FoodCard
+                    key={dish.id}
+                    {...dish}
+                    isFavorited={favoriteDishIds?.includes(dish.id)}
+                    favoriteIsLoading={
+                      !!isFavoritesLoading || !!isFavoritePending?.(dish.id)
+                    }
+                    onToggleFavorite={onToggleFavorite}
+                  />
+                )}
+              </React.Fragment>
+            )
+          )}
         </>
       )}
 

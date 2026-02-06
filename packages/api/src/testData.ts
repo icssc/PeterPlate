@@ -8,8 +8,8 @@ import type {
   InsertRestaurant,
   InsertStation,
   InsertUser,
-} from "@zotmeal/db";
-import { getRestaurantId } from "@zotmeal/db";
+} from "@peterplate/db";
+import { getRestaurantId } from "@peterplate/db";
 import { addDays, format } from "date-fns";
 
 const anteateryId = getRestaurantId("anteatery");

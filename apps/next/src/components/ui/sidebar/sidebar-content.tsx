@@ -146,14 +146,14 @@ export default function SidebarContent({
           {/* Header */}
           <Stack direction="row" className="items-center gap-3">
             <Image
-              src="/ZotMeal-Logo.webp"
+              src="/PeterPlate-Logo.webp"
               width={32}
               height={32}
-              alt="ZotMeal Logo"
+              alt="PeterPlate Logo"
             />
 
             <Typography variant="h6" className="font-semibold">
-              ZotMeal{" "}
+              PeterPlate{" "}
               <Typography
                 component="span"
                 variant="body2"

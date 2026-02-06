@@ -1,7 +1,7 @@
-import type { DiningHallInformation, Schedule } from "@zotmeal/validators";
+import type { DiningHallInformation, Schedule } from "@peterplate/validators";
 import { upsertPeriod } from "@api/periods/services";
-import type { Drizzle, RestaurantId } from "@zotmeal/db";
-import type { MealPeriodWithHours } from "@zotmeal/validators";
+import type { Drizzle, RestaurantId } from "@peterplate/db";
+import type { MealPeriodWithHours } from "@peterplate/validators";
 import { logger } from "@api/logger";
 
 export async function upsertPeriods(
@@ -13,15 +13,15 @@ export async function upsertPeriods(
 ) {
   const periodsResult = await Promise.allSettled(
     mealPeriods.map(period => {
-        upsertPeriod(db, {
-          id: period.id.toString(),
-          date: dateString,
-          restaurantId: restaurantId,
-          name: period.name,
-          startTime: period.openHours[dayOfWeek] ?? "",
-          endTime: period.closeHours[dayOfWeek] ?? ""
-        })
-      }
+      upsertPeriod(db, {
+        id: period.id.toString(),
+        date: dateString,
+        restaurantId: restaurantId,
+        name: period.name,
+        startTime: period.openHours[dayOfWeek] ?? "",
+        endTime: period.closeHours[dayOfWeek] ?? ""
+      })
+    }
     )
   );
 
@@ -55,11 +55,11 @@ export function getCurrentSchedule(
   date: Date
 ): Schedule {
   return schedules.find(schedule => {
-    if (!(schedule.startDate && schedule.endDate))  
+    if (!(schedule.startDate && schedule.endDate))
       return false;
     else
       return date >= schedule.startDate && date <= schedule.endDate
-  }) ?? 
+  }) ??
     // NOTE: We will assert that a standard schedule will always be returned.. 
     // if this no longer applies in the future, God help you.
     schedules.find(schedule => schedule.type == "standard")!;

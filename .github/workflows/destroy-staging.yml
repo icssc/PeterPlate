@@ -32,7 +32,7 @@ jobs:
 
     environment:
       name: staging-${{ github.event.pull_request.number }}
-      url: https://staging-${{ github.event.pull_request.number }}.zotmeal.com
+      url: https://staging-${{ github.event.pull_request.number }}.peterplate.com
 
     steps:
       - name: Checkout repository
@@ -51,10 +51,10 @@ jobs:
         with:
           pulumi-version: 3.138.0 # Any version < 3.214.0 works
 
-      - name: Destroy ZotMeal staging build
+      - name: Destroy Peterplate staging build
         run: pnpm sst remove --stage staging-$PR_NUM
 
-      - name: Set ZotMeal staging environment to inactive
+      - name: Set Peterplate staging environment to inactive
         uses: strumwolf/delete-deployment-environment@v2.3.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
