@@ -12,11 +12,41 @@ ALTER TABLE "restaurants" ALTER COLUMN "id" SET DATA TYPE text;--> statement-bre
 ALTER TABLE "stations" ALTER COLUMN "restaurant_id" SET DATA TYPE text;--> statement-breakpoint
 DROP TYPE "public"."restaurant_id_enum";--> statement-breakpoint
 CREATE TYPE "public"."restaurant_id_enum" AS ENUM('anteatery', 'brandywine');--> statement-breakpoint
-ALTER TABLE "events" ALTER COLUMN "restaurant_id" SET DATA TYPE "public"."restaurant_id_enum" USING "restaurant_id"::"public"."restaurant_id_enum";--> statement-breakpoint
-ALTER TABLE "menus" ALTER COLUMN "restaurant_id" SET DATA TYPE "public"."restaurant_id_enum" USING "restaurant_id"::"public"."restaurant_id_enum";--> statement-breakpoint
-ALTER TABLE "periods" ALTER COLUMN "restaurant_id" SET DATA TYPE "public"."restaurant_id_enum" USING "restaurant_id"::"public"."restaurant_id_enum";--> statement-breakpoint
-ALTER TABLE "restaurants" ALTER COLUMN "id" SET DATA TYPE "public"."restaurant_id_enum" USING "id"::"public"."restaurant_id_enum";--> statement-breakpoint
-ALTER TABLE "stations" ALTER COLUMN "restaurant_id" SET DATA TYPE "public"."restaurant_id_enum" USING "restaurant_id"::"public"."restaurant_id_enum";--> statement-breakpoint
+ALTER TABLE "events" ALTER COLUMN "restaurant_id" SET DATA TYPE "public"."restaurant_id_enum" USING (
+	CASE
+		WHEN "restaurant_id" = '3056' THEN 'anteatery'::"public"."restaurant_id_enum"
+		WHEN "restaurant_id" = '3314' THEN 'brandywine'::"public"."restaurant_id_enum"
+		ELSE "restaurant_id"::"public"."restaurant_id_enum"
+	END
+);--> statement-breakpoint
+ALTER TABLE "menus" ALTER COLUMN "restaurant_id" SET DATA TYPE "public"."restaurant_id_enum" USING (
+	CASE
+		WHEN "restaurant_id" = '3056' THEN 'anteatery'::"public"."restaurant_id_enum"
+		WHEN "restaurant_id" = '3314' THEN 'brandywine'::"public"."restaurant_id_enum"
+		ELSE "restaurant_id"::"public"."restaurant_id_enum"
+	END
+);--> statement-breakpoint
+ALTER TABLE "periods" ALTER COLUMN "restaurant_id" SET DATA TYPE "public"."restaurant_id_enum" USING (
+	CASE
+		WHEN "restaurant_id" = '3056' THEN 'anteatery'::"public"."restaurant_id_enum"
+		WHEN "restaurant_id" = '3314' THEN 'brandywine'::"public"."restaurant_id_enum"
+		ELSE "restaurant_id"::"public"."restaurant_id_enum"
+	END
+);--> statement-breakpoint
+ALTER TABLE "restaurants" ALTER COLUMN "id" SET DATA TYPE "public"."restaurant_id_enum" USING (
+	CASE
+		WHEN "id" = '3056' THEN 'anteatery'::"public"."restaurant_id_enum"
+		WHEN "id" = '3314' THEN 'brandywine'::"public"."restaurant_id_enum"
+		ELSE "id"::"public"."restaurant_id_enum"
+	END
+);--> statement-breakpoint
+ALTER TABLE "stations" ALTER COLUMN "restaurant_id" SET DATA TYPE "public"."restaurant_id_enum" USING (
+	CASE
+		WHEN "restaurant_id" = '3056' THEN 'anteatery'::"public"."restaurant_id_enum"
+		WHEN "restaurant_id" = '3314' THEN 'brandywine'::"public"."restaurant_id_enum"
+		ELSE "restaurant_id"::"public"."restaurant_id_enum"
+	END
+);--> statement-breakpoint
 ALTER TABLE "logged_meals" DROP CONSTRAINT IF EXISTS "logged_meals_user_id_dish_id_pk";--> statement-breakpoint
 ALTER TABLE "menus" ALTER COLUMN "price" SET DATA TYPE numeric(6, 2) USING price::numeric(6, 2);--> statement-breakpoint
 ALTER TABLE "menus" ALTER COLUMN "price" DROP NOT NULL;--> statement-breakpoint
