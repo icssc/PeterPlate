@@ -30,6 +30,7 @@
     "lint:ws": "pnpm dlx sherif@latest",
     "postinstall": "pnpm lint:ws",
     "sst:dev": "npx sst dev",
+    "test:api": "pnpm -F @peterplate/api test",
     "prepare": "husky"
   },
   "devDependencies": {
