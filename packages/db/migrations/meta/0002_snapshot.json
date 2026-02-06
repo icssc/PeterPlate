@@ -57,7 +57,6 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
-      "uniqueConstraints": {}
     },
     "public.diet_restrictions": {
       "name": "diet_restrictions",
@@ -197,7 +196,6 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
-      "uniqueConstraints": {}
     },
     "public.dishes": {
       "name": "dishes",
@@ -305,7 +303,6 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
       "uniqueConstraints": {}
     },
     "public.events": {
@@ -523,7 +520,6 @@
         }
       },
       "uniqueConstraints": {}
-      "uniqueConstraints": {}
     },
     "public.menus": {
       "name": "menus",
@@ -608,7 +604,6 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
       "uniqueConstraints": {}
     },
     "public.nutrition_infos": {
@@ -925,7 +920,6 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
-      "uniqueConstraints": {}
     },
     "public.ratings": {
       "name": "ratings",
@@ -1002,7 +996,6 @@
         }
       },
       "uniqueConstraints": {}
-      "uniqueConstraints": {}
     },
     "public.restaurants": {
       "name": "restaurants",
@@ -1039,7 +1032,6 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
       "uniqueConstraints": {}
     },
     "public.stations": {
@@ -1096,7 +1088,6 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
       "uniqueConstraints": {}
     },
     "public.users": {
@@ -1263,7 +1254,6 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
       "uniqueConstraints": {}
     },
     "public.session": {
