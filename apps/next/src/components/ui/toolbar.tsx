@@ -15,11 +15,15 @@ import { useState } from "react";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in";
 import { useSession } from "@/utils/auth-client";
 import SidebarContent from "./sidebar/sidebar-content";
+import MenuIcon from "@mui/icons-material/Menu"
 
 export type CalendarRange = {
   earliest: Date;
   latest: Date;
 };
+
+
+
 
 // NOTE: Children take precedence over the href.
 // Please only define one or the other.
@@ -72,7 +76,7 @@ const TOOLBAR_ELEMENTS: ToolbarElement[] = [
 
 function ToolbarDropdown({ element }: { element: ToolbarElement }) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
+    const open = Boolean(anchorEl);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -109,6 +113,16 @@ function ToolbarDropdown({ element }: { element: ToolbarElement }) {
 }
 
 export default function Toolbar(): React.JSX.Element {
+  const [profileAnchor, setProfileAnchor] = useState<null | HTMLElement>(null);
+  const profileOpen = Boolean(profileAnchor);
+
+  const handleProfileOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setProfileAnchor(event.currentTarget);
+    };
+
+  const handleProfileClose = () => {
+    setProfileAnchor(null);
+    };
   const { data: session, isPending } = useSession();
   const user = session?.user;
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -195,7 +209,7 @@ export default function Toolbar(): React.JSX.Element {
           </nav>
 
           <div className="flex-none flex items-center gap-4">
-            {isPending ? (
+            {/* {isPending ? (
               <div className="w-10 h-10" />
             ) : user ? (
               <IconButton
@@ -212,16 +226,102 @@ export default function Toolbar(): React.JSX.Element {
                 />
               </IconButton>
             ) : (
-              <GoogleSignInButton />
-            )}
+              <p></p>
+            )} */}
+            <div className="flex-none flex items-center gap-4">
+                         {isPending ? (
+                            <>
+                                <div className="w-24 h-5" />
+                                <IconButton
+                                    className="!text-[#1f2937] hover:!bg-[rgba(0,0,0,0.04)]"
+                                    aria-label="Open sidebar"
+                                    disabled
+                                >
+                                    <MenuIcon />
+                                </IconButton>
+                            </>
+                        ) : 
+                        user ? (
+                          <IconButton
+                            onClick={handleProfileOpen}
+                            className="!p-0"
+                            aria-label="Open profile menu"
+                          >
+                            <Image
+                              src={user.image || "/default-avatar.png"}
+                              alt={user.name || "User profile"}
+                              width={40}
+                              height={40}
+                              className="w-10 h-10 rounded-full"
+                            />
+                          </IconButton>
+                        )
+                        // user ? (
+                        //     <>
+                        //         <span className="text-sm text-gray-800 font-medium">
+                                    // {user.name || user.email || "User"}
+                        //         </span>
+                        //         <IconButton
+                        //             onClick={handleProfileOpen}
+                        //             className="!text-[#1f2937] hover:!bg-[rgba(0,0,0,0.04)]"
+                        //             aria-label="Open sidebar"
+                        //         >
+                        //             <MenuIcon />
+                        //         </IconButton>
+                        //     </>
+                         : (
+                            <div className="flex items-center gap-2">
+                                <GoogleSignInButton />
+                                <IconButton
+                                    onClick={handleProfileOpen}
+                                    className="!text-[#1f2937] hover:!bg-[rgba(0,0,0,0.04)]"
+                                    aria-label="Open sidebar"
+                                >
+                                    <MenuIcon />
+                                </IconButton>
+                            </div>
+                        )}
+                    </div>
           </div>
         </MuiToolbar>
       </AppBar>
 
-      <SidebarContent
+          <Menu
+                anchorEl={profileAnchor}
+                open={profileOpen}
+                onClose={handleProfileClose}
+                anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: "right",
+                }}
+                transformOrigin={{
+                    vertical: "top",
+                    horizontal: "right",
+                }}
+                PaperProps={{
+                    sx: {
+                    backgroundColor: "transparent",
+                    boxShadow: "none",
+                    padding: 0,
+                    width: 357,
+                    maxHeight: 658,
+                    // borderRadius: 3,
+                    mt: 1,
+                    },
+                }}
+                MenuListProps={{
+                    sx: {
+                        padding: 0
+                    },
+                }}
+                >
+                <SidebarContent onClose={handleProfileClose} />
+          </Menu>
+
+      {/* <SidebarContent
         open={drawerOpen}
         onClose={() => setDrawerOpen(!drawerOpen)}
-      />
+      /> */}
     </>
   );
 }
