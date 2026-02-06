@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Contributor from "@/components/ui/contributor";
 import { Button } from "@/components/ui/shadcn/button";
 import {
@@ -11,7 +12,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/shadcn/dialog";
 import { trpc } from "@/utils/trpc";
-import Image from "next/image";
 
 export default function About() {
   const {
@@ -40,7 +40,7 @@ export default function About() {
               About PeterPlate
             </h1>
             <Image
-              src="/PeterPlate-Logo.webp"
+              src="/peterplate-icon.webp"
               alt="PeterPlate's logo"
               width={32}
               height={32}
@@ -101,11 +101,11 @@ export default function About() {
                   <DialogDescription asChild className="p-4">
                     <div>
                       <p className="mb-4">
-                        PeterPlate is a cross-platform mobile application designed
-                        to help users view dining hall menus at the University
-                        of California, Irvine (UCI). We value your privacy and
-                        are committed to protecting any personal information you
-                        may share with us.
+                        PeterPlate is a cross-platform mobile application
+                        designed to help users view dining hall menus at the
+                        University of California, Irvine (UCI). We value your
+                        privacy and are committed to protecting any personal
+                        information you may share with us.
                       </p>
                       <p className="mb-4">
                         PeterPlate does not collect or store any personally

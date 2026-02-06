@@ -146,7 +146,7 @@ export default function SidebarContent({
           {/* Header */}
           <Stack direction="row" className="items-center gap-3">
             <Image
-              src="/PeterPlate-Logo.webp"
+              src="/peterplate-icon.webp"
               width={32}
               height={32}
               alt="PeterPlate Logo"
