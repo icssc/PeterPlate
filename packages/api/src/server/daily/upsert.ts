@@ -1,14 +1,25 @@
-import { getRestaurantId, type Drizzle, type RestaurantName } from "@peterplate/db";
-import { getAdobeEcommerceMenuDaily, getLocationInformation, restaurantUrlMap } from "./parse";
-import { DiningHallInformation } from "@peterplate/validators";
+import { logger } from "@api/logger";
+import { upsertMenu } from "@api/menus/services";
 import { upsertRestaurant } from "@api/restaurants/services";
 import { upsertAllStations } from "@api/stations/services";
-import { logger } from "@api/logger";
+import {
+  type Drizzle,
+  getRestaurantId,
+  type RestaurantName,
+} from "@peterplate/db";
+import type {
+  DiningHallInformation,
+  MealPeriodWithHours,
+  Schedule,
+} from "@peterplate/validators";
 import { format } from "date-fns";
-import { upsertMenu } from "@api/menus/services";
-import { getCurrentSchedule, upsertPeriods } from "../periods/services";
-import type { MealPeriodWithHours, Schedule } from "@peterplate/validators";
 import { parseAndUpsertDish } from "../dishes/services";
+import { getCurrentSchedule, upsertPeriods } from "../periods/services";
+import {
+  getAdobeEcommerceMenuDaily,
+  getLocationInformation,
+  restaurantUrlMap,
+} from "./parse";
 
 /**
  * Upserts the menu for the date `date` for a restaurant.
@@ -33,24 +44,29 @@ export async function upsertMenusForDate(
 
   await upsertRestaurant(db, {
     id: restaurantId,
-    name: restaurantName
+    name: restaurantName,
   });
 
   await upsertAllStations(db, restaurantId, restaurantInfo);
 
-  let currentSchedule: Schedule
-    = getCurrentSchedule(restaurantInfo.schedules, date);
+  const currentSchedule: Schedule = getCurrentSchedule(
+    restaurantInfo.schedules,
+    date,
+  );
 
-  // Get relevant periods from schedule that aligns with `date` 
+  // Get relevant periods from schedule that aligns with `date`
   // and has hours that day
-  let relevantPeriods: MealPeriodWithHours[] = currentSchedule.mealPeriods
-    .filter(mealPeriod => mealPeriod.openHours[dayOfWeek] && mealPeriod.closeHours[dayOfWeek])
+  const relevantPeriods: MealPeriodWithHours[] =
+    currentSchedule.mealPeriods.filter(
+      (mealPeriod) =>
+        mealPeriod.openHours[dayOfWeek] && mealPeriod.closeHours[dayOfWeek],
+    );
 
   logger.info(`[daily] Upserting ${relevantPeriods.length} periods...`);
   await upsertPeriods(db, restaurantId, dateString, dayOfWeek, relevantPeriods);
 
   const menuResult = await Promise.allSettled(
-    relevantPeriods.map(async period => {
+    relevantPeriods.map(async (period) => {
       const currentPeriodMenu = await getAdobeEcommerceMenuDaily(
         date,
         restaurantName,
@@ -64,26 +80,33 @@ export async function upsertMenusForDate(
         periodId: period.id.toString(),
         date: dateString,
         price: null, // NOTE: Not sure if this was ever provided in the API..
-        restaurantId
+        restaurantId,
       });
 
       logger.info(`[daily] Upserting ${currentPeriodMenu.length} dishes...`);
       await Promise.all(
-        currentPeriodMenu.map(async dish => {
-          if (dish.name == "UNIDENTIFIED")
-            return;
+        currentPeriodMenu.map(async (dish) => {
+          if (dish.name === "UNIDENTIFIED") return;
 
-          parseAndUpsertDish(db, restaurantInfo, dish, menuIdHash);
-        })
-      )
-    })
+          await parseAndUpsertDish(db, restaurantInfo, dish, menuIdHash);
+        }),
+      );
+    }),
   );
 
   for (const menu of menuResult)
     if (menu.status === "rejected") {
       const reason = menu.reason;
       let menuDetail = "unknown menu";
-      if (reason && typeof reason === 'object' && 'value' in reason && reason.value && typeof reason.value === 'object' && 'name' in reason.value && typeof reason.value.name === 'string') {
+      if (
+        reason &&
+        typeof reason === "object" &&
+        "value" in reason &&
+        reason.value &&
+        typeof reason.value === "object" &&
+        "name" in reason.value &&
+        typeof reason.value.name === "string"
+      ) {
         menuDetail = `menu '${reason.value.name}'`;
       } else if (reason instanceof Error) {
         menuDetail = `Error: ${reason.message}`;
