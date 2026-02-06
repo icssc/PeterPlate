@@ -48,7 +48,12 @@ ALTER TABLE "stations" ALTER COLUMN "restaurant_id" SET DATA TYPE "public"."rest
 	END
 );--> statement-breakpoint
 ALTER TABLE "logged_meals" DROP CONSTRAINT IF EXISTS "logged_meals_user_id_dish_id_pk";--> statement-breakpoint
-ALTER TABLE "menus" ALTER COLUMN "price" SET DATA TYPE numeric(6, 2) USING price::numeric(6, 2);--> statement-breakpoint
+ALTER TABLE "menus" ALTER COLUMN "price" SET DATA TYPE numeric(6, 2) USING (
+	CASE
+		WHEN "price" = '???' THEN 0
+		ELSE "price"::numeric(6, 2)
+	END
+);--> statement-breakpoint
 ALTER TABLE "menus" ALTER COLUMN "price" DROP NOT NULL;--> statement-breakpoint
 ALTER TABLE "nutrition_infos" ALTER COLUMN "calories" SET DATA TYPE numeric(10, 2) USING "calories"::numeric(10, 2);--> statement-breakpoint
 ALTER TABLE "nutrition_infos" ALTER COLUMN "total_fat_g" SET DATA TYPE numeric(10, 2) USING "total_fat_g"::numeric(10, 2);--> statement-breakpoint
