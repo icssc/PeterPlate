@@ -135,14 +135,14 @@ export async function upsertMenusForWeek(
             id: menuIdHash,
             periodId: periodId.toString(),
             date: dateString,
-            price: "???", // NOTE: Not sure if this was ever provided in the API..
+            price: null,
             restaurantId,
           });
 
           for (const dish of dishes) {
             if (dish.name !== "UNIDENTIFIED") {
               dishesToUpsert.push({
-                dish: { ...dish, menuId: menuIdHash },
+                dish,
                 menuId: menuIdHash,
               });
             }

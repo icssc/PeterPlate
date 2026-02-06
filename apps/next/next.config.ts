@@ -1,6 +1,5 @@
 import type { NextConfig } from "next";
 import path from "node:path";
-import path from "node:path";
 
 const nextConfig: NextConfig = {
   // ! TODO: Fix these errors
@@ -16,6 +15,10 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "images.elevate-dxp.com",
+      },
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
       },
     ],
   },

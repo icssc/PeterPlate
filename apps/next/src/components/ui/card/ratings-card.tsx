@@ -1,15 +1,20 @@
+/** biome-ignore-all lint/a11y/useKeyWithClickEvents: Will fix when using MUI.*/
+/** biome-ignore-all lint/a11y/noStaticElementInteractions: Will fix when using MUI. */
+/** biome-ignore-all lint/a11y/useSemanticElements: Will fix when using MUI. */
+/** biome-ignore-all lint/a11y/useFocusableInteractive: Will fix when using MUI. */
+
 "use client";
 
-import React from "react";
+import { Delete, Restaurant } from "@mui/icons-material";
 import { Card, CardContent, Dialog, IconButton } from "@mui/material";
-import { Utensils, Trash2 } from "lucide-react";
+import type { DishInfo } from "@zotmeal/api";
+import React from "react";
+import { useUserStore } from "@/context/useUserStore";
 import { formatFoodName, getFoodIcon } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
-import InteractiveStarRating from "../interactive-star-rating";
-import { DishInfo } from "@zotmeal/api";
-import FoodDialogContent from "../food-dialog-content";
 import { cn } from "@/utils/tw";
-import { useUserStore } from "@/context/useUserStore";
+import FoodDialogContent from "../food-dialog-content";
+import InteractiveStarRating from "../interactive-star-rating";
 
 interface RatingsCardProps {
   food: DishInfo & {
@@ -26,7 +31,7 @@ const RatingsCardContent = React.forwardRef<
     deleteLoading: boolean;
   } & React.HTMLAttributes<HTMLDivElement>
 >(({ food, handleDelete, deleteLoading, className, ...divProps }, ref) => {
-  const IconComponent = getFoodIcon(food.name) ?? Utensils;
+  const IconComponent = getFoodIcon(food.name) ?? Restaurant;
 
   return (
     <div ref={ref} {...divProps} className={cn("w-full", className)}>
@@ -47,7 +52,7 @@ const RatingsCardContent = React.forwardRef<
             </div>
             <div
               className="flex flex-row items-center ml-4 gap-4"
-              onClick={(e) => e.stopPropagation()} // keep stars/delete interactive
+              onClick={(e) => e.stopPropagation()}
             >
               <InteractiveStarRating dishId={food.id} />
               <IconButton
@@ -60,7 +65,7 @@ const RatingsCardContent = React.forwardRef<
                   deleteLoading && "opacity-60",
                 )}
               >
-                <Trash2 className="w-4 h-4" />
+                <Delete className="w-4 h-4 text-gray-400 hover:text-red-500" />
               </IconButton>
             </div>
           </div>
@@ -75,19 +80,22 @@ export default function RatingsCard({ food }: RatingsCardProps) {
   const userId = useUserStore((s) => s.userId);
   const [open, setOpen] = React.useState(false);
   const utils = trpc.useUtils();
-  
+
   const deleteRatingMutation = trpc.dish.deleteRating.useMutation({
     onSuccess: () => {
       utils.dish.rated.invalidate();
-      utils.dish.getUserRating.invalidate({ userId, dishId: food.id });
       utils.dish.getAverageRating.invalidate({ dishId: food.id });
     },
   });
 
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
+    // TODO: Replace this with a MUI dialog instead of relying on browser window.
     if (window.confirm("Delete this rating?")) {
-      await deleteRatingMutation.mutateAsync({ userId, dishId: food.id });
+      await deleteRatingMutation.mutateAsync({
+        userId: userId ?? "default-user",
+        dishId: food.id,
+      });
     }
   };
 
@@ -99,7 +107,8 @@ export default function RatingsCard({ food }: RatingsCardProps) {
       <RatingsCardContent
         food={food}
         handleDelete={handleDelete}
-        deleteLoading={deleteRatingMutation.isLoading}
+        // NOTE: Why is this property here? We don't do the delete async, so there should be no loading, nor a way to show that.
+        deleteLoading={false}
         onClick={handleOpen}
       />
       <Dialog

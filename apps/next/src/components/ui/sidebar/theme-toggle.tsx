@@ -1,9 +1,12 @@
+/** biome-ignore-all lint/a11y/useKeyWithClickEvents: Will fix when using MUI.*/
+/** biome-ignore-all lint/a11y/useSemanticElements: Will fix when using MUI. */
+/** biome-ignore-all lint/a11y/useFocusableInteractive: Will fix when using MUI. */
 "use client";
 
-import { useEffect, useState } from "react";
+import { DarkMode, LightMode } from "@mui/icons-material";
 import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 import { Switch } from "@/components/ui/switch";
-import { Moon, Sun } from "lucide-react";
 
 export function ThemeToggle() {
   const { theme, setTheme, resolvedTheme } = useTheme();
@@ -23,15 +26,16 @@ export function ThemeToggle() {
     >
       <div className="flex gap-3 items-center">
         {isDark ? (
-          <Sun className="stroke-1 size-5" />
+          <LightMode className="stroke-1 size-5" />
         ) : (
-          <Moon className="stroke-1 size-5" />
+          <DarkMode className="stroke-1 size-5" />
         )}
         <span className="text-md font-medium">
           {isDark ? "Light mode" : "Dark mode"}
         </span>
       </div>
 
+      {/* TODO: Migrate Switch to MUI */}
       <Switch
         checked={isDark}
         onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}

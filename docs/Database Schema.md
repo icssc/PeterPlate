@@ -50,7 +50,7 @@ erDiagram
       name text
       description text
       category text
-      num_ratings intger
+      num_ratings integer
       total_rating integer
       created_at timestamp
       updated_at timestamp
@@ -68,7 +68,7 @@ erDiagram
       period_id text FK
       date date
       restaurant_id restaurant_id_enum
-      price text
+      price numeric
       created_at timestamp
       updated_at timestamp
    }
@@ -99,20 +99,20 @@ erDiagram
       dish_id text PK,FK
       serving_size text
       serving_unit text
-      calories text
-      total_fat_g text
-      trans_fat_g text
-      saturated_fat_g text
-      cholesterol_mg text
-      sodium_mg text
-      total_carbs_g text
-      dietary_fiber_g text
-      sugars_mg text
-      protein_g text
-      vitamin_a_iu text
-      vitamin_c_iu text
-      calcium_mg text
-      iron_mg text
+      calories numeric
+      total_fat_g numeric
+      trans_fat_g numeric
+      saturated_fat_g numeric
+      cholesterol_mg numeric
+      sodium_mg numeric
+      total_carbs_g numeric
+      dietary_fiber_g numeric
+      sugars_g numeric
+      protein_g numeric
+      vitamin_a numeric
+      vitamin_c numeric
+      calcium numeric
+      iron numeric
       created_at timestamp
       updated_at timestamp
    }

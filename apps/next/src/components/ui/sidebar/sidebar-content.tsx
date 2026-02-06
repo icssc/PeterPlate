@@ -1,27 +1,115 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
 import {
-  Box,
-  Drawer,
-  Typography,
+  CalendarToday,
+  EditNote,
+  EggAlt,
+  EmojiEvents,
+  FavoriteBorder,
+  House,
+  Info,
+  Logout,
+  Person,
+  Settings,
+  StarBorder,
+} from "@mui/icons-material";
+import {
   Avatar,
-  IconButton,
+  Box,
   Divider,
+  Drawer,
+  IconButton,
   Stack,
+  Typography,
 } from "@mui/material";
-import SidebarButton from "./sidebar-button";
-import SidebarDivider from "./sidebar-divider";
-import { Settings2, CalendarFold, LogOut, House, Info, Pin, Trophy, StarIcon, Heart, Star, User, NotebookPen, Carrot } from "lucide-react";
-import { useSession, signOut } from "@/utils/auth-client"; // BetterAuth React hook
+import Image from "next/image";
+import type React from "react";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in";
+import { signOut, useSession } from "@/utils/auth-client"; // BetterAuth React hook
+import SidebarButton, { type SidebarButtonProps } from "./sidebar-button";
+import SidebarDivider from "./sidebar-divider";
 import { ThemeToggle } from "./theme-toggle";
 
 interface SidebarContentProps {
   open: boolean;
   onClose: () => void;
 }
+
+type SidebarSection = {
+  title: string;
+  buttons: SidebarButtonProps[];
+};
+
+const SIDEBAR_CONTENT_MAP: SidebarSection[] = [
+  {
+    title: "Dining Hall Info",
+    buttons: [
+      {
+        Icon: House,
+        title: "Home",
+        href: "/",
+      },
+      {
+        Icon: CalendarToday,
+        title: "Events",
+        href: "/events",
+      },
+      {
+        Icon: EmojiEvents,
+        title: "Most Liked",
+        href: "/leaderboard",
+        deactivated: true,
+      },
+      {
+        Icon: EggAlt,
+        title: "Nutrition",
+        href: "/nutrition",
+      },
+    ],
+  },
+  {
+    title: "Account",
+    buttons: [
+      {
+        Icon: Person,
+        title: "My Account",
+        href: "/account",
+      },
+      {
+        Icon: StarBorder,
+        title: "My Ratings",
+        href: "/ratings",
+      },
+      {
+        Icon: FavoriteBorder,
+        title: "My Favorites",
+        href: "/my-favorites",
+      },
+      {
+        Icon: EditNote,
+        title: "My Meal Tracker",
+        href: "/meal-tracker",
+        deactivated: true,
+      },
+    ],
+  },
+  {
+    title: "Miscellaneous",
+    buttons: [
+      {
+        Icon: Settings,
+        title: "Settings",
+        href: "/settings",
+        deactivated: true,
+      },
+      {
+        Icon: Info,
+        title: "About",
+        href: "/about",
+      },
+    ],
+  },
+];
 
 /**
  * `SidebarContent` is a presentational component that renders the main content
@@ -36,7 +124,7 @@ interface SidebarContentProps {
 export default function SidebarContent({
   open,
   onClose,
-}: SidebarContentProps): JSX.Element {
+}: SidebarContentProps): React.JSX.Element {
   // Get session data using BetterAuth's React hook
   const { data: session, isPending } = useSession();
   const user = session?.user;
@@ -78,15 +166,14 @@ export default function SidebarContent({
 
           <Divider className="my-2" />
 
-          <SidebarDivider title="Account" />
-
-          <SidebarButton
-            Icon={User}
-            title="My Account"
-            href="/account"
-            onClose={onClose}
-            deactivated={!user}
-          />
+          {SIDEBAR_CONTENT_MAP.map((section) => (
+            <div key={section.title}>
+              <SidebarDivider title={section.title} />
+              {section.buttons.map((button) => (
+                <SidebarButton key={button.title} {...button} />
+              ))}
+            </div>
+          ))}
         </Stack>
 
         {/* Bottom */}
@@ -112,10 +199,7 @@ export default function SidebarContent({
                   <Typography className="font-semibold leading-tight">
                     {user.name || "User"}
                   </Typography>
-                  <Typography
-                    variant="body2"
-                    className="text-gray-500"
-                  >
+                  <Typography variant="body2" className="text-gray-500">
                     {user.email || ""}
                   </Typography>
                 </Box>
@@ -127,7 +211,7 @@ export default function SidebarContent({
                 size="small"
                 className="hover:bg-gray-200"
               >
-                <LogOut size={18} />
+                <Logout fontSize="small" />
               </IconButton>
             </Box>
           )}
