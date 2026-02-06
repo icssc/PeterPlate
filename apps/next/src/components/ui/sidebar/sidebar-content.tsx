@@ -3,6 +3,7 @@
 import Link from "next/link";
 import {
   Logout as LogoutIcon,
+  Login as LoginIcon,
   Info as InfoIcon,
   Edit as EditIcon,
   LightMode as LightModeIcon,
@@ -13,6 +14,7 @@ import {
 } from "@mui/icons-material";
 import { useSession, signOut } from "@/utils/auth-client";
 import { useState } from "react";
+import { GoogleSignInButton } from "@/components/auth/google-sign-in";
 
 interface ProfileMenuContentProps {
   onClose: () => void;
@@ -29,6 +31,7 @@ export default function SidebarContent({
     await signOut();
     window.location.href = "/";
   };
+
 
   return (
     <div className="h-full w-full rounded-2xl bg-white dark:bg-gray-900 shadow-xl flex flex-col">
@@ -144,7 +147,7 @@ export default function SidebarContent({
         </div>
       </div>
 
-      {/* Sign out */}
+      {/* Sign out
       <div className="px-5 pb-5 pt-3">
         <button
           onClick={handleSignOut}
@@ -156,7 +159,24 @@ export default function SidebarContent({
           </span>
         </button>
       </div>
+    </div> */}
+    {/* Auth action */}
+    <div className="px-5 pb-5 pt-3">
+      {user ? (
+        <button
+          onClick={handleSignOut}
+          className="w-full rounded-lg bg-blue-600 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
+        >
+          <span className="inline-flex items-center gap-2">
+            <LogoutIcon fontSize="small" />
+            Sign Out
+          </span>
+        </button>
+      ) : (
+        <GoogleSignInButton />
+      )}
     </div>
+  </div>
   );
 }
 
