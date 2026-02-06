@@ -19,7 +19,7 @@
     "db:studio": "pnpm --filter db run db:studio",
     "db:dump": "pg_dump -h icssc.cf3yrjegcna8.us-east-1.rds.amazonaws.com -U peterplate_prod -W -O -x peterplate > ./docker/db/peterplate.sql",
     "dev": "pnpm -F @peterplate/next dev",
-    "dev:graphql": "turbo dev --filter=./packages/graphql",
+    "dev:graphql": "pnpm -F @peterplate/graphql dev",
     "dev:data": "pnpm -F @peterplate/server test:weekly",
     "deploy": "npx sst deploy --stage production",
     "deploy:dev": "npx sst deploy --stage dev",
