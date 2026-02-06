@@ -147,9 +147,6 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                     </p>
                   )}
                 </div>
-                <button onClick={handleLogMeal}>
-                  <CirclePlus />
-                </button>
                 <div className="flex items-center">
                   <button
                     type="button"
