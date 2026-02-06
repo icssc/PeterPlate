@@ -10,6 +10,8 @@ import { GoogleSignInButton } from "@/components/auth/google-sign-in";
 import { useSession } from "@/utils/auth-client";
 import SidebarContent from "./sidebar/sidebar-content";
 
+const SCALE = 0.9;
+
 export default function Header(): JSX.Element {
     const { data: session, isPending } = useSession();
     const user = session?.user;
@@ -178,8 +180,7 @@ export default function Header(): JSX.Element {
                     </div>
                 </Toolbar>
             </AppBar>
-
-            {/* <SidebarContent open={drawerOpen} onClose={toggleDrawer} /> */}
+            
             <Menu
                 anchorEl={profileAnchor}
                 open={profileOpen}
@@ -198,6 +199,7 @@ export default function Header(): JSX.Element {
                     boxShadow: "none",
                     padding: 0,
                     width: 357,
+                    maxHeight: 658,
                     // borderRadius: 3,
                     mt: 1,
                     },
