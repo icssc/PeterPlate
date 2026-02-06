@@ -55,20 +55,20 @@ ALTER TABLE "menus" ALTER COLUMN "price" SET DATA TYPE numeric(6, 2) USING (
 	END
 );--> statement-breakpoint
 ALTER TABLE "menus" ALTER COLUMN "price" DROP NOT NULL;--> statement-breakpoint
-ALTER TABLE "nutrition_infos" ALTER COLUMN "calories" SET DATA TYPE numeric(10, 2) USING "calories"::numeric(10, 2);--> statement-breakpoint
-ALTER TABLE "nutrition_infos" ALTER COLUMN "total_fat_g" SET DATA TYPE numeric(10, 2) USING "total_fat_g"::numeric(10, 2);--> statement-breakpoint
-ALTER TABLE "nutrition_infos" ALTER COLUMN "trans_fat_g" SET DATA TYPE numeric(10, 2) USING "trans_fat_g"::numeric(10, 2);--> statement-breakpoint
-ALTER TABLE "nutrition_infos" ALTER COLUMN "saturated_fat_g" SET DATA TYPE numeric(10, 2) USING "saturated_fat_g"::numeric(10, 2);--> statement-breakpoint
-ALTER TABLE "nutrition_infos" ALTER COLUMN "cholesterol_mg" SET DATA TYPE numeric(10, 2) USING "cholesterol_mg"::numeric(10, 2);--> statement-breakpoint
-ALTER TABLE "nutrition_infos" ALTER COLUMN "sodium_mg" SET DATA TYPE numeric(10, 2) USING "sodium_mg"::numeric(10, 2);--> statement-breakpoint
-ALTER TABLE "nutrition_infos" ALTER COLUMN "total_carbs_g" SET DATA TYPE numeric(10, 2) USING "total_carbs_g"::numeric(10, 2);--> statement-breakpoint
-ALTER TABLE "nutrition_infos" ALTER COLUMN "dietary_fiber_g" SET DATA TYPE numeric(10, 2) USING "dietary_fiber_g"::numeric(10, 2);--> statement-breakpoint
-ALTER TABLE "nutrition_infos" ALTER COLUMN "sugars_g" SET DATA TYPE numeric(10, 2) USING "sugars_g"::numeric(10, 2);--> statement-breakpoint
-ALTER TABLE "nutrition_infos" ALTER COLUMN "protein_g" SET DATA TYPE numeric(10, 2) USING "protein_g"::numeric(10, 2);--> statement-breakpoint
-ALTER TABLE "nutrition_infos" ALTER COLUMN "calcium" SET DATA TYPE numeric(10, 2) USING "calcium"::numeric(10, 2);--> statement-breakpoint
-ALTER TABLE "nutrition_infos" ALTER COLUMN "iron" SET DATA TYPE numeric(10, 2) USING "iron"::numeric(10, 2);--> statement-breakpoint
-ALTER TABLE "nutrition_infos" ALTER COLUMN "vitamin_a" SET DATA TYPE numeric(10, 2) USING "vitamin_a"::numeric(10, 2);--> statement-breakpoint
-ALTER TABLE "nutrition_infos" ALTER COLUMN "vitamin_c" SET DATA TYPE numeric(10, 2) USING "vitamin_c"::numeric(10, 2);--> statement-breakpoint
+ALTER TABLE "nutrition_infos" ALTER COLUMN "calories" SET DATA TYPE numeric(10, 2) USING (CASE WHEN "calories" = '' THEN NULL ELSE "calories"::numeric(10, 2) END);--> statement-breakpoint
+ALTER TABLE "nutrition_infos" ALTER COLUMN "total_fat_g" SET DATA TYPE numeric(10, 2) USING (CASE WHEN "total_fat_g" = '' THEN NULL ELSE "total_fat_g"::numeric(10, 2) END);--> statement-breakpoint
+ALTER TABLE "nutrition_infos" ALTER COLUMN "trans_fat_g" SET DATA TYPE numeric(10, 2) USING (CASE WHEN "trans_fat_g" = '' THEN NULL ELSE "trans_fat_g"::numeric(10, 2) END);--> statement-breakpoint
+ALTER TABLE "nutrition_infos" ALTER COLUMN "saturated_fat_g" SET DATA TYPE numeric(10, 2) USING (CASE WHEN "saturated_fat_g" = '' THEN NULL ELSE "saturated_fat_g"::numeric(10, 2) END);--> statement-breakpoint
+ALTER TABLE "nutrition_infos" ALTER COLUMN "cholesterol_mg" SET DATA TYPE numeric(10, 2) USING (CASE WHEN "cholesterol_mg" = '' THEN NULL ELSE "cholesterol_mg"::numeric(10, 2) END);--> statement-breakpoint
+ALTER TABLE "nutrition_infos" ALTER COLUMN "sodium_mg" SET DATA TYPE numeric(10, 2) USING (CASE WHEN "sodium_mg" = '' THEN NULL ELSE "sodium_mg"::numeric(10, 2) END);--> statement-breakpoint
+ALTER TABLE "nutrition_infos" ALTER COLUMN "total_carbs_g" SET DATA TYPE numeric(10, 2) USING (CASE WHEN "total_carbs_g" = '' THEN NULL ELSE "total_carbs_g"::numeric(10, 2) END);--> statement-breakpoint
+ALTER TABLE "nutrition_infos" ALTER COLUMN "dietary_fiber_g" SET DATA TYPE numeric(10, 2) USING (CASE WHEN "dietary_fiber_g" = '' THEN NULL ELSE "dietary_fiber_g"::numeric(10, 2) END);--> statement-breakpoint
+ALTER TABLE "nutrition_infos" ALTER COLUMN "sugars_g" SET DATA TYPE numeric(10, 2) USING (CASE WHEN "sugars_g" = '' THEN NULL ELSE "sugars_g"::numeric(10, 2) END);--> statement-breakpoint
+ALTER TABLE "nutrition_infos" ALTER COLUMN "protein_g" SET DATA TYPE numeric(10, 2) USING (CASE WHEN "protein_g" = '' THEN NULL ELSE "protein_g"::numeric(10, 2) END);--> statement-breakpoint
+ALTER TABLE "nutrition_infos" ALTER COLUMN "calcium" SET DATA TYPE numeric(10, 2) USING (CASE WHEN "calcium" = '' THEN NULL ELSE "calcium"::numeric(10, 2) END);--> statement-breakpoint
+ALTER TABLE "nutrition_infos" ALTER COLUMN "iron" SET DATA TYPE numeric(10, 2) USING (CASE WHEN "iron" = '' THEN NULL ELSE "iron"::numeric(10, 2) END);--> statement-breakpoint
+ALTER TABLE "nutrition_infos" ALTER COLUMN "vitamin_a" SET DATA TYPE numeric(10, 2) USING (CASE WHEN "vitamin_a" = '' THEN NULL ELSE "vitamin_a"::numeric(10, 2) END);--> statement-breakpoint
+ALTER TABLE "nutrition_infos" ALTER COLUMN "vitamin_c" SET DATA TYPE numeric(10, 2) USING (CASE WHEN "vitamin_c" = '' THEN NULL ELSE "vitamin_c"::numeric(10, 2) END);--> statement-breakpoint
 ALTER TABLE "logged_meals" ADD COLUMN IF NOT EXISTS "id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL;--> statement-breakpoint
 CREATE INDEX "dishes_station_id_idx" ON "dishes" USING btree ("station_id");--> statement-breakpoint
 CREATE INDEX "dishes_name_idx" ON "dishes" USING btree ("name");--> statement-breakpoint
