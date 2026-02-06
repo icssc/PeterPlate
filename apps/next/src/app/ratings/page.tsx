@@ -33,13 +33,16 @@ export default function RatedFoods() {
   return (
     <div className="max-w-full h-screen">
       <div className="z-0 flex flex-col h-full overflow-x-hidden">
-        <Image
-          className="object-cover w-full min-h-80 max-h-80"
-          src="/aldrich.webp"
-          alt="An Image of Aldrich Park."
-          width={2000}
-          height={2000}
-        />
+        <div className="relative w-full min-h-80 max-h-80">
+          <div className="absolute inset-0 bg-gradient-to-b from-black/65 to-transparent" />
+          <Image
+            className="object-cover w-full h-full"
+            src="/aldrich.webp"
+            alt="An Image of Aldrich Park."
+            width={2000}
+            height={2000}
+          />
+        </div>
 
         <div
           className="flex flex-col gap-4 justify-center w-full p-5 sm:px-12 sm:py-8"

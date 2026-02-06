@@ -1,4 +1,4 @@
-import { Dialog, Button } from "@mui/material";
+import { Button, Dialog } from "@mui/material";
 import { useState } from "react";
 
 interface IngredientsDialogProps {
@@ -9,7 +9,7 @@ interface IngredientsDialogProps {
 export default function IngredientsDialog({
   name,
   ingredients,
-}: IngredientsDialogProps): JSX.Element {
+}: IngredientsDialogProps): React.JSX.Element {
   const [open, setOpen] = useState(false);
 
   const handleOpen = () => setOpen(true);

@@ -10,8 +10,6 @@ import { GoogleSignInButton } from "@/components/auth/google-sign-in";
 import { useSession } from "@/utils/auth-client";
 import SidebarContent from "./sidebar/sidebar-content";
 
-const SCALE = 0.9;
-
 export default function Header(): JSX.Element {
     const { data: session, isPending } = useSession();
     const user = session?.user;

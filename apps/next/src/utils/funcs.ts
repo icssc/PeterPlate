@@ -1,9 +1,8 @@
-import { Utensils } from "lucide-react";
+import { Restaurant } from "@mui/icons-material";
 import {
   foodIconKeywords,
   foodIcons,
   HallEnum,
-  type LucideIconComponent,
   numToMonth,
   preferredCategoryOrder,
 } from "./types";
@@ -152,7 +151,7 @@ function enhanceDescription(
   }
 
   // Return original if no rules match or it's already reasonably descriptive
-  return description.endsWith(".") ? description : description + ".";
+  return description.endsWith(".") ? description : `${description}.`;
 }
 
 /**
@@ -406,8 +405,8 @@ function sortCategoryKeys(keys: string[]): string[] {
  * @param dishName The name of the dish.
  * @returns A LucideIconComponent (e.g., Soup, Pizza) or a default icon component (Utensils).
  */
-function getFoodIcon(dishName: string): LucideIconComponent {
-  const defaultFoodIcon: LucideIconComponent = Utensils;
+function getFoodIcon(dishName: string) {
+  const defaultFoodIcon = Restaurant;
 
   if (!dishName || dishName.trim() === "") {
     return defaultFoodIcon;

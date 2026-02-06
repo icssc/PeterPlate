@@ -4,11 +4,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink } from "@trpc/client";
 import { trpc } from "../utils/trpc";
 import superjson from "superjson";
-import Header from "@/components/ui/header";
 import { DateProvider } from "@/context/date-context";
 import { ThemeProvider } from "next-themes";
 import { useSession } from "@/utils/auth-client";
 import { useUserStore } from "@/context/useUserStore";
+import Toolbar from "@/components/ui/toolbar";
 
 export function RootClient({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient({
@@ -64,7 +64,7 @@ export function RootClient({ children }: { children: React.ReactNode }) {
       <trpc.Provider client={trpcClient} queryClient={queryClient}>
         <QueryClientProvider client={queryClient}>
           <DateProvider>
-            <Header />
+            <Toolbar />
             {children}
           </DateProvider>
         </QueryClientProvider>

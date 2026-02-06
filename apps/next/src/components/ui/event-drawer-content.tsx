@@ -1,10 +1,11 @@
-import { Box, Typography, Button } from "@mui/material";
-import { EventInfo } from "./card/event-card";
+import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
+import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
+import PinDropOutlinedIcon from "@mui/icons-material/PinDropOutlined";
+import { Box, Button, Typography } from "@mui/material";
 import Image from "next/image";
-import { CalendarPlus, Clock, MapPinned } from "lucide-react";
+import { dateToString, generateGCalLink, toTitleCase } from "@/utils/funcs";
 import { HallEnum } from "@/utils/types";
-import { toTitleCase, dateToString, generateGCalLink } from "@/utils/funcs";
-import React from "react";
+import type { EventInfo } from "./card/event-card";
 
 /**
  * `EventDrawerContent` renders the detailed view of an event within a drawer (mobile view).
@@ -25,7 +26,7 @@ export default function EventDrawerContent(
         alt={props.alt}
         width={600}
         height={600}
-        className="w-full h-auto max-h-64 object-contain"
+        className="w-full h-auto max-h-64 object-cover"
       />
       <Box sx={{ padding: "20px 24px 24px" }} className="flex flex-col gap-2">
         <Typography
@@ -40,11 +41,11 @@ export default function EventDrawerContent(
           id="event-card-subheader"
         >
           <div className="flex gap-1 items-center whitespace-nowrap">
-            <Clock className="stroke-zinc-400" size={20} />
+            <AccessTimeOutlinedIcon />
             <p>{dateToString(props.startTime, props.endTime)}</p>
           </div>
           <div className="flex gap-1 items-center whitespace-nowrap">
-            <MapPinned className="stroke-zinc-400" size={20} />
+            <PinDropOutlinedIcon />
             <p>{toTitleCase(HallEnum[props.location])}</p>
           </div>
         </div>
@@ -65,7 +66,7 @@ export default function EventDrawerContent(
             <Button
               variant="contained"
               className="[&_svg]:size-5 whitespace-nowrap"
-              startIcon={<CalendarPlus />}
+              startIcon={<CalendarTodayOutlinedIcon />}
             >
               Add to Google Calendar
             </Button>

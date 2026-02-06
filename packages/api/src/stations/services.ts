@@ -1,6 +1,6 @@
 import { upsert } from "@api/utils";
 
-import type { Drizzle, InsertStation } from "@zotmeal/db";
+import type { Drizzle, InsertStation, RestaurantId } from "@zotmeal/db";
 import { stations } from "@zotmeal/db";
 import { DiningHallInformation } from "@zotmeal/validators";
 import { logger } from "@api/logger";
@@ -17,7 +17,7 @@ export const upsertStation = async (db: Drizzle, station: InsertStation) =>
  */
 export async function upsertAllStations(
   db: Drizzle,
-  restaurantId: "3056" | "3314",
+  restaurantId: RestaurantId,
   restaurantInfo: DiningHallInformation,
 ): Promise<void> {
   const stationsResult = await Promise.allSettled(

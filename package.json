@@ -30,7 +30,7 @@
     "lint:ws": "pnpm dlx sherif@latest",
     "postinstall": "pnpm lint:ws",
     "sst:dev": "npx sst dev",
-    "typecheck": "pnpm typecheck"
+    "prepare": "husky"
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.8",
@@ -59,5 +59,8 @@
     "*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}": [
       "biome check --write --no-errors-on-unmatched"
     ]
+  },
+  "dependencies": {
+    "@mui/icons-material": "^7.3.7"
   }
 }

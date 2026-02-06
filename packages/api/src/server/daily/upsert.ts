@@ -63,7 +63,7 @@ export async function upsertMenusForDate(
         id: menuIdHash,
         periodId: period.id.toString(),
         date: dateString,
-        price: "???", // NOTE: Not sure if this was ever provided in the API..
+        price: null, // NOTE: Not sure if this was ever provided in the API..
         restaurantId
       });
 
@@ -73,7 +73,7 @@ export async function upsertMenusForDate(
           if (dish.name == "UNIDENTIFIED")
             return;
 
-          parseAndUpsertDish(db, restaurantInfo, {...dish, menuId: menuIdHash}, menuIdHash);
+          parseAndUpsertDish(db, restaurantInfo, dish, menuIdHash);
         })
       )
     })

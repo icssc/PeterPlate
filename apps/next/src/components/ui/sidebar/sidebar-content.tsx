@@ -32,7 +32,6 @@ export default function SidebarContent({
     window.location.href = "/";
   };
 
-
   return (
     <div className="h-full w-full rounded-2xl bg-white dark:bg-gray-900 shadow-xl flex flex-col">
       {/* Header */}
@@ -121,62 +120,37 @@ export default function SidebarContent({
 
         {/* Links */}
         <div className="space-y-1">
-          <MenuLink
-            href="/account"
-            onClick={onClose}
-            icon={<EditIcon fontSize="small" />}
-          >
+          <MenuLink href="/account" onClick={onClose} icon={<EditIcon fontSize="small" />}>
             Edit Preferences
           </MenuLink>
 
-          <MenuLink
-            href="/feedback"
-            onClick={onClose}
-            icon={<FeedbackIcon fontSize="small" />}
-          >
+          <MenuLink href="/feedback" onClick={onClose} icon={<FeedbackIcon fontSize="small" />}>
             Feedback
           </MenuLink>
 
-          <MenuLink
-            href="/about"
-            onClick={onClose}
-            icon={<InfoIcon fontSize="small" />}
-          >
+          <MenuLink href="/about" onClick={onClose} icon={<InfoIcon fontSize="small" />}>
             About PeterPlate
           </MenuLink>
         </div>
       </div>
 
-      {/* Sign out
+      {/* Auth action */}
       <div className="px-5 pb-5 pt-3">
-        <button
-          onClick={handleSignOut}
-          className="w-full rounded-lg bg-blue-600 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
-        >
-          <span className="inline-flex items-center gap-2">
-            <LogoutIcon fontSize="small" />
-            Sign Out
-          </span>
-        </button>
+        {user ? (
+          <button
+            onClick={handleSignOut}
+            className="w-full rounded-lg bg-blue-600 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
+          >
+            <span className="inline-flex items-center gap-2">
+              <LogoutIcon fontSize="small" />
+              Sign Out
+            </span>
+          </button>
+        ) : (
+          <GoogleSignInButton />
+        )}
       </div>
-    </div> */}
-    {/* Auth action */}
-    <div className="px-5 pb-5 pt-3">
-      {user ? (
-        <button
-          onClick={handleSignOut}
-          className="w-full rounded-lg bg-blue-600 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
-        >
-          <span className="inline-flex items-center gap-2">
-            <LogoutIcon fontSize="small" />
-            Sign Out
-          </span>
-        </button>
-      ) : (
-        <GoogleSignInButton />
-      )}
     </div>
-  </div>
   );
 }
 
