@@ -17,6 +17,9 @@ import { cn } from "@/utils/tw";
 import FoodDialogContent from "../food-dialog-content";
 import FoodDrawerContent from "../food-drawer-content";
 
+/** Handler for "Add to meal tracker" used by card, dialog, and drawer. */
+export type OnAddToMealTracker = (e: React.MouseEvent) => void;
+
 /**
  * Props for the FoodCardContent component.
  */
@@ -37,6 +40,10 @@ interface FoodCardContentProps extends React.HTMLAttributes<HTMLDivElement> {
    * Handler invoked when a user toggles the favorite button.
    */
   onToggleFavorite?: (dishId: string, currentlyFavorite: boolean) => void;
+  /**
+   * Handler invoked when a user clicks "Add to meal tracker" (card, dialog, or drawer).
+   */
+  onAddToMealTracker?: OnAddToMealTracker;
 }
 
 /**
@@ -51,6 +58,7 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
       isFavorited,
       favoriteDisabled,
       onToggleFavorite,
+      onAddToMealTracker,
       className,
       ...divProps
     },
@@ -69,39 +77,6 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
 
     const averageRating = ratingData?.averageRating ?? 0;
     const ratingCount = ratingData?.ratingCount ?? 0;
-
-    // const caloricInformationAvailable: boolean =
-    //   dish.nutritionInfo.calories != null &&
-    //   dish.nutritionInfo.calories.length > 0;
-
-    const utils = trpc.useUtils();
-    const logMealMutation = trpc.nutrition.logMeal.useMutation({
-      onSuccess: () => {
-        //TODO: Replace this with a shad/cn sonner or equivalent.
-        alert(`Added ${formatFoodName(dish.name)} to your log`);
-        utils.nutrition.invalidate();
-      },
-      onError: (error) => {
-        console.error(error.message);
-      },
-    });
-
-    const handleLogMeal = (e: React.MouseEvent) => {
-      e.stopPropagation();
-
-      // TODO: use [MUI snackbar](https://mui.com/material-ui/react-snackbar/) to warn users.
-      if (!userId) {
-        alert("Login to track meals!");
-        return;
-      }
-
-      logMealMutation.mutate({
-        dishId: dish.id,
-        userId: userId,
-        dishName: dish.name,
-        servings: 1, // Default to 1 serving (TODO: add ability to manually input servings. Maybe a popup will ask to input a multiple of 0.5)
-      });
-    };
 
     const handleFavoriteClick = (
       event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -163,7 +138,13 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                   </div>
                 </div>
                 {/*//TODO: Add user feedback on clicking button (e.g. changing Icon, making it green) */}
-                <button type="button" onClick={handleLogMeal}>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onAddToMealTracker?.(e);
+                  }}
+                >
                   <AddCircleOutline />
                 </button>
               </div>
@@ -231,9 +212,35 @@ export default function FoodCard({
 }: FoodCardProps): React.JSX.Element {
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const [open, setOpen] = React.useState(false);
+  const userId = useUserStore((s) => s.userId);
+  const utils = trpc.useUtils();
+  const logMealMutation = trpc.nutrition.logMeal.useMutation({
+    onSuccess: () => {
+      // TODO: Replace with shadcn sonner or equivalent
+      alert(`Added ${formatFoodName(dish.name)} to your log`);
+      utils.nutrition.invalidate();
+    },
+    onError: (error) => {
+      console.error(error.message);
+    },
+  });
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+
+  const handleAddToMealTracker = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!userId) {
+      alert("Login to track meals!");
+      return;
+    }
+    logMealMutation.mutate({
+      dishId: dish.id,
+      userId,
+      dishName: dish.name,
+      servings: 1,
+    });
+  };
 
   if (isDesktop)
     return (
@@ -243,6 +250,7 @@ export default function FoodCard({
           isFavorited={isFavorited}
           favoriteDisabled={favoriteIsLoading}
           onToggleFavorite={onToggleFavorite}
+          onAddToMealTracker={handleAddToMealTracker}
           onClick={handleOpen}
         />
         <Dialog
@@ -262,7 +270,11 @@ export default function FoodCard({
             },
           }}
         >
-          <FoodDialogContent dish={dish} />
+          <FoodDialogContent
+            dish={dish}
+            onAddToMealTracker={handleAddToMealTracker}
+            isAddingToMealTracker={logMealMutation.isPending}
+          />
         </Dialog>
       </>
     );
@@ -274,6 +286,7 @@ export default function FoodCard({
           isFavorited={isFavorited}
           favoriteDisabled={favoriteIsLoading}
           onToggleFavorite={onToggleFavorite}
+          onAddToMealTracker={handleAddToMealTracker}
           onClick={handleOpen}
         />
         <Drawer
@@ -301,7 +314,11 @@ export default function FoodCard({
             },
           }}
         >
-          <FoodDrawerContent dish={dish} />
+          <FoodDrawerContent
+            dish={dish}
+            onAddToMealTracker={handleAddToMealTracker}
+            isAddingToMealTracker={logMealMutation.isPending}
+          />
         </Drawer>
       </>
     );
