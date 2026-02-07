@@ -1,15 +1,20 @@
+/** biome-ignore-all lint/a11y/useKeyWithClickEvents: Will fix when using MUI.*/
+/** biome-ignore-all lint/a11y/noStaticElementInteractions: Will fix when using MUI. */
+/** biome-ignore-all lint/a11y/useSemanticElements: Will fix when using MUI. */
+/** biome-ignore-all lint/a11y/useFocusableInteractive: Will fix when using MUI. */
+
 "use client";
 
 import { Delete, Restaurant } from "@mui/icons-material";
-import type { DishInfo } from "@peterplate/api";
+import { Card, CardContent, Dialog, IconButton } from "@mui/material";
+import type { DishInfo } from "@zotmeal/api";
 import React from "react";
+import { useUserStore } from "@/context/useUserStore";
 import { formatFoodName, getFoodIcon } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
+import { cn } from "@/utils/tw";
 import FoodDialogContent from "../food-dialog-content";
 import InteractiveStarRating from "../interactive-star-rating";
-import { Card, CardContent, Dialog, IconButton } from "@mui/material";
-import { useUserStore } from "@/context/useUserStore";
-import { cn } from "@/utils/tw";
 
 interface RatingsCardProps {
   food: DishInfo & {
@@ -89,7 +94,7 @@ export default function RatingsCard({ food }: RatingsCardProps) {
     if (window.confirm("Delete this rating?")) {
       await deleteRatingMutation.mutateAsync({
         userId: userId ?? "default-user",
-        dishId: food.id
+        dishId: food.id,
       });
     }
   };
