@@ -1,6 +1,7 @@
 "use client";
 
 import { AccessTime, PinDrop } from "@mui/icons-material";
+import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import { Card, CardContent, Dialog, Drawer } from "@mui/material";
 import Image from "next/image";
 import React from "react";
@@ -64,38 +65,44 @@ const EventCardContent = React.forwardRef<
   return (
     <div ref={ref} {...divProps}>
       <Card
-        className="cursor-pointer hover:shadow-lg transition"
-        sx={{ borderRadius: "16px" }}
+        className="cursor-pointer hover:shadow-lg transition h-full"
+        sx={{ borderRadius: "12px" }}
       >
-        <CardContent className="flex items-center h-full w-full pt-6 gap-3 flex-wrap">
-          <Image
-            src={props.imgSrc}
-            alt={props.alt}
-            width={0}
-            height={0}
-            sizes="100vw"
-            className="w-full sm:w-[300px] md:w-[200px] h-auto rounded-sm"
-          />
-          <div className="flex flex-col gap-1 h-full" id="event-card-content">
-            <div className="flex flex-row gap-2">
-              <strong className="text-2xl">{props.name}</strong>
-              {props.isOngoing && <OngoingBadge />}
-            </div>
-            <div
-              className="text-zinc-400 flex flex-col sm:flex-row gap-x-4 gap-y-1"
-              id="event-card-subheader"
-            >
-              <div className="flex gap-1">
-                <AccessTime className="stroke-zinc-400" />
-                <p>{dateToString(props.startTime, props.endTime)}</p>
-              </div>
-              <div className="flex gap-1">
-                <PinDrop />
-                <p>{toTitleCase(HallEnum[props.location])}</p>
-              </div>
-            </div>
-            <p className="max-w-xl">{props.shortDesc}</p>
+        <Image
+          src={props.imgSrc}
+          alt={props.alt}
+          width={400}
+          height={300}
+          className="w-full h-56 object-cover"
+        />
+        <CardContent className="flex flex-col gap-1 p-4">
+          <div className="flex flex-row gap-2 items-center">
+            <h3 className="text-lg font-semibold text-sky-700">{props.name}</h3>
+            {props.isOngoing && <OngoingBadge />}
           </div>
+          <div className="flex flex-col gap-1 text-sm text-zinc-500 mt-1">
+            <div className="flex gap-1 items-center">
+              <CalendarTodayOutlinedIcon sx={{ fontSize: 16 }} />
+              <span>
+                {props.startTime.toLocaleDateString(undefined, {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </span>
+            </div>
+            <div className="flex gap-1 items-center">
+              <AccessTime sx={{ fontSize: 16 }} />
+              <span>{dateToString(props.startTime, props.endTime)}</span>
+            </div>
+            <div className="flex gap-1 items-center">
+              <PinDrop sx={{ fontSize: 16 }} />
+              <span>{toTitleCase(HallEnum[props.location])}</span>
+            </div>
+          </div>
+          <p className="text-sm text-zinc-700 mt-2 line-clamp-3">
+            {props.shortDesc}
+          </p>
         </CardContent>
       </Card>
     </div>
