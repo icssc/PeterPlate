@@ -313,18 +313,6 @@ export default function Side({
           }
           isCompactView={isCompactView}
         />
-
-        <DishesInfo
-          dishes={dishes}
-          isLoading={isLoading}
-          isError={isError || (!isLoading && !hallData)}
-          errorMessage={
-            error?.message ??
-            (!isLoading && !hallData
-              ? `Data not available for ${HallEnum[hall]}.`
-              : undefined)
-          }
-        />
       </div>
     </div>
   );
