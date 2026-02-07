@@ -49,17 +49,19 @@ export default function FoodDrawerContent({ dish }: { dish: DishInfo }) {
   return (
     <Box className="max-h-[95vh] flex flex-col">
       <Box className="pb-4">
-        {showImage ? (
-          <img
-            src={dish.image_url ?? ""}
+        {showImage && dish.image_url && !imageError ? (
+          <Image
+            src={dish.image_url}
             alt=""
+            width={800}
+            height={128}
             className="w-full h-32 object-cover"
             onError={() => setImageError(true)}
           />
         ) : (
           <Image
             src={"/zm-card-header.webp"}
-            alt={"An image of zotmeal logo."}
+            alt=""
             width={1200}
             height={700}
             className="w-full h-32 object-cover"

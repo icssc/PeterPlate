@@ -8,6 +8,7 @@ import {
 } from "@mui/icons-material";
 import { Card, CardContent, Dialog, Drawer } from "@mui/material";
 import type { DishInfo } from "@zotmeal/api";
+import Image from "next/image";
 import React from "react";
 import { useUserStore } from "@/context/useUserStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
@@ -133,10 +134,12 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
           <CardContent sx={{ padding: "0 !important" }}>
             <div className="flex justify-between h-full p-6">
               <div className="flex items-center gap-6 w-full">
-                {showImage ? (
-                  <img
-                    src={dish.image_url ?? ""}
+                {showImage && dish.image_url && !imageError ? (
+                  <Image
+                    src={dish.image_url}
                     alt=""
+                    width={40}
+                    height={40}
                     className="w-10 h-10 object-cover rounded"
                     onError={() => setImageError(true)}
                   />

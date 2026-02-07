@@ -70,17 +70,19 @@ export default function FoodDialogContent({ dish }: { dish: DishInfo }) {
 
   return (
     <div className="font-poppins">
-      {showImage ? (
-        <img
-          src={dish.image_url ?? ""}
+      {showImage && dish.image_url && !imageError ? (
+        <Image
+          src={dish.image_url}
           alt=""
+          width={800}
+          height={160}
           className="w-full h-40 object-cover"
           onError={() => setImageError(true)}
         />
       ) : (
         <Image
           src={"/zm-card-header.webp"}
-          alt={"An image of zotmeal logo."}
+          alt=""
           width={1200}
           height={700}
           className="w-full h-40 object-cover"
