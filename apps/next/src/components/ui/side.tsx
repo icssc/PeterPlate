@@ -1,7 +1,7 @@
 "use client";
 
 import { GridView, Menu, SyncAlt } from "@mui/icons-material";
-import type { RestaurantInfo } from "@zotmeal/api"; // Import types
+import type { RestaurantInfo } from "@peterplate/api"; // Import types
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useDate } from "@/context/date-context";

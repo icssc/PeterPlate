@@ -7,7 +7,7 @@
 
 import { Delete, Restaurant } from "@mui/icons-material";
 import { Card, CardContent, Dialog, IconButton } from "@mui/material";
-import type { DishInfo } from "@zotmeal/api";
+import type { DishInfo } from "@peterplate/api";
 import React from "react";
 import { useUserStore } from "@/context/useUserStore";
 import { formatFoodName, getFoodIcon } from "@/utils/funcs";

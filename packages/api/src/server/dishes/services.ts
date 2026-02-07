@@ -4,7 +4,7 @@ import {
   AllergenKeys,
   type DiningHallInformation,
   PreferenceKeys,
-} from "@zotmeal/validators";
+} from "@peterplate/validators";
 import type { InsertDishWithModifiedRelations } from "../daily/parse";
 
 type BaseDietRestriction = Omit<
