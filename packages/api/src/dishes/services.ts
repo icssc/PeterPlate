@@ -15,7 +15,7 @@ export async function upsertDish(
   try {
     const result = await db.transaction<
       Omit<InsertDishWithRelations, "stationId">
-      >(async (tx) => {
+    >(async (tx) => {
       const upsertedDish = await upsert(tx, dishes, dishData, {
         target: [dishes.id],
         set: dishData,

@@ -33,6 +33,10 @@ interface DishesInfoProps {
    * An optional error message string to display if `isError` is true.
    */
   errorMessage?: string;
+  /**
+   * Whether to display dishes in compact/simplified view.
+   */
+  isCompactView?: boolean;
 }
 
 /**
@@ -47,6 +51,7 @@ export default function DishesInfo({
   isLoading,
   isError,
   errorMessage,
+  isCompactView = false,
 }: DishesInfoProps): JSX.Element {
   const userId = useUserStore((s) => s.userId);
 
@@ -99,17 +104,20 @@ export default function DishesInfo({
                 sortCategoryKeys(Object.keys(categoryMap)).map(categoryString => 
                   <React.Fragment key={`${categoryString}`}>
                     <MealDivider title={categoryString} />
-                    {categoryMap[categoryString].map(dish => 
-                      <FoodCard
-                        key={dish.id}
-                        {... dish}
-                        isFavorited={favoriteDishIds?.includes(dish.id)}
-                        favoriteIsLoading={
-                          !!isFavoritesLoading || !!isFavoritePending?.(dish.id)
-                        }
-                        onToggleFavorite={onToggleFavorite}
-                      />
-                    )}
+                    <div className="flex flex-wrap gap-4">
+                      {categoryMap[categoryString].map(dish => 
+                        <FoodCard
+                          key={dish.id}
+                          {... dish}
+                          isFavorited={favoriteDishIds?.includes(dish.id)}
+                          favoriteIsLoading={
+                            !!isFavoritesLoading || !!isFavoritePending?.(dish.id)
+                          }
+                          onToggleFavorite={onToggleFavorite}
+                          isSimplified={isCompactView}
+                        />
+                      )}
+                    </div>
                   </React.Fragment>
                 )
             )}

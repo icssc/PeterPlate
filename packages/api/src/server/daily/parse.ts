@@ -344,7 +344,8 @@ type ProductAttributes = {
 type ProductDictionary = { [sku: string]: ProductAttributes };
 
 const parseNumericAttribute = (value: unknown): string | null => {
-  if (typeof value === "number") return Number.isFinite(value) ? `${value}` : null;
+  if (typeof value === "number")
+    return Number.isFinite(value) ? `${value}` : null;
   if (typeof value !== "string") return null;
   const match = value.match(/-?\d+(\.\d+)?/);
   return match ? match[0] : null;
@@ -407,7 +408,9 @@ function parseProducts(products: WeeklyProducts): ProductDictionary {
       sugarsG: parseNumericAttribute(attributesMap.get("sugars")),
       ironMg: parseNumericAttribute(attributesMap.get("iron")),
       cholesterolMg: parseNumericAttribute(attributesMap.get("cholesterol")),
-      totalCarbsG: parseNumericAttribute(attributesMap.get("total_carbohydrates")),
+      totalCarbsG: parseNumericAttribute(
+        attributesMap.get("total_carbohydrates"),
+      ),
       dietaryFiberG: parseNumericAttribute(attributesMap.get("dietary_fiber")),
       proteinG: parseNumericAttribute(attributesMap.get("protein")),
       calciumMg: parseNumericAttribute(attributesMap.get("calcium")),
