@@ -2,8 +2,8 @@ import { upsert } from "@api/utils";
 import { TRPCError } from "@trpc/server";
 import { eq, and } from "drizzle-orm";
 
-import type { Drizzle, InsertFavorite, SelectFavorite } from "@zotmeal/db";
-import { favorites, dishes, users } from "@zotmeal/db";
+import type { Drizzle, InsertFavorite, SelectFavorite } from "@peterplate/db";
+import { favorites, dishes, users } from "@peterplate/db";
 
 /**
  * Get all favorites for a given user ID.

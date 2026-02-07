@@ -2,7 +2,7 @@
 
 import { StarBorder } from "@mui/icons-material";
 import { Button, DialogContent } from "@mui/material";
-import type { DishInfo } from "@zotmeal/api";
+import type { DishInfo } from "@peterplate/api";
 import Image from "next/image";
 import { useState } from "react";
 import {
@@ -29,7 +29,7 @@ import InteractiveStarRating from "./interactive-star-rating";
  *
  * This component is typically used as the content for a `Dialog` triggered by a {@link FoodCard}.
  *
- * @param {DishInfo} dish - The dish data to display. See {@link DishInfo} (from `@zotmeal/api`) for detailed property descriptions.
+ * @param {DishInfo} dish - The dish data to display. See {@link DishInfo} (from `@peterplate/api`) for detailed property descriptions.
  * @returns {JSX.Element} The rendered content for the food item dialog.
  */
 export default function FoodDialogContent({ dish }: { dish: DishInfo }) {
@@ -67,7 +67,7 @@ export default function FoodDialogContent({ dish }: { dish: DishInfo }) {
     <div className="font-poppins">
       <Image
         src={"/zm-card-header.webp"}
-        alt={"An image of zotmeal logo."}
+        alt={"An image of peterplate logo."}
         width={1200}
         height={700}
         className="w-full h-40 object-cover"
@@ -152,7 +152,7 @@ export default function FoodDialogContent({ dish }: { dish: DishInfo }) {
                                 "col-span-1",
                                 (nutrientKey === "transFatG" ||
                                   nutrientKey === "saturatedFatG") &&
-                                  "text-gray-500 pl-4",
+                                "text-gray-500 pl-4",
                               )}
                             >
                               {formatNutrientLabel(nutrientKey)}
@@ -162,7 +162,7 @@ export default function FoodDialogContent({ dish }: { dish: DishInfo }) {
                                 "col-span-1 text-right",
                                 (nutrientKey === "transFatG" ||
                                   nutrientKey === "saturatedFatG") &&
-                                  "text-gray-500",
+                                "text-gray-500",
                               )}
                             >
                               {value == null

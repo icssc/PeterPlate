@@ -1,5 +1,5 @@
 {
-  "name": "@zotmeal/graphql",
+  "name": "@peterplate/graphql",
   "type": "module",
   "scripts": {
     "dev": "tsx index.ts"

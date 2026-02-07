@@ -1,12 +1,12 @@
 import { upsert } from "@api/utils";
 
-import type { DishToMenu, Drizzle, InsertDishWithRelations } from "@zotmeal/db";
+import type { DishToMenu, Drizzle, InsertDishWithRelations } from "@peterplate/db";
 import {
   dietRestrictions,
   dishes,
   dishesToMenus,
   nutritionInfos,
-} from "@zotmeal/db";
+} from "@peterplate/db";
 
 export async function upsertDish(
   db: Drizzle,

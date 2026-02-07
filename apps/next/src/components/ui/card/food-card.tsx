@@ -2,7 +2,7 @@
 
 import { FavoriteBorder, Restaurant, StarBorder } from "@mui/icons-material";
 import { Card, CardContent, Dialog, Drawer } from "@mui/material";
-import type { DishInfo } from "@zotmeal/api";
+import type { DishInfo } from "@peterplate/api";
 import React from "react";
 import { useUserStore } from "@/context/useUserStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";

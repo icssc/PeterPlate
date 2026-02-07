@@ -1,10 +1,10 @@
 import { upsertDish, upsertDishToMenu } from "@api/dishes/services";
-import type { Drizzle, InsertDishWithRelations } from "@zotmeal/db";
+import type { Drizzle, InsertDishWithRelations } from "@peterplate/db";
 import {
   AllergenKeys,
   type DiningHallInformation,
   PreferenceKeys,
-} from "@zotmeal/validators";
+} from "@peterplate/validators";
 import type { InsertDishWithModifiedRelations } from "../daily/parse";
 
 type BaseDietRestriction = Omit<

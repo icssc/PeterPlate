@@ -6,12 +6,12 @@ import {
   type Drizzle,
   getRestaurantId,
   type RestaurantName,
-} from "@zotmeal/db";
+} from "@peterplate/db";
 import type {
   DiningHallInformation,
   MealPeriodWithHours,
   Schedule,
-} from "@zotmeal/validators";
+} from "@peterplate/validators";
 import { format } from "date-fns";
 import { parseAndUpsertDish } from "../dishes/services";
 import { getCurrentSchedule, upsertPeriods } from "../periods/services";
@@ -88,7 +88,7 @@ export async function upsertMenusForDate(
         currentPeriodMenu.map(async (dish) => {
           if (dish.name === "UNIDENTIFIED") return;
 
-          parseAndUpsertDish(db, restaurantInfo, dish, menuIdHash);
+          await parseAndUpsertDish(db, restaurantInfo, dish, menuIdHash);
         }),
       );
     }),

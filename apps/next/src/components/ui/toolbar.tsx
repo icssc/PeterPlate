@@ -162,8 +162,8 @@ export default function Toolbar(): React.JSX.Element {
             <Link href="/" className="flex items-center gap-2">
               <Image
                 className="rounded-full cursor-pointer"
-                src="/Zotmeal-Logo.webp"
-                alt="Zotmeal's Logo: a beige anteater with a bushy tail sitting next to an anthill."
+                src="/peterplate-icon.webp"
+                alt="PeterPlate's Logo."
                 width={40}
                 height={40}
               />

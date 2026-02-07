@@ -19,10 +19,10 @@ export default function Events() {
   // Sort events by start time if data is available
   const sortedEvents = upcomingEvents
     ? [...upcomingEvents].sort((a, b) => {
-      const dateA = new Date(a.start);
-      const dateB = new Date(b.start);
-      return dateA.getTime() - dateB.getTime();
-    })
+        const dateA = new Date(a.start);
+        const dateB = new Date(b.start);
+        return dateA.getTime() - dateB.getTime();
+      })
     : [];
 
   const now = new Date();

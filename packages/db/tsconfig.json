@@ -1,7 +1,9 @@
 {
-  "extends": "@zotmeal/tsconfig/base.json",
+  "extends": "@peterplate/tsconfig/base.json",
   "compilerOptions": {
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json"
   },
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }

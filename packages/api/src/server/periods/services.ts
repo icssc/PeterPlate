@@ -1,11 +1,7 @@
 import { logger } from "@api/logger";
 import { upsertPeriod } from "@api/periods/services";
-import type { Drizzle, RestaurantId } from "@zotmeal/db";
-import type {
-  DiningHallInformation,
-  MealPeriodWithHours,
-  Schedule,
-} from "@zotmeal/validators";
+import type { Drizzle, RestaurantId } from "@peterplate/db";
+import type { MealPeriodWithHours, Schedule } from "@peterplate/validators";
 
 export async function upsertPeriods(
   db: Drizzle,

@@ -1,4 +1,4 @@
-import { AEMEventListSchema, GetLocationRecipesDailySchema, GetLocationRecipesWeeklySchema, GetLocationSchema } from "@zotmeal/validators";
+import { AEMEventListSchema, GetLocationRecipesDailySchema, GetLocationRecipesWeeklySchema, GetLocationSchema } from "@peterplate/validators";
 import { queryAdobeECommerce } from "./parse";
 
 import {
@@ -35,7 +35,7 @@ const allApiQueries: TestCase<any>[] = [
     name: "getLocationRecipes (Daily / Anteatery)",
     query: GetLocationRecipesDailyQuery,
     variables: {
-      date: new Date().toLocaleString("fr-CA", {year: "numeric", month: "2-digit", day: "2-digit"}),
+      date: new Date().toLocaleString("fr-CA", { year: "numeric", month: "2-digit", day: "2-digit" }),
       locationUrlKey: "the-anteatery",
       mealPeriod: null,
       viewType: "DAILY"
@@ -46,7 +46,7 @@ const allApiQueries: TestCase<any>[] = [
     name: "getLocationRecipes (Weekly / Brandywine)",
     query: GetLocationRecipesWeeklyQuery,
     variables: {
-      date: new Date().toLocaleString("fr-CA", {year: "numeric", month: "2-digit", day: "2-digit"}),
+      date: new Date().toLocaleString("fr-CA", { year: "numeric", month: "2-digit", day: "2-digit" }),
       locationUrlKey: "brandywine",
       mealPeriod: null,
       viewType: "WEEKLY"
@@ -78,7 +78,7 @@ const allApiQueries: TestCase<any>[] = [
 
 describe("AdobeECommerce API Integration Tests", () => {
   describe.each(allApiQueries)(
-    "Query: $name", 
+    "Query: $name",
     ({ query, variables, schema, name }) => {
 
       it(`should successfully fetch data, not throw errors, and validate against Zod schema (${name})`, async () => {
@@ -99,16 +99,16 @@ describe("AdobeECommerce API Integration Tests", () => {
 
         if (response && response.data) {
           const validationResult = schema.safeParse(response.data);
-          
+
           if (!validationResult.success) {
             console.error(`Zod Validation Failed for query: ${name}`);
             console.error(validationResult.error.issues);
             expect(validationResult.success).toBe(true);
           }
-          
+
           expect(validationResult.success).toBe(true);
         } else {
-          expect(response).toHaveProperty('data'); 
+          expect(response).toHaveProperty('data');
         }
       });
     }

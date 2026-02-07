@@ -1,6 +1,6 @@
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 import type { AnyRouter } from "@trpc/server";
-import { appRouter, createTRPCContext } from "@zotmeal/api";
+import { appRouter, createTRPCContext } from "@peterplate/api";
 
 const handler = (req: Request) => {
   return fetchRequestHandler({

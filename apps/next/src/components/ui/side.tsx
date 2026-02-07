@@ -1,7 +1,7 @@
 "use client";
 
 import { GridView, Menu, SyncAlt } from "@mui/icons-material";
-import type { RestaurantInfo } from "@zotmeal/api"; // Import types
+import type { RestaurantInfo } from "@peterplate/api"; // Import types
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useDate } from "@/context/date-context";
@@ -53,7 +53,7 @@ export default function Side({
   const setHallInputs = useHallStore((s) => s.setInputs);
 
   /** Fetch data */
-  const { data, isLoading, isError, error } = trpc.zotmeal.useQuery(
+  const { data, isLoading, isError, error } = trpc.peterplate.useQuery(
     { date: selectedDate ?? today },
     { staleTime: 2 * 60 * 60 * 1000 },
   );

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Contributor from "@/components/ui/contributor";
 import { Button } from "@/components/ui/shadcn/button";
 import {
@@ -11,7 +12,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/shadcn/dialog";
 import { trpc } from "@/utils/trpc";
-import Image from "next/image";
 
 export default function About() {
   const {
@@ -19,7 +19,7 @@ export default function About() {
     isLoading,
     isError,
     error,
-  } = trpc.zotmeal_contributors.useQuery();
+  } = trpc.peterplate_contributors.useQuery();
 
   return (
     <div className="flex flex-col">
@@ -37,11 +37,11 @@ export default function About() {
         <div className="flex flex-col" id="about-text">
           <div className="flex gap-4 items-center mb-2" id="about-header">
             <h1 className="text-3xl font-bold" id="about-title">
-              About ZotMeal
+              About PeterPlate
             </h1>
             <Image
-              src="/ZotMeal-Logo.webp"
-              alt="Zotmeal's logo"
+              src="/peterplate-icon.webp"
+              alt="PeterPlate's logo"
               width={32}
               height={32}
               className="rounded-full"
@@ -52,7 +52,7 @@ export default function About() {
             className="grid gap-4 max-w-3xl max-md:max-w-2xl"
           >
             <p>
-              ZotMeal is your go-to app for everything dining at UCI! From
+              PeterPlate is your go-to app for everything dining at UCI! From
               up-to-date menus and nutritional information to dining hall events
               and meal ratings, we make it easy to plan your next meal. Built by
               students, for students, our goal is to make campus dining more
@@ -71,11 +71,11 @@ export default function About() {
               passionate about improving student life through technology.
             </p>
             <p>
-              Want to contribute? ZotMeal is open-source, and we welcome
+              Want to contribute? PeterPlate is open-source, and we welcome
               contributions on our&nbsp;
               <a
                 className="underline text-sky-600"
-                href="https://github.com/icssc/ZotMeal"
+                href="https://github.com/icssc/PeterPlate"
                 rel="noreferrer"
               >
                 GitHub
@@ -101,20 +101,20 @@ export default function About() {
                   <DialogDescription asChild className="p-4">
                     <div>
                       <p className="mb-4">
-                        ZotMeal is a cross-platform mobile application designed
-                        to help users view dining hall menus at the University
-                        of California, Irvine (UCI). We value your privacy and
-                        are committed to protecting any personal information you
-                        may share with us.
+                        PeterPlate is a cross-platform mobile application
+                        designed to help users view dining hall menus at the
+                        University of California, Irvine (UCI). We value your
+                        privacy and are committed to protecting any personal
+                        information you may share with us.
                       </p>
                       <p className="mb-4">
-                        ZotMeal does not collect or store any personally
+                        PeterPlate does not collect or store any personally
                         identifiable information. The app does not require login
                         or account creation. We do not track or monitor user
                         behavior within the app.
                       </p>
                       <p className="mb-4">
-                        ZotMeal fetches dining hall menu data from publicly
+                        PeterPlate fetches dining hall menu data from publicly
                         available or authorized UCI resources. This data is used
                         solely to display daily menus within the app and is not
                         shared or stored beyond your device.
@@ -151,7 +151,7 @@ export default function About() {
                   name={contributor.name || contributor.login}
                   username={contributor.login}
                   profileSrc={contributor.avatar_url}
-                  bio={contributor.bio || "ZotMeal Contributor"}
+                  bio={contributor.bio || "PeterPlate Contributor"}
                   contributions={contributor.contributions}
                 />
               ))}

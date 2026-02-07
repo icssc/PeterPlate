@@ -2,9 +2,9 @@
 // 
 // Queries the separate GraphQL endpoint for event image headers.
 import axios from 'axios';
-import { EventImageSchema, type EventImageData } from "@zotmeal/validators";
+import { EventImageSchema, type EventImageData } from "@peterplate/validators";
 
-const imageGraphQLEndpoint: string = 
+const imageGraphQLEndpoint: string =
   "https://uci.mydininghub.com/graphql/execute.json/elevate/events;root=/content/dam/cf/ch/uci/en/events/;campus=campus";
 const imageGraphQLHeaders = {
   "Host": "uci.mydininghub.com",
@@ -27,7 +27,7 @@ const imageGraphQLHeaders = {
   "TE": "trailers",
 };
 
-const imageURLPrefix: string = 
+const imageURLPrefix: string =
   "https://images.elevate-dxp.com/adobe/assets/urn:aaid:aem:";
 
 // Maps the event's title to its image URL.

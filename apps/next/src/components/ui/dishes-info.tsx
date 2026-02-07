@@ -1,15 +1,14 @@
-'use client';
+"use client";
 
+import type { DishInfo } from "@peterplate/api";
 import React from "react";
-import FoodCard from "./card/food-card"
-import FoodCardSkeleton from "./skeleton/food-card-skeleton"
-import MealDividerSkeleton from "./skeleton/meal-divider-skeleton"
-import { DishInfo } from "@zotmeal/api";
-import MealDivider from "./meal-divider";
-import { sortCategoryKeys } from "@/utils/funcs";
-import { useFavorites } from "@/hooks/useFavorites";
 import { useUserStore } from "@/context/useUserStore";
-
+import { useFavorites } from "@/hooks/useFavorites";
+import { sortCategoryKeys } from "@/utils/funcs";
+import FoodCard from "./card/food-card";
+import MealDivider from "./meal-divider";
+import FoodCardSkeleton from "./skeleton/food-card-skeleton";
+import MealDividerSkeleton from "./skeleton/meal-divider-skeleton";
 
 /**
  * Props for the {@link DishesInfo} component.
@@ -52,78 +51,73 @@ export default function DishesInfo({
   isError,
   errorMessage,
   isCompactView = false,
-}: DishesInfoProps): JSX.Element {
+}: DishesInfoProps): React.JSX.Element {
   const userId = useUserStore((s) => s.userId);
 
-  const {
-    favoriteIds,
-    isLoadingFavorites,
-    toggleFavorite,
-    isFavoritePending,
-  } = useFavorites(userId!);
+  const { favoriteIds, isLoadingFavorites, toggleFavorite, isFavoritePending } =
+    useFavorites(userId ?? "");
 
   const favoriteDishIds = favoriteIds ?? [];
   const onToggleFavorite = toggleFavorite;
   const isFavoritesLoading = isLoadingFavorites;
 
   // Sort the dishes by category string
-  let categoryMap: {[dishCategory : string]: DishInfo[]} = {};
+  const categoryMap: { [dishCategory: string]: DishInfo[] } = {};
   dishes.forEach((dish) => {
-    if (dish.category in categoryMap)
-      categoryMap[dish.category].push(dish)
-    else
-      categoryMap[dish.category] = [dish]
-  })
+    if (dish.category in categoryMap) categoryMap[dish.category].push(dish);
+    else categoryMap[dish.category] = [dish];
+  });
 
   return (
-    <div className="flex flex-col gap-6 mt-6 px-2 overflow-y-auto 
-      flex-grow h-1" 
-      id="food-scroll">
+    <div
+      className="flex flex-col gap-6 mt-6 px-2 overflow-y-auto 
+      flex-grow h-1"
+      id="food-scroll"
+    >
       {isLoading && (
         <>
-          <MealDividerSkeleton/>
-          <FoodCardSkeleton/>
-          <FoodCardSkeleton/>
-          <FoodCardSkeleton/>
-          <MealDividerSkeleton/>
-          <FoodCardSkeleton/>
+          <MealDividerSkeleton />
+          <FoodCardSkeleton />
+          <FoodCardSkeleton />
+          <FoodCardSkeleton />
+          <MealDividerSkeleton />
+          <FoodCardSkeleton />
         </>
       )}
 
       {isError && (
-        <p className="text-red-500 w-full text-center">Error loading data: {errorMessage}</p>
+        <p className="text-red-500 w-full text-center">
+          Error loading data: {errorMessage}
+        </p>
       )}
 
-      {!isLoading && !isError && (
-        <> 
-          {dishes.length === 0 ? (
-            <p className="text-center text-gray-500 py-4">
-              No dishes available for this selection.
-            </p>
-          ) : (
-                sortCategoryKeys(Object.keys(categoryMap)).map(categoryString => 
-                  <React.Fragment key={`${categoryString}`}>
-                    <MealDivider title={categoryString} />
-                    <div className="flex flex-wrap gap-4">
-                      {categoryMap[categoryString].map(dish => 
-                        <FoodCard
-                          key={dish.id}
-                          {... dish}
-                          isFavorited={favoriteDishIds?.includes(dish.id)}
-                          favoriteIsLoading={
-                            !!isFavoritesLoading || !!isFavoritePending?.(dish.id)
-                          }
-                          onToggleFavorite={onToggleFavorite}
-                          isSimplified={isCompactView}
-                        />
-                      )}
-                    </div>
-                  </React.Fragment>
-                )
-            )}
-        </>
-      )}
-
+      {!isLoading &&
+        !isError &&
+        (dishes.length === 0 ? (
+          <p className="text-center text-gray-500 py-4">
+            No dishes available for this selection.
+          </p>
+        ) : (
+          sortCategoryKeys(Object.keys(categoryMap)).map((categoryString) => (
+            <React.Fragment key={`${categoryString}`}>
+              <MealDivider title={categoryString} />
+              <div className="flex flex-wrap gap-4">
+                {categoryMap[categoryString].map((dish) => (
+                  <FoodCard
+                    key={dish.id}
+                    {...dish}
+                    isFavorited={favoriteDishIds?.includes(dish.id)}
+                    favoriteIsLoading={
+                      !!isFavoritesLoading || !!isFavoritePending?.(dish.id)
+                    }
+                    onToggleFavorite={onToggleFavorite}
+                    isSimplified={isCompactView}
+                  />
+                ))}
+              </div>
+            </React.Fragment>
+          ))
+        ))}
     </div>
   );
 }

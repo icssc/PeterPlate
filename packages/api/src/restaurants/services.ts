@@ -11,8 +11,8 @@ import type {
   SelectPeriod,
   SelectRestaurant,
   SelectStation,
-} from "@zotmeal/db";
-import { restaurants } from "@zotmeal/db";
+} from "@peterplate/db";
+import { restaurants } from "@peterplate/db";
 import { formatInTimeZone } from "date-fns-tz";
 
 export const upsertRestaurant = async (
@@ -43,7 +43,7 @@ export interface RestaurantInfo extends SelectRestaurant {
 }
 
 /** Data object to be given to the client. */
-interface ZotmealData {
+interface PeterPlateData {
   anteatery: RestaurantInfo;
   brandywine: RestaurantInfo;
 }
@@ -55,7 +55,7 @@ interface ZotmealData {
 export async function getRestaurantsByDate(
   db: Drizzle,
   date: Date,
-): Promise<ZotmealData> {
+): Promise<PeterPlateData> {
   const restaurants = await db.query.restaurants.findMany({
     with: {
       /** Get menus that correspond to the given date. */
@@ -125,11 +125,11 @@ export async function getRestaurantsByDate(
 
   return firstRestaurant.name === "anteatery"
     ? {
-        anteatery: firstRestaurant,
-        brandywine: secondRestaurant,
-      }
+      anteatery: firstRestaurant,
+      brandywine: secondRestaurant,
+    }
     : {
-        anteatery: secondRestaurant,
-        brandywine: firstRestaurant,
-      };
+      anteatery: secondRestaurant,
+      brandywine: firstRestaurant,
+    };
 }

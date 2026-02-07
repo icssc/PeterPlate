@@ -3,7 +3,7 @@ import { promisify } from "util";
 import { PostgreSqlContainer } from "@testcontainers/postgresql";
 import { Wait } from "testcontainers";
 
-import { pool } from "@zotmeal/db";
+import { pool } from "@peterplate/db";
 
 import { logger } from "./logger";
 
