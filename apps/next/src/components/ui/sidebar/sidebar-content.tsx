@@ -216,8 +216,9 @@ import {
   Close as CloseIcon,
 } from "@mui/icons-material";
 import { useSession, signOut } from "@/utils/auth-client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in";
+import { useTheme } from "next-themes";
 
 interface ProfileMenuContentProps {
   onClose: () => void;
@@ -228,7 +229,12 @@ export default function SidebarContent({
 }: ProfileMenuContentProps): JSX.Element {
   const { data: session } = useSession();
   const user = session?.user;
-  const [themeMode, setThemeMode] = useState<"light" | "dark" | "device">("dark");
+  // const [themeMode, setThemeMode] = useState<"light" | "dark" | "device">("dark");
+  const { theme, setTheme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return null;
 
   const handleSignOut = async () => {
     await signOut();
@@ -301,20 +307,20 @@ export default function SidebarContent({
 
           <div className="flex rounded-lg border border-blue-500 overflow-hidden">
             <ThemeButton
-              active={themeMode === "light"}
-              onClick={() => setThemeMode("light")}
+              active={theme === "light"}
+              onClick={() => setTheme("light")}
               icon={<LightModeIcon sx={{ fontSize: 16 }} />}
               label="Light"
             />
             <ThemeButton
-              active={themeMode === "device"}
-              onClick={() => setThemeMode("device")}
+              active={theme === "system"}
+              onClick={() => setTheme("system")}
               icon={<DesktopWindowsIcon sx={{ fontSize: 16 }} />}
               label="Device"
             />
             <ThemeButton
-              active={themeMode === "dark"}
-              onClick={() => setThemeMode("dark")}
+              active={theme === "dark"}
+              onClick={() => setTheme("dark")}
               icon={<DarkModeIcon sx={{ fontSize: 16 }} />}
               label="Dark"
             />
