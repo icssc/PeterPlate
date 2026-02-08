@@ -233,11 +233,11 @@ export default function Toolbar(): React.JSX.Element {
                             <>
                                 <div className="w-24 h-5" />
                                 <IconButton
-                                    className="!text-[#1f2937] hover:!bg-[rgba(0,0,0,0.04)]"
+                                    className="!text-[#1f2937] hover:!bg-[rgba(0, 0, 0, 0.04)]"
                                     aria-label="Open sidebar"
                                     disabled
                                 >
-                                    <MenuIcon />
+                                    <MenuIcon style={{color: "white"}}/>
                                 </IconButton>
                             </>
                         ) : 
@@ -277,7 +277,7 @@ export default function Toolbar(): React.JSX.Element {
                                     className="!text-[#1f2937] hover:!bg-[rgba(0,0,0,0.04)]"
                                     aria-label="Open sidebar"
                                 >
-                                    <MenuIcon />
+                                    <MenuIcon style={{color: "white"}}/>
                                 </IconButton>
                             </div>
                         )}
