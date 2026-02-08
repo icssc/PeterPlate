@@ -10,8 +10,8 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "ZotMeal",
-  description: `ZotMeal: A dynamic web app to discover everything UCI's dining 
+  title: "PeterPlate",
+  description: `PeterPlate: A dynamic web app to discover everything UCI's dining 
                 halls have to offer - from daily menus and special events to 
                 dining hall features and updates.`,
 };
@@ -24,9 +24,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={poppins.className}>
-        <RootClient>
-          {children}
-        </RootClient>
+        <RootClient>{children}</RootClient>
       </body>
     </html>
   );

@@ -29,7 +29,7 @@ table contributors {
   avatar_url text [not null]
   contributions integer [not null]
   name text
-  bio text [default: 'ZotMeal Contributor']
+  bio text [default: 'PeterPlate Contributor']
   created_at timestamp [not null, default: `now()`]
   updated_at timestamp
 }

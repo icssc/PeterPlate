@@ -37,7 +37,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": false,
-          "default": "'ZotMeal Contributor'"
+          "default": "'PeterPlate Contributor'"
         },
         "created_at": {
           "name": "created_at",

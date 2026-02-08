@@ -1,5 +1,5 @@
 {
-  "name": "zotmeal",
+  "name": "peterplate",
   "type": "module",
   "private": true,
   "packageManager": "pnpm@10.0.0",
@@ -12,15 +12,15 @@
     "build": "turbo build",
     "clean": "git clean -xdf node_modules",
     "clean:workspaces": "turbo clean",
-    "cron:daily": "pnpm -F @zotmeal/server test:daily",
-    "cron:weekly": "pnpm -F @zotmeal/server test:weekly",
+    "cron:daily": "pnpm -F @peterplate/server test:daily",
+    "cron:weekly": "pnpm -F @peterplate/server test:weekly",
     "db:generate": "pnpm -F db db:generate",
     "db:migrate": "pnpm -F db db:migrate",
     "db:studio": "pnpm --filter db run db:studio",
-    "db:dump": "pg_dump -h icssc.cf3yrjegcna8.us-east-1.rds.amazonaws.com -U zotmeal_prod -W -O -x zotmeal > ./docker/db/zotmeal.sql",
-    "dev": "pnpm -F @zotmeal/next dev",
-    "dev:graphql": "turbo dev --filter=./packages/graphql",
-    "dev:data": "pnpm -F @zotmeal/server test:weekly",
+    "db:dump": "pg_dump -h icssc.cf3yrjegcna8.us-east-1.rds.amazonaws.com -U peterplate_prod -W -O -x peterplate > ./docker/db/peterplate.sql",
+    "dev": "pnpm -F @peterplate/next dev",
+    "dev:graphql": "pnpm -F @peterplate/graphql dev",
+    "dev:data": "pnpm -F @peterplate/server test:weekly",
     "deploy": "npx sst deploy --stage production",
     "deploy:dev": "npx sst deploy --stage dev",
     "format": "pnpm biome format",
@@ -30,14 +30,15 @@
     "lint:ws": "pnpm dlx sherif@latest",
     "postinstall": "pnpm lint:ws",
     "sst:dev": "npx sst dev",
+    "test:api": "pnpm -F @peterplate/api test",
     "prepare": "husky"
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.8",
     "@commitlint/cli": "^20.2.0",
     "@commitlint/config-conventional": "^20.2.0",
+    "@peterplate/prettier-config": "workspace:*",
     "@turbo/gen": "catalog:",
-    "@zotmeal/prettier-config": "workspace:*",
     "aws-cdk-lib": "^2.170.0",
     "constructs": "^10.4.2",
     "devmoji": "^2.3.0",
@@ -49,7 +50,7 @@
     "turbo": "catalog:",
     "typescript": "catalog:"
   },
-  "prettier": "@zotmeal/prettier-config",
+  "prettier": "@peterplate/prettier-config",
   "pnpm": {
     "overrides": {
       "@auth/core": "0.20.0"
@@ -59,8 +60,5 @@
     "*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}": [
       "biome check --write --no-errors-on-unmatched"
     ]
-  },
-  "dependencies": {
-    "@mui/icons-material": "^7.3.7"
   }
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import type { SelectLoggedMeal } from "@zotmeal/db";
+import type { SelectLoggedMeal } from "@peterplate/db";
 import { useEffect, useMemo, useState } from "react";
 import NutritionBreakdown from "@/components/ui/nutrition-breakdown";
 import { trpc } from "@/utils/trpc";

@@ -1,9 +1,12 @@
+/** biome-ignore-all lint/a11y/useKeyWithClickEvents: Will fix when using MUI.*/
+/** biome-ignore-all lint/a11y/useSemanticElements: Will fix when using MUI. */
+/** biome-ignore-all lint/a11y/useFocusableInteractive: Will fix when using MUI. */
 "use client";
 
-import { useEffect, useState } from "react";
-import { useTheme } from "next-themes";
-import { Switch } from "@/components/ui/switch";
 import { DarkMode, LightMode } from "@mui/icons-material";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
+import { Switch } from "@/components/ui/switch";
 
 export function ThemeToggle() {
   const { theme, setTheme, resolvedTheme } = useTheme();

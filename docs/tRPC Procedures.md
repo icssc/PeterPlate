@@ -106,7 +106,7 @@ We will now go into detail about each individual tRPC procedure.
 `getRestaurantsByDate`
 	Queries the database for information on both restaurants corresponding to a given date.
 - Input: `Date`
-- Returns: `ZotmealData`
+- Returns: `PeterPlateData`
 ## Stations
 
 #### Services

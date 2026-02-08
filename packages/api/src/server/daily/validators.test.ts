@@ -3,12 +3,12 @@
  * querying GetLocation, GetLocationRecipes, AEMEventList
  */
 
-import { 
-  GetLocationSchema, 
+import {
+  GetLocationSchema,
   GetLocationRecipesDailySchema,
   GetLocationRecipesWeeklySchema,
   AEMEventListSchema,
-} from "@zotmeal/validators";
+} from "@peterplate/validators";
 import { describe, it } from "vitest";
 
 import getLocation from "./testData/getLocation.json";
@@ -25,7 +25,7 @@ describe("Validates AdobeECommerce Responses", () => {
     expect(() => GetLocationRecipesDailySchema.parse(getLocationRecipesDaily)).not.toThrow();
   });
 
-  it("validates getLocationRecipesWeekly response", ({expect}) => {
+  it("validates getLocationRecipesWeekly response", ({ expect }) => {
     expect(() => GetLocationRecipesWeeklySchema.parse(getLocationRecipesWeekly)).not.toThrow();
   });
 
