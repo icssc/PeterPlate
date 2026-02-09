@@ -24,3 +24,6 @@ export const userDietaryPreferencesRelations = relations(
     }),
   }),
 );
+
+export type InsertPreference = typeof userDietaryPreferences.$inferInsert;
+export type SelectPreference = typeof userDietaryPreferences.$inferSelect;

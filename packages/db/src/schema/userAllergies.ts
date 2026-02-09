@@ -21,3 +21,6 @@ export const userAllergyRelations = relations(userAllergies, ({ one }) => ({
     references: [users.id],
   }),
 }));
+
+export type InsertAllergy = typeof userAllergies.$inferInsert;
+export type SelectAllergy = typeof userAllergies.$inferSelect;
