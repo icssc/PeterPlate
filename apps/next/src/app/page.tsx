@@ -285,7 +285,7 @@ function DesktopHome() {
 
 /* ────────────────────────────── Sub-components ────────────────────────────── */
 
-/** A small card for a popular dish in the horizontal scroll row (desktop only). */
+/** A small card for a popular dish in the horizontal scroll row */
 function PopularDishCard({
   dish,
   hallName,
