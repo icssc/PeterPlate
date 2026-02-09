@@ -88,7 +88,7 @@ function ToolbarDropdown({ element }: { element: ToolbarElement }) {
         onClick={handleClick}
         endIcon={<ArrowDropDownIcon fontSize="small" />}
         className="!capitalize !text-[16px] !font-medium
-        group-hover:!text-white !text-white/60 !bg-transparent"
+        !text-neutral-800 !bg-transparent"
       >
         {element.title}
       </Button>
@@ -153,11 +153,10 @@ export default function Toolbar(): React.JSX.Element {
   return (
     <>
       <AppBar
-        position="absolute"
-        className="!bg-transparent !shadow-none 
-        hover:!bg-gradient-to-b !from-black/50 !to-black/0"
+        position="sticky"
+        className="!bg-white !shadow-none !border-b !border-neutral-200"
       >
-        <MuiToolbar className="justify-between px-4 py-1 group">
+        <MuiToolbar className="justify-between px-4 py-1">
           <div className="flex-none flex items-center">
             <Link href="/" className="flex items-center gap-2">
               <Image
@@ -167,7 +166,7 @@ export default function Toolbar(): React.JSX.Element {
                 width={40}
                 height={40}
               />
-              <span className="text-white font-poppins font-bold text-[28px] leading-[24px]">
+              <span className="text-sky-700 font-poppins font-bold text-[28px] leading-[24px]">
                 PeterPlate
               </span>
             </Link>
@@ -185,8 +184,8 @@ export default function Toolbar(): React.JSX.Element {
                   key={element.title}
                   component={Link}
                   href={element.href || "#"}
-                  className="group-hover:!text-white !normal-case !text-[16px] 
-                  !font-medium !text-white/60"
+                  className="!text-neutral-800 !normal-case !text-[16px] 
+                  !font-medium"
                 >
                   {element.title}
                 </Button>
