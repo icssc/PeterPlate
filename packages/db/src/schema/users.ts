@@ -1,9 +1,11 @@
 import { relations } from "drizzle-orm";
-import { pgTable, text, boolean, timestamp } from "drizzle-orm/pg-core";
+import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 
 import { favorites } from "./favorites";
 import { ratings } from "./ratings";
+import { userAllergies } from "./userAllergies";
+import { userDietaryPreferences } from "./userDietaryPreferences";
 import { metadataColumns } from "./utils";
 
 export const users = pgTable("users", {
@@ -18,6 +20,8 @@ export const users = pgTable("users", {
 export const usersRelations = relations(users, ({ many }) => ({
   favorites: many(favorites),
   ratings: many(ratings),
+  allergies: many(userAllergies),
+  dietaryPreferences: many(userDietaryPreferences),
 }));
 
 /**
