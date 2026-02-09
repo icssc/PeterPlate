@@ -1,20 +1,21 @@
 "use client";
 
-import Link from "next/link";
 import {
-  Logout as LogoutIcon,
-  Info as InfoIcon,
-  Edit as EditIcon,
-  LightMode as LightModeIcon,
+  Close as CloseIcon,
   DarkMode as DarkModeIcon,
   DesktopWindows as DesktopWindowsIcon,
+  Edit as EditIcon,
   Feedback as FeedbackIcon,
-  Close as CloseIcon,
+  Info as InfoIcon,
+  LightMode as LightModeIcon,
+  Logout as LogoutIcon,
 } from "@mui/icons-material";
-import { useSession, signOut } from "@/utils/auth-client";
-import { useState, useEffect } from "react";
-import { GoogleSignInButton } from "@/components/auth/google-sign-in";
+import Image from "next/image";
+import Link from "next/link";
 import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
+import { GoogleSignInButton } from "@/components/auth/google-sign-in";
+import { signOut, useSession } from "@/utils/auth-client";
 
 interface ProfileMenuContentProps {
   onClose: () => void;
@@ -25,8 +26,7 @@ export default function SidebarContent({
 }: ProfileMenuContentProps): JSX.Element {
   const { data: session } = useSession();
   const user = session?.user;
-  // const [themeMode, setThemeMode] = useState<"light" | "dark" | "device">("dark");
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);
@@ -42,10 +42,12 @@ export default function SidebarContent({
       {/* Header */}
       <div className="flex items-start justify-between px-5 pt-5">
         <div className="flex items-center gap-3">
-          <img
+          <Image
             src={user?.image || "/peter.webp"}
             alt="Profile"
-            className="w-11 h-11 rounded-full object-cover"
+            width={44}
+            height={44}
+            className="rounded-full object-cover"
           />
           <div>
             <h2 className="text-sm font-semibold text-gray-900 dark:text-white">
@@ -58,6 +60,7 @@ export default function SidebarContent({
         </div>
 
         <button
+          type="button"
           onClick={onClose}
           className="rounded-full p-1.5 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
         >
@@ -107,7 +110,7 @@ export default function SidebarContent({
               onClick={() => setTheme("light")}
               icon={<LightModeIcon sx={{ fontSize: 16 }} />}
               label="Light"
-
+            />
             <ThemeButton
               active={theme === "system"}
               onClick={() => setTheme("system")}
@@ -153,10 +156,10 @@ export default function SidebarContent({
 
       {/* Sign out */}
 
-
       <div className="px-5 pb-5 pt-3">
         {user ? (
           <button
+            type="button"
             onClick={handleSignOut}
             className="w-full rounded-lg bg-blue-600 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
           >
@@ -186,11 +189,10 @@ function ThemeButton({
 }) {
   return (
     <button
+      type="button"
       onClick={onClick}
       className={`flex-1 flex items-center justify-center gap-1 py-2 text-xs font-medium transition-colors ${
-        active
-          ? "bg-blue-100 text-blue-700"
-          : "text-blue-600 hover:bg-blue-50"
+        active ? "bg-blue-100 text-blue-700" : "text-blue-600 hover:bg-blue-50"
       }`}
     >
       {icon}
