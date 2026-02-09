@@ -161,7 +161,9 @@ export default function SidebarContent({
           <button
             type="button"
             onClick={handleSignOut}
-            className="w-full rounded-lg bg-blue-600 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
+            className="w-full rounded-lg bg-blue-600
+            py-2.5 text-sm font-semibold text-white
+            hover:bg-blue-700 flex items-center justify-center"
           >
             <span className="inline-flex items-center gap-2">
               <LogoutIcon fontSize="small" />
