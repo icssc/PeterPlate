@@ -166,15 +166,14 @@ function DesktopHome(): React.JSX.Element {
   return (
     <div className="min-h-screen bg-white dark:bg-neutral-950">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-10">
-        {/* Hero heading */}
         <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 dark:text-neutral-100">
-          See what&apos;s on the menu today!
+          See what's on the menu today!
         </h1>
 
-        {/* ── Dining Halls ── */}
+        {/* Dining Halls */}
         <section>
           <h2 className="text-xl font-bold text-sky-600 mb-4">Dining Halls</h2>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-12">
             {/* Brandywine Card */}
             <Link href="/brandywine" className="group">
               <div className="rounded-xl overflow-hidden border border-neutral-200 dark:border-neutral-700 shadow-sm hover:shadow-md transition">
