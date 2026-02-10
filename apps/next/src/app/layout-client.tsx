@@ -3,11 +3,13 @@
 import { Alert, Snackbar } from "@mui/material";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink } from "@trpc/client";
-import { useState } from "react";
+import React, { useState } from "react";
 import superjson from "superjson";
 import Toolbar from "@/components/ui/toolbar";
 import { DateProvider } from "@/context/date-context";
 import { useSnackbarStore } from "@/hooks/useSnackbar";
+import { useUserStore } from "@/hooks/useUser";
+import { useSession } from "@/utils/auth-client";
 import { trpc } from "../utils/trpc";
 
 export function RootClient({ children }: { children: React.ReactNode }) {
@@ -28,6 +30,14 @@ export function RootClient({ children }: { children: React.ReactNode }) {
       ],
     }),
   );
+
+  // handle user session and set user ID in Zustand store for global access
+  const { data: session } = useSession();
+  const setUserId = useUserStore((s) => s.setUserId);
+
+  React.useEffect(() => {
+    setUserId(session?.user?.id ?? null);
+  }, [session?.user?.id, setUserId]);
 
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>

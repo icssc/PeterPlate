@@ -15,6 +15,7 @@ import type { DishInfo } from "@zotmeal/api";
 import React from "react";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useSnackbarStore } from "@/hooks/useSnackbar";
+import { useUserStore } from "@/hooks/useUser";
 import { useSession } from "@/utils/auth-client";
 import { formatFoodName, getFoodIcon, toTitleCase } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
@@ -72,8 +73,7 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
     const IconComponent = getFoodIcon(dish.name) ?? Restaurant;
 
     // check if user is signed in andshow  error if not signed in before attempting to add meal
-    const { data: session } = useSession();
-    const user = session?.user;
+    const userId = useUserStore((s) => s.userId);
 
     // snackbar constants and handler moved to useSnackbar (Zustand store)
     const showSnackbar = useSnackbarStore((s) => s.showSnackbar);
@@ -91,8 +91,8 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
 
     // When a user adds a meal to their log, they should be able to adjust the quantity and/or remove the item from their log by clicking the button on the card
     const { data: loggedMeals } = trpc.nutrition.getMealsInLastWeek.useQuery(
-      { userId: user?.id ?? "" },
-      { enabled: !!user?.id, staleTime: 30 * 1000 },
+      { userId: userId ?? "" },
+      { enabled: !!userId, staleTime: 30 * 1000 },
     );
 
     const loggedMeal = loggedMeals?.find((meal) => meal.dishId === dish.id);
@@ -139,7 +139,7 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
       e.stopPropagation();
 
       // Give the user a proper error when they've not signed in before attempting to add a meal
-      if (!user?.id) {
+      if (!userId) {
         showSnackbar(
           "You must be signed in to track meals. Please sign in to continue.",
           "error",
@@ -154,14 +154,14 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
 
       logMealMutation.mutate({
         dishId: dish.id,
-        userId: user.id,
+        userId: userId,
         dishName: dish.name,
         servings: 1,
       });
     };
 
     const handleAdjustQuantity = (newServings: number) => {
-      if (!user?.id || !loggedMeal) return;
+      if (!userId || !loggedMeal) return;
 
       // Servings are multiples of 0.5
       if (newServings < 0.5) {
@@ -171,12 +171,12 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
 
       // Delete and insert again with new servings
       deleteMealMutation.mutate(
-        { userId: user.id, dishId: dish.id },
+        { userId: userId, dishId: dish.id },
         {
           onSuccess: () => {
             logMealMutation.mutate({
               dishId: dish.id,
-              userId: user.id,
+              userId: userId,
               dishName: dish.name,
               servings: newServings,
             });
@@ -187,10 +187,10 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
 
     const handleRemoveMeal = (e: React.MouseEvent) => {
       e.stopPropagation();
-      if (!user?.id) return;
+      if (!userId) return;
 
       deleteMealMutation.mutate({
-        userId: user.id,
+        userId: userId,
         dishId: dish.id,
       });
     };
@@ -257,7 +257,7 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                   </div>
                 </div>
                 {/* Show quantity controls if logged, otherwise show add button */}
-                {isLogged && user?.id ? (
+                {isLogged && userId ? (
                   <Popover>
                     <PopoverTrigger asChild>
                       <button
