@@ -4,7 +4,8 @@ import PinDropOutlinedIcon from "@mui/icons-material/PinDropOutlined";
 import { Button, DialogContent } from "@mui/material";
 import Image from "next/image";
 import type React from "react";
-import { dateToString, generateGCalLink, toTitleCase } from "@/utils/funcs";
+import EventTypeBadge from "@/components/ui/event-type-badge";
+import { generateGCalLink, timeToString, toTitleCase } from "@/utils/funcs";
 import { HallEnum } from "@/utils/types";
 import type { EventInfo } from "./card/event-card";
 
@@ -22,54 +23,46 @@ export default function EventDialogContent(
 ): React.JSX.Element {
   return (
     <>
-      <Image
-        src={props.imgSrc}
-        alt={props.alt}
-        width={600}
-        height={600}
-        className="w-full h-auto max-h-72 object-cover"
-      />
+      <div className="relative">
+        <Image
+          src={props.imgSrc}
+          alt={props.alt}
+          width={600}
+          height={600}
+          className="w-full h-56 object-cover object-top"
+        />
+        <EventTypeBadge title={props.name} />
+      </div>
       <DialogContent
         sx={{ padding: "20px 24px 24px !important" }}
         className="flex flex-col gap-2"
       >
-        <h2 className="text-3xl font-semibold leading-tight tracking-normal text-left">
+        <h2 className="text-2xl font-semibold text-sky-700 leading-tight">
           {props.name}
         </h2>
-        <div
-          className="flex flex-wrap gap-x-2 gap-y-1 text-zinc-400 items-center"
-          id="event-card-subheader"
-        >
-          <div className="flex gap-1 items-center whitespace-nowrap">
-            <AccessTimeOutlinedIcon fontSize="small" />
-            <p>{dateToString(props.startTime, props.endTime)}</p>
+        <div className="flex flex-col gap-2 text-sm text-zinc-500 mt-1">
+          <div className="flex gap-2 items-center">
+            <CalendarTodayOutlinedIcon sx={{ fontSize: 16 }} />
+            <span>
+              {props.startTime.toLocaleDateString(undefined, {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </span>
           </div>
-          <div className="flex gap-1 items-center whitespace-nowrap">
-            <PinDropOutlinedIcon fontSize="small" />
-            <p>{toTitleCase(HallEnum[props.location])}</p>
+          <div className="flex gap-2 items-center">
+            <AccessTimeOutlinedIcon sx={{ fontSize: 16 }} />
+            <span>
+              {timeToString(props.startTime)} – {timeToString(props.endTime)}
+            </span>
+          </div>
+          <div className="flex gap-2 items-center">
+            <PinDropOutlinedIcon sx={{ fontSize: 16 }} />
+            <span>{toTitleCase(HallEnum[props.location])}</span>
           </div>
         </div>
         <p className="text-sm leading-relaxed mt-2">{props.longDesc}</p>
-        <div className="w-full flex items-center justify-center pt-4">
-          <a
-            href={generateGCalLink(
-              props.name,
-              props.longDesc,
-              props.location,
-              props.startTime,
-            )}
-            rel="noreferrer"
-            target="_blank"
-          >
-            <Button
-              variant="contained"
-              className="[&_svg]:size-5 whitespace-nowrap"
-              startIcon={<CalendarTodayOutlinedIcon />}
-            >
-              Add to Google Calendar
-            </Button>
-          </a>
-        </div>
       </DialogContent>
     </>
   );

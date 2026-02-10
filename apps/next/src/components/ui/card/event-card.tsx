@@ -5,6 +5,7 @@ import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined
 import { Card, CardContent, Dialog, Drawer } from "@mui/material";
 import Image from "next/image";
 import React from "react";
+import EventTypeBadge from "@/components/ui/event-type-badge";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { dateToString, timeToString, toTitleCase } from "@/utils/funcs";
 import { HallEnum } from "@/utils/types";
@@ -68,7 +69,7 @@ const EventCardContent = React.forwardRef<
         className="cursor-pointer hover:shadow-lg transition h-full"
         sx={{ borderRadius: "6px" }}
       >
-        <div className="p-7 pb-2">
+        <div className="p-7 pb-2 relative">
           <Image
             src={props.imgSrc}
             alt={props.alt}
@@ -76,6 +77,7 @@ const EventCardContent = React.forwardRef<
             height={300}
             className="w-full object-contain"
           />
+          <EventTypeBadge title={props.name} />
         </div>
         <CardContent className="flex flex-col gap-2 p-4">
           <div className="flex flex-row gap-2 items-center">
@@ -141,7 +143,7 @@ export default function EventCard(props: EventInfo): React.JSX.Element {
           slotProps={{
             paper: {
               sx: {
-                width: "460px",
+                width: "570px",
                 maxWidth: "90vw",
                 margin: 2,
                 padding: 0,
@@ -166,7 +168,7 @@ export default function EventCard(props: EventInfo): React.JSX.Element {
           slotProps={{
             paper: {
               sx: {
-                width: "460px",
+                width: "570px",
                 maxWidth: "90vw",
                 margin: 2,
                 overflow: "hidden",

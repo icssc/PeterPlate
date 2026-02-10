@@ -6,6 +6,7 @@ import Button from "@mui/material/Button";
 import { useState } from "react";
 import EventCard from "@/components/ui/card/event-card";
 import EventCardSkeleton from "@/components/ui/skeleton/event-card-skeleton";
+import { getEventType } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
 import { HallEnum } from "@/utils/types";
 
@@ -29,12 +30,16 @@ export default function Events() {
   const now = new Date();
 
   const [selectedLocation, setSelectedLocation] = useState("all");
+  const [selectedType, setSelectedType] = useState("all");
 
   const filteredEvents = sortedEvents.filter((event) => {
-    if (selectedLocation === "all") return true;
-    if (selectedLocation === "anteatery") return event.restaurantId === "3056";
-    if (selectedLocation === "brandywine") return event.restaurantId === "3314";
-    return true;
+    const matchesLocation =
+      selectedLocation === "all" ||
+      (selectedLocation === "anteatery" && event.restaurantId === "3056") ||
+      (selectedLocation === "brandywine" && event.restaurantId === "3314");
+    const matchesType =
+      selectedType === "all" || getEventType(event.title) === selectedType;
+    return matchesLocation && matchesType;
   });
 
   return (
@@ -82,21 +87,36 @@ export default function Events() {
                   <Button
                     variant="outlined"
                     size="small"
-                    className="!px-4 !py-1 flex items-center justify-center !bg-sky-700 !text-white !border-sky-700 hover:!bg-sky-800 hover:!text-white !normal-case !text-sm !font-thin"
+                    onClick={() => setSelectedType("all")}
+                    className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
+                      selectedType === "all"
+                        ? "!bg-sky-700 !text-white !border-sky-700 hover:!bg-sky-800 hover:!text-white"
+                        : "!bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50 hover:!text-slate-900"
+                    }`}
                   >
                     All Events
                   </Button>
                   <Button
                     variant="outlined"
                     size="small"
-                    className="!px-4 !py-1 flex items-center justify-center !bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50 hover:!text-slate-900 !normal-case !text-sm !font-thin"
+                    onClick={() => setSelectedType("special")}
+                    className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
+                      selectedType === "special"
+                        ? "!bg-sky-700 !text-white !border-sky-700 hover:!bg-sky-800 hover:!text-white"
+                        : "!bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50 hover:!text-slate-900"
+                    }`}
                   >
                     Special Meals
                   </Button>
                   <Button
                     variant="outlined"
                     size="small"
-                    className="!px-4 !py-1 flex items-center justify-center !bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50 hover:!text-slate-900 !normal-case !text-sm !font-thin"
+                    onClick={() => setSelectedType("celebration")}
+                    className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
+                      selectedType === "celebration"
+                        ? "!bg-sky-700 !text-white !border-sky-700 hover:!bg-sky-800 hover:!text-white"
+                        : "!bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50 hover:!text-slate-900"
+                    }`}
                   >
                     Celebration
                   </Button>
@@ -189,7 +209,7 @@ export default function Events() {
                   />
                 ))}
               </div>
-              {sortedEvents.length === 0 && (
+              {filteredEvents.length === 0 && (
                 <p className="text-center text-zinc-700 py-5">
                   No events found :(
                 </p>
