@@ -3,6 +3,7 @@
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import GridOnIcon from "@mui/icons-material/GridOn";
 import Button from "@mui/material/Button";
+import { useState } from "react";
 import EventCard from "@/components/ui/card/event-card";
 import EventCardSkeleton from "@/components/ui/skeleton/event-card-skeleton";
 import { trpc } from "@/utils/trpc";
@@ -26,6 +27,15 @@ export default function Events() {
     : [];
 
   const now = new Date();
+
+  const [selectedLocation, setSelectedLocation] = useState("all");
+
+  const filteredEvents = sortedEvents.filter((event) => {
+    if (selectedLocation === "all") return true;
+    if (selectedLocation === "anteatery") return event.restaurantId === "3056";
+    if (selectedLocation === "brandywine") return event.restaurantId === "3314";
+    return true;
+  });
 
   return (
     <div className="max-w-full h-screen">
@@ -100,21 +110,36 @@ export default function Events() {
                   <Button
                     variant="outlined"
                     size="small"
-                    className="!px-4 !py-1 flex items-center justify-center !bg-sky-700 !text-white !border-sky-700 hover:!bg-sky-800 hover:!text-white !normal-case !text-sm !font-thin"
+                    onClick={() => setSelectedLocation("all")}
+                    className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
+                      selectedLocation === "all"
+                        ? "!bg-sky-700 !text-white !border-sky-700 hover:!bg-sky-800 hover:!text-white"
+                        : "!bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50 hover:!text-slate-900"
+                    }`}
                   >
                     All Locations
                   </Button>
                   <Button
                     variant="outlined"
                     size="small"
-                    className="!px-4 !py-1 flex items-center justify-center !bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50 hover:!text-slate-900 !normal-case !text-sm !font-thin"
+                    onClick={() => setSelectedLocation("brandywine")}
+                    className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
+                      selectedLocation === "brandywine"
+                        ? "!bg-sky-700 !text-white !border-sky-700 hover:!bg-sky-800 hover:!text-white"
+                        : "!bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50 hover:!text-slate-900"
+                    }`}
                   >
                     Brandywine
                   </Button>
                   <Button
                     variant="outlined"
                     size="small"
-                    className="!px-4 !py-1 flex items-center justify-center !bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50 hover:!text-slate-900 !normal-case !text-sm !font-thin"
+                    onClick={() => setSelectedLocation("anteatery")}
+                    className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
+                      selectedLocation === "anteatery"
+                        ? "!bg-sky-700 !text-white !border-sky-700 hover:!bg-sky-800 hover:!text-white"
+                        : "!bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50 hover:!text-slate-900"
+                    }`}
                   >
                     Anteatery
                   </Button>
@@ -140,11 +165,12 @@ export default function Events() {
           {!isLoading && !error && (
             <>
               <p className="text-sm text-zinc-700">
-                Showing {sortedEvents.length} event
-                {sortedEvents.length !== 1 ? "s" : ""}
+                Showing {filteredEvents.length} event
+                {filteredEvents.length !== 1 ? "s" : ""}
               </p>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12 max-w-10xl">
-                {sortedEvents.map((event) => (
+                {filteredEvents.map((event) => (
                   <EventCard
                     key={`${event.title}|${event.start.toISOString()}|${event.restaurantId}`}
                     name={event.title}
@@ -153,7 +179,7 @@ export default function Events() {
                     startTime={event.start}
                     endTime={event.end}
                     location={
-                      event.restaurantId === "anteatery"
+                      event.restaurantId === "3056"
                         ? HallEnum.ANTEATERY
                         : HallEnum.BRANDYWINE
                     }
