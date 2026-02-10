@@ -172,7 +172,7 @@ function DesktopHome(): React.JSX.Element {
 
         {/* Dining Halls */}
         <section>
-          <h2 className="text-xl font-bold text-sky-600 mb-4">Dining Halls</h2>
+          <h2 className="text-2xl font-bold text-sky-600 mb-4">Dining Halls</h2>
           <div className="grid grid-cols-2 gap-12">
             {/* Brandywine Card */}
             <Link href="/brandywine" className="group">
