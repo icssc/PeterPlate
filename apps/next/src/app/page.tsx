@@ -81,7 +81,7 @@ export default function Home() {
 
 /* ────────────────────────────── Desktop Home ────────────────────────────── */
 
-function DesktopHome() {
+function DesktopHome(): React.JSX.Element {
   const { selectedDate } = useDate();
   const today = selectedDate ?? new Date();
 
@@ -127,29 +127,32 @@ function DesktopHome() {
   const brandywineStatus = getHallStatus(data?.brandywine);
   const anteateryStatus = getHallStatus(data?.anteatery);
 
-  // Collect all dishes across both halls for "Popular Today"
-  const allDishes = [
-    ...(data?.brandywine?.menus ?? []).flatMap((menu) =>
-      menu.stations.flatMap((station) =>
-        station.dishes.map((dish) => ({
-          ...dish,
-          hallName: "Brandywine",
-          stationName: station.name,
-        })),
-      ),
-    ),
-    ...(data?.anteatery?.menus ?? []).flatMap((menu) =>
-      menu.stations.flatMap((station) =>
-        station.dishes.map((dish) => ({
-          ...dish,
-          hallName: "Anteatery",
-          stationName: station.name,
-        })),
-      ),
-    ),
-  ];
+  const brandywineMenus = data?.brandywine?.menus ?? [];
+  const anteateryMenus = data?.anteatery?.menus ?? [];
 
-  // Take a selection for "Popular Today" – just pick the first ~10 unique dishes
+  const brandywineDishes = brandywineMenus.flatMap((menu) =>
+    menu.stations.flatMap((station) =>
+      station.dishes.map((dish) => ({
+        ...dish,
+        hallName: "Brandywine",
+        stationName: station.name,
+      })),
+    ),
+  );
+
+  const anteateryDishes = anteateryMenus.flatMap((menu) =>
+    menu.stations.flatMap((station) =>
+      station.dishes.map((dish) => ({
+        ...dish,
+        hallName: "Anteatery",
+        stationName: station.name,
+      })),
+    ),
+  );
+
+  const allDishes = [...brandywineDishes, ...anteateryDishes];
+
+  // Take a selection for "Popular Today" pick the first ~5 unique dishes as an overview
   const seenNames = new Set<string>();
   const popularDishes = allDishes
     .filter((d) => {
@@ -158,7 +161,7 @@ function DesktopHome() {
       seenNames.add(key);
       return true;
     })
-    .slice(0, 10);
+    .slice(0, 5);
 
   return (
     <div className="min-h-screen bg-white dark:bg-neutral-950">
