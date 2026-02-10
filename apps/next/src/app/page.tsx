@@ -187,15 +187,15 @@ function DesktopHome(): React.JSX.Element {
                   />
                 </div>
                 <div className="flex items-center justify-between p-4">
-                  <div>
+                  <div className="space-y-1.5">
                     <h3 className="text-lg font-semibold text-sky-600">
                       Brandywine
                     </h3>
-                    <div className="flex items-center gap-1 text-sm text-neutral-500 dark:text-neutral-400">
+                    <div className="flex items-center gap-1.5 text-sm text-neutral-500 dark:text-neutral-400">
                       <LocationOn className="w-4 h-4" />
                       <span>Middle Earth Community</span>
                     </div>
-                    <div className="flex items-center gap-1 text-sm text-neutral-500 dark:text-neutral-400">
+                    <div className="flex items-center gap-1.5 text-sm text-neutral-500 dark:text-neutral-400">
                       <AccessTime className="w-4 h-4" />
                       <span>
                         {isLoading
@@ -222,15 +222,15 @@ function DesktopHome(): React.JSX.Element {
                   />
                 </div>
                 <div className="flex items-center justify-between p-4">
-                  <div>
+                  <div className="space-y-1.5">
                     <h3 className="text-lg font-semibold text-sky-600">
                       Anteatery
                     </h3>
-                    <div className="flex items-center gap-1 text-sm text-neutral-500 dark:text-neutral-400">
+                    <div className="flex items-center gap-1.5 text-sm text-neutral-500 dark:text-neutral-400">
                       <LocationOn className="w-4 h-4" />
                       <span>Mesa Court</span>
                     </div>
-                    <div className="flex items-center gap-1 text-sm text-neutral-500 dark:text-neutral-400">
+                    <div className="flex items-center gap-1.5 text-sm text-neutral-500 dark:text-neutral-400">
                       <AccessTime className="w-4 h-4" />
                       <span>
                         {isLoading
@@ -292,13 +292,20 @@ function DesktopHome(): React.JSX.Element {
           {!events || events.length === 0 ? (
             <p className="text-neutral-500">No upcoming events.</p>
           ) : (
-            <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin">
-              {events.slice(0, 6).map((event, idx) => (
-                <UpcomingEventCard
-                  key={`${event.title}-${idx}`}
-                  event={event}
-                />
-              ))}
+            <div className="grid grid-cols-4 gap-4">
+              {[...events]
+                .sort((a, b) => {
+                  const aStart = a.start ? new Date(a.start).getTime() : 0;
+                  const bStart = b.start ? new Date(b.start).getTime() : 0;
+                  return aStart - bStart;
+                })
+                .slice(0, 4)
+                .map((event, idx) => (
+                  <UpcomingEventCard
+                    key={`${event.title}-${idx}`}
+                    event={event}
+                  />
+                ))}
             </div>
           )}
         </section>
@@ -417,38 +424,40 @@ function UpcomingEventCard({
     <>
       <button
         type="button"
-        className="flex-shrink-0 w-56 rounded-xl border border-neutral-200 dark:border-neutral-700 p-4 shadow-sm hover:shadow-md transition cursor-pointer space-y-2 text-left bg-transparent"
+        className="w-full rounded-xl border border-neutral-200 dark:border-neutral-700 p-5 shadow-sm hover:shadow-md transition cursor-pointer text-left bg-transparent"
         onClick={() => setOpen(true)}
       >
-        <div className="flex items-center gap-2 flex-wrap">
-          <h3 className="text-base font-bold text-sky-600 leading-tight">
+        <div className="flex items-start justify-between mb-3">
+          <h3 className="text-base font-bold text-sky-600 leading-tight pr-2">
             {event.title}
           </h3>
-          <span className="text-[10px] font-semibold uppercase tracking-wider bg-sky-100 text-sky-700 dark:bg-sky-900 dark:text-sky-300 px-2 py-0.5 rounded-full">
+          <span className="flex-shrink-0 text-[10px] font-semibold uppercase tracking-wider bg-sky-100 text-sky-700 dark:bg-sky-900 dark:text-sky-300 px-2 py-0.5 rounded-full">
             Celebration
           </span>
         </div>
-        {startDate && (
-          <>
-            <div className="flex items-center gap-1.5 text-xs text-neutral-500 dark:text-neutral-400">
-              <CalendarMonth className="w-3.5 h-3.5" />
-              <span>
-                {numToMonth[startDate.getMonth()]} {startDate.getDate()},{" "}
-                {startDate.getFullYear()}
-              </span>
-            </div>
-            <div className="flex items-center gap-1.5 text-xs text-neutral-500 dark:text-neutral-400">
-              <AccessTime className="w-3.5 h-3.5" />
-              <span>
-                {timeToString(startDate)}
-                {endDate ? `- ${timeToString(endDate)}` : ""}
-              </span>
-            </div>
-          </>
-        )}
-        <div className="flex items-center gap-1.5 text-xs text-neutral-500 dark:text-neutral-400">
-          <LocationOn className="w-3.5 h-3.5" />
-          <span>{toTitleCase(event.restaurantId)}</span>
+        <div className="space-y-2">
+          {startDate && (
+            <>
+              <div className="flex items-center gap-1.5 text-xs text-neutral-500 dark:text-neutral-400">
+                <CalendarMonth className="w-3.5 h-3.5" />
+                <span>
+                  {numToMonth[startDate.getMonth()]} {startDate.getDate()},{" "}
+                  {startDate.getFullYear()}
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5 text-xs text-neutral-500 dark:text-neutral-400">
+                <AccessTime className="w-3.5 h-3.5" />
+                <span>
+                  {timeToString(startDate)}
+                  {endDate ? ` - ${timeToString(endDate)}` : ""}
+                </span>
+              </div>
+            </>
+          )}
+          <div className="flex items-center gap-1.5 text-xs text-neutral-500 dark:text-neutral-400">
+            <LocationOn className="w-3.5 h-3.5" />
+            <span>{toTitleCase(event.restaurantId)}</span>
+          </div>
         </div>
       </button>
       <Dialog
