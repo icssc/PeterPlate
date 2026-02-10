@@ -6,7 +6,7 @@ import { Card, CardContent, Dialog, Drawer } from "@mui/material";
 import Image from "next/image";
 import React from "react";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-import { dateToString, toTitleCase } from "@/utils/funcs";
+import { dateToString, timeToString, toTitleCase } from "@/utils/funcs";
 import { HallEnum } from "@/utils/types";
 import EventDialogContent from "../event-dialog-content";
 import EventDrawerContent from "../event-drawer-content";
@@ -66,22 +66,24 @@ const EventCardContent = React.forwardRef<
     <div ref={ref} {...divProps}>
       <Card
         className="cursor-pointer hover:shadow-lg transition h-full"
-        sx={{ borderRadius: "12px" }}
+        sx={{ borderRadius: "6px" }}
       >
-        <Image
-          src={props.imgSrc}
-          alt={props.alt}
-          width={400}
-          height={300}
-          className="w-full h-56 object-cover"
-        />
-        <CardContent className="flex flex-col gap-1 p-4">
+        <div className="p-7 pb-2">
+          <Image
+            src={props.imgSrc}
+            alt={props.alt}
+            width={400}
+            height={300}
+            className="w-full object-contain"
+          />
+        </div>
+        <CardContent className="flex flex-col gap-2 p-4">
           <div className="flex flex-row gap-2 items-center">
             <h3 className="text-lg font-semibold text-sky-700">{props.name}</h3>
             {props.isOngoing && <OngoingBadge />}
           </div>
-          <div className="flex flex-col gap-1 text-sm text-zinc-500 mt-1">
-            <div className="flex gap-1 items-center">
+          <div className="flex flex-col gap-2 text-sm text-zinc-500 mt-1">
+            <div className="flex gap-3 items-center">
               <CalendarTodayOutlinedIcon sx={{ fontSize: 16 }} />
               <span>
                 {props.startTime.toLocaleDateString(undefined, {
@@ -91,18 +93,18 @@ const EventCardContent = React.forwardRef<
                 })}
               </span>
             </div>
-            <div className="flex gap-1 items-center">
+            <div className="flex gap-3 items-center">
               <AccessTime sx={{ fontSize: 16 }} />
-              <span>{dateToString(props.startTime, props.endTime)}</span>
+              <span>
+                {timeToString(props.startTime)} – {timeToString(props.endTime)}
+              </span>
             </div>
-            <div className="flex gap-1 items-center">
+            <div className="flex gap-3 items-center">
               <PinDrop sx={{ fontSize: 16 }} />
               <span>{toTitleCase(HallEnum[props.location])}</span>
             </div>
           </div>
-          <p className="text-sm text-zinc-700 mt-2 line-clamp-3">
-            {props.shortDesc}
-          </p>
+          <p className="text-sm text-zinc-900 mt-2">{props.longDesc}</p>
         </CardContent>
       </Card>
     </div>
