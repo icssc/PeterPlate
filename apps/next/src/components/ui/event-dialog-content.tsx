@@ -1,11 +1,12 @@
-import { DialogContent } from "./shadcn/dialog";
-import { EventInfo } from "./card/event-card";
-import { DialogHeader, DialogTitle, DialogDescription } from "./shadcn/dialog";
+import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
+import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
+import PinDropOutlinedIcon from "@mui/icons-material/PinDropOutlined";
+import { Button, DialogContent } from "@mui/material";
 import Image from "next/image";
-import { CalendarPlus, Clock, MapPinned } from "lucide-react";
-import { Button } from "./shadcn/button"
+import type React from "react";
+import { dateToString, generateGCalLink, toTitleCase } from "@/utils/funcs";
 import { HallEnum } from "@/utils/types";
-import { toTitleCase, dateToString, generateGCalLink } from "@/utils/funcs";
+import type { EventInfo } from "./card/event-card";
 
 /**
  * `EventDialogContent` renders the detailed view of an event within a dialog.
@@ -16,38 +17,60 @@ import { toTitleCase, dateToString, generateGCalLink } from "@/utils/funcs";
  * @param {EventInfo} props - The event data to display. See {@link EventInfo} for detailed property descriptions.
  * @returns {JSX.Element} The rendered content for the event dialog.
  */
-export default function EventDialogContent(props: EventInfo): JSX.Element {
-    return (
-      <DialogContent>
-        <DialogHeader>
-          <Image 
-            src={props.imgSrc}
-            alt={props.alt}
-            width={600}
-            height={600}
-            className="w-full h-48 object-cover"
-          />
-        </DialogHeader>
-        <div className="px-6">
-          <DialogTitle className="mb-1">{props.name}</DialogTitle>
-          <div className="flex gap-2 text-zinc-400 items-center mb-2" id="event-card-subheader">
-            <Clock className="stroke-zinc-400" size={20}/>
+export default function EventDialogContent(
+  props: EventInfo,
+): React.JSX.Element {
+  return (
+    <>
+      <Image
+        src={props.imgSrc}
+        alt={props.alt}
+        width={600}
+        height={600}
+        className="w-full h-auto max-h-72 object-cover"
+      />
+      <DialogContent
+        sx={{ padding: "20px 24px 24px !important" }}
+        className="flex flex-col gap-2"
+      >
+        <h2 className="text-3xl font-semibold leading-tight tracking-normal text-left">
+          {props.name}
+        </h2>
+        <div
+          className="flex flex-wrap gap-x-2 gap-y-1 text-zinc-400 items-center"
+          id="event-card-subheader"
+        >
+          <div className="flex gap-1 items-center whitespace-nowrap">
+            <AccessTimeOutlinedIcon fontSize="small" />
             <p>{dateToString(props.startTime, props.endTime)}</p>
-            <MapPinned className="stroke-zinc-400" size={20}/>
-            <p>
-              {toTitleCase(HallEnum[props.location])}
-            </p>
           </div>
-          <DialogDescription className="mb-8">{props.longDesc}</DialogDescription>
-          <div className="w-full flex items-center justify-center">
-            <a href={generateGCalLink(props.name, props.longDesc, props.location, props.startTime)} rel="noreferrer" target="_blank">
-              <Button className="[&_svg]:size-5">
-                <CalendarPlus/>
-                Add to Google Calendar
-              </Button>
-            </a>
+          <div className="flex gap-1 items-center whitespace-nowrap">
+            <PinDropOutlinedIcon fontSize="small" />
+            <p>{toTitleCase(HallEnum[props.location])}</p>
           </div>
         </div>
+        <p className="text-sm leading-relaxed mt-2">{props.longDesc}</p>
+        <div className="w-full flex items-center justify-center pt-4">
+          <a
+            href={generateGCalLink(
+              props.name,
+              props.longDesc,
+              props.location,
+              props.startTime,
+            )}
+            rel="noreferrer"
+            target="_blank"
+          >
+            <Button
+              variant="contained"
+              className="[&_svg]:size-5 whitespace-nowrap"
+              startIcon={<CalendarTodayOutlinedIcon />}
+            >
+              Add to Google Calendar
+            </Button>
+          </a>
+        </div>
       </DialogContent>
-    )
+    </>
+  );
 }

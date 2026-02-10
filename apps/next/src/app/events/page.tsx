@@ -1,12 +1,12 @@
 "use client";
 
+import Image from "next/image";
 import EventCard from "@/components/ui/card/event-card";
-import EventCardSkeleton from "@/components/ui/skeleton/event-card-skeleton";
 import MealDivider from "@/components/ui/meal-divider";
+import EventCardSkeleton from "@/components/ui/skeleton/event-card-skeleton";
 import MealDividerSkeleton from "@/components/ui/skeleton/meal-divider-skeleton";
 import { trpc } from "@/utils/trpc";
 import { HallEnum } from "@/utils/types";
-import Image from "next/image";
 
 export default function Events() {
   // Destructure the result from useQuery
@@ -32,25 +32,28 @@ export default function Events() {
   endOfWeek.setHours(23, 59, 59, 999);
 
   const eventsThisWeek = sortedEvents.filter((event) => {
-    const eventStartDate = new Date(event.start);
+    const eventStartDate = new Date(event.start ?? "");
     return eventStartDate >= now && eventStartDate <= endOfWeek;
   });
 
   const futureEvents = sortedEvents.filter((event) => {
-    const eventStartDate = new Date(event.start);
+    const eventStartDate = new Date(event.start ?? "");
     return eventStartDate > endOfWeek;
   });
 
   return (
     <div className="max-w-full h-screen">
       <div className="z-0 flex flex-col h-full overflow-x-hidden">
-        <Image
-          className="object-cover w-full min-h-80 max-h-80"
-          src="/uci.webp"
-          alt="An Image of UCI's signage."
-          width={2000}
-          height={2000}
-        />
+        <div className="relative w-full min-h-80 max-h-80">
+          <div className="absolute inset-0 bg-gradient-to-b from-black/65 to-transparent" />
+          <Image
+            className="object-cover w-full h-full"
+            src="/uci.webp"
+            alt="An Image of UCI's signage."
+            width={2000}
+            height={2000}
+          />
+        </div>
         <div
           className="flex flex-col gap-4 justify-center w-full p-5 sm:px-12 sm:py-8"
           id="event-scroll"
@@ -75,7 +78,7 @@ export default function Events() {
             <>
               <MealDivider title="This Week's Events" />
               {eventsThisWeek.length > 0 &&
-                eventsThisWeek.map((event: any) => (
+                eventsThisWeek.map((event) => (
                   <EventCard
                     key={`${event.title}|${event.start.toISOString()}|${event.restaurantId}`}
                     name={event.title}
@@ -84,7 +87,7 @@ export default function Events() {
                     startTime={event.start}
                     endTime={event.end}
                     location={
-                      event.restaurantId == 3056
+                      event.restaurantId === "anteatery"
                         ? HallEnum.ANTEATERY
                         : HallEnum.BRANDYWINE
                     }
@@ -93,14 +96,14 @@ export default function Events() {
                     isOngoing={event.start <= now && event.end >= now}
                   />
                 ))}
-              {eventsThisWeek.length == 0 && (
+              {eventsThisWeek.length === 0 && (
                 <p className="text-center text-zinc-700 py-5">
                   No events scheduled for this week :(
                 </p>
               )}
               <MealDivider title="Upcoming Events" />
               {futureEvents.length > 0 &&
-                futureEvents.map((event: any) => (
+                futureEvents.map((event) => (
                   <EventCard
                     key={`${event.title}|${event.start.toISOString()}|${event.restaurantId}`}
                     name={event.title}
@@ -109,7 +112,7 @@ export default function Events() {
                     startTime={event.start}
                     endTime={event.end}
                     location={
-                      event.restaurantId == 3056
+                      event.restaurantId === "anteatery"
                         ? HallEnum.ANTEATERY
                         : HallEnum.BRANDYWINE
                     }
@@ -118,7 +121,7 @@ export default function Events() {
                     isOngoing={event.start <= now && event.end >= now}
                   />
                 ))}
-              {futureEvents.length == 0 && (
+              {futureEvents.length === 0 && (
                 <p className="text-center text-zinc-700 py-5">
                   No upcoming events found :(
                 </p>

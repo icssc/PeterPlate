@@ -1,7 +1,7 @@
 import { upsert } from "@api/utils";
-import type { Drizzle, InsertRating } from "@zotmeal/db";
-import { dishes, ratings } from "@zotmeal/db";
-import { and, avg, count, desc, eq, sum } from "drizzle-orm";
+import type { Drizzle, InsertRating } from "@peterplate/db";
+import { dishes, ratings } from "@peterplate/db";
+import { and, avg, count, eq, sum } from "drizzle-orm";
 
 const updateDishStats = async (db: Drizzle, dishId: string) => {
   const result = await db

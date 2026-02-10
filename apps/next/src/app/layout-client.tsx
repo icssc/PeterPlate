@@ -3,17 +3,30 @@
 import { Alert, Snackbar } from "@mui/material";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink } from "@trpc/client";
-import React, { useState } from "react";
+import { ThemeProvider } from "next-themes";
+import { useEffect, useState } from "react";
 import superjson from "superjson";
 import Toolbar from "@/components/ui/toolbar";
 import { DateProvider } from "@/context/date-context";
-import { useSnackbarStore } from "@/hooks/useSnackbar";
-import { useUserStore } from "@/hooks/useUser";
+import { useSnackbarStore } from "@/context/useSnackbar";
+import { useUserStore } from "@/context/useUserStore";
 import { useSession } from "@/utils/auth-client";
 import { trpc } from "../utils/trpc";
 
 export function RootClient({ children }: { children: React.ReactNode }) {
-  const [queryClient] = useState(() => new QueryClient());
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            // 5m defualt stale time
+            staleTime: 5 * 60 * 1000,
+            refetchOnWindowFocus: false,
+            refetchOnReconnect: false,
+          },
+        },
+      }),
+  );
   const [trpcClient] = useState(() =>
     trpc.createClient({
       links: [
@@ -31,25 +44,40 @@ export function RootClient({ children }: { children: React.ReactNode }) {
     }),
   );
 
-  // handle user session and set user ID in Zustand store for global access
-  const { data: session } = useSession();
+  // syncs better auth session
+  // with zustand user store
+  const { data: session, isPending } = useSession();
   const setUserId = useUserStore((s) => s.setUserId);
+  const clearUser = useUserStore((s) => s.clearUser);
 
-  React.useEffect(() => {
-    setUserId(session?.user?.id ?? null);
-  }, [session?.user?.id, setUserId]);
+  useEffect(() => {
+    if (isPending) return;
+
+    if (session?.user) {
+      setUserId(session.user.id);
+    } else {
+      clearUser();
+    }
+  }, [session, isPending, setUserId, clearUser]);
 
   return (
-    <trpc.Provider client={trpcClient} queryClient={queryClient}>
-      <QueryClientProvider client={queryClient}>
-        <DateProvider>
-          <Toolbar />
-          {children}
-          <GlobalSnackbar />
-          <Snackbar />
-        </DateProvider>
-      </QueryClientProvider>
-    </trpc.Provider>
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+    >
+      <trpc.Provider client={trpcClient} queryClient={queryClient}>
+        <QueryClientProvider client={queryClient}>
+          <DateProvider>
+            <Toolbar />
+            {children}
+            <GlobalSnackbar />
+            <Snackbar />
+          </DateProvider>
+        </QueryClientProvider>
+      </trpc.Provider>
+    </ThemeProvider>
   );
 }
 

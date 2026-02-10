@@ -11,6 +11,13 @@ function getDomain() {
   throw new Error("Invalid stage");
 }
 
+function getClientId() {
+  if ($app.stage === "production" || $app.stage.match(/^staging-(\d+)$/))
+    return "peterplate";
+
+  return "peterplate-dev";
+}
+
 export default $config({
   app(input) {
     return {
@@ -27,6 +34,7 @@ export default $config({
   },
   async run() {
     const domain = getDomain();
+    const clientId = getClientId();
 
     const api = new sst.aws.ApiGatewayV2("Api", {
       cors: {
@@ -46,6 +54,9 @@ export default $config({
       memory: "256 MB",
       environment: {
         DATABASE_URL: process.env.DATABASE_URL!,
+        BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET!,
+        BETTER_AUTH_URL: `https://${domain}`,
+        AUTH_CLIENT_ID: clientId,
         NODE_ENV: process.env.NODE_ENV || "development",
       },
     });
@@ -90,6 +101,9 @@ export default $config({
       environment: {
         NEXT_PUBLIC_API_URL: api.url,
         DATABASE_URL: process.env.DATABASE_URL!,
+        BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET!,
+        AUTH_CLIENT_ID: clientId,
+        BETTER_AUTH_URL: `https://${domain}`,
       },
       cachePolicy: "50ea56d0-b7b0-4bf7-9ab8-0f7f9a0d03d5",
       domain: {
@@ -108,12 +122,12 @@ export default $config({
     });
 
     // ! TODO @KevinWu098: figure out the router
-    // Redirect zotmeal.com and www.zotmeal.com to peterplate.com
+    // Redirect peterplate.com and www.peterplate.com to peterplate.com
     // if ($app.stage === "production") {
-    //   new sst.aws.Router("ZotmealRedirect", {
+    //   new sst.aws.Router("PeterplateRedirect", {
     //     domain: {
-    //       name: "zotmeal.com",
-    //       redirects: ["www.zotmeal.com"],
+    //       name: "peterplate.com",
+    //       redirects: ["www.peterplate.com"],
     //       dns: sst.aws.dns({
     //         zone: "Z05683903NC7KZ5HQGFOI",
     //       }),

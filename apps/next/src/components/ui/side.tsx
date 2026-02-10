@@ -1,22 +1,28 @@
-"use client"; 
+"use client";
 
-import { useState, useEffect } from "react";
+import { GridView, Menu, SyncAlt } from "@mui/icons-material";
+import type { RestaurantInfo } from "@peterplate/api"; // Import types
 import Image from "next/image";
-import { Tabs, TabsList, TabsTrigger } from "./shadcn/tabs"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./shadcn/select";
-import { DiningHallStatus } from "./status";
-import DishesInfo from "./dishes-info";
-import { HallEnum, HallStatusEnum, MealTimeEnum} from "@/utils/types";
-import { trpc } from "@/utils/trpc"; // Import tRPC hook
-import { RestaurantInfo } from "@zotmeal/api"; // Import types
-import { toTitleCase, utcToPacificTime, formatOpenCloseTime, isSameDay, militaryToStandard } from "@/utils/funcs";
-import TabsSkeleton from "./skeleton/tabs-skeleton";
-import SelectSkeleton from "./skeleton/select-skeleton";
+import { useEffect, useState } from "react";
 import { useDate } from "@/context/date-context";
-import { ArrowRightLeft, RefreshCw } from "lucide-react";
-import { Button } from "./shadcn/button";
+import { useHallDerived, useHallStore } from "@/context/useHallStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-
+import { formatOpenCloseTime, isSameDay, toTitleCase } from "@/utils/funcs";
+import { trpc } from "@/utils/trpc"; // Import tRPC hook
+import { HallEnum } from "@/utils/types";
+import DishesInfo from "./dishes-info";
+import { Button } from "./shadcn/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./shadcn/select";
+import { Tabs, TabsList, TabsTrigger } from "./shadcn/tabs";
+import SelectSkeleton from "./skeleton/select-skeleton";
+import TabsSkeleton from "./skeleton/tabs-skeleton";
+import { DiningHallStatus } from "./status";
 
 /**
  * Props for the {@link Side} component.
@@ -39,181 +45,141 @@ interface SideProps {
 export default function Side({
   hall,
   toggleHall,
-}: SideProps): JSX.Element {
-    const { selectedDate } = useDate();
-    const today = new Date();
-    const isDesktop = useMediaQuery('(min-width: 768px)'); // Tailwind's `md` breakpoint
+}: SideProps): React.JSX.Element {
+  const { selectedDate } = useDate();
+  const isDesktop = useMediaQuery("(min-width: 768px)");
 
-    // Fetch data using tRPC
-    const { data: queryResponse, isLoading, isError, error } = trpc.zotmeal.useQuery(
-      {date: selectedDate!},
-      {staleTime: 2 * 60 * 60 * 1000} // 2 hour stale time
-    );
+  const today = useHallStore((s) => s.today);
+  const setHallInputs = useHallStore((s) => s.setInputs);
 
-    let heroImageSrc: string | undefined, heroImageAlt: string | undefined;
-    let openTime: Date | undefined, closeTime: Date | undefined;
-    let periods: string[] | null = [];
+  /** Fetch data */
+  const { data, isLoading, isError, error } = trpc.peterplate.useQuery(
+    { date: selectedDate ?? today },
+    { staleTime: 2 * 60 * 60 * 1000 },
+  );
 
-    switch (hall) {
-      case HallEnum.ANTEATERY:
-        heroImageSrc = "/anteatery.webp";
-        heroImageAlt = "An image of the front of the Anteatery dining hall at UCI.";
-        break;
-      case HallEnum.BRANDYWINE:
-        heroImageSrc = "/brandywine.webp";
-        heroImageAlt = "An image of the front of the Brandywine dining hall at UCI.";
-        break;
-    }
-
-
-    // --- Derived Data ---
-    const hallData: RestaurantInfo | undefined = !isLoading && !isError && queryResponse
-      ? (hall === HallEnum.ANTEATERY ? queryResponse.anteatery : queryResponse.brandywine)
+  /** Raw hall data (NOT derived) */
+  const hallData: RestaurantInfo | undefined =
+    !isLoading && !isError && data
+      ? hall === HallEnum.ANTEATERY
+        ? data.anteatery
+        : data.brandywine
       : undefined;
 
-    let availablePeriodTimes: { [mealName: string]: [Date, Date]} = {};
-    let derivedHallStatus: HallStatusEnum = HallStatusEnum.CLOSED; // Default status
-
-    if (!isLoading && !isError && hallData?.menus && hallData.menus.length > 0) {
-      let earliestOpen: Date | null = null;
-      let latestClose: Date | null = null;
-
-      hallData.menus.forEach(menu => {
-        try {
-          const periodNameLower = menu.period.name.toLowerCase();
-          const currentPeriodOpenTime = militaryToStandard(menu.period.startTime);
-          const currentPeriodCloseTime = militaryToStandard(menu.period.endTime);
-
-          if (periodNameLower === 'latenight') {
-            currentPeriodOpenTime.setDate(currentPeriodOpenTime.getDate() + 1);
-            currentPeriodCloseTime.setDate(currentPeriodCloseTime.getDate() + 1);
-          } else if (selectedDate?.getDay() == today.getDay() && selectedDate.getMonth() == today.getMonth() && selectedDate.getFullYear() == today.getFullYear()) {
-            currentPeriodOpenTime.setDate(today.getDate())
-            currentPeriodCloseTime.setDate(today.getDate())
-          }
-
-          availablePeriodTimes[periodNameLower] = [currentPeriodOpenTime, currentPeriodCloseTime];
-
-          if (!earliestOpen || currentPeriodOpenTime < earliestOpen) {
-            earliestOpen = currentPeriodOpenTime;
-          }
-          if (!latestClose || currentPeriodCloseTime > latestClose) {
-            latestClose = currentPeriodCloseTime;
-          }
-        } catch (e) {
-          console.error("Error parsing time:", e);
-        }
-      });
-
-      openTime = earliestOpen ?? undefined;
-      closeTime = latestClose ?? undefined;
-
-      if (openTime === undefined && closeTime === undefined)
-        derivedHallStatus = HallStatusEnum.ERROR;
-      else if (today.getDay() != openTime!.getDay())
-        derivedHallStatus = HallStatusEnum.PREVIEW
-      else if (selectedDate! >= openTime! && selectedDate! < closeTime!)
-        derivedHallStatus = HallStatusEnum.OPEN;
-      else 
-        derivedHallStatus = HallStatusEnum.CLOSED;
+  /** Push raw inputs into Zustand */
+  useEffect(() => {
+    if (hallData && selectedDate) {
+      setHallInputs({ hallData, selectedDate });
     }
-    // --- End Derived Data ---
+  }, [hallData, selectedDate, setHallInputs]);
 
-    // Sorts the period keys by time (earliest to latest)
-    periods = Object.keys(availablePeriodTimes).sort((a, b) => {
-      let aOpenTime: Date = availablePeriodTimes[a][0]
-      let bOpenTime: Date = availablePeriodTimes[b][0]
+  /** Read derived data */
+  const { availablePeriodTimes, derivedHallStatus, openTime, closeTime } =
+    useHallDerived();
 
-      if (aOpenTime <= bOpenTime)
-        return -1
-      else 
-        return 1
-    });
+  /** Sort meal periods */
+  const periods = Object.keys(availablePeriodTimes).sort((a, b) => {
+    return availablePeriodTimes[a][0] <= availablePeriodTimes[b][0] ? -1 : 1;
+  });
 
-    const [selectedPeriod, setSelectedPeriod] = useState<string>('');
-    const [selectedStation, setSelectedStation] = useState<string>('');
+  /** UI state */
+  const [selectedPeriod, setSelectedPeriod] = useState("");
+  const [selectedStation, setSelectedStation] = useState("");
+  const [isCompactView, setIsCompactView] = useState(false);
 
-    // Effect to update selectedPeriod when periods data changes
-    useEffect(() => {
-      // Ensure selectedDate is defined and periods are available
-      if (selectedDate && periods.length > 0 && Object.keys(availablePeriodTimes).length > 0) {
-        const currentPeriodIsValid = periods.some(p => p.toLowerCase() === selectedPeriod.toLowerCase());
-        if (!isSameDay(selectedDate, today) && !selectedPeriod) {
-          setSelectedPeriod(periods[0])
-        } else if (!currentPeriodIsValid) {
-          setSelectedPeriod(getCurrentPeriod(selectedDate, availablePeriodTimes));
-        }
-      } else {
-        setSelectedPeriod('');
+  /** Sync selectedPeriod with derived periods */
+  useEffect(() => {
+    if (!selectedDate || periods.length === 0) {
+      if (selectedPeriod !== "") {
+        setSelectedPeriod("");
       }
-    }, [periods]); // Rerun when the `periods` array identity changes.
+      return;
+    }
 
+    const isValid = periods.includes(selectedPeriod);
 
-    //TODO: Grey-out the menus that have no stations
-    const currentMenu = hallData?.menus.find(menu =>
-      menu.period.name.toLowerCase() === selectedPeriod.toLowerCase()
+    if (!isSameDay(selectedDate, today) && !selectedPeriod) {
+      setSelectedPeriod(periods[0]);
+      return;
+    }
+
+    if (!isValid) {
+      const current = getCurrentPeriod(selectedDate, availablePeriodTimes);
+      if (current !== selectedPeriod) {
+        setSelectedPeriod(current);
+      }
+    }
+  }, [periods, selectedDate, today, availablePeriodTimes, selectedPeriod]);
+
+  /** Stations */
+  const currentMenu = hallData?.menus.find(
+    (m) => m.period.name.toLowerCase() === selectedPeriod.toLowerCase(),
+  );
+
+  const stations = currentMenu?.stations ?? [];
+
+  useEffect(() => {
+    if (stations.length === 0) {
+      if (selectedStation !== "") {
+        setSelectedStation("");
+      }
+      return;
+    }
+
+    const first = stations[0].name.toLowerCase();
+    const isValid = stations.some(
+      (s) => s.name.toLowerCase() === selectedStation,
     );
 
-    const fetchedStations: RestaurantInfo['menus'][number]['stations'] 
-    = currentMenu?.stations ?? [];
+    if (!isValid) {
+      setSelectedStation(first);
+    }
+  }, [stations, selectedStation]);
 
-    const currentStation = fetchedStations.find(stationEntry =>
-      stationEntry.name.toLowerCase() === selectedStation.toLowerCase()
-    );
+  const dishes =
+    stations.find((s) => s.name.toLowerCase() === selectedStation)?.dishes ??
+    [];
 
-    const dishesForSelectedStation = currentStation?.dishes ?? [];
+  /** Hero image */
+  const hero =
+    hall === HallEnum.ANTEATERY
+      ? { src: "/anteatery.webp", alt: "Anteatery dining hall" }
+      : { src: "/brandywine.webp", alt: "Brandywine dining hall" };
 
+  return (
+    <div className="z-0 flex flex-col h-full overflow-x-hidden">
+      <div className="relative w-full min-h-[20vh] max-h-[30vh] h-2/5">
+        <Image
+          className="object-cover object-bottom"
+          src={hero.src}
+          alt={hero.alt}
+          // width={2000}
+          // height={2000}
+          fill
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/65 to-transparent" />
+        {!isDesktop && toggleHall && (
+          <Button
+            variant="outline"
+            size="icon"
+            className="absolute top-[68px] right-3 rounded-full bg-white shadow-md"
+            onClick={() => toggleHall()}
+          >
+            <SyncAlt className="text-black-500 w-5 h-5" />
+          </Button>
+        )}
+      </div>
 
-    // Effect to update selected station when stations change 
-    useEffect(() => {
-      if (fetchedStations.length > 0) {
-        // Ensure fetchedStations[0] and its name property exist before accessing
-        const firstStationNameLower = fetchedStations[0].name.toLowerCase();
-        // Check if current selection is valid, if not, reset to first
-        const currentSelectionIsValid = fetchedStations.some(s => s.name.toLowerCase() === selectedStation);
-        if (!currentSelectionIsValid || !selectedStation) {
-            setSelectedStation(firstStationNameLower);
-        }
-      } else {
-        setSelectedStation('');
-      }
-      // Note: Adding selectedStation here would cause infinite loop if resetting.
-      // We only want to reset based on the *availability* of stations.
-    }, [fetchedStations, hall]); // Re-run when fetchedStations array identity changes
-
-    return (
-      <div className="z-0 flex flex-col h-full overflow-x-hidden">
-        <div className="relative w-full min-h-[20vh] max-h-[30vh] h-2/5">
-          <Image 
-            className="object-cover object-bottom"
-            src={heroImageSrc}
-            alt={heroImageAlt}
-            // width={2000}
-            // height={2000}
-            fill
-            priority 
-          />
-          {!isDesktop && toggleHall && (
-            <Button
-              variant="outline"
-              size="icon"
-              className="absolute top-[68px] right-3 rounded-full bg-white shadow-md"
-              onClick={() => toggleHall()}
-            >
-              <ArrowRightLeft className="text-black-500 w-5 h-5" />
-            </Button>
-          )}
-        </div>
-        
-        <div className="p-5 flex flex-col flex-grow h-1" id="side-content"> 
-          <div className="flex flex-col gap-4 sm:gap-6 items-center">
-            <div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-4 w-full">
-              {isLoading && <SelectSkeleton/>}
-              {!isLoading && !isError && 
+      <div className="p-5 flex flex-col flex-grow h-1" id="side-content">
+        <div className="flex flex-col gap-4 sm:gap-6 items-center">
+          <div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-4 w-full">
+            {isLoading && <SelectSkeleton />}
+            {!isLoading && !isError && (
               <div>
                 <Select
                   value={selectedPeriod}
-                  onValueChange={(value) => setSelectedPeriod(value || '')}
+                  onValueChange={(value) => setSelectedPeriod(value || "")}
                 >
                   <SelectTrigger className=" w-full sm:w-52">
                     <SelectValue placeholder="Select Meal" />
@@ -221,14 +187,19 @@ export default function Side({
                   <SelectContent>
                     {periods.map((time) => {
                       const mealTimeKey = time.toLowerCase();
-                      const periodTimes = availablePeriodTimes[mealTimeKey]; 
+                      const periodTimes = availablePeriodTimes[mealTimeKey];
 
                       return (
                         <SelectItem key={time} value={mealTimeKey}>
                           {toTitleCase(time)}&nbsp;
                           {periodTimes && (
                             <span className="text-zinc-500 text-sm">
-                              &nbsp;({formatOpenCloseTime(periodTimes[0], periodTimes[1])})
+                              &nbsp;(
+                              {formatOpenCloseTime(
+                                periodTimes[0],
+                                periodTimes[1],
+                              )}
+                              )
                             </span>
                           )}
                         </SelectItem>
@@ -236,53 +207,115 @@ export default function Side({
                     })}
                   </SelectContent>
                 </Select>
-              </div>}
-              {!isLoading && !isError && openTime && closeTime && // Ensure openTime and closeTime are defined
-              <div className="flex justify-center sm:justify-start">
-                <DiningHallStatus
-                  status={derivedHallStatus}
-                  openTime={openTime.toLocaleTimeString(undefined, {hour: '2-digit', minute: '2-digit'})}
-                  closeTime={closeTime.toLocaleTimeString(undefined, {hour: '2-digit', minute: '2-digit'})}
-                />
-              </div>}
-            </div>
-            {!isLoading && !isError && fetchedStations.length > 0 && (
-              <Tabs
-                value={selectedStation}
-                onValueChange={(value) => setSelectedStation(value || '')}
-                className="flex w-full justify-center" 
-              >
-                <div className="overflow-x-auto">
-                  <TabsList className="mx-auto">
-                      {fetchedStations.map((station => {
-                        return (
-                          <TabsTrigger key={station.name} value={station.name.toLowerCase()}>
-                            {toTitleCase(station.name)}
-                          </TabsTrigger>
-                        )
-                      }))}
-                  </TabsList>
+              </div>
+            )}
+            {!isLoading &&
+              !isError &&
+              openTime &&
+              closeTime && ( // Ensure openTime and closeTime are defined
+                <div className="flex justify-center sm:justify-start">
+                  <DiningHallStatus
+                    status={derivedHallStatus}
+                    openTime={openTime.toLocaleTimeString(undefined, {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                    closeTime={closeTime.toLocaleTimeString(undefined, {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  />
                 </div>
-              </Tabs>
-            )}
-            {isLoading && <TabsSkeleton/> /* Tab Skeleton */}
-            {!isLoading && !isError && fetchedStations.length === 0 && selectedPeriod && (
-                 <p className="text-center text-gray-500 py-2">No stations found for {toTitleCase(selectedPeriod)}.</p>
-            )}
-            {!isLoading && !isError && fetchedStations.length === 0 && !selectedPeriod && (
-                 <p className="text-center text-gray-500 py-2">No stations found.</p>
-            )}
+              )}
           </div>
+          {!isLoading && !isError && stations.length > 0 && (
+            <Tabs
+              value={selectedStation}
+              onValueChange={(value) => setSelectedStation(value || "")}
+              className="flex w-full justify-center"
+            >
+              <div className="overflow-x-auto">
+                <TabsList className="mx-auto">
+                  {stations.map((station) => {
+                    return (
+                      <TabsTrigger
+                        key={station.name}
+                        value={station.name.toLowerCase()}
+                      >
+                        {toTitleCase(station.name)}
+                      </TabsTrigger>
+                    );
+                  })}
+                </TabsList>
+              </div>
+            </Tabs>
+          )}
+          {isLoading && <TabsSkeleton /> /* Tab Skeleton */}
+          {!isLoading &&
+            !isError &&
+            stations.length === 0 &&
+            selectedPeriod && (
+              <p className="text-center text-gray-500 py-2">
+                No stations found for {toTitleCase(selectedPeriod)}.
+              </p>
+            )}
+          {!isLoading &&
+            !isError &&
+            stations.length === 0 &&
+            !selectedPeriod && (
+              <p className="text-center text-gray-500 py-2">
+                No stations found.
+              </p>
+            )}
 
-          <DishesInfo 
-            dishes={dishesForSelectedStation}
-            isLoading={isLoading}
-            isError={isError || (!isLoading && !hallData)} 
-            errorMessage={error?.message ?? (!isLoading && !hallData ? `Data not available for ${HallEnum[hall]}.` : undefined)}
-          />
+          {/* View Toggle Buttons */}
+          {!isLoading && !isError && dishes.length > 0 && (
+            <div className="flex gap-2 w-full justify-end">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsCompactView(false)}
+                className={`px-4 py-1 flex items-center justify-center ${
+                  !isCompactView
+                    ? "bg-sky-700 text-white border-sky-700 hover:bg-sky-700 hover:text-white"
+                    : "border-sky-700 text-slate-900 hover:bg-sky-50 hover:text-slate-900"
+                }`}
+              >
+                <Menu className="mr-1" />
+                Card View
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsCompactView(true)}
+                className={`px-4 py-1 flex items-center justify-center ${
+                  isCompactView
+                    ? "bg-sky-700 text-white border-sky-700 hover:bg-sky-700 hover:text-white"
+                    : "border-sky-700 text-slate-900 hover:bg-sky-50 hover:text-slate-900"
+                }`}
+              >
+                <GridView className="mr-1" />
+                Compact View
+              </Button>
+            </div>
+          )}
         </div>
+
+        <DishesInfo
+          dishes={dishes}
+          isLoading={isLoading}
+          isError={isError || (!isLoading && !hallData)}
+          errorMessage={
+            error?.message ??
+            (!isLoading && !hallData
+              ? `Data not available for ${HallEnum[hall]}.`
+              : undefined)
+          }
+          isCompactView={isCompactView}
+        />
       </div>
-    )
+    </div>
+  );
 }
 
 /**
@@ -294,14 +327,15 @@ export default function Side({
  *                                                            and values are tuples containing the start and end Date objects for that period.
  * @returns {string} The key/name of the current or default meal period.
  */
-function getCurrentPeriod(selectedDate: Date, periods: { [periodName: string]: [Date, Date] }): string {
-  for (let key in periods) {
-    let periodBegin: Date = periods[key][0];
-    let periodEnd: Date = periods[key][1];
+function getCurrentPeriod(
+  selectedDate: Date,
+  periods: { [periodName: string]: [Date, Date] },
+): string {
+  for (const key in periods) {
+    const periodBegin: Date = periods[key][0];
+    const periodEnd: Date = periods[key][1];
 
-    if (selectedDate >= periodBegin && selectedDate <= periodEnd)
-      return key;
-
+    if (selectedDate >= periodBegin && selectedDate <= periodEnd) return key;
   }
 
   return Object.keys(periods)[0];
