@@ -35,6 +35,7 @@
   },
   "devDependencies": {
     "@testcontainers/postgresql": "catalog:",
+    "@types/minimatch": "^6.0.0",
     "@zotmeal/eslint-config": "workspace:*",
     "@zotmeal/prettier-config": "workspace:*",
     "@zotmeal/tsconfig": "workspace:*",

@@ -432,6 +432,9 @@ importers:
       '@testcontainers/postgresql':
         specifier: 'catalog:'
         version: 10.28.0
+      '@types/minimatch':
+        specifier: ^6.0.0
+        version: 6.0.0
       '@zotmeal/eslint-config':
         specifier: workspace:*
         version: link:../../tooling/eslint

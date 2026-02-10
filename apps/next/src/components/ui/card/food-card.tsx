@@ -1,18 +1,18 @@
 "use client";
 
-import { Alert, Snackbar } from "@mui/material";
-
-import type { DishInfo } from "@zotmeal/api";
 import {
+  Add,
+  AddCircleOutline,
   Check,
-  CirclePlus,
-  Heart,
-  Minus,
-  Plus,
-  Star,
-  Trash2,
-  Utensils,
-} from "lucide-react";
+  Circle,
+  Delete,
+  FavoriteBorder,
+  Remove,
+  Restaurant,
+  StarBorder,
+} from "@mui/icons-material";
+import { Alert, Snackbar } from "@mui/material";
+import type { DishInfo } from "@zotmeal/api";
 import React from "react";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useSession } from "@/utils/auth-client";
@@ -69,7 +69,7 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
     },
     ref,
   ) => {
-    const IconComponent = getFoodIcon(dish.name) ?? Utensils;
+    const IconComponent = getFoodIcon(dish.name) ?? Restaurant;
 
     // check if user is signed in andshow  error if not signed in before attempting to add meal
     const { data: session } = useSession();
@@ -267,7 +267,7 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                     )}
                     {/* Average rating display - grey outline star */}
                     <div className="flex gap-1 items-center">
-                      <Star
+                      <StarBorder
                         className="w-4 h-4 stroke-zinc-200"
                         strokeWidth={1}
                       />
@@ -312,7 +312,7 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                             disabled={loggedMeal.servings <= 0.5}
                             className="h-8 w-8"
                           >
-                            <Minus className="h-4 w-4" />
+                            <Remove className="h-4 w-4" />
                           </Button>
                           <span className="flex-1 text-center font-medium">
                             {loggedMeal.servings}
@@ -323,7 +323,7 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                             onClick={handleIncreaseQuantity}
                             className="h-8 w-8"
                           >
-                            <Plus className="h-4 w-4" />
+                            <Add className="h-4 w-4" />
                           </Button>
                         </div>
                         <Button
@@ -332,7 +332,7 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                           onClick={handleRemoveMeal}
                           className="w-full"
                         >
-                          <Trash2 className="h-4 w-4 mr-2" />
+                          <Delete className="h-4 w-4 mr-2" />
                           Remove from log
                         </Button>
                       </div>
@@ -345,7 +345,7 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                     aria-label="Add meal to log"
                     className="hover:text-green-600 transition-colors"
                   >
-                    <CirclePlus className="w-5 h-5" />
+                    <AddCircleOutline className="w-5 h-5" />
                   </button>
                 )}
               </div>
@@ -367,7 +367,7 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                       : "hover:bg-rose-50 hover:text-rose-600",
                   )}
                 >
-                  <Heart
+                  <FavoriteBorder
                     className={cn(
                       "w-5 h-5",
                       isFavorited
