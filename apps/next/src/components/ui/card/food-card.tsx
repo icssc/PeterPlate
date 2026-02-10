@@ -4,7 +4,6 @@ import {
   Add,
   AddCircleOutline,
   Check,
-  Circle,
   Delete,
   FavoriteBorder,
   Remove,
@@ -15,6 +14,7 @@ import { Alert, Snackbar } from "@mui/material";
 import type { DishInfo } from "@zotmeal/api";
 import React from "react";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { useSnackbarStore } from "@/hooks/useSnackbar";
 import { useSession } from "@/utils/auth-client";
 import { formatFoodName, getFoodIcon, toTitleCase } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
@@ -75,29 +75,8 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
     const { data: session } = useSession();
     const user = session?.user;
 
-    // snackbar constants and handler
-    const [snackbarOpen, setSnackbarOpen] = React.useState(false);
-    const [snackbarMessage, setSnackbarMessage] = React.useState("");
-    const [snackbarSeverity, setSnackbarSeverity] = React.useState<
-      "success" | "error" | "info" | "warning"
-    >("success");
-
-    const showSnackbar = (
-      message: string,
-      severity: "success" | "error" | "info" | "warning" = "info",
-    ) => {
-      setSnackbarMessage(message);
-      setSnackbarSeverity(severity);
-      setSnackbarOpen(true);
-    };
-
-    const handleSnackbarClose = (
-      _event?: React.SyntheticEvent | Event,
-      reason?: string,
-    ) => {
-      if (reason === "clickaway") return;
-      setSnackbarOpen(false);
-    };
+    // snackbar constants and handler moved to useSnackbar (Zustand store)
+    const showSnackbar = useSnackbarStore((s) => s.showSnackbar);
 
     /**
      * Fetches the average rating and rating count for the dish.
@@ -380,22 +359,6 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
             </div>
           </CardContent>
         </Card>
-
-        <Snackbar
-          open={snackbarOpen}
-          autoHideDuration={3000}
-          onClose={handleSnackbarClose}
-          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-        >
-          <Alert
-            onClose={() => setSnackbarOpen(false)}
-            severity={snackbarSeverity}
-            variant="filled"
-            sx={{ width: "100%" }}
-          >
-            {snackbarMessage}
-          </Alert>
-        </Snackbar>
       </div>
     );
   },

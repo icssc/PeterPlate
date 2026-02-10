@@ -1,11 +1,13 @@
 "use client";
-import Snackbar from "@mui/material/Snackbar";
+
+import { Alert, Snackbar } from "@mui/material";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink } from "@trpc/client";
 import { useState } from "react";
 import superjson from "superjson";
 import Toolbar from "@/components/ui/toolbar";
 import { DateProvider } from "@/context/date-context";
+import { useSnackbarStore } from "@/hooks/useSnackbar";
 import { trpc } from "../utils/trpc";
 
 export function RootClient({ children }: { children: React.ReactNode }) {
@@ -33,9 +35,22 @@ export function RootClient({ children }: { children: React.ReactNode }) {
         <DateProvider>
           <Toolbar />
           {children}
+          <GlobalSnackbar />
           <Snackbar />
         </DateProvider>
       </QueryClientProvider>
     </trpc.Provider>
+  );
+}
+
+function GlobalSnackbar() {
+  const { open, message, severity, closeSnackbar } = useSnackbarStore();
+
+  return (
+    <Snackbar open={open} autoHideDuration={4000} onClose={closeSnackbar}>
+      <Alert onClose={closeSnackbar} severity={severity} variant="filled">
+        {message}
+      </Alert>
+    </Snackbar>
   );
 }
