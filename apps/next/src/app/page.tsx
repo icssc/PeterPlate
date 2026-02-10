@@ -204,7 +204,7 @@ function DesktopHome(): React.JSX.Element {
                       </span>
                     </div>
                   </div>
-                  <ChevronRight className="text-sky-600 w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                  <ChevronRight className="text-sky-600 w-6 h-6" />
                 </div>
               </div>
             </Link>
@@ -239,7 +239,7 @@ function DesktopHome(): React.JSX.Element {
                       </span>
                     </div>
                   </div>
-                  <ChevronRight className="text-sky-600 w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                  <ChevronRight className="text-sky-600 w-6 h-6" />
                 </div>
               </div>
             </Link>
