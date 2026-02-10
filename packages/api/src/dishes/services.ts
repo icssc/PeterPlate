@@ -20,13 +20,15 @@ export async function upsertDish(
     const result = await db.transaction<
       Omit<InsertDishWithRelations, "stationId">
     >(async (tx) => {
-      const upsertedDish = await upsert(tx, dishes, dishData, {
+      const txDb = tx as unknown as Drizzle;
+
+      const upsertedDish = await upsert(txDb, dishes, dishData, {
         target: [dishes.id],
         set: dishData,
       });
 
       const upsertedDietRestriction = await upsert(
-        tx,
+        txDb,
         dietRestrictions,
         dietRestriction,
         {
@@ -36,7 +38,7 @@ export async function upsertDish(
       );
 
       const upsertedNutritionInfo = await upsert(
-        tx,
+        txDb,
         nutritionInfos,
         nutritionInfo,
         {
