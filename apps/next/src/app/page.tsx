@@ -294,10 +294,14 @@ function DesktopHome(): React.JSX.Element {
           ) : (
             <div className="grid grid-cols-4 gap-4">
               {[...events]
-                .sort((a, b) => {
-                  const aStart = a.start ? new Date(a.start).getTime() : 0;
-                  const bStart = b.start ? new Date(b.start).getTime() : 0;
-                  return aStart - bStart;
+                .sort((event, nextEvent) => {
+                  const eventStartTime = event.start
+                    ? new Date(event.start).getTime()
+                    : 0;
+                  const nextEventStartTime = nextEvent.start
+                    ? new Date(nextEvent.start).getTime()
+                    : 0;
+                  return eventStartTime - nextEventStartTime;
                 })
                 .slice(0, 4)
                 .map((event, idx) => (
