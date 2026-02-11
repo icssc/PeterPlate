@@ -26,6 +26,9 @@ const Events = () => {
     "both" | "special" | "celebration"
   >("both");
   const [viewMode, setViewMode] = useState<"grid" | "calendar">("grid");
+  const [selectedEventData, setSelectedEventData] = useState<EventInfo | null>(
+    null,
+  );
   const now = new Date();
 
   const {
@@ -65,9 +68,6 @@ const Events = () => {
   }));
 
   const isDesktop = useMediaQuery("(min-width: 768px)");
-  const [selectedEventData, setSelectedEventData] = useState<EventInfo | null>(
-    null,
-  );
 
   const handleSelectEvent = (calendarEvent: any) => {
     const resource = calendarEvent.resource;
