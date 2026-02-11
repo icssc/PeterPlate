@@ -17,6 +17,21 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { getEventType } from "@/utils/funcs";
 import { HallEnum } from "@/utils/types";
 
+const months = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
 const Events = () => {
   const localizer = momentLocalizer(moment);
   const [selectedDiningHall, setSelectedDiningHall] = useState<
@@ -280,7 +295,7 @@ const Events = () => {
             <div className="border-2 border-sky-700 p-4 rounded-lg">
               <div className="text-center">
                 <span className="inline-block mb-6 text-3xl text-sky-700 font-medium">
-                  February 2026
+                  {months[now.getMonth()]} {now.getFullYear()}
                 </span>
               </div>
               <Calendar
