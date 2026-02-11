@@ -95,7 +95,7 @@ describe("AdobeECommerce API Integration Tests", () => {
     name,
   }) => {
     it(`should successfully fetch data, not throw errors, and validate against Zod schema (${name})`, async () => {
-      let response;
+      let response: any;
       let caughtError = null;
 
       try {

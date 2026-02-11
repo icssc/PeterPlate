@@ -1,5 +1,4 @@
 {
-
   "id": "a02fd737-a250-4cbf-a70a-22e9b9a69476",
   "prevId": "73beb0f4-e287-43f8-bfad-36ddec5e7492",
   "version": "7",
@@ -334,19 +333,6 @@
           "tableTo": "stations",
           "columnsFrom": [
             "station_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "restrict",
-          "onUpdate": "cascade"
-        },
-        "dishes_menu_id_menus_id_fk": {
-          "name": "dishes_menu_id_menus_id_fk",
-          "tableFrom": "dishes",
-          "tableTo": "menus",
-          "columnsFrom": [
-            "menu_id"
           ],
           "columnsTo": [
             "id"

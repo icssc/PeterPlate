@@ -29,6 +29,7 @@ export async function upsertDish(
       ) {
         delete dishSet.image_url;
       }
+
       const upsertedDish = await upsert(tx, dishes, dishData, {
         target: [dishes.id],
         set: dishSet,

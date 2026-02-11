@@ -20,7 +20,6 @@ export const dishes = pgTable(
         onDelete: "restrict",
         onUpdate: "cascade",
       }),
-
     name: text("name").notNull(),
     description: text("description").notNull(),
     ingredients: text("ingredients").default(

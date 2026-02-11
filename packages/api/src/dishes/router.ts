@@ -5,7 +5,7 @@ import {
   upsertRating,
 } from "@api/ratings/services";
 import { createTRPCRouter, publicProcedure } from "@api/trpc";
-import { RatingSchema } from "@peterplate/db";
+import { dishes, RatingSchema } from "@peterplate/db";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
