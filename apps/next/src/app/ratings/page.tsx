@@ -1,12 +1,12 @@
 "use client";
 
-import MealDivider from "@/components/ui/meal-divider";
-import { trpc } from "@/utils/trpc";
 import Image from "next/image";
-import RatingsCard from "@/components/ui/card/ratings-card";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import RatingsCard from "@/components/ui/card/ratings-card";
+import MealDivider from "@/components/ui/meal-divider";
 import { useUserStore } from "@/context/useUserStore";
+import { trpc } from "@/utils/trpc";
 
 export default function RatedFoods() {
   const router = useRouter();
@@ -18,17 +18,20 @@ export default function RatedFoods() {
       alert("Login to rate meals!");
       router.push("/");
     }
-  }, [userId]);
+  }, [userId, router]);
 
   const {
     data: ratedFoods,
     isLoading,
     error,
-  } = trpc.dish.rated.useQuery({
-    userId: userId!
-  }, {
-    enabled: !!userId
-  });
+  } = trpc.dish.rated.useQuery(
+    {
+      userId: userId ?? "",
+    },
+    {
+      enabled: !!userId,
+    },
+  );
 
   return (
     <div className="max-w-full h-screen">
@@ -58,19 +61,17 @@ export default function RatedFoods() {
             </p>
           )}
 
-          {!isLoading && !error && (
-            <>
-              {ratedFoods && ratedFoods.length > 0 ? (
-                ratedFoods.map((food: (typeof ratedFoods)[number]) => (
-                  <RatingsCard key={`${food.id}|${food.ratedAt}`} food={food} />
-                ))
-              ) : (
-                <p className="text-center text-zinc-700 py-5">
-                  You haven't rated any foods yet
-                </p>
-              )}
-            </>
-          )}
+          {!isLoading &&
+            !error &&
+            (ratedFoods && ratedFoods.length > 0 ? (
+              ratedFoods.map((food: (typeof ratedFoods)[number]) => (
+                <RatingsCard key={`${food.id}|${food.ratedAt}`} food={food} />
+              ))
+            ) : (
+              <p className="text-center text-zinc-700 py-5">
+                You haven't rated any foods yet
+              </p>
+            ))}
         </div>
       </div>
     </div>

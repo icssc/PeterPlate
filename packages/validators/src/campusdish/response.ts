@@ -1,6 +1,5 @@
+import { restaurantIds } from "@peterplate/db";
 import { z } from "zod";
-
-import { restaurantIds } from "@zotmeal/db";
 
 import { MenuProductSchema, MenuStationSchema } from "./models";
 

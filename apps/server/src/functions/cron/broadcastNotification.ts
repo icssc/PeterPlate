@@ -1,12 +1,12 @@
 import { Expo } from "expo-server-sdk";
 
-import { broadcastNotification, Notification } from "@zotmeal/api";
+import { broadcastNotification, Notification } from "@peterplate/api";
 import {
   createDrizzle,
   EventSchema,
   getRestaurantNameById,
   pool,
-} from "@zotmeal/db";
+} from "@peterplate/db";
 
 export const main = async (evt, _context) => {
   const db = createDrizzle({

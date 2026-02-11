@@ -11,7 +11,7 @@ import {
   type InsertDishWithRelations,
   type InsertEvent,
   type RestaurantName,
-} from "@zotmeal/db";
+} from "@peterplate/db";
 import {
   AEMEventListSchema,
   type DiningHallInformation,
@@ -25,7 +25,7 @@ import {
   type MealPeriodWithHours,
   type Schedule,
   type WeekTimes,
-} from "@zotmeal/validators";
+} from "@peterplate/validators";
 import axios, { type AxiosError, type AxiosResponse } from "axios";
 import {
   AEMEventListQuery,
@@ -346,6 +346,14 @@ type ProductAttributes = {
 
 type ProductDictionary = { [sku: string]: ProductAttributes };
 
+const parseNumericAttribute = (value: unknown): string | null => {
+  if (typeof value === "number")
+    return Number.isFinite(value) ? `${value}` : null;
+  if (typeof value !== "string") return null;
+  const match = value.match(/-?\d+(\.\d+)?/);
+  return match ? match[0] : null;
+};
+
 /**
  * Parses the product attributes found in {@link WeeklyProducts} into a
  * more-conveniently accessible {@link ProductDictionary}
@@ -395,20 +403,22 @@ function parseProducts(products: WeeklyProducts): ProductDictionary {
 
     const nutritionInfo = {
       dishId: product.sku,
-      calories: (attributesMap.get("calories") as string) ?? "",
-      sodiumMg: (attributesMap.get("sodium") as string) ?? "",
-      totalFatG: (attributesMap.get("total_fat") as string) ?? "",
-      transFatG: (attributesMap.get("trans_fat") as string) ?? "",
-      saturatedFatG: (attributesMap.get("saturated_fat") as string) ?? "",
-      sugarsG: (attributesMap.get("sugars") as string) ?? "",
-      ironMg: (attributesMap.get("iron") as string) ?? "",
-      cholesterolMg: (attributesMap.get("cholesterol") as string) ?? "",
-      totalCarbsG: (attributesMap.get("total_carbohydrates") as string) ?? "",
-      dietaryFiberG: (attributesMap.get("dietary_fiber") as string) ?? "",
-      proteinG: (attributesMap.get("protein") as string) ?? "",
-      calciumMg: (attributesMap.get("calcium") as string) ?? "",
-      vitaminAIU: (attributesMap.get("vitamin_a") as string) ?? "",
-      vitaminCIU: (attributesMap.get("vitamin_c") as string) ?? "",
+      calories: parseNumericAttribute(attributesMap.get("calories")),
+      sodiumMg: parseNumericAttribute(attributesMap.get("sodium")),
+      totalFatG: parseNumericAttribute(attributesMap.get("total_fat")),
+      transFatG: parseNumericAttribute(attributesMap.get("trans_fat")),
+      saturatedFatG: parseNumericAttribute(attributesMap.get("saturated_fat")),
+      sugarsG: parseNumericAttribute(attributesMap.get("sugars")),
+      ironMg: parseNumericAttribute(attributesMap.get("iron")),
+      cholesterolMg: parseNumericAttribute(attributesMap.get("cholesterol")),
+      totalCarbsG: parseNumericAttribute(
+        attributesMap.get("total_carbohydrates"),
+      ),
+      dietaryFiberG: parseNumericAttribute(attributesMap.get("dietary_fiber")),
+      proteinG: parseNumericAttribute(attributesMap.get("protein")),
+      calciumMg: parseNumericAttribute(attributesMap.get("calcium")),
+      vitaminAIU: parseNumericAttribute(attributesMap.get("vitamin_a")),
+      vitaminCIU: parseNumericAttribute(attributesMap.get("vitamin_c")),
       servingSize: servingSize ?? "",
       servingUnit: servingUnit ?? "",
       // possible to get vitamins B and D and potassium in

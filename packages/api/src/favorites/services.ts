@@ -1,18 +1,14 @@
 import { upsert } from "@api/utils";
+import type { Drizzle, SelectFavorite } from "@peterplate/db";
+import { favorites } from "@peterplate/db";
 import { TRPCError } from "@trpc/server";
-import { eq, and } from "drizzle-orm";
-
-import type { Drizzle, InsertFavorite, SelectFavorite } from "@zotmeal/db";
-import { favorites, dishes, users } from "@zotmeal/db";
+import { and, eq } from "drizzle-orm";
 
 /**
  * Get all favorites for a given user ID.
  * Returns empty array if the user has no favorites.
  */
-export async function getFavorites(
-  db: Drizzle,
-  userId: string,
-) {
+export async function getFavorites(db: Drizzle, userId: string) {
   const userFavorites = await db.query.favorites.findMany({
     where: (favorites, { eq }) => eq(favorites.userId, userId),
     with: {
@@ -105,4 +101,3 @@ export async function deleteFavorite(
     .delete(favorites)
     .where(and(eq(favorites.userId, userId), eq(favorites.dishId, dishId)));
 }
-

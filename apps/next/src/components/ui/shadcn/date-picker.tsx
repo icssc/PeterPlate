@@ -1,7 +1,7 @@
 "use client";
 
+import { CalendarToday } from "@mui/icons-material";
 import { format } from "date-fns";
-import { CalendarToday } from "@mui/icons-material"
 import { Button } from "@/components/ui/shadcn/button";
 import { Calendar } from "@/components/ui/shadcn/calendar";
 import { isSameDay } from "@/utils/funcs";

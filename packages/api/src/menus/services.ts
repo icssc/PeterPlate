@@ -1,6 +1,6 @@
 import { upsert, upsertBatch } from "@api/utils";
-import type { DateList, Drizzle, InsertMenu } from "@zotmeal/db";
-import { menus } from "@zotmeal/db";
+import type { DateList, Drizzle, InsertMenu } from "@peterplate/db";
+import { menus } from "@peterplate/db";
 import { sql } from "drizzle-orm";
 
 export const upsertMenu = async (db: Drizzle, menu: InsertMenu) =>

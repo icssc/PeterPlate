@@ -1,222 +1,227 @@
 "use client";
 
 import {
-  CalendarToday,
-  EditNote,
-  EggAlt,
-  EmojiEvents,
-  FavoriteBorder,
-  House,
-  Info,
-  Logout,
-  Person,
-  Settings,
-  StarBorder,
+  Close as CloseIcon,
+  DarkMode as DarkModeIcon,
+  DesktopWindows as DesktopWindowsIcon,
+  Edit as EditIcon,
+  Feedback as FeedbackIcon,
+  Info as InfoIcon,
+  LightMode as LightModeIcon,
+  Logout as LogoutIcon,
 } from "@mui/icons-material";
-import {
-  Avatar,
-  Box,
-  Divider,
-  Drawer,
-  IconButton,
-  Stack,
-  Typography,
-} from "@mui/material";
 import Image from "next/image";
-import type React from "react";
+import Link from "next/link";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in";
-import { signOut, useSession } from "@/utils/auth-client"; // BetterAuth React hook
-import SidebarButton, { type SidebarButtonProps } from "./sidebar-button";
-import SidebarDivider from "./sidebar-divider";
-import { ThemeToggle } from "./theme-toggle";
+import { signOut, useSession } from "@/utils/auth-client";
 
-interface SidebarContentProps {
-  open: boolean;
+interface ProfileMenuContentProps {
   onClose: () => void;
 }
 
-type SidebarSection = {
-  title: string;
-  buttons: SidebarButtonProps[];
-};
-
-const SIDEBAR_CONTENT_MAP: SidebarSection[] = [
-  {
-    title: "Dining Hall Info",
-    buttons: [
-      {
-        Icon: House,
-        title: "Home",
-        href: "/",
-      },
-      {
-        Icon: CalendarToday,
-        title: "Events",
-        href: "/events",
-      },
-      {
-        Icon: EmojiEvents,
-        title: "Most Liked",
-        href: "/leaderboard",
-        deactivated: true,
-      },
-      {
-        Icon: EggAlt,
-        title: "Nutrition",
-        href: "/nutrition",
-      },
-    ],
-  },
-  {
-    title: "Account",
-    buttons: [
-      {
-        Icon: Person,
-        title: "My Account",
-        href: "/account",
-      },
-      {
-        Icon: StarBorder,
-        title: "My Ratings",
-        href: "/ratings",
-      },
-      {
-        Icon: FavoriteBorder,
-        title: "My Favorites",
-        href: "/my-favorites",
-      },
-      {
-        Icon: EditNote,
-        title: "My Meal Tracker",
-        href: "/meal-tracker",
-        deactivated: true,
-      },
-    ],
-  },
-  {
-    title: "Miscellaneous",
-    buttons: [
-      {
-        Icon: Settings,
-        title: "Settings",
-        href: "/settings",
-        deactivated: true,
-      },
-      {
-        Icon: Info,
-        title: "About",
-        href: "/about",
-      },
-    ],
-  },
-];
-
-/**
- * `SidebarContent` is a presentational component that renders the main content
- * displayed within the application's sidebar.
- *
- * It includes:
- * - A header section with the application logo and title.
- * - Navigation links using {@link SidebarButton} and section separators using {@link SidebarDivider}.
- * - A user profile section at the bottom with an avatar, user details, and a logout button.
- * @returns {JSX.Element} The rendered content for the sidebar.
- */
 export default function SidebarContent({
-  open,
   onClose,
-}: SidebarContentProps): React.JSX.Element {
-  // Get session data using BetterAuth's React hook
-  const { data: session, isPending } = useSession();
+}: ProfileMenuContentProps): JSX.Element {
+  const { data: session } = useSession();
   const user = session?.user;
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return null;
 
   const handleSignOut = async () => {
-    try {
-      await signOut();
-      window.location.href = "/";
-    } catch (error) {
-      console.error("Sign out error:", error);
-    }
+    await signOut();
+    window.location.href = "/";
   };
 
   return (
-    <Drawer anchor="right" open={open} onClose={onClose}>
-      <Box className="flex h-full w-[280px] flex-col justify-between p-4">
-        {/* Top */}
-        <Stack className="space-y-2">
-          {/* Header */}
-          <Stack direction="row" className="items-center gap-3">
-            <Image
-              src="/ZotMeal-Logo.webp"
-              width={32}
-              height={32}
-              alt="ZotMeal Logo"
+    <div className="w-full h-full rounded-2xl bg-white dark:bg-gray-900 shadow-xl flex flex-col">
+      {/* Header */}
+      <div className="flex items-start justify-between px-5 pt-5">
+        <div className="flex items-center gap-3">
+          <Image
+            src={user?.image || "/peter.webp"}
+            alt="Profile"
+            width={44}
+            height={44}
+            className="rounded-full object-cover"
+          />
+          <div>
+            <h2 className="text-sm font-semibold text-gray-900 dark:text-white">
+              {user?.name || "Peter Anteater"}
+            </h2>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              {user?.email || "panteater@uci.edu"}
+            </p>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={onClose}
+          className="rounded-full p-1.5 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
+        >
+          <CloseIcon sx={{ fontSize: 18 }} />
+        </button>
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 px-5 pt-4 space-y-5">
+        {/* Dietary Preferences */}
+        <div>
+          <h3 className="text-sm font-semibold text-blue-600 dark:text-blue-400 mb-2">
+            Dietary Preferences
+          </h3>
+
+          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+            Restrictions:
+          </p>
+          <div className="flex flex-wrap gap-1.5 mb-3">
+            <span className="rounded-md border border-blue-500 px-2.5 py-0.5 text-xs text-blue-600 dark:text-blue-400">
+              Kosher
+            </span>
+          </div>
+
+          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+            Allergies:
+          </p>
+          <div className="flex flex-wrap gap-1.5">
+            <span className="rounded-md border border-blue-500 px-2.5 py-0.5 text-xs text-blue-600 dark:text-blue-400">
+              Tree Nuts
+            </span>
+            <span className="rounded-md border border-blue-500 px-2.5 py-0.5 text-xs text-blue-600 dark:text-blue-400">
+              Soy
+            </span>
+          </div>
+        </div>
+
+        {/* Appearance */}
+        <div>
+          <h3 className="text-sm font-semibold text-blue-600 dark:text-blue-400 mb-2">
+            Appearance
+          </h3>
+
+          <div className="flex rounded-lg border border-blue-500 overflow-hidden">
+            <ThemeButton
+              active={theme === "light"}
+              onClick={() => setTheme("light")}
+              icon={<LightModeIcon sx={{ fontSize: 16 }} />}
+              label="Light"
             />
+            <ThemeButton
+              active={theme === "system"}
+              onClick={() => setTheme("system")}
+              icon={<DesktopWindowsIcon sx={{ fontSize: 16 }} />}
+              label="Device"
+            />
+            <ThemeButton
+              active={theme === "dark"}
+              onClick={() => setTheme("dark")}
+              icon={<DarkModeIcon sx={{ fontSize: 16 }} />}
+              label="Dark"
+            />
+          </div>
+        </div>
 
-            <Typography variant="h6" className="font-semibold">
-              ZotMeal{" "}
-              <Typography
-                component="span"
-                variant="body2"
-                className="text-gray-500"
-              >
-                v0.1 (preview)
-              </Typography>
-            </Typography>
-          </Stack>
+        {/* Links */}
+        <div className="space-y-1">
+          <MenuLink
+            href="/account"
+            onClick={onClose}
+            icon={<EditIcon fontSize="small" />}
+          >
+            Edit Preferences
+          </MenuLink>
 
-          <Divider className="my-2" />
+          <MenuLink
+            href="/feedback"
+            onClick={onClose}
+            icon={<FeedbackIcon fontSize="small" />}
+          >
+            Feedback
+          </MenuLink>
 
-          {SIDEBAR_CONTENT_MAP.map((section) => (
-            <div key={section.title}>
-              <SidebarDivider title={section.title} />
-              {section.buttons.map((button) => (
-                <SidebarButton key={button.title} {...button} />
-              ))}
-            </div>
-          ))}
-        </Stack>
+          <MenuLink
+            href="/about"
+            onClick={onClose}
+            icon={<InfoIcon fontSize="small" />}
+          >
+            About PeterPlate
+          </MenuLink>
+        </div>
+      </div>
 
-        {/* Bottom */}
-        <Stack className="space-y-2">
-          <ThemeToggle />
-          {!isPending && !user && <GoogleSignInButton />}
+      {/* Sign out */}
 
-          {!isPending && user && (
-            <Box className="flex items-center justify-between rounded-md p-2 hover:bg-gray-100">
-              <Stack direction="row" className="items-center gap-3">
-                <Avatar
-                  src={user.image || "/peter.webp"}
-                  alt={user.name || "User"}
-                  variant="rounded"
-                  className="h-10 w-10"
-                >
-                  {user.name?.[0]?.toUpperCase() ||
-                    user.email?.[0]?.toUpperCase() ||
-                    "U"}
-                </Avatar>
+      <div className="px-5 pb-5 pt-3">
+        {user ? (
+          <button
+            type="button"
+            onClick={handleSignOut}
+            className="w-full rounded-lg bg-blue-600
+            py-2.5 text-sm font-semibold text-white
+            hover:bg-blue-700 flex items-center justify-center"
+          >
+            <span className="inline-flex items-center gap-2">
+              <LogoutIcon fontSize="small" />
+              Sign Out
+            </span>
+          </button>
+        ) : (
+          <GoogleSignInButton />
+        )}
+      </div>
+    </div>
+  );
+}
 
-                <Box>
-                  <Typography className="font-semibold leading-tight">
-                    {user.name || "User"}
-                  </Typography>
-                  <Typography variant="body2" className="text-gray-500">
-                    {user.email || ""}
-                  </Typography>
-                </Box>
-              </Stack>
+function ThemeButton({
+  active,
+  onClick,
+  icon,
+  label,
+}: {
+  active: boolean;
+  onClick: () => void;
+  icon: React.ReactNode;
+  label: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`flex-1 flex items-center justify-center gap-1 py-2 text-xs font-medium transition-colors ${
+        active ? "bg-blue-100 text-blue-700" : "text-blue-600 hover:bg-blue-50"
+      }`}
+    >
+      {icon}
+      {label}
+    </button>
+  );
+}
 
-              <IconButton
-                onClick={handleSignOut}
-                aria-label="Log out"
-                size="small"
-                className="hover:bg-gray-200"
-              >
-                <Logout fontSize="small" />
-              </IconButton>
-            </Box>
-          )}
-        </Stack>
-      </Box>
-    </Drawer>
+function MenuLink({
+  href,
+  onClick,
+  icon,
+  children,
+}: {
+  href: string;
+  onClick: () => void;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <Link
+      href={href}
+      onClick={onClick}
+      className="flex items-center gap-3 rounded-lg px-4 py-2 text-sm text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
+    >
+      {icon}
+      <span className="font-medium">{children}</span>
+    </Link>
   );
 }

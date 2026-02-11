@@ -1,7 +1,10 @@
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
+  check,
   date,
   foreignKey,
+  index,
+  numeric,
   pgTable,
   primaryKey,
   text,
@@ -25,16 +28,27 @@ export const menus = pgTable(
         onDelete: "restrict",
         onUpdate: "cascade",
       }),
-    price: text("price").notNull(),
+    price: numeric("price", { precision: 6, scale: 2 }),
     ...metadataColumns,
   },
   (table) => ({
+    restaurantDateIdx: index("menus_restaurant_date_idx").on(
+      table.restaurantId,
+      table.date,
+    ),
+    restaurantIdx: index("menus_restaurant_id_idx").on(table.restaurantId),
+    dateIdx: index("menus_date_idx").on(table.date),
+    periodIdx: index("menus_period_id_idx").on(table.periodId),
     periodFk: foreignKey({
       columns: [table.periodId, table.date, table.restaurantId],
       foreignColumns: [periods.id, periods.date, periods.restaurantId],
     })
       .onDelete("restrict")
       .onUpdate("cascade"),
+    priceNonNegative: check(
+      "menus_price_nonnegative",
+      sql`price IS NULL OR price >= 0`,
+    ),
   }),
 );
 

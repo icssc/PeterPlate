@@ -1,8 +1,8 @@
 import { createTRPCRouter, publicProcedure } from "@api/trpc";
-import { z } from "zod";
-import { loggedMeals, nutritionInfos } from "@zotmeal/db";
+import { loggedMeals, nutritionInfos } from "@peterplate/db";
 import { TRPCError } from "@trpc/server";
-import { gt, eq, and, desc } from "drizzle-orm";
+import { and, desc, eq, gt } from "drizzle-orm";
+import { z } from "zod";
 
 const LoggedMealSchema = z.object({
   dishId: z.string(),
@@ -26,7 +26,7 @@ export const nutritionRouter = createTRPCRouter({
           dishId: input.dishId,
           dishName: input.dishName,
           servings: input.servings,
-          eatenAt: input.eatenAt ?? new Date(), 
+          eatenAt: input.eatenAt ?? new Date(),
         })
         .returning();
 
@@ -39,65 +39,69 @@ export const nutritionRouter = createTRPCRouter({
 
       return result[0];
     }),
-    getMealsInLastWeek: publicProcedure
-      .input(z.object({
-        userId: z.string()
-      }))
-      .query(async ({ ctx, input }) => {
-        const oneWeekAgo = new Date();
-        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-
-        const meals = await ctx.db
-          .select({
-            // from logged_meals table
-            id: loggedMeals.id,
-            userId: loggedMeals.userId,
-            dishId: loggedMeals.dishId,
-            dishName: loggedMeals.dishName,
-            eatenAt: loggedMeals.eatenAt,
-            servings: loggedMeals.servings,
-
-            // from the join on nutrition_infos table
-            calories: nutritionInfos.calories,
-            protein: nutritionInfos.proteinG,
-            carbs: nutritionInfos.totalCarbsG,
-            fat: nutritionInfos.totalFatG,
-          })
-          .from(loggedMeals)
-          .leftJoin(nutritionInfos, eq(loggedMeals.dishId, nutritionInfos.dishId))
-          .where(
-            and(
-              gt(loggedMeals.eatenAt, oneWeekAgo),
-              eq(loggedMeals.userId, input.userId) 
-            )
-          )
-          .orderBy(desc(loggedMeals.eatenAt));;
-
-        return meals;
-      }),
-    deleteLoggedMeal: publicProcedure
-      .input(z.object({
+  getMealsInLastWeek: publicProcedure
+    .input(
+      z.object({
         userId: z.string(),
-        dishId: z.string()
-      }))
-      .mutation(async ({ ctx, input }) => {
-        const result = await ctx.db
-          .delete(loggedMeals)
-          .where(
-            and(
-              eq(loggedMeals.userId, input.userId),
-              eq(loggedMeals.dishId, input.dishId)
-            )
-          )
-          .returning();
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const oneWeekAgo = new Date();
+      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
-        if (!result[0]) {
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: "Logged meal not found",
-          });
-        }
+      const meals = await ctx.db
+        .select({
+          // from logged_meals table
+          id: loggedMeals.id,
+          userId: loggedMeals.userId,
+          dishId: loggedMeals.dishId,
+          dishName: loggedMeals.dishName,
+          eatenAt: loggedMeals.eatenAt,
+          servings: loggedMeals.servings,
 
-        return result[0];
-      })
+          // from the join on nutrition_infos table
+          calories: nutritionInfos.calories,
+          protein: nutritionInfos.proteinG,
+          carbs: nutritionInfos.totalCarbsG,
+          fat: nutritionInfos.totalFatG,
+        })
+        .from(loggedMeals)
+        .leftJoin(nutritionInfos, eq(loggedMeals.dishId, nutritionInfos.dishId))
+        .where(
+          and(
+            gt(loggedMeals.eatenAt, oneWeekAgo),
+            eq(loggedMeals.userId, input.userId),
+          ),
+        )
+        .orderBy(desc(loggedMeals.eatenAt));
+
+      return meals;
+    }),
+  deleteLoggedMeal: publicProcedure
+    .input(
+      z.object({
+        userId: z.string(),
+        dishId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const result = await ctx.db
+        .delete(loggedMeals)
+        .where(
+          and(
+            eq(loggedMeals.userId, input.userId),
+            eq(loggedMeals.dishId, input.dishId),
+          ),
+        )
+        .returning();
+
+      if (!result[0]) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Logged meal not found",
+        });
+      }
+
+      return result[0];
+    }),
 });
