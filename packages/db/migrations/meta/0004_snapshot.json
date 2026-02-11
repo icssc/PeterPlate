@@ -1,5 +1,6 @@
 {
-  "id": "16d84bec-e589-4932-b6ea-833dca8ea6e4",
+
+  "id": "a02fd737-a250-4cbf-a70a-22e9b9a69476",
   "prevId": "73beb0f4-e287-43f8-bfad-36ddec5e7492",
   "version": "7",
   "dialect": "postgresql",
@@ -37,7 +38,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": false,
-          "default": "'ZotMeal Contributor'"
+          "default": "'PeterPlate Contributor'"
         },
         "created_at": {
           "name": "created_at",
@@ -219,12 +220,6 @@
           "primaryKey": false,
           "notNull": true
         },
-        "menu_id": {
-          "name": "menu_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
         "name": {
           "name": "name",
           "type": "text",
@@ -285,7 +280,53 @@
           "notNull": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "dishes_station_id_idx": {
+          "name": "dishes_station_id_idx",
+          "columns": [
+            {
+              "expression": "station_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "dishes_name_idx": {
+          "name": "dishes_name_idx",
+          "columns": [
+            {
+              "expression": "name",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "dishes_category_idx": {
+          "name": "dishes_category_idx",
+          "columns": [
+            {
+              "expression": "category",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "dishes_station_id_stations_id_fk": {
           "name": "dishes_station_id_stations_id_fk",
@@ -381,7 +422,23 @@
           "notNull": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "events_restaurant_id_idx": {
+          "name": "events_restaurant_id_idx",
+          "columns": [
+            {
+              "expression": "restaurant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "events_restaurant_id_restaurants_id_fk": {
           "name": "events_restaurant_id_restaurants_id_fk",
@@ -576,9 +633,9 @@
         },
         "price": {
           "name": "price",
-          "type": "text",
+          "type": "numeric(6, 2)",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "created_at": {
           "name": "created_at",
@@ -594,7 +651,74 @@
           "notNull": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "menus_restaurant_date_idx": {
+          "name": "menus_restaurant_date_idx",
+          "columns": [
+            {
+              "expression": "restaurant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "menus_restaurant_id_idx": {
+          "name": "menus_restaurant_id_idx",
+          "columns": [
+            {
+              "expression": "restaurant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "menus_date_idx": {
+          "name": "menus_date_idx",
+          "columns": [
+            {
+              "expression": "date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "menus_period_id_idx": {
+          "name": "menus_period_id_idx",
+          "columns": [
+            {
+              "expression": "period_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "menus_restaurant_id_restaurants_id_fk": {
           "name": "menus_restaurant_id_restaurants_id_fk",
@@ -630,7 +754,12 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
-      "checkConstraints": {},
+      "checkConstraints": {
+        "menus_price_nonnegative": {
+          "name": "menus_price_nonnegative",
+          "value": "price IS NULL OR price >= 0"
+        }
+      },
       "isRLSEnabled": false
     },
     "public.nutrition_infos": {
@@ -657,85 +786,85 @@
         },
         "calories": {
           "name": "calories",
-          "type": "text",
+          "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": false
         },
         "total_fat_g": {
           "name": "total_fat_g",
-          "type": "text",
+          "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": false
         },
         "trans_fat_g": {
           "name": "trans_fat_g",
-          "type": "text",
+          "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": false
         },
         "saturated_fat_g": {
           "name": "saturated_fat_g",
-          "type": "text",
+          "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": false
         },
         "cholesterol_mg": {
           "name": "cholesterol_mg",
-          "type": "text",
+          "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": false
         },
         "sodium_mg": {
           "name": "sodium_mg",
-          "type": "text",
+          "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": false
         },
         "total_carbs_g": {
           "name": "total_carbs_g",
-          "type": "text",
+          "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": false
         },
         "dietary_fiber_g": {
           "name": "dietary_fiber_g",
-          "type": "text",
+          "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": false
         },
         "sugars_g": {
           "name": "sugars_g",
-          "type": "text",
+          "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": false
         },
         "protein_g": {
           "name": "protein_g",
-          "type": "text",
+          "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": false
         },
         "calcium": {
           "name": "calcium",
-          "type": "text",
+          "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": false
         },
         "iron": {
           "name": "iron",
-          "type": "text",
+          "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": false
         },
         "vitamin_a": {
           "name": "vitamin_a",
-          "type": "text",
+          "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": false
         },
         "vitamin_c": {
           "name": "vitamin_c",
-          "type": "text",
+          "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": false
         },
@@ -854,7 +983,7 @@
       "checkConstraints": {
         "servings_is_valid": {
           "name": "servings_is_valid",
-          "value": "((\"logged_meals\".\"servings\" * 2) % 1 = 0) AND (\"logged_meals\".\"servings\" >= 0.5)"
+          "value": "((\"logged_meals\".\"servings\" * 2) = floor(\"logged_meals\".\"servings\" * 2)) AND (\"logged_meals\".\"servings\" >= 0.5)"
         }
       },
       "isRLSEnabled": false
@@ -914,7 +1043,29 @@
           "notNull": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "periods_restaurant_date_idx": {
+          "name": "periods_restaurant_date_idx",
+          "columns": [
+            {
+              "expression": "restaurant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "periods_restaurant_id_restaurants_id_fk": {
           "name": "periods_restaurant_id_restaurants_id_fk",
@@ -1120,7 +1271,23 @@
           "notNull": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "stations_restaurant_id_idx": {
+          "name": "stations_restaurant_id_idx",
+          "columns": [
+            {
+              "expression": "restaurant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "stations_restaurant_id_restaurants_id_fk": {
           "name": "stations_restaurant_id_restaurants_id_fk",
@@ -1456,8 +1623,8 @@
       "name": "restaurant_id_enum",
       "schema": "public",
       "values": [
-        "3056",
-        "3314"
+        "anteatery",
+        "brandywine"
       ]
     },
     "public.restaurant_name_enum": {

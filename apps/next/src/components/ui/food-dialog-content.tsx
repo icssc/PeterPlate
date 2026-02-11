@@ -2,7 +2,7 @@
 
 import { StarBorder } from "@mui/icons-material";
 import { Button, DialogContent } from "@mui/material";
-import type { DishInfo } from "@zotmeal/api";
+import type { DishInfo } from "@peterplate/api";
 import Image from "next/image";
 import { useState } from "react";
 import {
@@ -29,7 +29,7 @@ import InteractiveStarRating from "./interactive-star-rating";
  *
  * This component is typically used as the content for a `Dialog` triggered by a {@link FoodCard}.
  *
- * @param {DishInfo} dish - The dish data to display. See {@link DishInfo} (from `@zotmeal/api`) for detailed property descriptions.
+ * @param {DishInfo} dish - The dish data to display. See {@link DishInfo} (from `@peterplate/api`) for detailed property descriptions.
  * @returns {JSX.Element} The rendered content for the food item dialog.
  */
 export default function FoodDialogContent({ dish }: { dish: DishInfo }) {
@@ -70,10 +70,10 @@ export default function FoodDialogContent({ dish }: { dish: DishInfo }) {
 
   return (
     <div className="font-poppins">
-      {showImage && dish.image_url && !imageError ? (
+      {showImage ? (
         <Image
-          src={dish.image_url}
-          alt=""
+          src={dish.image_url as string}
+          alt={formatFoodName(dish.name)}
           width={800}
           height={160}
           className="w-full h-40 object-cover"
@@ -82,7 +82,7 @@ export default function FoodDialogContent({ dish }: { dish: DishInfo }) {
       ) : (
         <Image
           src={"/zm-card-header.webp"}
-          alt=""
+          alt={"An image of peterplate logo."}
           width={1200}
           height={700}
           className="w-full h-40 object-cover"

@@ -1,7 +1,7 @@
 "use client"; // Need state for toggling nutrient visibility
 
 import { Box, Button } from "@mui/material";
-import type { DishInfo } from "@zotmeal/api";
+import type { DishInfo } from "@peterplate/api";
 import Image from "next/image";
 import { useState } from "react";
 import {
@@ -49,10 +49,10 @@ export default function FoodDrawerContent({ dish }: { dish: DishInfo }) {
   return (
     <Box className="max-h-[95vh] flex flex-col">
       <Box className="pb-4">
-        {showImage && dish.image_url && !imageError ? (
+        {showImage ? (
           <Image
-            src={dish.image_url}
-            alt=""
+            src={dish.image_url as string}
+            alt={formatFoodName(dish.name)}
             width={800}
             height={128}
             className="w-full h-32 object-cover"
@@ -61,7 +61,7 @@ export default function FoodDrawerContent({ dish }: { dish: DishInfo }) {
         ) : (
           <Image
             src={"/zm-card-header.webp"}
-            alt=""
+            alt={"An image of peterplate logo."}
             width={1200}
             height={700}
             className="w-full h-32 object-cover"

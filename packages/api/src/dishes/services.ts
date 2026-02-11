@@ -1,22 +1,26 @@
 import { upsert } from "@api/utils";
 
-import type { DishToMenu, Drizzle, InsertDishWithRelations } from "@zotmeal/db";
+import type {
+  DishToMenu,
+  Drizzle,
+  InsertDishWithRelations,
+} from "@peterplate/db";
 import {
   dietRestrictions,
   dishes,
   dishesToMenus,
   nutritionInfos,
-} from "@zotmeal/db";
+} from "@peterplate/db";
 
 export async function upsertDish(
   db: Drizzle,
   { dietRestriction, nutritionInfo, ...dishData }: InsertDishWithRelations,
-): Promise<Omit<InsertDishWithRelations, "menuId" | "stationId">> {
+): Promise<Omit<InsertDishWithRelations, "stationId">> {
   try {
     const result = await db.transaction<
-      Omit<InsertDishWithRelations, "menuId" | "stationId">
+      Omit<InsertDishWithRelations, "stationId">
     >(async (tx) => {
-      // Only update image_url when the incoming value is a valid string; do not overwrite existing with null
+      // Only update image_url when the incoming value is a valid non-empty string; do not overwrite existing image_url with null/empty.
       const dishSet = { ...dishData };
       if (
         dishSet.image_url == null ||
