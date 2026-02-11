@@ -22,9 +22,19 @@ export async function upsertDish(
     >(async (tx) => {
       const txDb = tx as unknown as Drizzle;
 
-      const upsertedDish = await upsert(txDb, dishes, dishData, {
+      // Only update image_url when the incoming value is a valid non-empty string; do not overwrite existing image_url with null/empty.
+      const dishSet = { ...dishData };
+      if (
+        dishSet.image_url == null ||
+        typeof dishSet.image_url !== "string" ||
+        dishSet.image_url.trim() === ""
+      ) {
+        delete dishSet.image_url;
+      }
+
+      const upsertedDish = await upsert(tx, dishes, dishData, {
         target: [dishes.id],
-        set: dishData,
+        set: dishSet,
       });
 
       const upsertedDietRestriction = await upsert(

@@ -36,13 +36,6 @@
       "when": 1770345372470,
       "tag": "0004_peterplate",
       "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1768865762667,
-      "tag": "0003_zotmeal",
-      "breakpoints": true
     }
   ]
 }

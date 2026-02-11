@@ -70,6 +70,7 @@ export default function MyAccountPage() {
           {isLoggedIn ? (
             // Logged-in password reset
             <div className="space-y-2">
+              {/* TODO: Replace these inputs with MUI inputs */}
               <input
                 type="password"
                 placeholder="Current password"
@@ -85,6 +86,7 @@ export default function MyAccountPage() {
                 className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm"
               />
               <button
+                type="button"
                 onClick={handlePasswordReset}
                 className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
               >
@@ -102,6 +104,7 @@ export default function MyAccountPage() {
                 className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm"
               />
               <button
+                type="button"
                 onClick={handleCreateAccount}
                 className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
               >
@@ -112,7 +115,9 @@ export default function MyAccountPage() {
         </section>
 
         {/* Debug button just for testing change in UI */}
+        {/* TODO: Remove */}
         <button
+          type="button"
           onClick={() => setIsLoggedIn(!isLoggedIn)}
           className="text-xs text-blue-600 underline mt-4"
         >

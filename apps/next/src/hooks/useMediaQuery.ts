@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from "react";
 
 /**
  * A custom React hook that listens for changes in a CSS media query.
@@ -15,7 +15,7 @@ export function useMediaQuery(query: string): boolean {
 
   useEffect(() => {
     // Ensure window is defined (for SSR compatibility)
-    if (typeof window === 'undefined') {
+    if (typeof window === "undefined") {
       return;
     }
 
@@ -25,11 +25,11 @@ export function useMediaQuery(query: string): boolean {
     listener();
 
     // Add an event listener for changes in the media query's matched status.
-    mediaQueryList.addEventListener('change', listener);
+    mediaQueryList.addEventListener("change", listener);
 
     // Cleanup function: Remove the event listener when the component unmounts or the query changes.
     return () => {
-      mediaQueryList.removeEventListener('change', listener);
+      mediaQueryList.removeEventListener("change", listener);
     };
   }, [query]);
 

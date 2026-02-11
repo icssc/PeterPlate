@@ -110,7 +110,7 @@ describe("AdobeECommerce API Integration Tests", () => {
       expect(response).toBeDefined();
       expect(response).toHaveProperty("data");
 
-      if (response && response.data) {
+      if (response?.data) {
         const validationResult = schema.safeParse(response.data);
 
         if (!validationResult.success) {

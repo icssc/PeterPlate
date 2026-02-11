@@ -73,7 +73,6 @@ export function RootClient({ children }: { children: React.ReactNode }) {
             <Toolbar />
             {children}
             <GlobalSnackbar />
-            <Snackbar />
           </DateProvider>
         </QueryClientProvider>
       </trpc.Provider>

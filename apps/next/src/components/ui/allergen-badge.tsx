@@ -1,8 +1,8 @@
-import * as React from "react"
-import { cva, type VariantProps } from "class-variance-authority"
-import { toTitleCase } from "@/utils/funcs"
+import { cva, type VariantProps } from "class-variance-authority";
+import type * as React from "react";
+import { toTitleCase } from "@/utils/funcs";
 
-import { cn } from "@/utils/tw"
+import { cn } from "@/utils/tw";
 
 /**
  * Defines the visual variants for the {@link AllergenBadge} component using `class-variance-authority`.
@@ -20,23 +20,20 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        default:
-          "bg-primary hover:bg-primary/80 text-primary-foreground",
+        default: "bg-primary hover:bg-primary/80 text-primary-foreground",
         vegetarian:
           "bg-emerald-700 hover:bg-emerald-700/80 text-primary-foreground",
-        vegan:
-          "bg-lime-700 hover:bg-lime-700/80 text-primary-foreground",
+        vegan: "bg-lime-700 hover:bg-lime-700/80 text-primary-foreground",
         gluten_free:
           "bg-orange-700 hover:bg-orange-700/80 text-primary-foreground",
-        kosher:
-          "bg-sky-700 hover:bg-sky-700/80 text-primary-foreground",
+        kosher: "bg-sky-700 hover:bg-sky-700/80 text-primary-foreground",
       },
     },
     defaultVariants: {
       variant: "default",
     },
-  }
-)
+  },
+);
 
 /**
  * Props for the {@link AllergenBadge} component.
@@ -56,12 +53,16 @@ export interface BadgeProps
  *        The text displayed is the title-cased version of the variant name (e.g., "vegetarian" becomes "Vegetarian").
  * @returns {JSX.Element} The rendered allergen badge component.
  */
-function AllergenBadge({ className, variant, ...props }: BadgeProps): JSX.Element {
+function AllergenBadge({
+  className,
+  variant,
+  ...props
+}: BadgeProps): JSX.Element {
   return (
     <div className={cn(badgeVariants({ variant }), className)} {...props}>
       {toTitleCase(variant?.replace("_", "-") ?? "default")}
     </div>
-  )
+  );
 }
 
-export { AllergenBadge, badgeVariants }
+export { AllergenBadge, badgeVariants };

@@ -19,7 +19,7 @@ export default function MyFavoritesPage() {
       alert("Login to favorite meals!");
       router.push("/");
     }
-  }, [userId, router]);
+  }, [userId, router.push]);
 
   const {
     favorites,

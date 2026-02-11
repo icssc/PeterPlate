@@ -1,15 +1,9 @@
 "use client";
 
 import { FavoriteBorder, Restaurant, StarBorder } from "@mui/icons-material";
-import {
-  Alert,
-  Card,
-  CardContent,
-  Dialog,
-  Drawer,
-  Snackbar,
-} from "@mui/material";
+import { Card, CardContent, Dialog, Drawer } from "@mui/material";
 import type { DishInfo } from "@peterplate/api";
+import Image from "next/image";
 import React from "react";
 import { useSnackbarStore } from "@/context/useSnackbar";
 import { useUserStore } from "@/context/useUserStore";
@@ -19,9 +13,6 @@ import { trpc } from "@/utils/trpc";
 import { cn } from "@/utils/tw";
 import FoodDialogContent from "../food-dialog-content";
 import FoodDrawerContent from "../food-drawer-content";
-
-// TODO: remove this variable and get the currently signed in user through session
-const DUMMY_USER_ID = "TEST_USER";
 
 /**
  * Props for the FoodCardContent component.
@@ -69,6 +60,11 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
   ) => {
     const userId = useUserStore((state) => state.userId);
     const IconComponent = getFoodIcon(dish.name) ?? Restaurant;
+    const [imageError, setImageError] = React.useState(false);
+    const showImage =
+      typeof dish.image_url === "string" &&
+      dish.image_url.trim() !== "" &&
+      !imageError;
 
     /**
      * Fetches the average rating and rating count for the dish.
@@ -126,7 +122,7 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
       },
     });
 
-    const handleLogMeal = (e: React.MouseEvent) => {
+    const _handleLogMeal = (e: React.MouseEvent) => {
       e.stopPropagation();
 
       // Give the user a proper error when they've not signed in before attempting to add a meal
@@ -176,7 +172,7 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
       );
     };
 
-    const handleRemoveMeal = (e: React.MouseEvent) => {
+    const _handleRemoveMeal = (e: React.MouseEvent) => {
       e.stopPropagation();
       if (!userId) return;
 
@@ -186,14 +182,14 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
       });
     };
 
-    const handleIncreaseQuantity = (e: React.MouseEvent) => {
+    const _handleIncreaseQuantity = (e: React.MouseEvent) => {
       e.stopPropagation();
       if (!loggedMeal) return;
       const newServings = loggedMeal.servings + 0.5;
       handleAdjustQuantity(newServings);
     };
 
-    const handleDecreaseQuantity = (e: React.MouseEvent) => {
+    const _handleDecreaseQuantity = (e: React.MouseEvent) => {
       e.stopPropagation();
       if (!loggedMeal) return;
       const newServings = Math.max(0.5, loggedMeal.servings - 0.5);
@@ -292,8 +288,19 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
           <CardContent sx={{ padding: "0 !important" }}>
             <div className="flex justify-between h-full p-4 gap-4">
               <div className="flex items-center gap-4 w-full">
-                {IconComponent && (
-                  <IconComponent className="w-12 h-12 text-slate-700 flex-shrink-0" />
+                {showImage && dish.image_url && !imageError ? (
+                  <Image
+                    src={dish.image_url}
+                    alt=""
+                    width={40}
+                    height={40}
+                    className="w-10 h-10 object-cover rounded"
+                    onError={() => setImageError(true)}
+                  />
+                ) : (
+                  IconComponent && (
+                    <IconComponent className="w-12 h-12 text-slate-700 flex-shrink-0" />
+                  )
                 )}
                 <div className="flex flex-col gap-1">
                   <span className="font-bold text-base text-sky-700">

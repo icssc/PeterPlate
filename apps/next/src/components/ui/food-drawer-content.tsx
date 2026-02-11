@@ -17,6 +17,11 @@ import { AllergenBadge } from "./allergen-badge";
 import InteractiveStarRating from "./interactive-star-rating";
 
 export default function FoodDrawerContent({ dish }: { dish: DishInfo }) {
+  const [imageError, setImageError] = useState(false);
+  const showImage =
+    typeof dish.image_url === "string" &&
+    dish.image_url.trim() !== "" &&
+    !imageError;
   // const ingredientsAvailable: boolean =
   //   dish.ingredients != null && dish.ingredients.length > 0;
   const caloricInformationAvailable: boolean =
@@ -44,13 +49,24 @@ export default function FoodDrawerContent({ dish }: { dish: DishInfo }) {
   return (
     <Box className="max-h-[95vh] flex flex-col">
       <Box className="pb-4">
-        <Image
-          src={"/zm-card-header.webp"}
-          alt={"An image of peterplate logo."}
-          width={1200}
-          height={700}
-          className="w-full h-32 object-cover"
-        />
+        {showImage ? (
+          <Image
+            src={dish.image_url as string}
+            alt={formatFoodName(dish.name)}
+            width={800}
+            height={128}
+            className="w-full h-32 object-cover"
+            onError={() => setImageError(true)}
+          />
+        ) : (
+          <Image
+            src={"/zm-card-header.webp"}
+            alt={"An image of PeterPlate's logo."}
+            width={1200}
+            height={700}
+            className="w-full h-32 object-cover"
+          />
+        )}
         <Box className="px-4 pt-4 flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <h2 className="text-3xl font-bold leading-tight tracking-normal text-sky-700">

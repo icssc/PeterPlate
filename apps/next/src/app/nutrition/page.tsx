@@ -1,5 +1,6 @@
 "use client";
 
+import type { SelectLoggedMeal } from "@peterplate/db";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import NutritionBreakdown from "@/components/ui/nutrition-breakdown";
