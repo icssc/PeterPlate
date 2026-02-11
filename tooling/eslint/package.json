@@ -1,5 +1,5 @@
 {
-  "name": "@zotmeal/eslint-config",
+  "name": "@peterplate/eslint-config",
   "version": "0.2.0",
   "private": true,
   "license": "MIT",
@@ -26,9 +26,9 @@
     "eslint-plugin-react-hooks": "catalog:"
   },
   "devDependencies": {
+    "@peterplate/prettier-config": "workspace:*",
+    "@peterplate/tsconfig": "workspace:*",
     "@types/eslint": "catalog:",
-    "@zotmeal/prettier-config": "workspace:*",
-    "@zotmeal/tsconfig": "workspace:*",
     "eslint": "catalog:",
     "prettier": "catalog:",
     "typescript": "catalog:"
@@ -39,5 +39,5 @@
       "./base.js"
     ]
   },
-  "prettier": "@zotmeal/prettier-config"
+  "prettier": "@peterplate/prettier-config"
 }

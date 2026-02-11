@@ -1,7 +1,7 @@
 import { logger } from "logger";
 
-import { weekly } from "@zotmeal/api";
-import { createDrizzle, pool } from "@zotmeal/db";
+import { weekly } from "@peterplate/api";
+import { createDrizzle, pool } from "@peterplate/db";
 
 import { env } from "../env";
 

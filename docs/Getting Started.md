@@ -23,14 +23,14 @@
 
 ### Developing
 
-1. Clone the ZotMeal repository from GitHub.
-   `git clone https://github.com/icssc/ZotMeal.git`
+1. Clone the PeterPlate repository from GitHub.
+   `git clone https://github.com/icssc/PeterPlate.git`
 
 2. Navigate to the root directory and change your node version to the one specified in the .nvmrc by running
    `nvm use` or `fnm use`. In particular, we will be using Node v20.
 
 3. While still in the root directory and install the dependencies by running
-   `cd ZotMeal && pnpm install`
+   `cd PeterPlate && pnpm install`
 
 4. To start a local Postgres container database run the `docker compose up` in the root directory.
    This will automatically set up and run a test database using docker.
@@ -70,10 +70,10 @@ Ensure Node is correct version
 
 ### Structure Overview
 
-The following directory tree outlines the major folders in the ZotMeal repository:
+The following directory tree outlines the major folders in the PeterPlate repository:
 
 ```
-📦ZotMeal
+📦PeterPlate
  ┣ 📂node_modules
  ┣ 📂apps
  ┃ ┣ 📂next
@@ -88,14 +88,14 @@ The following directory tree outlines the major folders in the ZotMeal repositor
 
 The `node_modules` folder contains all **_Node.js_** packages that the repository uses
 
-The `apps` folder contains major endpoints that ZotMeal uses
+The `apps` folder contains major endpoints that PeterPlate uses
 
 - `apps/next` contains all of the frontend components and scripts used to build
   the web app, written in **Next.js**.
 - `apps/server` contains the scripts used to connect backend functions to AWS
   Lambda Serverless procedures.
 
-The `packages` folder contains all the functionality of the backend of ZotMeal.
+The `packages` folder contains all the functionality of the backend of PeterPlate.
 
 - `packages/api` contains all the **\*tRPC** procedures used
 - `packages/db` contains the database schema (written using **_DrizzleORM_**)

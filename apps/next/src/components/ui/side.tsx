@@ -1,23 +1,28 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { GridView, Menu, SyncAlt } from "@mui/icons-material";
+import type { RestaurantInfo } from "@peterplate/api"; // Import types
 import Image from "next/image";
-import { Tabs, TabsList, TabsTrigger } from "./shadcn/tabs"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./shadcn/select";
-import { DiningHallStatus } from "./status";
-import DishesInfo from "./dishes-info";
-import { HallEnum, HallStatusEnum, MealTimeEnum } from "@/utils/types";
-import { trpc } from "@/utils/trpc"; // Import tRPC hook
-import { RestaurantInfo } from "@zotmeal/api"; // Import types
-import { toTitleCase, utcToPacificTime, formatOpenCloseTime, isSameDay, militaryToStandard } from "@/utils/funcs";
-import TabsSkeleton from "./skeleton/tabs-skeleton";
-import SelectSkeleton from "./skeleton/select-skeleton";
+import { useEffect, useState } from "react";
 import { useDate } from "@/context/date-context";
-import { SyncAlt, Refresh } from "@mui/icons-material"
-import { Button } from "./shadcn/button";
-import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useHallDerived, useHallStore } from "@/context/useHallStore";
-
+import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { formatOpenCloseTime, isSameDay, toTitleCase } from "@/utils/funcs";
+import { trpc } from "@/utils/trpc"; // Import tRPC hook
+import { HallEnum } from "@/utils/types";
+import DishesInfo from "./dishes-info";
+import { Button } from "./shadcn/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./shadcn/select";
+import { Tabs, TabsList, TabsTrigger } from "./shadcn/tabs";
+import SelectSkeleton from "./skeleton/select-skeleton";
+import TabsSkeleton from "./skeleton/tabs-skeleton";
+import { DiningHallStatus } from "./status";
 
 /**
  * Props for the {@link Side} component.
@@ -37,17 +42,20 @@ interface SideProps {
  * @param {SideProps} props - The properties for the Side component.
  * @returns {JSX.Element} The rendered side panel for the specified dining hall.
  */
-export default function Side({ hall, toggleHall }: SideProps): JSX.Element {
+export default function Side({
+  hall,
+  toggleHall,
+}: SideProps): React.JSX.Element {
   const { selectedDate } = useDate();
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
-  const today = useHallStore(s => s.today);
-  const setHallInputs = useHallStore(s => s.setInputs);
+  const today = useHallStore((s) => s.today);
+  const setHallInputs = useHallStore((s) => s.setInputs);
 
   /** Fetch data */
-  const { data, isLoading, isError, error } = trpc.zotmeal.useQuery(
-    { date: selectedDate! },
-    { staleTime: 2 * 60 * 60 * 1000 }
+  const { data, isLoading, isError, error } = trpc.peterplate.useQuery(
+    { date: selectedDate ?? today },
+    { staleTime: 2 * 60 * 60 * 1000 },
   );
 
   /** Raw hall data (NOT derived) */
@@ -66,12 +74,8 @@ export default function Side({ hall, toggleHall }: SideProps): JSX.Element {
   }, [hallData, selectedDate, setHallInputs]);
 
   /** Read derived data */
-  const {
-    availablePeriodTimes,
-    derivedHallStatus,
-    openTime,
-    closeTime,
-  } = useHallDerived();
+  const { availablePeriodTimes, derivedHallStatus, openTime, closeTime } =
+    useHallDerived();
 
   /** Sort meal periods */
   const periods = Object.keys(availablePeriodTimes).sort((a, b) => {
@@ -81,6 +85,7 @@ export default function Side({ hall, toggleHall }: SideProps): JSX.Element {
   /** UI state */
   const [selectedPeriod, setSelectedPeriod] = useState("");
   const [selectedStation, setSelectedStation] = useState("");
+  const [isCompactView, setIsCompactView] = useState(false);
 
   /** Sync selectedPeriod with derived periods */
   useEffect(() => {
@@ -104,12 +109,11 @@ export default function Side({ hall, toggleHall }: SideProps): JSX.Element {
         setSelectedPeriod(current);
       }
     }
-  }, [periods, selectedDate, today, availablePeriodTimes]);
-
+  }, [periods, selectedDate, today, availablePeriodTimes, selectedPeriod]);
 
   /** Stations */
   const currentMenu = hallData?.menus.find(
-    m => m.period.name.toLowerCase() === selectedPeriod.toLowerCase()
+    (m) => m.period.name.toLowerCase() === selectedPeriod.toLowerCase(),
   );
 
   const stations = currentMenu?.stations ?? [];
@@ -124,16 +128,17 @@ export default function Side({ hall, toggleHall }: SideProps): JSX.Element {
 
     const first = stations[0].name.toLowerCase();
     const isValid = stations.some(
-      s => s.name.toLowerCase() === selectedStation
+      (s) => s.name.toLowerCase() === selectedStation,
     );
 
     if (!isValid) {
       setSelectedStation(first);
     }
-  }, [stations, hall]);
+  }, [stations, selectedStation]);
 
   const dishes =
-    stations.find(s => s.name.toLowerCase() === selectedStation)?.dishes ?? [];
+    stations.find((s) => s.name.toLowerCase() === selectedStation)?.dishes ??
+    [];
 
   /** Hero image */
   const hero =
@@ -170,11 +175,11 @@ export default function Side({ hall, toggleHall }: SideProps): JSX.Element {
         <div className="flex flex-col gap-4 sm:gap-6 items-center">
           <div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-4 w-full">
             {isLoading && <SelectSkeleton />}
-            {!isLoading && !isError &&
+            {!isLoading && !isError && (
               <div>
                 <Select
                   value={selectedPeriod}
-                  onValueChange={(value) => setSelectedPeriod(value || '')}
+                  onValueChange={(value) => setSelectedPeriod(value || "")}
                 >
                   <SelectTrigger className=" w-full sm:w-52">
                     <SelectValue placeholder="Select Meal" />
@@ -189,7 +194,12 @@ export default function Side({ hall, toggleHall }: SideProps): JSX.Element {
                           {toTitleCase(time)}&nbsp;
                           {periodTimes && (
                             <span className="text-zinc-500 text-sm">
-                              &nbsp;({formatOpenCloseTime(periodTimes[0], periodTimes[1])})
+                              &nbsp;(
+                              {formatOpenCloseTime(
+                                periodTimes[0],
+                                periodTimes[1],
+                              )}
+                              )
                             </span>
                           )}
                         </SelectItem>
@@ -197,41 +207,97 @@ export default function Side({ hall, toggleHall }: SideProps): JSX.Element {
                     })}
                   </SelectContent>
                 </Select>
-              </div>}
-            {!isLoading && !isError && openTime && closeTime && // Ensure openTime and closeTime are defined
-              <div className="flex justify-center sm:justify-start">
-                <DiningHallStatus
-                  status={derivedHallStatus}
-                  openTime={openTime.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
-                  closeTime={closeTime.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
-                />
-              </div>}
+              </div>
+            )}
+            {!isLoading &&
+              !isError &&
+              openTime &&
+              closeTime && ( // Ensure openTime and closeTime are defined
+                <div className="flex justify-center sm:justify-start">
+                  <DiningHallStatus
+                    status={derivedHallStatus}
+                    openTime={openTime.toLocaleTimeString(undefined, {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                    closeTime={closeTime.toLocaleTimeString(undefined, {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  />
+                </div>
+              )}
           </div>
           {!isLoading && !isError && stations.length > 0 && (
             <Tabs
               value={selectedStation}
-              onValueChange={(value) => setSelectedStation(value || '')}
+              onValueChange={(value) => setSelectedStation(value || "")}
               className="flex w-full justify-center"
             >
               <div className="overflow-x-auto">
                 <TabsList className="mx-auto">
-                  {stations.map((station => {
+                  {stations.map((station) => {
                     return (
-                      <TabsTrigger key={station.name} value={station.name.toLowerCase()}>
+                      <TabsTrigger
+                        key={station.name}
+                        value={station.name.toLowerCase()}
+                      >
                         {toTitleCase(station.name)}
                       </TabsTrigger>
-                    )
-                  }))}
+                    );
+                  })}
                 </TabsList>
               </div>
             </Tabs>
           )}
           {isLoading && <TabsSkeleton /> /* Tab Skeleton */}
-          {!isLoading && !isError && stations.length === 0 && selectedPeriod && (
-            <p className="text-center text-gray-500 py-2">No stations found for {toTitleCase(selectedPeriod)}.</p>
-          )}
-          {!isLoading && !isError && stations.length === 0 && !selectedPeriod && (
-            <p className="text-center text-gray-500 py-2">No stations found.</p>
+          {!isLoading &&
+            !isError &&
+            stations.length === 0 &&
+            selectedPeriod && (
+              <p className="text-center text-gray-500 py-2">
+                No stations found for {toTitleCase(selectedPeriod)}.
+              </p>
+            )}
+          {!isLoading &&
+            !isError &&
+            stations.length === 0 &&
+            !selectedPeriod && (
+              <p className="text-center text-gray-500 py-2">
+                No stations found.
+              </p>
+            )}
+
+          {/* View Toggle Buttons */}
+          {!isLoading && !isError && dishes.length > 0 && (
+            <div className="flex gap-2 w-full justify-end">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsCompactView(false)}
+                className={`px-4 py-1 flex items-center justify-center ${
+                  !isCompactView
+                    ? "bg-sky-700 text-white border-sky-700 hover:bg-sky-700 hover:text-white"
+                    : "border-sky-700 text-slate-900 hover:bg-sky-50 hover:text-slate-900"
+                }`}
+              >
+                <Menu className="mr-1" />
+                Card View
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsCompactView(true)}
+                className={`px-4 py-1 flex items-center justify-center ${
+                  isCompactView
+                    ? "bg-sky-700 text-white border-sky-700 hover:bg-sky-700 hover:text-white"
+                    : "border-sky-700 text-slate-900 hover:bg-sky-50 hover:text-slate-900"
+                }`}
+              >
+                <GridView className="mr-1" />
+                Compact View
+              </Button>
+            </div>
           )}
         </div>
 
@@ -239,11 +305,17 @@ export default function Side({ hall, toggleHall }: SideProps): JSX.Element {
           dishes={dishes}
           isLoading={isLoading}
           isError={isError || (!isLoading && !hallData)}
-          errorMessage={error?.message ?? (!isLoading && !hallData ? `Data not available for ${HallEnum[hall]}.` : undefined)}
+          errorMessage={
+            error?.message ??
+            (!isLoading && !hallData
+              ? `Data not available for ${HallEnum[hall]}.`
+              : undefined)
+          }
+          isCompactView={isCompactView}
         />
       </div>
     </div>
-  )
+  );
 }
 
 /**
@@ -255,13 +327,15 @@ export default function Side({ hall, toggleHall }: SideProps): JSX.Element {
  *                                                            and values are tuples containing the start and end Date objects for that period.
  * @returns {string} The key/name of the current or default meal period.
  */
-function getCurrentPeriod(selectedDate: Date, periods: { [periodName: string]: [Date, Date] }): string {
+function getCurrentPeriod(
+  selectedDate: Date,
+  periods: { [periodName: string]: [Date, Date] },
+): string {
   for (const key in periods) {
     const periodBegin: Date = periods[key][0];
     const periodEnd: Date = periods[key][1];
 
-    if (selectedDate >= periodBegin && selectedDate <= periodEnd)
-      return key;
+    if (selectedDate >= periodBegin && selectedDate <= periodEnd) return key;
   }
 
   return Object.keys(periods)[0];

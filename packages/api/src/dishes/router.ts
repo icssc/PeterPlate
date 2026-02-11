@@ -8,7 +8,7 @@ import {
 import { createTRPCRouter, publicProcedure } from "@api/trpc";
 import { upsertUser } from "@api/users/services";
 import { TRPCError } from "@trpc/server";
-import { dishes, RatingSchema } from "@zotmeal/db";
+import { dishes, RatingSchema } from "@peterplate/db";
 import { z } from "zod";
 
 const getDishProcedure = publicProcedure

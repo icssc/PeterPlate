@@ -37,7 +37,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": false,
-          "default": "'ZotMeal Contributor'"
+          "default": "'PeterPlate Contributor'"
         },
         "created_at": {
           "name": "created_at",
@@ -56,7 +56,6 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
       "uniqueConstraints": {}
     },
     "public.diet_restrictions": {
@@ -185,14 +184,17 @@
           "name": "diet_restrictions_dish_id_dishes_id_fk",
           "tableFrom": "diet_restrictions",
           "tableTo": "dishes",
-          "columnsFrom": ["dish_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "dish_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "restrict",
           "onUpdate": "cascade"
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
       "uniqueConstraints": {}
     },
     "public.dishes": {
@@ -277,8 +279,12 @@
           "name": "dishes_station_id_stations_id_fk",
           "tableFrom": "dishes",
           "tableTo": "stations",
-          "columnsFrom": ["station_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "station_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "restrict",
           "onUpdate": "cascade"
         },
@@ -286,14 +292,17 @@
           "name": "dishes_menu_id_menus_id_fk",
           "tableFrom": "dishes",
           "tableTo": "menus",
-          "columnsFrom": ["menu_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "menu_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "restrict",
           "onUpdate": "cascade"
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
       "uniqueConstraints": {}
     },
     "public.events": {
@@ -363,8 +372,12 @@
           "name": "events_restaurant_id_restaurants_id_fk",
           "tableFrom": "events",
           "tableTo": "restaurants",
-          "columnsFrom": ["restaurant_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "restaurant_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "restrict",
           "onUpdate": "cascade"
         }
@@ -372,7 +385,11 @@
       "compositePrimaryKeys": {
         "events_pk": {
           "name": "events_pk",
-          "columns": ["title", "restaurant_id", "start"]
+          "columns": [
+            "title",
+            "restaurant_id",
+            "start"
+          ]
         }
       },
       "uniqueConstraints": {}
@@ -470,8 +487,12 @@
           "name": "dishes_to_menus_menu_id_menus_id_fk",
           "tableFrom": "dishes_to_menus",
           "tableTo": "menus",
-          "columnsFrom": ["menu_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "menu_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -479,8 +500,12 @@
           "name": "dishes_to_menus_dish_id_dishes_id_fk",
           "tableFrom": "dishes_to_menus",
           "tableTo": "dishes",
-          "columnsFrom": ["dish_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "dish_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -488,10 +513,12 @@
       "compositePrimaryKeys": {
         "dishes_to_menus_pk": {
           "name": "dishes_to_menus_pk",
-          "columns": ["menu_id", "dish_id"]
+          "columns": [
+            "menu_id",
+            "dish_id"
+          ]
         }
       },
-      "uniqueConstraints": {}
       "uniqueConstraints": {}
     },
     "public.menus": {
@@ -549,8 +576,12 @@
           "name": "menus_restaurant_id_restaurants_id_fk",
           "tableFrom": "menus",
           "tableTo": "restaurants",
-          "columnsFrom": ["restaurant_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "restaurant_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "restrict",
           "onUpdate": "cascade"
         },
@@ -558,14 +589,21 @@
           "name": "menus_period_id_date_restaurant_id_periods_id_date_restaurant_id_fk",
           "tableFrom": "menus",
           "tableTo": "periods",
-          "columnsFrom": ["period_id", "date", "restaurant_id"],
-          "columnsTo": ["id", "date", "restaurant_id"],
+          "columnsFrom": [
+            "period_id",
+            "date",
+            "restaurant_id"
+          ],
+          "columnsTo": [
+            "id",
+            "date",
+            "restaurant_id"
+          ],
           "onDelete": "restrict",
           "onUpdate": "cascade"
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
       "uniqueConstraints": {}
     },
     "public.nutrition_infos": {
@@ -694,8 +732,12 @@
           "name": "nutrition_infos_dish_id_dishes_id_fk",
           "tableFrom": "nutrition_infos",
           "tableTo": "dishes",
-          "columnsFrom": ["dish_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "dish_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "restrict",
           "onUpdate": "cascade"
         }
@@ -841,8 +883,12 @@
           "name": "periods_restaurant_id_restaurants_id_fk",
           "tableFrom": "periods",
           "tableTo": "restaurants",
-          "columnsFrom": ["restaurant_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "restaurant_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "restrict",
           "onUpdate": "cascade"
         }
@@ -873,7 +919,6 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
       "uniqueConstraints": {}
     },
     "public.ratings": {
@@ -918,8 +963,12 @@
           "name": "ratings_user_id_users_id_fk",
           "tableFrom": "ratings",
           "tableTo": "users",
-          "columnsFrom": ["user_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -927,8 +976,12 @@
           "name": "ratings_dish_id_dishes_id_fk",
           "tableFrom": "ratings",
           "tableTo": "dishes",
-          "columnsFrom": ["dish_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "dish_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -936,10 +989,12 @@
       "compositePrimaryKeys": {
         "ratings_pk": {
           "name": "ratings_pk",
-          "columns": ["user_id", "dish_id"]
+          "columns": [
+            "user_id",
+            "dish_id"
+          ]
         }
       },
-      "uniqueConstraints": {}
       "uniqueConstraints": {}
     },
     "public.restaurants": {
@@ -977,7 +1032,6 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
       "uniqueConstraints": {}
     },
     "public.stations": {
@@ -1023,14 +1077,17 @@
           "name": "stations_restaurant_id_restaurants_id_fk",
           "tableFrom": "stations",
           "tableTo": "restaurants",
-          "columnsFrom": ["restaurant_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "restaurant_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "restrict",
           "onUpdate": "cascade"
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
       "uniqueConstraints": {}
     },
     "public.users": {
@@ -1186,14 +1243,17 @@
           "name": "account_userId_users_id_fk",
           "tableFrom": "account",
           "tableTo": "users",
-          "columnsFrom": ["userId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
       "uniqueConstraints": {}
     },
     "public.session": {
@@ -1257,8 +1317,12 @@
           "name": "session_userId_users_id_fk",
           "tableFrom": "session",
           "tableTo": "users",
-          "columnsFrom": ["userId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1327,12 +1391,18 @@
     "public.restaurant_id_enum": {
       "name": "restaurant_id_enum",
       "schema": "public",
-      "values": ["3056", "3314"]
+      "values": [
+        "3056",
+        "3314"
+      ]
     },
     "public.restaurant_name_enum": {
       "name": "restaurant_name_enum",
       "schema": "public",
-      "values": ["anteatery", "brandywine"]
+      "values": [
+        "anteatery",
+        "brandywine"
+      ]
     }
   },
   "schemas": {},

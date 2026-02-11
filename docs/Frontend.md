@@ -1,6 +1,6 @@
 # The Frontend
 
-ZotMeal's frontend -- written in the [Next.js](https://nextjs.org) framework.
+PeterPlate's frontend -- written in the [Next.js](https://nextjs.org) framework.
 
 ## Table of Contents
 1. [App Structure](#app-structure)
@@ -63,19 +63,19 @@ next to the tab name).
 
 ## 📂 Components
 
-All of the components used in ZotMeal's web app are defined in 
+All of the components used in PeterPlate's web app are defined in 
 `📂components`.
 
-ZotMeal extends a lot of the [shad/cn](https://ui.shadcn.com/) library's 
+PeterPlate extends a lot of the [shad/cn](https://ui.shadcn.com/) library's 
 components. As such, you may be better off looking at their documentation to 
-implement your own component for ZotMeal.
+implement your own component for PeterPlate.
 
 See [Components](#components) for more details on each unique component.
 
 ## 📂 Context
 
 All of the [contexts](https://react.dev/learn/passing-data-deeply-with-context)
-used in ZotMeal's webapp are defined in `📂context`.
+used in PeterPlate's webapp are defined in `📂context`.
 
 Essentially, a context is a method of passing information between components
 without having to **prop drill**, or pass props deeply into children that may
@@ -83,7 +83,7 @@ or may not use those props. See the link above for React context information.
 
 ## 📂 Hooks
 
-All of the [hooks](https://react.dev/reference/react/hooks) used in ZotMeal's
+All of the [hooks](https://react.dev/reference/react/hooks) used in PeterPlate's
 webapp are defined in `📂hooks`.
 
 See the link above for more information on React hooks.
@@ -91,12 +91,12 @@ See the link above for more information on React hooks.
 ## 📂 Utils
 
 Functions, types, constants, and other static information/tools used across
-ZotMeal's webapp are defined in `📂utils`.
+PeterPlate's webapp are defined in `📂utils`.
 
 ## Defining Your Own Folder
 
 If for some reason you find yourself writing a file that doesn't fit within the
-predefined folders above, please reach out to a current ZotMeal lead to figure
+predefined folders above, please reach out to a current PeterPlate lead to figure
 out whether a new folder needs to be created for organization. 
 
 # Components
@@ -212,7 +212,7 @@ Not yet implemented.
 
 # Backend Integration
 
-ZotMeal leverages a tRPC backend, which queries a local Postgres database. 
+PeterPlate leverages a tRPC backend, which queries a local Postgres database. 
 This database has cron jobs run on it that pull CampusDish data daily and weekly for dishes and events.
 
 Most of the tRPC calls in the frontend (as of writing) are performed in the `side.tsx` file (Side component). For more information on the tRPC functions, check out `docs/Serverless Functions.md`, `docs/tRPC Procedures`, and the `packages/api/src` folder.
