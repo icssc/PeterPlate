@@ -53,7 +53,7 @@ const WelcomeView = React.forwardRef<HTMLDivElement>((_, ref) => {
             height: "120px",
           }}
         />
-        <Typography variant="h4" color="primary" fontWeight={700}>
+        <Typography variant="h4" fontWeight={700} className="text-sky-700">
           PeterPlate
         </Typography>
         <Typography color="gray" fontWeight={500} fontSize={18} pt="10px">
@@ -85,16 +85,40 @@ WelcomeView.displayName = "WelcomeView";
 const PersonalizeView = React.forwardRef<HTMLDivElement, PersonalizeViewProps>(
   ({ title, description, options, selected, onSelection }, ref) => {
     return (
-      <Box ref={ref}>
-        <Box>
-          <Avatar src="/user.webp" alt="User Profile Icon" />
-          <Typography>Welcome USER</Typography>
-          <Typography>Let's personalize your dining experience</Typography>
+      <Box ref={ref} display="flex" flexDirection="column">
+        <Box
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+          gap={0.5}
+          sx={{
+            py: "20px",
+          }}
+          className="bg-sky-700"
+        >
+          <Avatar
+            src="/peterplate-icon.webp"
+            alt="PeterPlate Icon"
+            sx={{
+              width: "60px",
+              height: "60px",
+            }}
+          />
+          <Typography variant="h5" color="white" fontWeight={700}>
+            Welcome, PETER!
+          </Typography>
+          <Typography color="white">
+            Let's personalize your dining experience
+          </Typography>
         </Box>
 
-        <Box>
-          <Typography>{title}</Typography>
-          <Typography>{description}</Typography>
+        <Box px="40px" pt="20px">
+          <Typography variant="h4" fontWeight={700} className="text-sky-700">
+            {title}
+          </Typography>
+          <Typography color="gray" fontSize={18} pt="20px">
+            {description}
+          </Typography>
         </Box>
 
         <ToggleButtonGroup
@@ -104,13 +128,15 @@ const PersonalizeView = React.forwardRef<HTMLDivElement, PersonalizeViewProps>(
           exclusive={false}
           fullWidth
           sx={{
+            pt: "10px",
+            px: "40px",
             display: "grid",
             gridTemplateColumns: "repeat(3, 1fr)",
             gap: 1.5,
             "& .MuiToggleButtonGroup-grouped": {
-              border: "1px solid !important",
+              border: "2px solid !important",
               borderRadius: "12px !important",
-              borderColor: "divider",
+              borderColor: "grey !important",
             },
           }}
         >
@@ -121,17 +147,21 @@ const PersonalizeView = React.forwardRef<HTMLDivElement, PersonalizeViewProps>(
               sx={{
                 py: 3,
                 textTransform: "none",
+                color: "black",
+
                 "&.Mui-selected": {
-                  backgroundColor: "primary.light",
-                  color: "primary.main",
-                  borderColor: "primary.main",
+                  backgroundColor: "rgba(0, 105, 168, .2)",
+                  color: "#0069A8",
+                  borderColor: "#0069A8 !important",
                   "&:hover": {
-                    backgroundColor: "primary.light",
+                    backgroundColor: "rgba(0, 105, 168, .4)",
                   },
                 },
               }}
             >
-              {opt}
+              <Typography fontSize={16} fontWeight={700} lineHeight={1}>
+                {opt}
+              </Typography>
             </ToggleButton>
           ))}
         </ToggleButtonGroup>
@@ -180,7 +210,14 @@ const OnboardingContent = React.forwardRef<
   };
 
   return (
-    <Box ref={ref} width="100%">
+    <Box
+      ref={ref}
+      width="100%"
+      display="flex"
+      flexDirection="column"
+      gap={2}
+      mb="5px"
+    >
       {activeStep === 0 && <WelcomeView />}
       {activeStep === 1 && (
         <PersonalizeView
@@ -197,7 +234,7 @@ const OnboardingContent = React.forwardRef<
           description="Select any dietary restrictions that apply to you (optional)"
           options={PreferenceKeys}
           selected={formData.preferences}
-          onSelection={(vals) => handleToggle("allergies", vals)}
+          onSelection={(vals) => handleToggle("preferences", vals)}
         />
       )}
 
@@ -250,7 +287,7 @@ export default function OnboardingDialog(): React.JSX.Element {
         slotProps={{
           paper: {
             sx: {
-              width: "460px",
+              width: "520px",
               maxWidth: "90vw",
               margin: 2,
               padding: 0,
