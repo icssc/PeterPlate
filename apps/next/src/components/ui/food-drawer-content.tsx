@@ -15,6 +15,7 @@ import {
 import { cn } from "@/utils/tw";
 import { nutrientToUnit } from "@/utils/types";
 import type { OnAddToMealTracker } from "./card/food-card";
+import IngredientsDialog from "../ingredients-dialog";
 import { AllergenBadge } from "./allergen-badge";
 import InteractiveStarRating from "./interactive-star-rating";
 
@@ -27,8 +28,8 @@ export default function FoodDrawerContent({
   onAddToMealTracker?: OnAddToMealTracker;
   isAddingToMealTracker?: boolean;
 }) {
-  // const ingredientsAvailable: boolean =
-  //   dish.ingredients != null && dish.ingredients.length > 0;
+  const ingredientsAvailable: boolean =
+    dish.ingredients != null && dish.ingredients.length > 0;
   const caloricInformationAvailable: boolean =
     dish.nutritionInfo.calories != null &&
     dish.nutritionInfo.calories.length > 0;
@@ -52,7 +53,7 @@ export default function FoodDrawerContent({
   ]);
 
   return (
-    <Box className="max-h-[95vh] flex flex-col font-poppins">
+    <Box className="h-full max-h-[85vh] flex flex-col font-poppins min-h-0">
       <Box className="pb-4 shrink-0">
         <Image
           src={"/zm-card-header.webp"}
@@ -159,7 +160,7 @@ export default function FoodDrawerContent({
           </h2>
         )}
 
-        <Box className="mb-4">
+        <Box className="mb-4 flex flex-col gap-2">
           {caloricInformationAvailable && (
             <Button
               variant="outlined"
@@ -178,6 +179,17 @@ export default function FoodDrawerContent({
               {showAllNutrients ? "Show Less" : "Show More Nutrients"}
             </Button>
           )}
+          {ingredientsAvailable && (
+            <IngredientsDialog
+              name={dish.name}
+              ingredients={dish.ingredients ?? ""}
+            />
+          )}
+          {!ingredientsAvailable && (
+            <Button variant="outlined" disabled className="w-full whitespace-nowrap">
+              Ingredients Not Available
+            </Button>
+          )}
         </Box>
       </Box>
 
@@ -191,7 +203,7 @@ export default function FoodDrawerContent({
             style={{ fontFamily: "Poppins, sans-serif" }}
           >
             <Add sx={{ fontSize: 18, width: 18, height: 18 }} />
-            Add to meal tracker
+            Add to Meal Tracker
           </button>
         </Box>
       )}

@@ -262,9 +262,12 @@ export default function FoodCard({
               sx: {
                 width: "460px",
                 maxWidth: "90vw",
+                maxHeight: "90vh",
                 margin: 2,
                 padding: 0,
                 overflow: "hidden",
+                display: "flex",
+                flexDirection: "column",
                 borderRadius: "16px",
               },
             },
@@ -298,9 +301,12 @@ export default function FoodCard({
               sx: {
                 width: "460px",
                 maxWidth: "90vw",
+                maxHeight: "85vh",
                 margin: 2,
                 padding: 0,
                 overflow: "hidden",
+                display: "flex",
+                flexDirection: "column",
                 borderRadius: "16px",
               },
             },
@@ -311,6 +317,7 @@ export default function FoodCard({
               borderTopRightRadius: "10px",
               marginTop: "96px",
               height: "auto",
+              maxHeight: "85vh",
             },
           }}
         >

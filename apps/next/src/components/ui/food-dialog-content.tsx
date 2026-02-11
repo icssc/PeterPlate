@@ -31,7 +31,7 @@ import InteractiveStarRating from "./interactive-star-rating";
  * This component is typically used as the content for a `Dialog` triggered by a {@link FoodCard}.
  *
  * @param {DishInfo} dish - The dish data to display. See {@link DishInfo} (from `@zotmeal/api`) for detailed property descriptions.
- * @param {OnAddToMealTracker} onAddToMealTracker - Called when the user clicks "Add to meal tracker".
+ * @param {OnAddToMealTracker} onAddToMealTracker - Called when the user clicks "Add to Meal Tracker"
  * @param {boolean} isAddingToMealTracker - Whether the add-to-tracker mutation is pending.
  * @returns {JSX.Element} The rendered content for the food item dialog.
  */
@@ -239,7 +239,7 @@ export default function FoodDialogContent({
                 style={{ fontFamily: "Poppins, sans-serif" }}
               >
                 <Add sx={{ fontSize: 18, width: 18, height: 18 }} />
-                Add to meal tracker
+                Add to Meal Tracker
               </button>
             </div>
           )}
