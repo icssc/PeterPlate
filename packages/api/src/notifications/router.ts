@@ -1,8 +1,7 @@
-import { Expo } from "expo-server-sdk";
 import { createTRPCRouter, publicProcedure } from "@api/trpc";
+import { PushTokenSchema, pushTokens } from "@peterplate/db";
 import { TRPCError } from "@trpc/server";
-
-import { pushTokens, PushTokenSchema } from "@peterplate/db";
+import { Expo } from "expo-server-sdk";
 
 const registerPushToken = publicProcedure
   .input(PushTokenSchema)

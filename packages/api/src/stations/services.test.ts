@@ -1,5 +1,4 @@
 import { apiTest } from "@api/apiTest";
-import { upsertMenu } from "@api/menus/services";
 import { upsertRestaurant } from "@api/restaurants/services";
 import { describe } from "vitest";
 

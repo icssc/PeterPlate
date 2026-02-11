@@ -1,6 +1,10 @@
 import { upsert } from "@api/utils";
 
-import type { DishToMenu, Drizzle, InsertDishWithRelations } from "@peterplate/db";
+import type {
+  DishToMenu,
+  Drizzle,
+  InsertDishWithRelations,
+} from "@peterplate/db";
 import {
   dietRestrictions,
   dishes,
@@ -16,9 +20,19 @@ export async function upsertDish(
     const result = await db.transaction<
       Omit<InsertDishWithRelations, "stationId">
     >(async (tx) => {
+      // Only update image_url when the incoming value is a valid non-empty string; do not overwrite existing image_url with null/empty.
+      const dishSet = { ...dishData };
+      if (
+        dishSet.image_url == null ||
+        typeof dishSet.image_url !== "string" ||
+        dishSet.image_url.trim() === ""
+      ) {
+        delete dishSet.image_url;
+      }
+
       const upsertedDish = await upsert(tx, dishes, dishData, {
         target: [dishes.id],
-        set: dishData,
+        set: dishSet,
       });
 
       const upsertedDietRestriction = await upsert(

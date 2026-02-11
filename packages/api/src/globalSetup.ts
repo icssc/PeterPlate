@@ -1,9 +1,8 @@
-import { exec } from "child_process";
-import { promisify } from "util";
+import { exec } from "node:child_process";
+import { promisify } from "node:util";
+import { pool } from "@peterplate/db";
 import { PostgreSqlContainer } from "@testcontainers/postgresql";
 import { Wait } from "testcontainers";
-
-import { pool } from "@peterplate/db";
 
 import { logger } from "./logger";
 

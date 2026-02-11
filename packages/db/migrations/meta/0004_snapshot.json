@@ -245,6 +245,12 @@
           "notNull": true,
           "default": "'Other'"
         },
+        "image_url": {
+          "name": "image_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "num_ratings": {
           "name": "num_ratings",
           "type": "integer",
