@@ -7,6 +7,8 @@ import { useState } from "react";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import { trpc } from "@/utils/trpc";
 import "react-big-calendar/lib/css/react-big-calendar.css";
+import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { Dialog, Drawer } from "@mui/material";
 import moment from "moment";
 import EventCard, { type EventInfo } from "@/components/ui/card/event-card";
@@ -44,22 +46,34 @@ const Events = () => {
   const [selectedEventData, setSelectedEventData] = useState<EventInfo | null>(
     null,
   );
+  const [currentDate, setCurrentDate] = useState(new Date());
   const now = new Date();
 
   const {
-    data: upcomingEvents,
+    data: events,
     isLoading,
     error,
-  } = trpc.event.upcoming.useQuery();
+  } = trpc.event.inBetween.useQuery({
+    after: moment(currentDate).startOf("month").toDate(),
+    before: moment(currentDate).endOf("month").toDate(),
+  });
 
-  // Sort events by start date
   const sortedEvents =
-    upcomingEvents?.length > 0
-      ? upcomingEvents.sort(
+    events?.length > 0
+      ? [...events].sort(
           (a: any, b: any) =>
             new Date(a.start).getTime() - new Date(b.start).getTime(),
         )
       : [];
+
+  // Sort events by start date
+  // const sortedEvents =
+  //   upcomingEvents?.length > 0
+  //     ? upcomingEvents.sort(
+  //         (a: any, b: any) =>
+  //           new Date(a.start).getTime() - new Date(b.start).getTime(),
+  //       )
+  //     : [];
 
   const filteredEvents = sortedEvents.filter((event: any) => {
     const matchesDiningHall =
@@ -100,6 +114,17 @@ const Events = () => {
   };
 
   const handleClose = () => setSelectedEventData(null);
+
+  const viewPreviousMonthsEvents = () => {
+    setCurrentDate(moment(currentDate).subtract(1, "month").toDate());
+  };
+
+  const viewNextMonthsEvents = () => {
+    const _now = moment();
+    const calendarDate = moment(currentDate);
+    if (calendarDate.isSameOrAfter(_now, "month")) return;
+    setCurrentDate(calendarDate.add(1, "month").toDate());
+  };
 
   return (
     <div className="max-w-full h-screen">
@@ -293,15 +318,30 @@ const Events = () => {
           {/* CALENDAR DISPLAY: Map over the fetched events once loaded */}
           {!isLoading && !error && viewMode === "calendar" && (
             <div className="border-2 border-sky-700 p-4 rounded-lg">
-              <div className="text-center">
-                <span className="inline-block mb-6 text-3xl text-sky-700 font-medium">
-                  {months[now.getMonth()]} {now.getFullYear()}
-                </span>
+              <div className="flex items-center justify-center">
+                <div className="text-center flex items-center justify-center text-sky-700 font-medium">
+                  <ArrowBackIosIcon
+                    className="mb-6 mr-4 cursor-pointer"
+                    onClick={viewPreviousMonthsEvents}
+                  />
+                  <span className="inline-block mb-6 text-3xl">
+                    {months[currentDate.getMonth()]} {currentDate.getFullYear()}
+                  </span>
+                  <ArrowForwardIosIcon
+                    className={`mb-6 ml-4 ${
+                      moment(currentDate).isSameOrAfter(moment(), "month")
+                        ? "opacity-30 cursor-not-allowed"
+                        : "cursor-pointer"
+                    }`}
+                    onClick={viewNextMonthsEvents}
+                  />
+                </div>
               </div>
               <Calendar
                 localizer={localizer}
                 events={calendarEvents}
-                date={now}
+                date={currentDate}
+                onNavigate={(newDate) => setCurrentDate(newDate)}
                 startAccessor="start"
                 endAccessor="end"
                 style={{ height: 500 }}
