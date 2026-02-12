@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-const CIRCLE_RADIUS = 40
-const CIRCLE_CIRCUMFERENCE = 2 * Math.PI * CIRCLE_RADIUS
+const CIRCLE_RADIUS = 40;
+const CIRCLE_CIRCUMFERENCE = 2 * Math.PI * CIRCLE_RADIUS;
 
 interface Props {
   /**
@@ -20,14 +20,14 @@ interface Props {
   display_unit: string;
 }
 
-export function ProgressDonut({ 
-  progress_value, 
+export function ProgressDonut({
+  progress_value,
   max_value,
-  display_unit 
+  display_unit,
 }: Props) {
-  const value = Math.max(0, Math.min(progress_value, max_value))
+  const value = Math.max(0, Math.min(progress_value, max_value));
   const percent = value / max_value;
-  const strokeDashoffset = CIRCLE_CIRCUMFERENCE * (1 - percent)
+  const strokeDashoffset = CIRCLE_CIRCUMFERENCE * (1 - percent);
 
   return (
     <div className="flex flex-col items-center justify-center p-4 pt-0">
@@ -56,12 +56,13 @@ export function ProgressDonut({
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-xl font-semibold">{progress_value}{display_unit}</span>
-          <span className="text-sm text-muted-foreground">
-            / {max_value}
+          <span className="text-xl font-semibold">
+            {progress_value}
+            {display_unit}
           </span>
+          <span className="text-sm text-muted-foreground">/ {max_value}</span>
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -1,7 +1,6 @@
-import { test } from "vitest";
-
 import type { Drizzle } from "@peterplate/db";
 import { createDrizzle } from "@peterplate/db";
+import { test } from "vitest";
 
 import { createCaller, createTRPCContext } from ".";
 import { testData } from "./testData";

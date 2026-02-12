@@ -246,6 +246,7 @@ export async function getAdobeEcommerceMenuDaily(
         description: item?.description ?? "",
         category: item?.category ?? "",
         ingredients: item?.ingredients ?? "",
+        image_url: item?.image_url ?? null,
         nutritionInfo: item?.nutritionInfo ?? {},
         recipeAllergenCodes: item?.allergenIntolerances ?? new Set<number>(),
         recipePreferenceCodes: item?.recipePreferences ?? new Set<number>(),
@@ -309,6 +310,7 @@ export async function getAdobeEcommerceMenuWeekly(
           description: item?.description ?? "",
           category: item?.category ?? "",
           ingredients: item?.ingredients ?? "",
+          image_url: item?.image_url ?? null,
           nutritionInfo: item?.nutritionInfo ?? {},
           recipeAllergenCodes: item?.allergenIntolerances ?? new Set<number>(),
           recipePreferenceCodes: item?.recipePreferences ?? new Set<number>(),
@@ -336,6 +338,7 @@ type ProductAttributes = {
   description: string;
   category: string;
   ingredients: string;
+  image_url: string | null;
   allergenIntolerances: Set<number>;
   recipePreferences: Set<number>;
   nutritionInfo: InsertDishWithRelations["nutritionInfo"];
@@ -422,11 +425,18 @@ function parseProducts(products: WeeklyProducts): ProductDictionary {
       // attributes["recipe_additional_data"]
     } as InsertDishWithRelations["nutritionInfo"];
 
+    const firstImageUrl =
+      product.images?.[0]?.url != null &&
+      String(product.images[0].url).trim() !== ""
+        ? String(product.images[0].url)
+        : null;
+
     parsedProducts[product.sku] = {
       name: product.name,
       description: (attributesMap.get("marketing_description") as string) ?? "",
       category: (attributesMap.get("master_recipe_type") as string) ?? "",
       ingredients: (attributesMap.get("recipe_ingredients") as string) ?? "",
+      image_url: firstImageUrl,
       allergenIntolerances,
       recipePreferences,
       nutritionInfo,
