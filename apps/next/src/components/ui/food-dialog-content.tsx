@@ -34,6 +34,11 @@ import InteractiveStarRating from "./interactive-star-rating";
  */
 export default function FoodDialogContent({ dish }: { dish: DishInfo }) {
   const [showAllNutrients, setShowAllNutrients] = useState(false);
+  const [imageError, setImageError] = useState(false);
+  const showImage =
+    typeof dish.image_url === "string" &&
+    dish.image_url.trim() !== "" &&
+    !imageError;
   const initialNutrients = [
     "calories",
     "totalFatG",
@@ -65,13 +70,24 @@ export default function FoodDialogContent({ dish }: { dish: DishInfo }) {
 
   return (
     <div className="font-poppins">
-      <Image
-        src={"/zm-card-header.webp"}
-        alt={"An image of peterplate logo."}
-        width={1200}
-        height={700}
-        className="w-full h-40 object-cover"
-      />
+      {showImage ? (
+        <Image
+          src={dish.image_url as string}
+          alt={formatFoodName(dish.name)}
+          width={800}
+          height={160}
+          className="w-full h-40 object-cover"
+          onError={() => setImageError(true)}
+        />
+      ) : (
+        <Image
+          src={"/zm-card-header.webp"}
+          alt={"An image of peterplate logo."}
+          width={1200}
+          height={700}
+          className="w-full h-40 object-cover"
+        />
+      )}
       <div className="max-w-lg mx-auto w-full">
         <DialogContent sx={{ padding: "0 16px !important" }}>
           <div className="flex flex-col gap-6 pb-6 pt-4">
@@ -152,7 +168,7 @@ export default function FoodDialogContent({ dish }: { dish: DishInfo }) {
                                 "col-span-1",
                                 (nutrientKey === "transFatG" ||
                                   nutrientKey === "saturatedFatG") &&
-                                "text-gray-500 pl-4",
+                                  "text-gray-500 pl-4",
                               )}
                             >
                               {formatNutrientLabel(nutrientKey)}
@@ -162,7 +178,7 @@ export default function FoodDialogContent({ dish }: { dish: DishInfo }) {
                                 "col-span-1 text-right",
                                 (nutrientKey === "transFatG" ||
                                   nutrientKey === "saturatedFatG") &&
-                                "text-gray-500",
+                                  "text-gray-500",
                               )}
                             >
                               {value == null

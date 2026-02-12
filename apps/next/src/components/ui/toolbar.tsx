@@ -1,6 +1,7 @@
 "use client";
 
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import MenuIcon from "@mui/icons-material/Menu";
 import {
   AppBar,
   Button,
@@ -109,9 +110,18 @@ function ToolbarDropdown({ element }: { element: ToolbarElement }) {
 }
 
 export default function Toolbar(): React.JSX.Element {
+  const [profileAnchor, setProfileAnchor] = useState<null | HTMLElement>(null);
+  const profileOpen = Boolean(profileAnchor);
+
+  const handleProfileOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setProfileAnchor(event.currentTarget);
+  };
+
+  const handleProfileClose = () => {
+    setProfileAnchor(null);
+  };
   const { data: session, isPending } = useSession();
   const user = session?.user;
-  const [drawerOpen, setDrawerOpen] = useState(false);
 
   // const { selectedDate, setSelectedDate } = useDate();
   // const [enabledDates, setEnabledDates] = useState<DateList>([new Date()]);
@@ -194,33 +204,85 @@ export default function Toolbar(): React.JSX.Element {
           </nav>
 
           <div className="flex-none flex items-center gap-4">
-            {isPending ? (
-              <div className="w-10 h-10" />
-            ) : user ? (
-              <IconButton
-                onClick={() => setDrawerOpen(!drawerOpen)}
-                className="!p-0"
-                aria-label="Open sidebar"
-              >
-                <Image
-                  src={user.image || "/default-avatar.png"}
-                  alt={user.name || "User profile"}
-                  width={40}
-                  height={40}
-                  className="w-10 h-10 rounded-full"
-                />
-              </IconButton>
-            ) : (
-              <GoogleSignInButton />
-            )}
+            <div className="flex-none flex items-center gap-4">
+              {isPending ? (
+                <>
+                  <div className="w-24 h-5" />
+                  <IconButton
+                    className="!text-[#1f2937] hover:!bg-[rgba(0, 0, 0, 0.04)]"
+                    aria-label="Open sidebar"
+                    disabled
+                  >
+                    <MenuIcon style={{ color: "white" }} />
+                  </IconButton>
+                </>
+              ) : user ? (
+                <IconButton
+                  onClick={handleProfileOpen}
+                  className="!p-0"
+                  aria-label="Open profile menu"
+                >
+                  <Image
+                    src={user.image || "/default-avatar.png"}
+                    alt={user.name || "User profile"}
+                    width={40}
+                    height={40}
+                    className="w-10 h-10 rounded-full"
+                  />
+                </IconButton>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <GoogleSignInButton />
+                  <IconButton
+                    onClick={handleProfileOpen}
+                    className="!text-[#1f2937] hover:!bg-[rgba(0,0,0,0.04)]"
+                    aria-label="Open sidebar"
+                  >
+                    <MenuIcon style={{ color: "white" }} />
+                  </IconButton>
+                </div>
+              )}
+            </div>
           </div>
         </MuiToolbar>
       </AppBar>
 
-      <SidebarContent
+      <Menu
+        anchorEl={profileAnchor}
+        open={profileOpen}
+        onClose={handleProfileClose}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "right",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "right",
+        }}
+        PaperProps={{
+          sx: {
+            backgroundColor: "transparent",
+            boxShadow: "none",
+            padding: 0,
+            width: 357,
+            maxHeight: 658,
+            // borderRadius: 3,
+            mt: 1,
+          },
+        }}
+        MenuListProps={{
+          sx: {
+            padding: 0,
+          },
+        }}
+      >
+        <SidebarContent onClose={handleProfileClose} />
+      </Menu>
+
+      {/* <SidebarContent
         open={drawerOpen}
         onClose={() => setDrawerOpen(!drawerOpen)}
-      />
+      /> */}
     </>
   );
 }

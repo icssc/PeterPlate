@@ -1,27 +1,29 @@
 import { trpc } from "@/utils/trpc";
-import { SelectLoggedMeal } from "../../../../../packages/db/src/schema";
+import type { SelectLoggedMeal } from "../../../../../packages/db/src/schema";
 import { ProgressDonut } from "../progress-donut";
 
 interface NutritionData {
-  calories: number,
-  protein_g: number,
-  carbs_g: number,
-  fat_g: number
+  calories: number;
+  protein_g: number;
+  carbs_g: number;
+  fat_g: number;
 }
 
 type LoggedMealJoinedWithNutrition = SelectLoggedMeal & {
-  calories: number,
-  protein: number,
-  carbs: number,
-  fat: number
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
 };
 
-function compileMealData(meals: LoggedMealJoinedWithNutrition[]): NutritionData {
+function compileMealData(
+  meals: LoggedMealJoinedWithNutrition[],
+): NutritionData {
   const data = {
     calories: 0,
     protein_g: 0,
     carbs_g: 0,
-    fat_g: 0
+    fat_g: 0,
   };
 
   for (const meal of meals) {
@@ -41,8 +43,8 @@ function compileMealData(meals: LoggedMealJoinedWithNutrition[]): NutritionData 
 }
 
 interface Props {
-  dateString: string,
-  mealsEaten: LoggedMealJoinedWithNutrition[]
+  dateString: string;
+  mealsEaten: LoggedMealJoinedWithNutrition[];
 }
 
 const NutritionBreakdown = ({ dateString, mealsEaten }: Props) => {
@@ -50,17 +52,21 @@ const NutritionBreakdown = ({ dateString, mealsEaten }: Props) => {
 
   const utils = trpc.useUtils();
   const deleteLoggedMealMutation = trpc.nutrition.deleteLoggedMeal.useMutation({
-      onSuccess: () => {
-        //TODO: Replace this with a shad/cn sonner or equivalent.
-        alert(`Removed dish from your log`);
-        utils.nutrition.invalidate();
-      },
-      onError: (error: Error) => {
-        console.error(error.message);
-      }
-    });
+    onSuccess: () => {
+      //TODO: Replace this with a shad/cn sonner or equivalent.
+      alert(`Removed dish from your log`);
+      utils.nutrition.invalidate();
+    },
+    onError: (error: Error) => {
+      console.error(error.message);
+    },
+  });
 
-  const removeBtnOnClick = (e: React.MouseEvent, userId: string | null, dishId: string | null) => {
+  const removeBtnOnClick = (
+    e: React.MouseEvent,
+    userId: string | null,
+    dishId: string | null,
+  ) => {
     e.preventDefault();
     if (!userId || !dishId) return;
 
@@ -73,26 +79,48 @@ const NutritionBreakdown = ({ dateString, mealsEaten }: Props) => {
       <div className="flex align-items mt-4">
         <div className="flex flex-col">
           <center className="text-[2rem] font-bold">Calories</center>
-          <ProgressDonut progress_value={nutrition.calories} max_value={2000} display_unit="" />
+          <ProgressDonut
+            progress_value={nutrition.calories}
+            max_value={2000}
+            display_unit=""
+          />
         </div>
         <div className="flex flex-col">
           <center className="text-[2rem] font-bold">Protein</center>
-          <ProgressDonut progress_value={nutrition.protein_g} max_value={75} display_unit="g" />
+          <ProgressDonut
+            progress_value={nutrition.protein_g}
+            max_value={75}
+            display_unit="g"
+          />
         </div>
         <div className="flex flex-col">
           <center className="text-[2rem] font-bold">Carbs</center>
-          <ProgressDonut progress_value={nutrition.carbs_g} max_value={250} display_unit="g" />
+          <ProgressDonut
+            progress_value={nutrition.carbs_g}
+            max_value={250}
+            display_unit="g"
+          />
         </div>
         <div className="flex flex-col">
           <center className="text-[2rem] font-bold">Fat</center>
-          <ProgressDonut progress_value={nutrition.fat_g} max_value={50} display_unit="g" />
+          <ProgressDonut
+            progress_value={nutrition.fat_g}
+            max_value={50}
+            display_unit="g"
+          />
         </div>
       </div>
       <div className="meal-history">
-        {mealsEaten && mealsEaten.map((meal) => (
-          <div key={meal.id} className="flex items-center justify-between gap-4 rounded-lg border p-4 mb-3">
+        {mealsEaten?.map((meal) => (
+          <div
+            key={meal.id}
+            className="flex items-center justify-between gap-4 rounded-lg border p-4 mb-3"
+          >
             <div className="flex flex-col">
-              <h3 className="font-medium">{meal.servings} serving{meal.servings > 1 ? 's' : ''} of {meal.dishName}</h3>
+              <h3 className="font-medium">
+                {meal.servings} serving{meal.servings > 1 ? "s" : ""} of{" "}
+                {meal.dishName}
+              </h3>
               <p className="text-sm text-muted-foreground">
                 {Math.round(meal.calories * meal.servings)} calories |&nbsp;
                 {Math.round(meal.protein * meal.servings)}g protein |&nbsp;
@@ -101,8 +129,8 @@ const NutritionBreakdown = ({ dateString, mealsEaten }: Props) => {
               </p>
             </div>
 
-            <button 
-              className="h-8 rounded-md border px-3 text-sm transition-colors hover:bg-accent hover:text-accent-foreground" 
+            <button
+              className="h-8 rounded-md border px-3 text-sm transition-colors hover:bg-accent hover:text-accent-foreground"
               onClick={(e) => removeBtnOnClick(e, meal.userId, meal.dishId)}
             >
               Remove
@@ -112,6 +140,6 @@ const NutritionBreakdown = ({ dateString, mealsEaten }: Props) => {
       </div>
     </div>
   );
-}
- 
+};
+
 export default NutritionBreakdown;

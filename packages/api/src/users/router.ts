@@ -1,11 +1,10 @@
+import { getUserRating } from "@api/ratings/services";
 import { createTRPCRouter, publicProcedure } from "@api/trpc";
+import { UserSchema } from "@peterplate/db";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-import { UserSchema } from "@peterplate/db";
-
 import { getUser, upsertUser } from "./services";
-import { getUserRating } from "@api/ratings/services";
 
 const getUserProcedure = publicProcedure
   .input(z.object({ id: z.string() }))
