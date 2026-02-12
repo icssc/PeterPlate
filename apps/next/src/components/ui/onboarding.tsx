@@ -22,6 +22,7 @@ import { GoogleSignInButton } from "../auth/google-sign-in";
 interface PersonalizeViewProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
   description: string;
+  name: string;
   options: readonly string[];
   selected: string[];
   onSelection: (newValues: string[]) => void;
@@ -84,7 +85,7 @@ const WelcomeView = React.forwardRef<HTMLDivElement>((_, ref) => {
 WelcomeView.displayName = "WelcomeView";
 
 const PersonalizeView = React.forwardRef<HTMLDivElement, PersonalizeViewProps>(
-  ({ title, description, options, selected, onSelection }, ref) => {
+  ({ title, description, name, options, selected, onSelection }, ref) => {
     return (
       <Box ref={ref} display="flex" flexDirection="column">
         <Box
@@ -106,7 +107,7 @@ const PersonalizeView = React.forwardRef<HTMLDivElement, PersonalizeViewProps>(
             }}
           />
           <Typography variant="h5" color="white" fontWeight={700}>
-            Welcome, PETER!
+            Welcome, {name}!
           </Typography>
           <Typography color="white">
             Let's personalize your dining experience
@@ -177,6 +178,8 @@ const OnboardingContent = React.forwardRef<
   OnboardingContentProps
 >(({ handleClose }, ref) => {
   const { data: session, isPending } = useSession();
+  const firstName = session?.user?.name?.split(" ")[0] || "User";
+
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState({
     allergies: [] as string[],
@@ -233,6 +236,7 @@ const OnboardingContent = React.forwardRef<
         <PersonalizeView
           title="Food Allergies"
           description="Help us keep you safe by selecting your food allergies (optional)"
+          name={firstName}
           options={AllergenKeys}
           selected={formData.allergies}
           onSelection={(vals) => handleToggle("allergies", vals)}
@@ -242,6 +246,7 @@ const OnboardingContent = React.forwardRef<
         <PersonalizeView
           title="Dietary Preferences"
           description="Select any dietary restrictions that apply to you (optional)"
+          name={firstName}
           options={PreferenceKeys}
           selected={formData.preferences}
           onSelection={(vals) => handleToggle("preferences", vals)}
