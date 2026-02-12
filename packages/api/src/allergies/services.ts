@@ -16,28 +16,33 @@ export async function getAllergies(db: Drizzle, userId: string) {
   return allergies.map((a) => a.allergy);
 }
 
-export async function addAllergy(
+export async function addAllergies(
   db: Drizzle,
   userId: string,
-  allergy: string,
-): Promise<InsertAllergy> {
+  allergies: Array<string>,
+): Promise<Array<string>> {
   //check if allergy already in table
-  const existing_allergy = await db.query.userAllergies.findFirst({
-    where: (ua, { eq }) => and(eq(ua.userId, userId), eq(ua.allergy, allergy)),
-  });
-
-  if (existing_allergy) {
+  if (!allergies) {
     return null;
   }
+  for (const allergy in allergies) {
+    const existing_allergy = await db.query.userAllergies.findFirst({
+      where: (ua, { eq }) =>
+        and(eq(ua.userId, userId), eq(ua.allergy, allergy)),
+    });
 
-  const newAllergy: InsertAllergy = {
-    userId,
-    allergy,
-  };
+    if (existing_allergy) {
+      return null;
+    }
 
-  await db.insert(userAllergies).values(newAllergy);
+    const newAllergy: InsertAllergy = {
+      userId,
+      allergy,
+    };
 
-  return newAllergy;
+    await db.insert(userAllergies).values(newAllergy);
+  }
+  return allergies;
 }
 
 export async function deleteAllergy(

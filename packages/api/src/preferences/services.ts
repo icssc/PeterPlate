@@ -17,29 +17,33 @@ export async function getDietaryPreferences(db: Drizzle, userId: string) {
   return preferences.map((p) => p.preference);
 }
 
-export async function addDietaryPreference(
+export async function addDietaryPreferences(
   db: Drizzle,
   userId: string,
-  preference: string,
-): Promise<InsertPreference> {
-  //check if allergy already in table
-  const existing_preference = await db.query.userDietaryPreferences.findFirst({
-    where: (ud, { eq }) =>
-      and(eq(ud.userId, userId), eq(ud.preference, preference)),
-  });
-
-  if (existing_preference) {
+  preferences: Array<string>,
+): Promise<Array<string>> {
+  if (!preferences) {
     return null;
   }
 
-  const newPreference: InsertPreference = {
-    userId,
-    preference,
-  };
+  for (const preference in preferences) {
+    const already_existing_preference =
+      await db.query.userDietaryPreferences.findFirst({
+        where: (ud, { eq }) =>
+          and(eq(ud.userId, userId), eq(ud.preference, preference)),
+      });
+    if (already_existing_preference) {
+      continue;
+    }
+    const newPreference: InsertPreference = {
+      userId,
+      preference,
+    };
+    await db.insert(userDietaryPreferences).values(newPreference);
+  }
+  return preferences;
 
-  await db.insert(userDietaryPreferences).values(newPreference);
-
-  return newPreference;
+  //check if allergy already in table
 }
 
 export async function deletePreference(
