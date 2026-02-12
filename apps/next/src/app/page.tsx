@@ -35,7 +35,9 @@ export default function Home() {
   return (
     <div className="flex flex-col h-screen">
       <div className="flex-grow overflow-y-auto">
-        <OnboardingDialog />
+        {!isPending && session?.user && session.user.hasOnboarded === false && (
+          <OnboardingDialog />
+        )}
         {activeHall === HallEnum.BRANDYWINE && (
           <Side hall={HallEnum.BRANDYWINE} toggleHall={toggleHall} />
         )}
