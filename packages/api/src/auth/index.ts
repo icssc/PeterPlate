@@ -1,12 +1,10 @@
-import { account } from './../../../db/src/schema/auth-schema';
 import { betterAuth } from "better-auth";
-import { genericOAuth } from "better-auth/plugins";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { db } from "../../../db/src/index"
-import * as schema from "../../../db/src/index";
-
+import { genericOAuth } from "better-auth/plugins";
 import { config } from "dotenv";
 import { join } from "path";
+import * as schema from "../../../db/src/index";
+import { db } from "../../../db/src/index";
 
 config({ path: join(process.cwd(), ".env") });
 
@@ -16,13 +14,23 @@ export const auth = betterAuth({
   debug: true,
   secret: process.env.NEXT_PUBLIC_BETTER_AUTH_SECRET,
   baseURL: process.env.NEXT_PUBLIC_BASE_URL,
+  user: {
+    additionalFields: {
+      hasOnboarded: {
+        type: "boolean",
+        required: false,
+        defaultValue: false,
+      },
+    },
+  },
   plugins: [
     genericOAuth({
       config: [
         {
           providerId: "icssc",
           clientId: process.env.AUTH_CLIENT_ID || "peterplate-dev",
-          discoveryUrl: "https://auth.icssc.club/.well-known/openid-configuration",
+          discoveryUrl:
+            "https://auth.icssc.club/.well-known/openid-configuration",
           scopes: ["openid", "profile", "email"],
           pkce: true,
           mapProfileToUser: (profile) => {
@@ -36,19 +44,13 @@ export const auth = betterAuth({
       ],
     }),
   ],
-  // socialProviders: {
-  //   google: {
-  //     clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
-  //     clientSecret: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET!,
-  //   },
-  // },
   database: drizzleAdapter(db, {
     provider: "pg",
     schema: {
-      user: schema.users,        
+      user: schema.users,
       session: schema.session,
       account: schema.account,
       verification: schema.verification,
     },
-  })
+  }),
 });

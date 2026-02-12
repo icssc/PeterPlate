@@ -43,6 +43,13 @@
       "when": 1770671074905,
       "tag": "0005_fresh_onslaught",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1770856727738,
+      "tag": "0006_peterplate",
+      "breakpoints": true
     }
   ]
 }

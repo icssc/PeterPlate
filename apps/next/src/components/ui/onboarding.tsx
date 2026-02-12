@@ -192,7 +192,9 @@ const OnboardingContent = React.forwardRef<
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
-      // call TRPC procedure
+      // call TRPC procedure that sets user's
+      // allergies, preferences, and sets
+      // hasOnboarded to true
       handleClose();
     } catch (error) {
       console.error("Onboarding failed:", error);
