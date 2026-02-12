@@ -258,6 +258,7 @@ const OnboardingContent = React.forwardRef<
         steps={3}
         position="static"
         activeStep={activeStep}
+        sx={{ px: "40px" }}
         nextButton={
           activeStep === 2 ? (
             <Button
@@ -265,19 +266,39 @@ const OnboardingContent = React.forwardRef<
               variant="contained"
               disabled={isSubmitting}
               onClick={handleSubmit}
+              sx={{
+                height: "40px",
+                width: "80px",
+              }}
             >
               {isSubmitting ? "Saving..." : "Finish"}
             </Button>
           ) : (
-            <Button size="small" onClick={handleNext} disabled={!session?.user}>
+            <Button
+              variant="contained"
+              size="small"
+              onClick={handleNext}
+              disabled={!session?.user}
+              sx={{
+                height: "40px",
+                width: "80px",
+              }}
+            >
               Next
-              <KeyboardArrowRight />
             </Button>
           )
         }
         backButton={
-          <Button size="small" onClick={handleBack} disabled={activeStep !== 2}>
-            <KeyboardArrowLeft />
+          <Button
+            variant="contained"
+            size="small"
+            onClick={handleBack}
+            disabled={activeStep !== 2}
+            sx={{
+              height: "40px",
+              width: "80px",
+            }}
+          >
             Back
           </Button>
         }
