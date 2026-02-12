@@ -207,7 +207,7 @@ export function RestaurantPage({
         className="mt-4 mb-6 mx-auto w-full max-w-[1292px]"
       >
         <div className="flex flex-col md:flex-row items-start gap-3">
-          <div className="w-full md:basis-[968px] md:max-w-[968px] md:min-h-[740px]">
+          <div className="w-full md:w-[968px] md:min-h-[740px] min-w-0">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2 mb-2 flex-wrap md:flex-nowrap">
               <Typography variant="h4" fontWeight={700}>
                 {hall === HallEnum.ANTEATERY ? "Anteatery" : "Brandywine"}
@@ -282,7 +282,7 @@ export function RestaurantPage({
                   className="flex w-full justify-center"
                 >
                   <div className="overflow-x-auto">
-                    <TabsList className="mx-auto">
+                    <TabsList className={isDesktop ? "mx-auto" : ""}>
                       {stations.map((station) => (
                         <TabsTrigger
                           key={station.name}
@@ -353,7 +353,7 @@ export function RestaurantPage({
             </div>
           </div>
 
-          <div className="w-full md:basis-[300px] md:max-w-[300px] md:min-h-[740px]">
+          <div className="w-full md:w-[300px] md:min-h-[740px] min-w-0">
             <Paper elevation={1} className="p-4 mb-4 h-fit">
               <Typography variant="subtitle1" fontWeight={700}>
                 Hours of Operation
