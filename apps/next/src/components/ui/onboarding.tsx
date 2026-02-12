@@ -10,8 +10,9 @@ import {
   ToggleButtonGroup,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { useSession } from "@/utils/auth-client";
 import {
   AllergenKeys,
   PreferenceKeys,
@@ -175,12 +176,19 @@ const OnboardingContent = React.forwardRef<
   HTMLDivElement,
   OnboardingContentProps
 >(({ handleClose }, ref) => {
+  const { data: session, isPending } = useSession();
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState({
     allergies: [] as string[],
     preferences: [] as string[],
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!isPending && session?.user && session.user.hasOnboarded === false) {
+      setActiveStep(1);
+    }
+  }, [session, isPending]);
 
   const handleToggle = (key: keyof typeof formData, newValues: string[]) => {
     setFormData((prev) => ({
@@ -256,14 +264,14 @@ const OnboardingContent = React.forwardRef<
               {isSubmitting ? "Saving..." : "Finish"}
             </Button>
           ) : (
-            <Button size="small" onClick={handleNext}>
+            <Button size="small" onClick={handleNext} disabled={!session?.user}>
               Next
               <KeyboardArrowRight />
             </Button>
           )
         }
         backButton={
-          <Button size="small" onClick={handleBack} disabled={activeStep === 0}>
+          <Button size="small" onClick={handleBack} disabled={activeStep !== 2}>
             <KeyboardArrowLeft />
             Back
           </Button>
@@ -277,7 +285,6 @@ export default function OnboardingDialog(): React.JSX.Element {
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const [open, setOpen] = useState(true);
 
-  const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
   if (isDesktop)

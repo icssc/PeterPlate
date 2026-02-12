@@ -17,7 +17,8 @@ export default function Home() {
   if (isDesktop) {
     return (
       <div className="grid grid-cols-2 h-screen">
-        {!isPending && session?.user && session.user.hasOnboarded === false && (
+        {((!isPending && !session) ||
+          (session?.user && session.user.hasOnboarded === false)) && (
           <OnboardingDialog />
         )}
         <Side hall={HallEnum.BRANDYWINE} />
@@ -35,7 +36,8 @@ export default function Home() {
   return (
     <div className="flex flex-col h-screen">
       <div className="flex-grow overflow-y-auto">
-        {!isPending && session?.user && session.user.hasOnboarded === false && (
+        {((!isPending && !session) ||
+          (session?.user && session.user.hasOnboarded === false)) && (
           <OnboardingDialog />
         )}
         {activeHall === HallEnum.BRANDYWINE && (
