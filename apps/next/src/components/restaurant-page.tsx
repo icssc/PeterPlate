@@ -5,7 +5,6 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
-  Box,
   Chip,
   Container,
   Divider,
@@ -191,8 +190,8 @@ export function RestaurantPage({
   const displayDate = selectedDate ?? today;
 
   return (
-    <Box>
-      <Box position="relative" width="100%" height={{ xs: 200, md: 260 }}>
+    <div>
+      <div className="relative w-full h-[200px] md:h-[260px]">
         <Image
           src={hero.src}
           alt={hero.alt}
@@ -200,54 +199,21 @@ export function RestaurantPage({
           priority
           className="object-cover object-bottom"
         />
-        <Box
-          sx={{
-            position: "absolute",
-            inset: 0,
-            background:
-              "linear-gradient(to bottom, rgba(0,0,0,0.65), transparent)",
-          }}
-        />
-      </Box>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/65 to-transparent" />
+      </div>
 
       <Container
         maxWidth={false}
-        sx={{ mt: 4, mb: 6, mx: "auto", width: "100%", maxWidth: 1292 }}
+        className="mt-4 mb-6 mx-auto w-full max-w-[1292px]"
       >
-        <Box
-          display="flex"
-          flexDirection={isDesktop ? "row" : "column"}
-          alignItems="flex-start"
-          gap={3}
-        >
-          <Box
-            sx={{
-              flexBasis: isDesktop ? 968 : "100%",
-              maxWidth: isDesktop ? 968 : "100%",
-              width: isDesktop ? 300 : "100%",
-              minHeight: isDesktop ? 740 : "auto",
-            }}
-          >
-            <Box
-              display="flex"
-              flexDirection={isDesktop ? "row" : "column"}
-              alignItems={isDesktop ? "center" : "flex-start"}
-              justifyContent="space-between"
-              gap={2}
-              mb={2}
-              sx={{ flexWrap: isDesktop ? "nowrap" : "wrap" }}
-            >
+        <div className="flex flex-col md:flex-row items-start gap-3">
+          <div className="w-full md:basis-[968px] md:max-w-[968px] md:min-h-[740px]">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2 mb-2 flex-wrap md:flex-nowrap">
               <Typography variant="h4" fontWeight={700}>
                 {hall === HallEnum.ANTEATERY ? "Anteatery" : "Brandywine"}
               </Typography>
 
-              <Box
-                display="flex"
-                gap={2}
-                alignItems="center"
-                justifyContent={isDesktop ? "flex-end" : "flex-start"}
-                sx={{ flexWrap: isDesktop ? "nowrap" : "wrap" }}
-              >
+              <div className="flex gap-2 items-center justify-start md:justify-end flex-wrap md:flex-nowrap">
                 {openTime && closeTime ? (
                   <DiningHallStatus
                     status={derivedHallStatus}
@@ -296,19 +262,19 @@ export function RestaurantPage({
                 </Select>
 
                 {calendarRange && enabledDates && (
-                  <Box sx={{ width: 240 }}>
+                  <div className="w-[240px]">
                     <DatePicker
                       date={selectedDate}
                       enabledDates={enabledDates}
                       range={calendarRange}
                       onSelect={handleDateSelect}
                     />
-                  </Box>
+                  </div>
                 )}
-              </Box>
-            </Box>
+              </div>
+            </div>
 
-            <Box mt={3}>
+            <div className="mt-3">
               {!isLoading && !isError && stations.length > 0 && (
                 <Tabs
                   value={selectedStation}
@@ -329,15 +295,10 @@ export function RestaurantPage({
                   </div>
                 </Tabs>
               )}
-            </Box>
+            </div>
 
             {!isLoading && !isError && dishes.length > 0 && (
-              <Box
-                mt={2}
-                display="flex"
-                justifyContent="flex-end"
-                className="w-full"
-              >
+              <div className="mt-2 flex justify-end w-full">
                 <div className="flex gap-2">
                   <Button
                     variant="outline"
@@ -366,19 +327,12 @@ export function RestaurantPage({
                     Compact View
                   </Button>
                 </div>
-              </Box>
+              </div>
             )}
 
-            <Box mt={3}>
+            <div className="mt-3">
               {activeStation && (
-                <Box
-                  sx={{
-                    "& #food-scroll": {
-                      height: "auto",
-                      overflowY: "visible",
-                    },
-                  }}
-                >
+                <div className="[&_#food-scroll]:h-auto [&_#food-scroll]:overflow-y-visible">
                   <Typography variant="h6" fontWeight={700} gutterBottom>
                     {toTitleCase(activeStation.name)}
                   </Typography>
@@ -394,27 +348,20 @@ export function RestaurantPage({
                     }
                     isCompactView={isCompactView}
                   />
-                </Box>
+                </div>
               )}
-            </Box>
-          </Box>
+            </div>
+          </div>
 
-          <Box
-            sx={{
-              flexBasis: isDesktop ? 300 : "100%",
-              maxWidth: isDesktop ? 300 : "100%",
-              width: "100%",
-              minHeight: isDesktop ? 740 : "auto",
-            }}
-          >
-            <Paper elevation={1} sx={{ p: 2, mb: 2, height: "fit-content" }}>
+          <div className="w-full md:basis-[300px] md:max-w-[300px] md:min-h-[740px]">
+            <Paper elevation={1} className="p-4 mb-4 h-fit">
               <Typography variant="subtitle1" fontWeight={700}>
                 Hours of Operation
               </Typography>
               <Typography
                 variant="body2"
                 color="text.secondary"
-                sx={{ mt: 0.5, mb: 1 }}
+                className="mt-0.5 mb-2"
               >
                 Today (
                 {displayDate.toLocaleDateString(undefined, {
@@ -424,7 +371,7 @@ export function RestaurantPage({
                 })}
                 )
               </Typography>
-              <Divider sx={{ mb: 1 }} />
+              <Divider className="mb-2" />
               {periods.length > 0 ? (
                 periods.map((periodKey) => {
                   const periodTimes = availablePeriodTimes?.[periodKey];
@@ -432,11 +379,9 @@ export function RestaurantPage({
                   const hasTimes = periodTimes && periodTimes.length >= 2;
 
                   return (
-                    <Box
+                    <div
                       key={periodKey}
-                      display="flex"
-                      justifyContent="space-between"
-                      mb={0.5}
+                      className="flex justify-between mb-0.5"
                     >
                       <Typography variant="body2">{periodName}</Typography>
                       <Typography variant="body2" color="text.secondary">
@@ -444,7 +389,7 @@ export function RestaurantPage({
                           ? formatOpenCloseTime(periodTimes[0], periodTimes[1])
                           : "Closed"}
                       </Typography>
-                    </Box>
+                    </div>
                   );
                 })
               ) : (
@@ -454,26 +399,18 @@ export function RestaurantPage({
               )}
             </Paper>
 
-            <Paper elevation={1} sx={{ p: 2, mb: 2 }}>
+            <Paper elevation={1} className="p-4 mb-4">
               <Typography variant="subtitle1" fontWeight={700}>
                 Location
               </Typography>
               <Typography
                 variant="body2"
                 color="text.secondary"
-                sx={{ mt: 1, mb: 1 }}
+                className="my-2"
               >
                 Middle Earth Community Irvine, CA 92697
               </Typography>
-              <Box
-                sx={{
-                  width: "100%",
-                  height: 150,
-                  borderRadius: 1,
-                  overflow: "hidden",
-                  mb: 1,
-                }}
-              >
+              <div className="w-full h-[150px] rounded overflow-hidden mb-2">
                 <iframe
                   title="Campus map location"
                   width="100%"
@@ -482,21 +419,21 @@ export function RestaurantPage({
                   loading="lazy"
                   allowFullScreen
                   referrerPolicy="no-referrer-when-downgrade"
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3320.123456789!2d-117.8441234!3d33.6467890!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzPCsDM4JzQ4LjQiTiAxMTfCsDUwJzM4LjgiVw!5e0!3m2!1sen!2sus!4v1234567890123!5m2!1sen!2sus"
+                  src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d3429.7763637757234!2d-117.84095176884651!3d33.64518667561823!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80dcde0f35ca653d%3A0xf33e49e0efd9eea5!2sBrandywine%20Commons!5e0!3m2!1sen!2sus!4v1770858688774!5m2!1sen!2sus"
                 />
-              </Box>
+              </div>
               <Link
-                href="https://www.google.com/maps/dir/?api=1&destination=557+E+Peltason+Dr+Irvine+CA+92617"
+                href="https://maps.app.goo.gl/vTiuJzbKSwtZwZgi9"
                 target="_blank"
                 rel="noopener noreferrer"
-                sx={{ fontSize: "0.875rem" }}
+                className="text-sm"
               >
                 Directions
               </Link>
             </Paper>
 
-            <Paper elevation={1} sx={{ p: 2 }}>
-              <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 1 }}>
+            <Paper elevation={1} className="p-4">
+              <Typography variant="subtitle1" fontWeight={700} className="mb-2">
                 Special Schedules
               </Typography>
               {hallEvents.length > 0 ? (
@@ -523,15 +460,9 @@ export function RestaurantPage({
                       key={`${event.title}-${String(event.start)}-${event.restaurantId}`}
                     >
                       <AccordionSummary expandIcon={<ExpandMore />}>
-                        <Box
-                          display="flex"
-                          justifyContent="space-between"
-                          alignItems="center"
-                          width="100%"
-                          pr={1}
-                        >
+                        <div className="flex justify-between items-center w-full pr-2">
                           <Typography variant="body2">{event.title}</Typography>
-                          <Box display="flex" gap={1} alignItems="center">
+                          <div className="flex gap-2 items-center">
                             <Typography variant="body2" color="text.secondary">
                               {dateRange}
                             </Typography>
@@ -540,11 +471,11 @@ export function RestaurantPage({
                                 label="Active"
                                 size="small"
                                 color="primary"
-                                sx={{ height: 20, fontSize: "0.7rem" }}
+                                className="h-5 text-[0.7rem]"
                               />
                             )}
-                          </Box>
-                        </Box>
+                          </div>
+                        </div>
                       </AccordionSummary>
                       <AccordionDetails>
                         <Typography variant="body2" color="text.secondary">
@@ -560,10 +491,10 @@ export function RestaurantPage({
                 </Typography>
               )}
             </Paper>
-          </Box>
-        </Box>
+          </div>
+        </div>
       </Container>
-    </Box>
+    </div>
   );
 }
 
