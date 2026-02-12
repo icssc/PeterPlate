@@ -1,3 +1,3 @@
+export * from "../notifications/services";
 export * from "./daily";
 export * from "./weekly";
-export * from "../notifications/services";

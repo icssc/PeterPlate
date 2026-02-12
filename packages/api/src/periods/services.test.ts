@@ -21,8 +21,8 @@ describe("upsertPeriod", () => {
     await expect(
       db.transaction(async (trx) => {
         await upsertRestaurant(trx, testData.brandywine);
-        const insertedPeriod = await upsertPeriod(trx, testData.period);
-        const updatedPeriod = await upsertPeriod(trx, testData.period);
+        const _insertedPeriod = await upsertPeriod(trx, testData.period);
+        const _updatedPeriod = await upsertPeriod(trx, testData.period);
         // expect(insertedPeriod.updatedAt).not.toEqual(updatedPeriod.updatedAt);
         trx.rollback();
       }),

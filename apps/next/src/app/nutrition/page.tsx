@@ -1,11 +1,11 @@
 "use client";
 
 import type { SelectLoggedMeal } from "@peterplate/db";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import NutritionBreakdown from "@/components/ui/nutrition-breakdown";
-import { trpc } from "@/utils/trpc";
-import { useRouter } from "next/navigation";
 import { useUserStore } from "@/context/useUserStore";
+import { trpc } from "@/utils/trpc";
 
 export default function MealTracker() {
   const router = useRouter();
@@ -17,7 +17,7 @@ export default function MealTracker() {
       alert("Login to track meals!");
       router.push("/");
     }
-  }, [userId]);
+  }, [userId, router.push]);
 
   const {
     data: meals,

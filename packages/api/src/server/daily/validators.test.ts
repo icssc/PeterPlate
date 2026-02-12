@@ -1,20 +1,19 @@
 /**
- * Tests Zod schemas for AdobeEcommerce responses when 
+ * Tests Zod schemas for AdobeEcommerce responses when
  * querying GetLocation, GetLocationRecipes, AEMEventList
  */
 
 import {
-  GetLocationSchema,
+  AEMEventListSchema,
   GetLocationRecipesDailySchema,
   GetLocationRecipesWeeklySchema,
-  AEMEventListSchema,
+  GetLocationSchema,
 } from "@peterplate/validators";
 import { describe, it } from "vitest";
-
+import AEMEventList from "./testData/AEM_eventList.json";
 import getLocation from "./testData/getLocation.json";
-import getLocationRecipesDaily from "./testData/getLocationRecipesDaily.json"
-import getLocationRecipesWeekly from "./testData/getLocationRecipesWeekly.json"
-import AEMEventList from "./testData/AEM_eventList.json"
+import getLocationRecipesDaily from "./testData/getLocationRecipesDaily.json";
+import getLocationRecipesWeekly from "./testData/getLocationRecipesWeekly.json";
 
 describe("Validates AdobeECommerce Responses", () => {
   it("parses getLocation response", ({ expect }) => {
@@ -22,11 +21,15 @@ describe("Validates AdobeECommerce Responses", () => {
   });
 
   it("validates getLocationRecipesDaily response", ({ expect }) => {
-    expect(() => GetLocationRecipesDailySchema.parse(getLocationRecipesDaily)).not.toThrow();
+    expect(() =>
+      GetLocationRecipesDailySchema.parse(getLocationRecipesDaily),
+    ).not.toThrow();
   });
 
   it("validates getLocationRecipesWeekly response", ({ expect }) => {
-    expect(() => GetLocationRecipesWeeklySchema.parse(getLocationRecipesWeekly)).not.toThrow();
+    expect(() =>
+      GetLocationRecipesWeeklySchema.parse(getLocationRecipesWeekly),
+    ).not.toThrow();
   });
 
   it("validates AEMEventList response", ({ expect }) => {
