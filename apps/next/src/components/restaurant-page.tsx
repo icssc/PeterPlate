@@ -204,10 +204,10 @@ export function RestaurantPage({
 
       <Container
         maxWidth={false}
-        className="mt-4 mb-6 mx-auto w-full max-w-[1292px]"
+        className="mt-4 mb-6 mx-auto w-full max-w-[1400px]"
       >
         <div className="flex flex-col md:flex-row items-start gap-3">
-          <div className="w-full md:w-[968px] md:min-h-[740px] min-w-0">
+          <div className="w-full flex-1 md:min-h-[740px] min-w-0">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2 mb-2 flex-wrap md:flex-nowrap">
               <Typography variant="h4" fontWeight={700}>
                 {hall === HallEnum.ANTEATERY ? "Anteatery" : "Brandywine"}
@@ -353,7 +353,7 @@ export function RestaurantPage({
             </div>
           </div>
 
-          <div className="w-full md:w-[300px] md:min-h-[740px] min-w-0">
+          <div className="w-full md:basis-[325px] md:max-w-[325px] md:min-h-[740px]">
             <Paper elevation={1} className="p-4 mb-4 h-fit">
               <Typography variant="subtitle1" fontWeight={700}>
                 Hours of Operation
@@ -470,11 +470,10 @@ export function RestaurantPage({
                       key={`${event.title}-${String(event.start)}-${event.restaurantId}`}
                     >
                       <AccordionSummary expandIcon={<ExpandMore />}>
-                        <div className="flex justify-between items-center w-full pr-2">
-                          <Typography variant="body2">{event.title}</Typography>
-                          <div className="flex gap-2 items-center">
-                            <Typography variant="body2" color="text.secondary">
-                              {dateRange}
+                        <div className="flex flex-col w-full pr-2">
+                          <div className="flex justify-between items-center w-full">
+                            <Typography variant="body2">
+                              {event.title}
                             </Typography>
                             {isActive && (
                               <Chip
@@ -485,6 +484,9 @@ export function RestaurantPage({
                               />
                             )}
                           </div>
+                          <Typography variant="body2" color="text.secondary">
+                            {dateRange}
+                          </Typography>
                         </div>
                       </AccordionSummary>
                       <AccordionDetails>
