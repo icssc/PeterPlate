@@ -204,7 +204,7 @@ export function RestaurantPage({
 
       <Container
         maxWidth={false}
-        className="mt-4 mb-6 mx-auto w-full max-w-[1400px]"
+        className="mt-4 pb-[50px] mx-auto w-full max-w-[1400px]"
       >
         <div className="flex flex-col md:flex-row items-start gap-3">
           <div className="w-full flex-1 md:min-h-[740px] min-w-0">
