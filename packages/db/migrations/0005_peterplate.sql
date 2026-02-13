@@ -1,1 +1,1 @@
-ALTER TABLE "dishes" ADD COLUMN "image_url" text;
+ALTER TABLE "dishes" ADD COLUMN "image_url" text IF NOT EXISTS;
