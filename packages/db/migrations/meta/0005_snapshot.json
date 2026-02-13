@@ -1,5 +1,5 @@
 {
-  "id": "7fd3bfb6-9223-4425-aad8-a37813c1b2a8",
+  "id": "00fde99e-1215-4c0e-8164-e5fd331d2ba5",
   "prevId": "a02fd737-a250-4cbf-a70a-22e9b9a69476",
   "version": "7",
   "dialect": "postgresql",
@@ -244,6 +244,12 @@
           "primaryKey": false,
           "notNull": true,
           "default": "'Other'"
+        },
+        "image_url": {
+          "name": "image_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         },
         "num_ratings": {
           "name": "num_ratings",
@@ -1592,100 +1598,6 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.user_allergies": {
-      "name": "user_allergies",
-      "schema": "",
-      "columns": {
-        "userId": {
-          "name": "userId",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "allergy": {
-          "name": "allergy",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "user_allergies_userId_users_id_fk": {
-          "name": "user_allergies_userId_users_id_fk",
-          "tableFrom": "user_allergies",
-          "tableTo": "users",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
-        }
-      },
-      "compositePrimaryKeys": {
-        "user_allergies_userId_allergy_pk": {
-          "name": "user_allergies_userId_allergy_pk",
-          "columns": [
-            "userId",
-            "allergy"
-          ]
-        }
-      },
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.user_dietary_preferences": {
-      "name": "user_dietary_preferences",
-      "schema": "",
-      "columns": {
-        "userId": {
-          "name": "userId",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "preference": {
-          "name": "preference",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "user_dietary_preferences_userId_users_id_fk": {
-          "name": "user_dietary_preferences_userId_users_id_fk",
-          "tableFrom": "user_dietary_preferences",
-          "tableTo": "users",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
-        }
-      },
-      "compositePrimaryKeys": {
-        "user_dietary_preferences_userId_preference_pk": {
-          "name": "user_dietary_preferences_userId_preference_pk",
-          "columns": [
-            "userId",
-            "preference"
-          ]
-        }
-      },
       "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
