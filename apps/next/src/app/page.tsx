@@ -152,7 +152,7 @@ function DesktopHome(): React.JSX.Element {
 
   const allDishes = [...brandywineDishes, ...anteateryDishes];
 
-  // Take a selection for "Popular Today" pick the first ~5 unique dishes as an overview
+  // Popular Today: top 5 unique dishes sorted by average rating (descending)
   const seenNames = new Set<string>();
   const popularDishes = allDishes
     .filter((d) => {
@@ -160,6 +160,11 @@ function DesktopHome(): React.JSX.Element {
       if (seenNames.has(key)) return false;
       seenNames.add(key);
       return true;
+    })
+    .sort((a, b) => {
+      const avgA = a.numRatings > 0 ? a.totalRating / a.numRatings : 0;
+      const avgB = b.numRatings > 0 ? b.totalRating / b.numRatings : 0;
+      return avgB - avgA;
     })
     .slice(0, 5);
 
@@ -263,7 +268,7 @@ function DesktopHome(): React.JSX.Element {
           ) : popularDishes.length === 0 ? (
             <p className="text-neutral-500">No dishes available today.</p>
           ) : (
-            <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin">
+            <div className="grid grid-cols-5 gap-4">
               {popularDishes.map((dish, idx) => (
                 <PopularDishCard
                   key={`${dish.id}-${idx}`}
@@ -343,12 +348,24 @@ function PopularDishCard({
     <>
       <button
         type="button"
-        className="flex-shrink-0 w-44 rounded-xl border border-neutral-200 dark:border-neutral-700 overflow-hidden shadow-sm hover:shadow-md transition cursor-pointer text-left bg-transparent p-0"
+        className="w-full rounded-xl border border-neutral-200 dark:border-neutral-700 overflow-hidden shadow-sm hover:shadow-md transition cursor-pointer text-left bg-transparent p-0"
         onClick={() => setOpen(true)}
       >
-        {/* Placeholder food image area */}
-        <div className="relative w-full h-28 bg-amber-50 dark:bg-neutral-800 flex items-center justify-center">
-          <span className="text-4xl">🍽️</span>
+        {/* Dish image */}
+        <div className="relative w-full h-28 bg-amber-50 dark:bg-neutral-800">
+          {dish.image_url ? (
+            <Image
+              src={dish.image_url}
+              alt={dish.name}
+              fill
+              className="object-cover"
+              sizes="20vw"
+            />
+          ) : (
+            <div className="flex items-center justify-center w-full h-full">
+              <span className="text-4xl">🍽️</span>
+            </div>
+          )}
         </div>
         <div className="p-3 space-y-1">
           <h3 className="text-sm font-semibold text-sky-600 leading-tight line-clamp-2">
