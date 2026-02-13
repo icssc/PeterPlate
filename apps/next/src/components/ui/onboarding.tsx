@@ -55,19 +55,37 @@ const WelcomeView = React.forwardRef<HTMLDivElement>((_, ref) => {
             height: "120px",
           }}
         />
-        <Typography variant="h4" fontWeight={700} className="text-sky-700">
+        <Typography
+          variant="h4"
+          fontWeight={700}
+          fontFamily="Poppins, sans-serif"
+          className="text-sky-700"
+        >
           PeterPlate
         </Typography>
-        <Typography color="gray" fontWeight={500} fontSize={18} pt="10px">
+        <Typography
+          fontFamily="Poppins, sans-serif"
+          color="gray"
+          fontWeight={500}
+          fontSize={18}
+          pt="10px"
+        >
           Your UCI dining companion
         </Typography>
-        <Typography variant="h5" color="black" fontWeight={700} pt="20px">
+        <Typography
+          variant="h5"
+          fontFamily="Poppins, sans-serif"
+          color="black"
+          fontWeight={700}
+          pt="20px"
+        >
           Welcome!
         </Typography>
         <Typography
+          fontFamily="Poppins, sans-serif"
           color="gray"
           fontWeight={500}
-          fontSize={16}
+          fontSize={15}
           pt="10px"
           pb="20px"
         >
@@ -75,7 +93,13 @@ const WelcomeView = React.forwardRef<HTMLDivElement>((_, ref) => {
           and favorite dishes; and personalize your dining experience.
         </Typography>
         <GoogleSignInButton />
-        <Typography color="gray" fontWeight={500} fontSize={15} py="10px">
+        <Typography
+          fontFamily="Poppins, sans-serif"
+          color="gray"
+          fontWeight={500}
+          fontSize={13}
+          py="10px"
+        >
           By signing in, you agree to our Terms of Service and Privacy Policy
         </Typography>
       </Box>
@@ -106,19 +130,34 @@ const PersonalizeView = React.forwardRef<HTMLDivElement, PersonalizeViewProps>(
               height: "60px",
             }}
           />
-          <Typography variant="h5" color="white" fontWeight={700}>
+          <Typography
+            variant="h5"
+            fontFamily="Poppins, sans-serif"
+            color="white"
+            fontWeight={700}
+          >
             Welcome, {name}!
           </Typography>
-          <Typography color="white">
+          <Typography fontFamily="Poppins, sans-serif" color="white">
             Let's personalize your dining experience
           </Typography>
         </Box>
 
         <Box px="40px" pt="20px">
-          <Typography variant="h4" fontWeight={700} className="text-sky-700">
+          <Typography
+            variant="h5"
+            fontFamily="Poppins, sans-serif"
+            fontWeight={700}
+            className="text-sky-700"
+          >
             {title}
           </Typography>
-          <Typography color="gray" fontSize={18} pt="20px">
+          <Typography
+            fontFamily="Poppins, sans-serif"
+            color="gray"
+            fontSize={16}
+            pt="16px"
+          >
             {description}
           </Typography>
         </Box>
@@ -133,11 +172,14 @@ const PersonalizeView = React.forwardRef<HTMLDivElement, PersonalizeViewProps>(
             pt: "10px",
             px: "40px",
             display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
+            gridTemplateColumns: {
+              xs: "repeat(2, 1fr)",
+              sm: "repeat(3, 1fr)",
+            },
             gap: 1.5,
             "& .MuiToggleButtonGroup-grouped": {
               border: "2px solid !important",
-              borderRadius: "12px !important",
+              borderRadius: "10px !important",
               borderColor: "grey !important",
             },
           }}
@@ -150,7 +192,7 @@ const PersonalizeView = React.forwardRef<HTMLDivElement, PersonalizeViewProps>(
                 py: 3,
                 textTransform: "none",
                 color: "black",
-
+                height: "40px",
                 "&.Mui-selected": {
                   backgroundColor: "rgba(0, 105, 168, .2)",
                   color: "#0069A8",
@@ -161,7 +203,12 @@ const PersonalizeView = React.forwardRef<HTMLDivElement, PersonalizeViewProps>(
                 },
               }}
             >
-              <Typography fontSize={16} fontWeight={700} lineHeight={1}>
+              <Typography
+                fontFamily="Poppins, sans-serif"
+                fontSize={16}
+                fontWeight={500}
+                lineHeight={1}
+              >
                 {opt}
               </Typography>
             </ToggleButton>
@@ -229,7 +276,7 @@ const OnboardingContent = React.forwardRef<
       display="flex"
       flexDirection="column"
       gap={2}
-      mb="5px"
+      mb="10px"
     >
       {activeStep === 0 && <WelcomeView />}
       {activeStep === 1 && (
