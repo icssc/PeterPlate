@@ -98,7 +98,7 @@ export default function DishesInfo({
             No dishes available for this selection.
           </p>
         ) : isCompactView ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 md:gap-4">
             {sortCategoryKeys(Object.keys(categoryMap)).map((categoryString) =>
               categoryMap[categoryString].map((dish) => (
                 <FoodCard
