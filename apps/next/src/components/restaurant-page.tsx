@@ -278,7 +278,24 @@ export function RestaurantPage({
               {!isLoading && !isError && stations.length > 0 && (
                 <Tabs
                   value={selectedStation}
-                  onValueChange={(value) => setSelectedStation(value || "")}
+                  onValueChange={(value) => {
+                    const val = value || "";
+                    if (isCompactView) {
+                      const element = document.getElementById(val);
+                      if (element) {
+                        element.scrollIntoView({
+                          behavior: "smooth",
+                          block: "start",
+                        });
+                      }
+                      // Optionally still set selectedStation to highlight the tab,
+                      // though scroll-spy logic would be better for full correctness.
+                      // For now, let's just update it so the tab looks active.
+                      setSelectedStation(val);
+                    } else {
+                      setSelectedStation(val);
+                    }
+                  }}
                   className="flex w-full justify-center"
                 >
                   <div className="overflow-x-auto">
@@ -316,7 +333,10 @@ export function RestaurantPage({
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setIsCompactView(true)}
+                    onClick={() => {
+                      setIsCompactView(true);
+                      // Reset selected station if needed, or keep it.
+                    }}
                     className={`px-4 py-1 flex items-center justify-center ${
                       isCompactView
                         ? "bg-sky-700 text-white border-sky-700 hover:bg-sky-700 hover:text-white"
@@ -331,25 +351,55 @@ export function RestaurantPage({
             )}
 
             <div className="mt-3">
-              {activeStation && (
-                <div className="[&_#food-scroll]:h-auto [&_#food-scroll]:overflow-y-visible">
-                  <Typography variant="h6" fontWeight={700} gutterBottom>
-                    {toTitleCase(activeStation.name)}
-                  </Typography>
-                  <DishesInfo
-                    dishes={dishes}
-                    isLoading={isLoading}
-                    isError={isError || (!isLoading && !hallData)}
-                    errorMessage={
-                      error?.message ??
-                      (!isLoading && !hallData
-                        ? "Data not available for this hall."
-                        : undefined)
-                    }
-                    isCompactView={isCompactView}
-                  />
-                </div>
-              )}
+              {isCompactView
+                ? // Compact View: Render ALL stations
+                  stations.map((station) => (
+                    <div
+                      key={station.name}
+                      id={station.name.toLowerCase()}
+                      className="[&_#food-scroll]:h-auto [&_#food-scroll]:overflow-y-visible mb-8 scroll-mt-4"
+                    >
+                      <div className="border-b-2 mb-4">
+                        <h1 className="font-bold text-3xl">
+                          {toTitleCase(station.name)}
+                        </h1>
+                      </div>
+                      <DishesInfo
+                        dishes={station.dishes}
+                        isLoading={isLoading}
+                        isError={isError || (!isLoading && !hallData)}
+                        errorMessage={
+                          error?.message ??
+                          (!isLoading && !hallData
+                            ? "Data not available for this hall."
+                            : undefined)
+                        }
+                        isCompactView={isCompactView}
+                      />
+                    </div>
+                  ))
+                : // Normal View: Render active station logic
+                  activeStation && (
+                    <div className="[&_#food-scroll]:h-auto [&_#food-scroll]:overflow-y-visible">
+                      <div className="border-b-2 mb-4">
+                        <h1 className="font-bold text-3xl">
+                          {toTitleCase(activeStation.name)}
+                        </h1>
+                      </div>
+                      <DishesInfo
+                        dishes={dishes}
+                        isLoading={isLoading}
+                        isError={isError || (!isLoading && !hallData)}
+                        errorMessage={
+                          error?.message ??
+                          (!isLoading && !hallData
+                            ? "Data not available for this hall."
+                            : undefined)
+                        }
+                        isCompactView={isCompactView}
+                      />
+                    </div>
+                  )}
             </div>
           </div>
 

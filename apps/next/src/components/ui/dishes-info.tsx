@@ -97,6 +97,24 @@ export default function DishesInfo({
           <p className="text-center text-gray-500 py-4">
             No dishes available for this selection.
           </p>
+        ) : isCompactView ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {sortCategoryKeys(Object.keys(categoryMap)).map((categoryString) =>
+              categoryMap[categoryString].map((dish) => (
+                <FoodCard
+                  key={dish.id}
+                  className="max-w-none"
+                  {...dish}
+                  isFavorited={favoriteDishIds?.includes(dish.id)}
+                  favoriteIsLoading={
+                    !!isFavoritesLoading || !!isFavoritePending?.(dish.id)
+                  }
+                  onToggleFavorite={onToggleFavorite}
+                  isSimplified={isCompactView}
+                />
+              )),
+            )}
+          </div>
         ) : (
           sortCategoryKeys(Object.keys(categoryMap)).map((categoryString) => (
             <React.Fragment key={`${categoryString}`}>

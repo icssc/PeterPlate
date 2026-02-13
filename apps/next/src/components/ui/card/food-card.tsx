@@ -281,6 +281,8 @@ interface FoodCardProps extends DishInfo {
   onToggleFavorite?: (dishId: string, currentlyFavorite: boolean) => void;
   /** Whether to render a simplified version of the card. */
   isSimplified?: boolean;
+  /** Optional class name for styling. */
+  className?: string;
 }
 
 export default function FoodCard({
@@ -288,6 +290,7 @@ export default function FoodCard({
   favoriteIsLoading = false,
   onToggleFavorite,
   isSimplified = false,
+  className,
   ...dish
 }: FoodCardProps): React.JSX.Element {
   const isDesktop = useMediaQuery("(min-width: 768px)");
@@ -306,6 +309,7 @@ export default function FoodCard({
           onToggleFavorite={onToggleFavorite}
           isSimplified={isSimplified}
           onClick={handleOpen}
+          className={className}
         />
         <Dialog
           open={open}
@@ -338,6 +342,7 @@ export default function FoodCard({
           onToggleFavorite={onToggleFavorite}
           isSimplified={isSimplified}
           onClick={handleOpen}
+          className={className}
         />
         <Drawer
           anchor="bottom"
