@@ -348,11 +348,11 @@ function PopularDishCard({
     <>
       <button
         type="button"
-        className="w-full rounded-xl border border-neutral-200 dark:border-neutral-700 overflow-hidden shadow-sm hover:shadow-md transition cursor-pointer text-left bg-transparent p-0"
+        className="w-full h-full min-h-[210px] flex flex-col rounded-xl border border-neutral-200 dark:border-neutral-700 overflow-hidden shadow-sm hover:shadow-md transition cursor-pointer text-left bg-transparent p-0"
         onClick={() => setOpen(true)}
       >
         {/* Dish image */}
-        <div className="relative w-full h-28 bg-amber-50 dark:bg-neutral-800">
+        <div className="relative w-full aspect-[16/9] flex-shrink-0 bg-amber-50 dark:bg-neutral-800">
           {dish.image_url ? (
             <Image
               src={dish.image_url}
@@ -367,14 +367,14 @@ function PopularDishCard({
             </div>
           )}
         </div>
-        <div className="p-3 space-y-1">
-          <h3 className="text-sm font-semibold text-sky-600 leading-tight line-clamp-2">
+        <div className="flex flex-col flex-1 p-4">
+          <h3 className="text-sm font-semibold text-sky-600 leading-tight line-clamp-2 mb-1">
             {formatFoodName(dish.name)}
           </h3>
-          <p className="text-xs text-neutral-500 dark:text-neutral-400">
+          <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-1">
             {hallName} • {toTitleCase(stationName)}
           </p>
-          <div className="flex items-center gap-1 text-xs text-neutral-400">
+          <div className="flex items-center gap-1 text-xs text-neutral-400 mt-auto">
             <Star className="w-3.5 h-3.5" />
             <span>{averageRating > 0 ? averageRating.toFixed(1) : "—"}</span>
           </div>
