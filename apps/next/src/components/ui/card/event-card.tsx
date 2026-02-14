@@ -168,19 +168,17 @@ export default function EventCard(props: EventInfo): React.JSX.Element {
           slotProps={{
             paper: {
               sx: {
-                width: "570px",
-                maxWidth: "90vw",
-                margin: 2,
+                maxWidth: "100vw", // ✅ Full width on mobile
+                margin: 0, // ✅ Remove side margins
                 overflow: "hidden",
-                borderRadius: "6px",
+                borderTopLeftRadius: "16px",
+                borderTopRightRadius: "16px",
               },
             },
           }}
           sx={{
             "& .MuiDrawer-paper": {
-              borderTopLeftRadius: "10px",
-              borderTopRightRadius: "10px",
-              marginTop: "96px",
+              maxHeight: "90vh", // ✅ Don't take full screen
               height: "auto",
             },
           }}
