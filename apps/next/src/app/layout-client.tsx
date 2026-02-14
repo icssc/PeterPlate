@@ -16,7 +16,7 @@ export function RootClient({ children }: { children: React.ReactNode }) {
       new QueryClient({
         defaultOptions: {
           queries: {
-            // 5m defualt stale time
+            // 5m default stale time
             staleTime: 5 * 60 * 1000,
             refetchOnWindowFocus: false,
             refetchOnReconnect: false,
@@ -67,9 +67,7 @@ export function RootClient({ children }: { children: React.ReactNode }) {
       <trpc.Provider client={trpcClient} queryClient={queryClient}>
         <QueryClientProvider client={queryClient}>
           <DateProvider>
-            <div className="hidden md:block">
-              <Toolbar />
-            </div>
+            <Toolbar />
             {children}
           </DateProvider>
         </QueryClientProvider>
