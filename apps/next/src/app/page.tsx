@@ -119,7 +119,7 @@ function DesktopHome(): React.JSX.Element {
 
         {/* ── Dining Halls ── */}
         <section>
-          <h2 className="text-2xl font-bold text-sky-600 mb-4">Dining Halls</h2>
+          <h2 className="text-2xl font-bold text-sky-700 mb-4">Dining Halls</h2>
           <div className="grid grid-cols-2 gap-12">
             {/* Brandywine Card */}
             <Link href="/brandywine" className="group">
@@ -135,7 +135,7 @@ function DesktopHome(): React.JSX.Element {
                 </div>
                 <div className="flex items-center justify-between p-4">
                   <div className="space-y-1.5">
-                    <h3 className="text-lg font-semibold text-sky-600">
+                    <h3 className="text-lg font-semibold text-sky-700">
                       Brandywine
                     </h3>
                     <div className="flex items-center gap-1.5 text-sm text-neutral-500 dark:text-neutral-400">
@@ -151,7 +151,7 @@ function DesktopHome(): React.JSX.Element {
                       </span>
                     </div>
                   </div>
-                  <ChevronRight className="text-sky-600 w-6 h-6" />
+                  <ChevronRight className="text-sky-700 w-6 h-6" />
                 </div>
               </div>
             </Link>
@@ -170,7 +170,7 @@ function DesktopHome(): React.JSX.Element {
                 </div>
                 <div className="flex items-center justify-between p-4">
                   <div className="space-y-1.5">
-                    <h3 className="text-lg font-semibold text-sky-600">
+                    <h3 className="text-lg font-semibold text-sky-700">
                       Anteatery
                     </h3>
                     <div className="flex items-center gap-1.5 text-sm text-neutral-500 dark:text-neutral-400">
@@ -186,7 +186,7 @@ function DesktopHome(): React.JSX.Element {
                       </span>
                     </div>
                   </div>
-                  <ChevronRight className="text-sky-600 w-6 h-6" />
+                  <ChevronRight className="text-sky-700 w-6 h-6" />
                 </div>
               </div>
             </Link>
@@ -195,7 +195,7 @@ function DesktopHome(): React.JSX.Element {
 
         {/* ── Popular Today ── */}
         <section>
-          <h2 className="text-xl font-bold text-neutral-900 dark:text-neutral-100 mb-4">
+          <h2 className="text-xl font-bold text-sky-700 dark:text-neutral-100 mb-4">
             Popular Today
           </h2>
           {isLoading ? (
@@ -226,12 +226,12 @@ function DesktopHome(): React.JSX.Element {
         {/* ── Upcoming Events ── */}
         <section>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-neutral-900 dark:text-neutral-100">
+            <h2 className="text-xl font-bold text-sky-700 dark:text-neutral-100">
               Upcoming Events
             </h2>
             <Link
               href="/events"
-              className="text-sm font-medium text-sky-600 hover:text-sky-700 flex items-center gap-1"
+              className="text-sm font-medium text-sky-700 flex items-center gap-1"
             >
               See More <ChevronRight className="w-4 h-4" />
             </Link>
@@ -613,7 +613,7 @@ function PopularDishCard({
           )}
         </div>
         <div className="flex flex-col flex-1 p-4">
-          <h3 className="text-sm font-semibold text-sky-600 leading-tight line-clamp-2 mb-1">
+          <h3 className="text-sm font-semibold text-sky-700 leading-tight line-clamp-2 mb-1">
             {formatFoodName(dish.name)}
           </h3>
           <p
@@ -710,7 +710,7 @@ function UpcomingEventCard({
       >
         <div className="flex min-w-[150px] items-start justify-between mb-3">
           <h3
-            className={`${titleSize} font-bold text-sky-600 leading-tight pr-2`}
+            className={`${titleSize} font-bold text-sky-700 leading-tight pr-2`}
           >
             {event.title}
           </h3>
