@@ -4,13 +4,12 @@ import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import GridOnIcon from "@mui/icons-material/GridOn";
 import Button from "@mui/material/Button";
 import { useState } from "react";
-import { Calendar, momentLocalizer } from "react-big-calendar";
+import { momentLocalizer } from "react-big-calendar";
 import { trpc } from "@/utils/trpc";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { Dialog, Drawer } from "@mui/material";
 import moment from "moment";
+import CalendarView from "@/components/ui/calendar-view";
 import EventCard, { type EventInfo } from "@/components/ui/card/event-card";
 import EventDialogContent from "@/components/ui/event-dialog-content";
 import EventDrawerContent from "@/components/ui/event-drawer-content";
@@ -18,21 +17,6 @@ import EventCardSkeleton from "@/components/ui/skeleton/event-card-skeleton";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { getEventType } from "@/utils/funcs";
 import { HallEnum } from "@/utils/types";
-
-const months = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
 
 const Events = () => {
   const localizer = momentLocalizer(moment);
@@ -131,7 +115,7 @@ const Events = () => {
 
   return (
     <div className="max-w-full h-screen ">
-      <div className="fixed top-0 left-0 w-full h-16 bg-black/20 z-0" />
+      <div className="fixed top-0 left-0 w-full h-16 bg-sky-700/30 z-0" />
       <div className="z-0 flex flex-col h-full overflow-x-hidden">
         <div
           className="flex flex-col gap-4 justify-center w-full p-5 pt-16 sm:px-12 sm:py-8 sm:pt-20"
@@ -321,41 +305,13 @@ const Events = () => {
 
           {/* CALENDAR DISPLAY: Map over the fetched events once loaded */}
           {!isLoading && !error && viewMode === "calendar" && (
-            <div className="border-2 border-sky-700 p-4 rounded-lg">
-              <div className="flex items-center justify-center">
-                <div className="text-center flex items-center justify-center text-sky-700 font-medium">
-                  <ArrowBackIosIcon
-                    className="mb-6 mr-4 cursor-pointer"
-                    onClick={viewPreviousMonthsEvents}
-                  />
-                  <span className="inline-block mb-6 text-3xl">
-                    {months[currentDate.getMonth()]} {currentDate.getFullYear()}
-                  </span>
-                  <ArrowForwardIosIcon
-                    className={`mb-6 ml-4 ${
-                      moment(currentDate).isSameOrAfter(moment(), "month")
-                        ? "opacity-30 cursor-not-allowed"
-                        : "cursor-pointer"
-                    }`}
-                    onClick={viewNextMonthsEvents}
-                  />
-                </div>
-              </div>
-              <Calendar
-                localizer={localizer}
-                events={calendarEvents}
-                date={currentDate}
-                onNavigate={(newDate) => setCurrentDate(newDate)}
-                startAccessor="start"
-                endAccessor="end"
-                style={{ height: 500 }}
-                defaultView="month"
-                views={["month"]}
-                toolbar={false}
-                selectable
-                onSelectEvent={handleSelectEvent}
-              />
-            </div>
+            <CalendarView
+              currentDate={currentDate}
+              calendarEvents={calendarEvents}
+              onPreviousMonth={viewPreviousMonthsEvents}
+              onNextMonth={viewNextMonthsEvents}
+              onSelectEvent={handleSelectEvent}
+            />
           )}
 
           {/* DESKTOP MODAL */}
