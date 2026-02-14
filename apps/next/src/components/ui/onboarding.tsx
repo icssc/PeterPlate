@@ -253,6 +253,7 @@ const OnboardingContent = React.forwardRef<
       // call TRPC procedure that sets user's
       // allergies, preferences, and sets
       // hasOnboarded to true
+      console.log(formData);
       handleClose();
     } catch (error) {
       console.error("Onboarding failed:", error);
