@@ -49,7 +49,7 @@ export default function MyFavoritesPage() {
 
       {isLoadingFavorites && (
         <div className="space-y-4">
-          {Array.from({ length: 3 }).map((_, index) => (
+          {["s1", "s2", "s3"].map((index) => (
             <FoodCardSkeleton key={`favorite-skeleton-${index}`} />
           ))}
         </div>
@@ -62,6 +62,7 @@ export default function MyFavoritesPage() {
             {favorites.map((favorite: FavoriteEntry) => (
               <FoodCard
                 key={favorite.dishId}
+                menuId="favorite-menu"
                 {...favorite.dish}
                 isFavorited
                 favoriteIsLoading={isFavoritePending?.(favorite.dishId)}
