@@ -108,7 +108,10 @@ const Events = () => {
       alt: resource.title + " promotion image",
       startTime: resource.start,
       endTime: resource.end,
-      location: resource.restaurantId,
+      location:
+        resource.restaurantId === "anteatery"
+          ? HallEnum.ANTEATERY
+          : HallEnum.BRANDYWINE,
       isOngoing: resource.start <= now && resource.end >= now,
     });
   };
@@ -127,7 +130,8 @@ const Events = () => {
   };
 
   return (
-    <div className="max-w-full h-screen">
+    <div className="max-w-full h-screen ">
+      <div className="fixed top-0 left-0 w-full h-16 bg-black/20 z-0" />
       <div className="z-0 flex flex-col h-full overflow-x-hidden">
         <div
           className="flex flex-col gap-4 justify-center w-full p-5 pt-16 sm:px-12 sm:py-8 sm:pt-20"
