@@ -129,7 +129,7 @@ function DesktopHome(): React.JSX.Element {
                     src="/brandywine.webp"
                     alt="Brandywine dining hall"
                     fill
-                    className="object-cover"
+                    className="object-cover object-bottom"
                     priority
                   />
                 </div>
@@ -398,6 +398,7 @@ function MobileHome(): React.JSX.Element {
                   dish={dish}
                   hallName={dish.hallName}
                   stationName={dish.stationName}
+                  compact={true}
                 />
               ))}
             </div>
@@ -414,7 +415,8 @@ function MobileHome(): React.JSX.Element {
               href="/events"
               className="text-sm font-medium text-sky-600 hover:text-sky-700 flex items-center gap-1"
             >
-              See More <ChevronRight className="w-4 h-4" />
+              See More{" "}
+              <ChevronRight className="text-sky-600" style={{ fontSize: 16 }} />
             </Link>
           </div>
           {!events || sortedEvents.length === 0 ? (
@@ -425,6 +427,7 @@ function MobileHome(): React.JSX.Element {
                 <UpcomingEventCard
                   key={`${event.title}-${idx}`}
                   event={event}
+                  compact={true}
                 />
               ))}
             </div>
@@ -567,10 +570,12 @@ function PopularDishCard({
   dish,
   hallName,
   stationName,
+  compact = false,
 }: {
   dish: DishInfo;
   hallName: string;
   stationName: string;
+  compact?: boolean;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -580,6 +585,9 @@ function PopularDishCard({
   );
 
   const averageRating = ratingData?.averageRating ?? 0;
+
+  const iconSize = compact ? 16 : 24;
+  const descSize = compact ? "text-[8px]" : "text-[10px]";
 
   return (
     <>
@@ -608,11 +616,13 @@ function PopularDishCard({
           <h3 className="text-sm font-semibold text-sky-600 leading-tight line-clamp-2 mb-1">
             {formatFoodName(dish.name)}
           </h3>
-          <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-1">
+          <p
+            className={`${descSize} text-neutral-500 dark:text-neutral-400 mb-1`}
+          >
             {hallName} • {toTitleCase(stationName)}
           </p>
           <div className="flex items-center gap-1 text-xs text-neutral-400 mt-auto">
-            <Star className="w-3.5 h-3.5" />
+            <Star style={{ fontSize: iconSize }} />
             <span>{averageRating > 0 ? averageRating.toFixed(1) : "—"}</span>
           </div>
         </div>
@@ -640,9 +650,10 @@ function PopularDishCard({
   );
 }
 
-/** A compact card for an upcoming event in the horizontal scroll row (desktop only). */
+/** A compact card for an upcoming event in the horizontal scroll row */
 function UpcomingEventCard({
   event,
+  compact = false,
 }: {
   event: {
     title: string;
@@ -653,6 +664,7 @@ function UpcomingEventCard({
     end?: Date | null;
     restaurantId: string;
   };
+  compact?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const startDate = event.start ? new Date(event.start) : null;
@@ -683,6 +695,12 @@ function UpcomingEventCard({
       : false,
   };
 
+  // alternative sizing depending on mobile/desktop
+  const titleSize = compact ? "text-sm" : "text-base";
+  const iconSize = compact ? 16 : 24;
+  const tagSize = compact ? "text-[8px]" : "text-[10px]";
+  const spacing = compact ? "space-y-1" : "space-y-2";
+
   return (
     <>
       <button
@@ -690,26 +708,30 @@ function UpcomingEventCard({
         className="w-full rounded-xl border border-neutral-200 dark:border-neutral-700 p-5 shadow-sm hover:shadow-md transition cursor-pointer text-left bg-transparent"
         onClick={() => setOpen(true)}
       >
-        <div className="flex items-start justify-between mb-3">
-          <h3 className="text-base font-bold text-sky-600 leading-tight pr-2">
+        <div className="flex min-w-[150px] items-start justify-between mb-3">
+          <h3
+            className={`${titleSize} font-bold text-sky-600 leading-tight pr-2`}
+          >
             {event.title}
           </h3>
-          <span className="flex-shrink-0 text-[10px] font-semibold uppercase tracking-wider bg-sky-100 text-sky-700 dark:bg-sky-900 dark:text-sky-300 px-2 py-0.5 rounded-full">
+          <span
+            className={`flex-shrink-0 ${tagSize} font-semibold uppercase tracking-wider bg-sky-100 text-sky-700 dark:bg-sky-900 dark:text-sky-300 px-2 py-0.5 rounded-full`}
+          >
             Celebration
           </span>
         </div>
-        <div className="space-y-2">
+        <div className={spacing}>
           {startDate && (
             <>
               <div className="flex items-center gap-1.5 text-xs text-neutral-500 dark:text-neutral-400">
-                <CalendarMonth className="w-3.5 h-3.5" />
+                <CalendarMonth style={{ fontSize: iconSize }} />
                 <span>
                   {numToMonth[startDate.getMonth()]} {startDate.getDate()},{" "}
                   {startDate.getFullYear()}
                 </span>
               </div>
               <div className="flex items-center gap-1.5 text-xs text-neutral-500 dark:text-neutral-400">
-                <AccessTime className="w-3.5 h-3.5" />
+                <AccessTime style={{ fontSize: iconSize }} />
                 <span>
                   {timeToString(startDate)}
                   {endDate ? ` - ${timeToString(endDate)}` : ""}
@@ -718,7 +740,7 @@ function UpcomingEventCard({
             </>
           )}
           <div className="flex items-center gap-1.5 text-xs text-neutral-500 dark:text-neutral-400">
-            <LocationOn className="w-3.5 h-3.5" />
+            <LocationOn style={{ fontSize: iconSize }} />
             <span>{toTitleCase(event.restaurantId)}</span>
           </div>
         </div>
