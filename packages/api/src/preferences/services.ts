@@ -1,8 +1,7 @@
-import { upsert } from "@api/utils";
-import type { Drizzle, InsertAllergy, SelectAllergy } from "@peterplate/db";
-import { userDietaryPreferences, users } from "@peterplate/db";
+import { upsert, upsertBatch } from "@api/utils";
+import type { Drizzle, InsertPreference } from "@peterplate/db";
+import { userDietaryPreferences } from "@peterplate/db";
 import { TRPCError } from "@trpc/server";
-import type { InsertPreference } from "@zotmeal/db/src/schema/userDietaryPreferences";
 import { and, eq } from "drizzle-orm";
 
 /**
@@ -13,7 +12,7 @@ export async function getDietaryPreferences(db: Drizzle, userId: string) {
   const preferences = await db.query.userDietaryPreferences.findMany({
     where: (ud, { eq }) => eq(ud.userId, userId),
   });
-  //Return each allergy string
+  // Return each preference string
   return preferences.map((p) => p.preference);
 }
 
@@ -21,29 +20,28 @@ export async function addDietaryPreferences(
   db: Drizzle,
   userId: string,
   preferences: Array<string>,
-): Promise<Array<string>> {
-  if (!preferences) {
-    return null;
-  }
+): Promise<void> {
+  try {
+    const upsertPromises = preferences.map((pref) =>
+      upsert(
+        db,
+        userDietaryPreferences,
+        { userId, preference: pref },
+        {
+          target: [
+            userDietaryPreferences.userId,
+            userDietaryPreferences.preference,
+          ],
+          set: { preference: pref },
+        },
+      ),
+    );
 
-  for (const preference in preferences) {
-    const already_existing_preference =
-      await db.query.userDietaryPreferences.findFirst({
-        where: (ud, { eq }) =>
-          and(eq(ud.userId, userId), eq(ud.preference, preference)),
-      });
-    if (already_existing_preference) {
-      continue;
-    }
-    const newPreference: InsertPreference = {
-      userId,
-      preference,
-    };
-    await db.insert(userDietaryPreferences).values(newPreference);
+    const results = await Promise.all(upsertPromises);
+    console.log(`Successfully synced ${results.length} preferences.`);
+  } catch (error) {
+    console.error("Failed to save dietary preferences.");
   }
-  return preferences;
-
-  //check if allergy already in table
 }
 
 export async function deletePreference(

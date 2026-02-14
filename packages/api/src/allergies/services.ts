@@ -20,29 +20,25 @@ export async function addAllergies(
   db: Drizzle,
   userId: string,
   allergies: Array<string>,
-): Promise<Array<string>> {
-  //check if allergy already in table
-  if (!allergies) {
-    return null;
+): Promise<void> {
+  try {
+    const upsertPromises = allergies.map((a) =>
+      upsert(
+        db,
+        userAllergies,
+        { userId, allergy: a },
+        {
+          target: [userAllergies.userId, userAllergies.allergy],
+          set: { allergy: a },
+        },
+      ),
+    );
+
+    const results = await Promise.all(upsertPromises);
+    console.log(`Successfully synced ${results.length} preferences.`);
+  } catch (error) {
+    console.error("Failed to save dietary preferences.");
   }
-  for (const allergy in allergies) {
-    const existing_allergy = await db.query.userAllergies.findFirst({
-      where: (ua, { eq }) =>
-        and(eq(ua.userId, userId), eq(ua.allergy, allergy)),
-    });
-
-    if (existing_allergy) {
-      return null;
-    }
-
-    const newAllergy: InsertAllergy = {
-      userId,
-      allergy,
-    };
-
-    await db.insert(userAllergies).values(newAllergy);
-  }
-  return allergies;
 }
 
 export async function deleteAllergy(
