@@ -314,7 +314,7 @@ const OnboardingContent = React.forwardRef<
               disabled={isSubmitting}
               onClick={handleSubmit}
               sx={{
-                height: "40px",
+                height: "45px",
                 width: "80px",
               }}
             >
@@ -327,7 +327,7 @@ const OnboardingContent = React.forwardRef<
               onClick={handleNext}
               disabled={!session?.user}
               sx={{
-                height: "40px",
+                height: "45px",
                 width: "80px",
               }}
             >
@@ -342,7 +342,7 @@ const OnboardingContent = React.forwardRef<
             onClick={handleBack}
             disabled={activeStep !== 2}
             sx={{
-              height: "40px",
+              height: "45px",
               width: "80px",
             }}
           >
