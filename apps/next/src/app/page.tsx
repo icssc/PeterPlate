@@ -21,6 +21,7 @@ import { useDate } from "@/context/date-context";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import {
   formatFoodName,
+  getFoodIcon,
   militaryToStandard,
   timeToString,
   toTitleCase,
@@ -584,6 +585,8 @@ function PopularDishCard({
     { staleTime: 5 * 60 * 1000 },
   );
 
+  const IconComponent = getFoodIcon(dish.name);
+
   const averageRating = ratingData?.averageRating ?? 0;
 
   const iconSize = compact ? 16 : 24;
@@ -608,7 +611,10 @@ function PopularDishCard({
             />
           ) : (
             <div className="flex items-center justify-center w-full h-full">
-              <span className="text-4xl">🍽️</span>
+              <IconComponent
+                style={{ fontSize: 48 }}
+                className="text-slate-700"
+              />
             </div>
           )}
         </div>
