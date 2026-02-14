@@ -151,8 +151,8 @@ const Events = () => {
                 size="small"
                 className={`!px-4 !py-1 flex items-center justify-center !normal-case ${
                   viewMode === "grid"
-                    ? "!bg-sky-700 !text-white !border-sky-700 hover:!bg-sky-800"
-                    : "!bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50"
+                    ? "!bg-sky-700 dark:!bg-sky-400 !text-white !border-sky-700 dark:!border-sky-400 hover:!bg-sky-800 dark:hover:!bg-sky-500"
+                    : "!bg-white dark:!bg-zinc-800 !border-sky-700 dark:!border-sky-400 !text-slate-900 dark:!text-zinc-100 hover:!bg-sky-50 dark:hover:!bg-zinc-700"
                 }`}
               >
                 <GridOnIcon className="mr-1" sx={{ fontSize: 18 }} />
@@ -166,8 +166,8 @@ const Events = () => {
                 size="small"
                 className={`!px-4 !py-1 flex items-center justify-center !normal-case ${
                   viewMode === "calendar"
-                    ? "!bg-sky-700 !text-white !border-sky-700 hover:!bg-sky-800"
-                    : "!bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50"
+                    ? "!bg-sky-700 dark:!bg-sky-400 !text-white !border-sky-700 dark:!border-sky-400 hover:!bg-sky-800 dark:hover:!bg-sky-500"
+                    : "!bg-white dark:!bg-zinc-800 !border-sky-700 dark:!border-sky-400 !text-slate-900 dark:!text-zinc-100 hover:!bg-sky-50 dark:hover:!bg-zinc-700"
                 }`}
               >
                 <CalendarTodayIcon className="mr-1" sx={{ fontSize: 18 }} />
@@ -188,8 +188,8 @@ const Events = () => {
                     onClick={() => setSelectedEventType("both")}
                     className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
                       selectedEventType === "both"
-                        ? "!bg-sky-700 !text-white !border-sky-700 hover:!bg-sky-800 hover:!text-white"
-                        : "!bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50 hover:!text-slate-900"
+                        ? "!bg-sky-700 dark:!bg-sky-400 !text-white !border-sky-700 dark:!border-sky-400 hover:!bg-sky-800 dark:hover:!bg-sky-500 hover:!text-white"
+                        : "!bg-white dark:!bg-zinc-800 !border-sky-700 dark:!border-sky-400 !text-slate-900 dark:!text-zinc-100 hover:!bg-sky-50 dark:hover:!bg-zinc-700 hover:!text-slate-900"
                     }`}
                   >
                     All Events
@@ -200,8 +200,8 @@ const Events = () => {
                     onClick={() => setSelectedEventType("special")}
                     className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
                       selectedEventType === "special"
-                        ? "!bg-sky-700 !text-white !border-sky-700 hover:!bg-sky-800 hover:!text-white"
-                        : "!bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50 hover:!text-slate-900"
+                        ? "!bg-sky-700 dark:!bg-sky-400 !text-white !border-sky-700 dark:!border-sky-400 hover:!bg-sky-800 dark:hover:!bg-sky-500 hover:!text-white"
+                        : "!bg-white dark:!bg-zinc-800 !border-sky-700 dark:!border-sky-400 !text-slate-900 dark:!text-zinc-100 hover:!bg-sky-50 dark:hover:!bg-zinc-700 hover:!text-slate-900"
                     }`}
                   >
                     Special Meals
@@ -212,8 +212,8 @@ const Events = () => {
                     onClick={() => setSelectedEventType("celebration")}
                     className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
                       selectedEventType === "celebration"
-                        ? "!bg-sky-700 !text-white !border-sky-700 hover:!bg-sky-800 hover:!text-white"
-                        : "!bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50 hover:!text-slate-900"
+                        ? "!bg-sky-700 dark:!bg-sky-400 !text-white !border-sky-700 dark:!border-sky-400 hover:!bg-sky-800 dark:hover:!bg-sky-500 hover:!text-white"
+                        : "!bg-white dark:!bg-zinc-800 !border-sky-700 dark:!border-sky-400 !text-slate-900 dark:!text-zinc-100 hover:!bg-sky-50 dark:hover:!bg-zinc-700 hover:!text-slate-900"
                     }`}
                   >
                     Celebration
@@ -231,8 +231,8 @@ const Events = () => {
                     onClick={() => setSelectedDiningHall("both")}
                     className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
                       selectedDiningHall === "both"
-                        ? "!bg-sky-700 !text-white !border-sky-700 hover:!bg-sky-800 hover:!text-white"
-                        : "!bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50 hover:!text-slate-900"
+                        ? "!bg-sky-700 dark:!bg-sky-400 !text-white !border-sky-700 dark:!border-sky-400 hover:!bg-sky-800 dark:hover:!bg-sky-500 hover:!text-white"
+                        : "!bg-white dark:!bg-zinc-800 !border-sky-700 dark:!border-sky-400 !text-slate-900 dark:!text-zinc-100 hover:!bg-sky-50 dark:hover:!bg-zinc-700 hover:!text-slate-900"
                     }`}
                   >
                     All Locations
@@ -243,8 +243,8 @@ const Events = () => {
                     onClick={() => setSelectedDiningHall("brandywine")}
                     className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
                       selectedDiningHall === "brandywine"
-                        ? "!bg-sky-700 !text-white !border-sky-700 hover:!bg-sky-800 hover:!text-white"
-                        : "!bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50 hover:!text-slate-900"
+                        ? "!bg-sky-700 dark:!bg-sky-400 !text-white !border-sky-700 dark:!border-sky-400 hover:!bg-sky-800 dark:hover:!bg-sky-500 hover:!text-white"
+                        : "!bg-white dark:!bg-zinc-800 !border-sky-700 dark:!border-sky-400 !text-slate-900 dark:!text-zinc-100 hover:!bg-sky-50 dark:hover:!bg-zinc-700 hover:!text-slate-900"
                     }`}
                   >
                     Brandywine
@@ -255,8 +255,8 @@ const Events = () => {
                     onClick={() => setSelectedDiningHall("anteatery")}
                     className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
                       selectedDiningHall === "anteatery"
-                        ? "!bg-sky-700 !text-white !border-sky-700 hover:!bg-sky-800 hover:!text-white"
-                        : "!bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50 hover:!text-slate-900"
+                        ? "!bg-sky-700 dark:!bg-sky-400 !text-white !border-sky-700 dark:!border-sky-400 hover:!bg-sky-800 dark:hover:!bg-sky-500 hover:!text-white"
+                        : "!bg-white dark:!bg-zinc-800 !border-sky-700 dark:!border-sky-400 !text-slate-900 dark:!text-zinc-100 hover:!bg-sky-50 dark:hover:!bg-zinc-700 hover:!text-slate-900"
                     }`}
                   >
                     Anteatery
