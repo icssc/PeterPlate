@@ -55,11 +55,7 @@ function DiningHallStatus({
 
   switch (status) {
     case HallStatusEnum.OPEN:
-      if (openTime && closeTime) {
-        statusMessage = `Open (${openTime} - ${closeTime})`;
-      } else {
-        statusMessage = "Open";
-      }
+      statusMessage = `Open (${openTime} - ${closeTime})`;
       break;
     case HallStatusEnum.CLOSED:
       statusMessage = `Closed`;
@@ -69,7 +65,6 @@ function DiningHallStatus({
       break;
     case HallStatusEnum.PREVIEW:
       statusMessage = `Preview`;
-      break;
     default:
       break;
   }

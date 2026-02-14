@@ -1,12 +1,10 @@
-import { account } from './../../../db/src/schema/auth-schema';
+import { join } from "node:path";
 import { betterAuth } from "better-auth";
-import { genericOAuth } from "better-auth/plugins";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { db } from "../../../db/src/index"
-import * as schema from "../../../db/src/index";
-
+import { genericOAuth } from "better-auth/plugins";
 import { config } from "dotenv";
-import { join } from "path";
+import * as schema from "../../../db/src/index";
+import { db } from "../../../db/src/index";
 
 config({ path: join(process.cwd(), ".env") });
 
@@ -22,7 +20,8 @@ export const auth = betterAuth({
         {
           providerId: "icssc",
           clientId: process.env.AUTH_CLIENT_ID || "peterplate-dev",
-          discoveryUrl: "https://auth.icssc.club/.well-known/openid-configuration",
+          discoveryUrl:
+            "https://auth.icssc.club/.well-known/openid-configuration",
           scopes: ["openid", "profile", "email"],
           pkce: true,
           mapProfileToUser: (profile) => {
@@ -45,10 +44,10 @@ export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "pg",
     schema: {
-      user: schema.users,        
+      user: schema.users,
       session: schema.session,
       account: schema.account,
       verification: schema.verification,
     },
-  })
+  }),
 });

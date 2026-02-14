@@ -1,5 +1,5 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 interface UserState {
   userId: string | null;
@@ -15,7 +15,7 @@ export const useUserStore = create<UserState>()(
       clearUser: () => set({ userId: null }),
     }),
     {
-      name: 'user-storage', // saves to localStorage
-    }
-  )
+      name: "user-storage", // saves to localStorage
+    },
+  ),
 );

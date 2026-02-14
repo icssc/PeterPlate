@@ -18,5 +18,6 @@ describe("daily", () => {
           trx.rollback();
         }),
       ).rejects.toThrowError("Rollback");
-    });
+    },
+  );
 });

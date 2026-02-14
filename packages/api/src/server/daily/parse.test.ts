@@ -55,7 +55,7 @@ describe("AdobeECommerce Parsing Functions", () => {
     }
 
     const resultValues = Array.from(result.values());
-    const firstResult = resultValues[0]![0];
+    const firstResult = resultValues[0]?.[0];
 
     expect(resultValues.length).toBeGreaterThan(0);
     expect(firstResult).toHaveProperty("name");

@@ -3,6 +3,7 @@
 import { FavoriteBorder, Restaurant, StarBorder } from "@mui/icons-material";
 import { Card, CardContent, Dialog, Drawer } from "@mui/material";
 import type { DishInfo } from "@peterplate/api";
+import Image from "next/image";
 import React from "react";
 import { useUserStore } from "@/context/useUserStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
@@ -58,6 +59,11 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
   ) => {
     const userId = useUserStore((state) => state.userId);
     const IconComponent = getFoodIcon(dish.name) ?? Restaurant;
+    const [imageError, setImageError] = React.useState(false);
+    const showImage =
+      typeof dish.image_url === "string" &&
+      dish.image_url.trim() !== "" &&
+      !imageError;
 
     /**
      * Fetches the average rating and rating count for the dish.
@@ -195,8 +201,19 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
           <CardContent sx={{ padding: "0 !important" }}>
             <div className="flex justify-between h-full p-4 gap-4">
               <div className="flex items-center gap-4 w-full">
-                {IconComponent && (
-                  <IconComponent className="w-12 h-12 text-slate-700 flex-shrink-0" />
+                {showImage && dish.image_url && !imageError ? (
+                  <Image
+                    src={dish.image_url}
+                    alt=""
+                    width={40}
+                    height={40}
+                    className="w-10 h-10 object-cover rounded"
+                    onError={() => setImageError(true)}
+                  />
+                ) : (
+                  IconComponent && (
+                    <IconComponent className="w-12 h-12 text-slate-700 flex-shrink-0" />
+                  )
                 )}
                 <div className="flex flex-col gap-1">
                   <span className="font-bold text-base text-sky-700">
