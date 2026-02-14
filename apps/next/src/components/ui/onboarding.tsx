@@ -253,6 +253,7 @@ const OnboardingContent = React.forwardRef<
       // call TRPC procedure that sets user's
       // allergies, preferences, and sets
       // hasOnboarded to true
+
       console.log(formData);
       handleClose();
     } catch (error) {
@@ -317,6 +318,10 @@ const OnboardingContent = React.forwardRef<
               sx={{
                 height: "45px",
                 width: "80px",
+                bgcolor: "#0069A8",
+                "&:hover": {
+                  filter: "brightness(0.85)",
+                },
               }}
             >
               {isSubmitting ? "Saving..." : "Finish"}
@@ -330,6 +335,10 @@ const OnboardingContent = React.forwardRef<
               sx={{
                 height: "45px",
                 width: "80px",
+                bgcolor: "#0069A8",
+                "&:hover": {
+                  filter: "brightness(0.85)",
+                },
               }}
             >
               Next
@@ -345,6 +354,10 @@ const OnboardingContent = React.forwardRef<
             sx={{
               height: "45px",
               width: "80px",
+              bgcolor: "#0069A8",
+              "&:hover": {
+                filter: "brightness(0.85)",
+              },
             }}
           >
             Back
