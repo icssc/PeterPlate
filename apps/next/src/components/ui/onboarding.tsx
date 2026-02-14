@@ -13,6 +13,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useSession } from "@/utils/auth-client";
+import { trpc } from "@/utils/trpc";
 import {
   AllergenKeys,
   PreferenceKeys,
@@ -234,6 +235,10 @@ const OnboardingContent = React.forwardRef<
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const addAllergies = trpc.allergy.addAllergies.useMutation();
+  const addPreferences = trpc.preference.addDietaryPreferences.useMutation();
+  const onboard = trpc.user.onboard.useMutation();
+
   useEffect(() => {
     if (!isPending && session?.user && session.user.hasOnboarded === false) {
       setActiveStep(1);
@@ -248,13 +253,25 @@ const OnboardingContent = React.forwardRef<
   };
 
   const handleSubmit = async () => {
+    if (!session?.user?.id) {
+      console.error("Please login first.");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      // call TRPC procedure that sets user's
-      // allergies, preferences, and sets
-      // hasOnboarded to true
+      await addAllergies.mutateAsync({
+        userId: session.user.id,
+        allergies: formData.allergies,
+      });
+      await addPreferences.mutateAsync({
+        userId: session.user.id,
+        preferences: formData.preferences,
+      });
+      await onboard.mutateAsync({
+        id: session?.user.id,
+      });
 
-      console.log(formData);
       handleClose();
     } catch (error) {
       console.error("Onboarding failed:", error);
