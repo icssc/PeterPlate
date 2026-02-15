@@ -1,14 +1,20 @@
+/** biome-ignore-all lint/a11y/useKeyWithClickEvents: Will fix when using MUI.*/
+/** biome-ignore-all lint/a11y/noStaticElementInteractions: Will fix when using MUI. */
+/** biome-ignore-all lint/a11y/useSemanticElements: Will fix when using MUI. */
+/** biome-ignore-all lint/a11y/useFocusableInteractive: Will fix when using MUI. */
+
 "use client";
 
+import { Delete, Restaurant } from "@mui/icons-material";
+import { Card, CardContent, Dialog, IconButton } from "@mui/material";
+import type { DishInfo } from "@peterplate/api";
 import React from "react";
-import { Card, CardContent } from "../shadcn/card";
-import { Utensils, Trash2 } from "lucide-react";
+import { useUserStore } from "@/context/useUserStore";
 import { formatFoodName, getFoodIcon } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
-import InteractiveStarRating from "../interactive-star-rating";
-import { DishInfo } from "@zotmeal/api";
-import { Dialog, DialogTrigger } from "../shadcn/dialog"; // use shadcn Dialog
+import { cn } from "@/utils/tw";
 import FoodDialogContent from "../food-dialog-content";
+import InteractiveStarRating from "../interactive-star-rating";
 
 interface RatingsCardProps {
   food: DishInfo & {
@@ -24,35 +30,43 @@ const RatingsCardContent = React.forwardRef<
     handleDelete: (e: React.MouseEvent) => Promise<void>;
     deleteLoading: boolean;
   } & React.HTMLAttributes<HTMLDivElement>
->(({ food, handleDelete, deleteLoading, ...divProps }, ref) => {
-  const IconComponent = getFoodIcon(food.name) ?? Utensils;
+>(({ food, handleDelete, deleteLoading, className, ...divProps }, ref) => {
+  const IconComponent = getFoodIcon(food.name) ?? Restaurant;
 
   return (
-    <div ref={ref} {...divProps} className="w-full"> {}
-      <Card className="cursor-pointer hover:shadow-lg transition w-full">
-        <CardContent>
-          <div className="flex justify-between items-center h-full pt-6">
+    <div ref={ref} {...divProps} className={cn("w-full", className)}>
+      <Card
+        className="cursor-pointer hover:shadow-lg transition w-full border"
+        sx={{ borderRadius: "16px" }}
+      >
+        <CardContent sx={{ padding: "0 !important" }}>
+          <div className="flex justify-between items-center h-full p-6">
             <div className="flex items-center gap-6">
-              <IconComponent className="w-10 h-10 text-slate-700" />
+              <IconComponent className="w-10 h-10 text-foreground" />
               <div className="flex flex-col">
                 <strong>{formatFoodName(food.name)}</strong>
-                <span className="text-zinc-400 text-xs mt-1">
+                <span className="text-muted-foreground text-xs mt-1">
                   Rated {new Date(food.ratedAt).toLocaleDateString()}
                 </span>
               </div>
             </div>
             <div
               className="flex flex-row items-center ml-4 gap-4"
-              onClick={(e) => e.stopPropagation()} // keep stars/delete interactive
+              onClick={(e) => e.stopPropagation()}
             >
               <InteractiveStarRating dishId={food.id} />
-              <button
+              <IconButton
                 onClick={handleDelete}
                 disabled={deleteLoading}
                 title="Delete Rating"
+                size="small"
+                className={cn(
+                  "text-gray-400 hover:text-red-500 transition",
+                  deleteLoading && "opacity-60",
+                )}
               >
-                <Trash2 className="w-4 h-4 text-gray-400 hover:text-red-500" />
-              </button>
+                <Delete className="w-4 h-4 text-gray-400 hover:text-red-500" />
+              </IconButton>
             </div>
           </div>
         </CardContent>
@@ -63,32 +77,59 @@ const RatingsCardContent = React.forwardRef<
 RatingsCardContent.displayName = "RatingsCardContent";
 
 export default function RatingsCard({ food }: RatingsCardProps) {
+  const userId = useUserStore((s) => s.userId);
+  const [open, setOpen] = React.useState(false);
   const utils = trpc.useUtils();
+
   const deleteRatingMutation = trpc.dish.deleteRating.useMutation({
     onSuccess: () => {
       utils.dish.rated.invalidate();
-      utils.dish.getUserRating.invalidate({ userId: "default-user", dishId: food.id });
       utils.dish.getAverageRating.invalidate({ dishId: food.id });
     },
   });
 
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
+    // TODO: Replace this with a MUI dialog instead of relying on browser window.
     if (window.confirm("Delete this rating?")) {
-      await deleteRatingMutation.mutateAsync({ userId: "default-user", dishId: food.id });
+      await deleteRatingMutation.mutateAsync({
+        userId: userId ?? "default-user",
+        dishId: food.id,
+      });
     }
   };
 
+  const handleOpen = () => setOpen(true); // no dialog trigger component in MUI so handling manually
+  const handleClose = () => setOpen(false);
+
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <RatingsCardContent
-          food={food}
-          handleDelete={handleDelete}
-          deleteLoading={deleteRatingMutation.isLoading}
-        />
-      </DialogTrigger>
-      <FoodDialogContent {...food} />
-    </Dialog>
+    <>
+      <RatingsCardContent
+        food={food}
+        handleDelete={handleDelete}
+        // NOTE: Why is this property here? We don't do the delete async, so there should be no loading, nor a way to show that.
+        deleteLoading={false}
+        onClick={handleOpen}
+      />
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        maxWidth={false}
+        slotProps={{
+          paper: {
+            sx: {
+              width: "460px",
+              maxWidth: "90vw",
+              margin: 2,
+              padding: 0,
+              overflow: "hidden",
+              borderRadius: "6px",
+            },
+          },
+        }}
+      >
+        <FoodDialogContent dish={food} />
+      </Dialog>
+    </>
   );
 }

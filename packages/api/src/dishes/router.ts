@@ -2,13 +2,11 @@ import {
   deleteRating,
   getAverageRating,
   getUserRatedDishes,
-  getUserRating,
   upsertRating,
 } from "@api/ratings/services";
 import { createTRPCRouter, publicProcedure } from "@api/trpc";
-import { upsertUser } from "@api/users/services";
+import { dishes, RatingSchema } from "@peterplate/db";
 import { TRPCError } from "@trpc/server";
-import { dishes, RatingSchema } from "@zotmeal/db";
 import { z } from "zod";
 
 const getDishProcedure = publicProcedure
@@ -30,7 +28,6 @@ const getDishProcedure = publicProcedure
 const rateDishProcedure = publicProcedure
   .input(RatingSchema)
   .mutation(async ({ ctx: { db }, input }) => {
-    // 1. Check dish exists
     const dish = await db.query.dishes.findFirst({
       where: (dishes, { eq }) => eq(dishes.id, input.dishId),
     });
@@ -41,19 +38,8 @@ const rateDishProcedure = publicProcedure
         message: "dish not found",
       });
 
-    // 2. Create user if they don't exist
-    await upsertUser(db, {
-      id: input.userId,
-      name: "Anonymous",
-      email: `anonymous-${input.userId}@zotmeal.com`,
-      emailVerified: false,
-      image: "",
-    });
-
-    // 3. Upsert the rating
     await upsertRating(db, input);
 
-    // 4. Return the new average
     return await getAverageRating(db, input.dishId);
   });
 

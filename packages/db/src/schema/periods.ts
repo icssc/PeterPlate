@@ -1,4 +1,11 @@
-import { date, pgTable, primaryKey, text, time } from "drizzle-orm/pg-core";
+import {
+  date,
+  index,
+  pgTable,
+  primaryKey,
+  text,
+  time,
+} from "drizzle-orm/pg-core";
 import { restaurantIdEnum } from "./enums";
 import { restaurants } from "./restaurants";
 import { metadataColumns } from "./utils";
@@ -24,6 +31,10 @@ export const periods = pgTable(
       name: "periods_pk",
       columns: [table.id, table.date, table.restaurantId],
     }),
+    restaurantDateIdx: index("periods_restaurant_date_idx").on(
+      table.restaurantId,
+      table.date,
+    ),
   }),
 );
 

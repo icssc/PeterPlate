@@ -1,29 +1,51 @@
 "use client";
 
-import MealDivider from "@/components/ui/meal-divider";
-import { trpc } from "@/utils/trpc";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import RatingsCard from "@/components/ui/card/ratings-card";
+import MealDivider from "@/components/ui/meal-divider";
+import { useUserStore } from "@/context/useUserStore";
+import { trpc } from "@/utils/trpc";
 
 export default function RatedFoods() {
+  const router = useRouter();
+  const userId = useUserStore((s) => s.userId);
+
+  useEffect(() => {
+    // TODO: use [MUI snackbar](https://mui.com/material-ui/react-snackbar/) to warn users of issue
+    if (!userId) {
+      alert("Login to rate meals!");
+      router.push("/");
+    }
+  }, [userId, router]);
+
   const {
     data: ratedFoods,
     isLoading,
     error,
-  } = trpc.dish.rated.useQuery({
-    userId: "default-user",
-  });
+  } = trpc.dish.rated.useQuery(
+    {
+      userId: userId ?? "",
+    },
+    {
+      enabled: !!userId,
+    },
+  );
 
   return (
     <div className="max-w-full h-screen">
       <div className="z-0 flex flex-col h-full overflow-x-hidden">
-        <Image
-          className="object-cover w-full min-h-80 max-h-80"
-          src="/aldrich.webp"
-          alt="An Image of Aldrich Park."
-          width={2000}
-          height={2000}
-        />
+        <div className="relative w-full min-h-80 max-h-80">
+          <div className="absolute inset-0 bg-gradient-to-b from-black/65 to-transparent" />
+          <Image
+            className="object-cover w-full h-full"
+            src="/aldrich.webp"
+            alt="An Image of Aldrich Park."
+            width={2000}
+            height={2000}
+          />
+        </div>
 
         <div
           className="flex flex-col gap-4 justify-center w-full p-5 sm:px-12 sm:py-8"
@@ -39,19 +61,17 @@ export default function RatedFoods() {
             </p>
           )}
 
-          {!isLoading && !error && (
-            <>
-              {ratedFoods && ratedFoods.length > 0 ? (
-                ratedFoods.map((food: (typeof ratedFoods)[number]) => (
-                  <RatingsCard key={`${food.id}|${food.ratedAt}`} food={food} />
-                ))
-              ) : (
-                <p className="text-center text-zinc-700 py-5">
-                  You haven't rated any foods yet
-                </p>
-              )}
-            </>
-          )}
+          {!isLoading &&
+            !error &&
+            (ratedFoods && ratedFoods.length > 0 ? (
+              ratedFoods.map((food: (typeof ratedFoods)[number]) => (
+                <RatingsCard key={`${food.id}|${food.ratedAt}`} food={food} />
+              ))
+            ) : (
+              <p className="text-center text-zinc-700 py-5">
+                You haven't rated any foods yet
+              </p>
+            ))}
         </div>
       </div>
     </div>

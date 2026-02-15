@@ -1,17 +1,15 @@
 "use client";
 
-import React from "react";
-import { HallEnum } from "@/utils/types";
-import { dateToString, toTitleCase } from "@/utils/funcs";
-import { Dialog, DialogTrigger } from "../shadcn/dialog";
-import { Card, CardContent } from "../shadcn/card";
+import { AccessTime, PinDrop } from "@mui/icons-material";
+import { Card, CardContent, Dialog, Drawer } from "@mui/material";
 import Image from "next/image";
-import EventDialogContent from "../event-dialog-content";
-import OngoingBadge from "../ongoing-badge";
-import { Clock, MapPinned } from "lucide-react";
+import React from "react";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-import { Drawer, DrawerTrigger } from "../shadcn/drawer";
+import { dateToString, toTitleCase } from "@/utils/funcs";
+import { HallEnum } from "@/utils/types";
+import EventDialogContent from "../event-dialog-content";
 import EventDrawerContent from "../event-drawer-content";
+import OngoingBadge from "../ongoing-badge";
 
 /**
  * Defines the structure for event information used by event-related components.
@@ -65,7 +63,10 @@ const EventCardContent = React.forwardRef<
 >(({ props, ...divProps }, ref) => {
   return (
     <div ref={ref} {...divProps}>
-      <Card className="cursor-pointer hover:shadow-lg transition">
+      <Card
+        className="cursor-pointer hover:shadow-lg transition"
+        sx={{ borderRadius: "16px" }}
+      >
         <CardContent className="flex items-center h-full w-full pt-6 gap-3 flex-wrap">
           <Image
             src={props.imgSrc}
@@ -85,11 +86,11 @@ const EventCardContent = React.forwardRef<
               id="event-card-subheader"
             >
               <div className="flex gap-1">
-                <Clock className="stroke-zinc-400" />
+                <AccessTime className="stroke-zinc-400" />
                 <p>{dateToString(props.startTime, props.endTime)}</p>
               </div>
               <div className="flex gap-1">
-                <MapPinned />
+                <PinDrop />
                 <p>{toTitleCase(HallEnum[props.location])}</p>
               </div>
             </div>
@@ -113,25 +114,68 @@ EventCardContent.displayName = "EventCardContent";
  * @param {EventInfo} props - The event data to be displayed. See {@link EventInfo} for detailed property descriptions.
  * @returns {JSX.Element} A React component representing an event card.
  */
-export default function EventCard(props: EventInfo): JSX.Element {
+export default function EventCard(props: EventInfo): React.JSX.Element {
   const isDesktop = useMediaQuery("(min-width: 768px)");
+  const [open, setOpen] = React.useState(false);
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
   if (isDesktop)
     return (
-      <Dialog>
-        <DialogTrigger asChild>
-          <EventCardContent props={props} />
-        </DialogTrigger>
-        <EventDialogContent {...props} />
-      </Dialog>
+      <>
+        <EventCardContent props={props} onClick={handleOpen} />
+        <Dialog
+          open={open}
+          onClose={handleClose}
+          maxWidth={false}
+          slotProps={{
+            paper: {
+              sx: {
+                width: "460px",
+                maxWidth: "90vw",
+                margin: 2,
+                padding: 0,
+                overflow: "hidden",
+                borderRadius: "6px",
+              },
+            },
+          }}
+        >
+          <EventDialogContent {...props} />
+        </Dialog>
+      </>
     );
   else
     return (
-      <Drawer>
-        <DrawerTrigger asChild>
-          <EventCardContent props={props} />
-        </DrawerTrigger>
-        <EventDrawerContent {...props} />
-      </Drawer>
+      <>
+        <EventCardContent props={props} onClick={handleOpen} />
+        <Drawer
+          anchor="bottom"
+          open={open}
+          onClose={handleClose}
+          slotProps={{
+            paper: {
+              sx: {
+                width: "460px",
+                maxWidth: "90vw",
+                margin: 2,
+                overflow: "hidden",
+                borderRadius: "6px",
+              },
+            },
+          }}
+          sx={{
+            "& .MuiDrawer-paper": {
+              borderTopLeftRadius: "10px",
+              borderTopRightRadius: "10px",
+              marginTop: "96px",
+              height: "auto",
+            },
+          }}
+        >
+          <EventDrawerContent {...props} />
+        </Drawer>
+      </>
     );
 }

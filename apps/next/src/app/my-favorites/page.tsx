@@ -1,20 +1,33 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import FoodCard from "@/components/ui/card/food-card";
 import FoodCardSkeleton from "@/components/ui/skeleton/food-card-skeleton";
-import { DEFAULT_USER_ID } from "@/config/user";
+import { useUserStore } from "@/context/useUserStore";
 import { useFavorites } from "@/hooks/useFavorites";
 
 type FavoriteEntry = ReturnType<typeof useFavorites>["favorites"][number];
 
 export default function MyFavoritesPage() {
+  const router = useRouter();
+  const userId = useUserStore((s) => s.userId);
+
+  useEffect(() => {
+    // TODO: use [MUI snackbar](https://mui.com/material-ui/react-snackbar/) to warn users.
+    if (!userId) {
+      alert("Login to favorite meals!");
+      router.push("/");
+    }
+  }, [userId, router.push]);
+
   const {
     favorites,
     isLoadingFavorites,
     favoritesError,
     toggleFavorite,
     isFavoritePending,
-  } = useFavorites(DEFAULT_USER_ID);
+  } = useFavorites(userId!);
 
   const hasFavorites = favorites.length > 0;
 
@@ -42,35 +55,31 @@ export default function MyFavoritesPage() {
         </div>
       )}
 
-      {!isLoadingFavorites && !favoritesError && (
-        <>
-          {hasFavorites ? (
-            <div className="space-y-4">
-              {favorites.map((favorite: FavoriteEntry) => (
-                <FoodCard
-                  key={favorite.dishId}
-                  {...favorite.dish}
-                  isFavorited
-                  favoriteIsLoading={isFavoritePending?.(favorite.dishId)}
-                  onToggleFavorite={toggleFavorite}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="rounded-2xl border border-dashed border-zinc-200 bg-white/60 px-6 py-16 text-center shadow-sm">
-              <p className="text-lg font-medium text-zinc-800">
-                You haven&apos;t saved any meals yet
-              </p>
-              <p className="mt-2 text-sm text-zinc-500">
-                Browse today&apos;s menus and tap the heart icon to build your
-                favorites list.
-              </p>
-            </div>
-          )}
-        </>
-      )}
+      {!isLoadingFavorites &&
+        !favoritesError &&
+        (hasFavorites ? (
+          <div className="space-y-4">
+            {favorites.map((favorite: FavoriteEntry) => (
+              <FoodCard
+                key={favorite.dishId}
+                {...favorite.dish}
+                isFavorited
+                favoriteIsLoading={isFavoritePending?.(favorite.dishId)}
+                onToggleFavorite={toggleFavorite}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-dashed border-zinc-200 bg-white/60 px-6 py-16 text-center shadow-sm">
+            <p className="text-lg font-medium text-zinc-800">
+              You haven&apos;t saved any meals yet
+            </p>
+            <p className="mt-2 text-sm text-zinc-500">
+              Browse today&apos;s menus and tap the heart icon to build your
+              favorites list.
+            </p>
+          </div>
+        ))}
     </div>
   );
 }
-
-

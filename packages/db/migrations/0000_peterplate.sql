@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS "contributors" (
 	"avatar_url" text NOT NULL,
 	"contributions" integer NOT NULL,
 	"name" text,
-	"bio" text DEFAULT 'ZotMeal Contributor',
+	"bio" text DEFAULT 'PeterPlate Contributor',
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp
 );
