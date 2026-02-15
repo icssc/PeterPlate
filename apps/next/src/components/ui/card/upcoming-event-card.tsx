@@ -1,5 +1,5 @@
 import { AccessTime, CalendarMonth, LocationOn } from "@mui/icons-material";
-import { Dialog } from "@mui/material";
+import { Card, Dialog } from "@mui/material";
 import { useState } from "react";
 import { timeToString, toTitleCase } from "@/utils/funcs";
 import { HallEnum, numToMonth } from "@/utils/types";
@@ -59,8 +59,7 @@ export default function UpcomingEventCard({
 
   return (
     <>
-      <button
-        type="button"
+      <Card
         className="w-full rounded-xl border border-neutral-200 dark:border-neutral-700 p-5 shadow-sm hover:shadow-md transition cursor-pointer text-left bg-transparent"
         onClick={() => setOpen(true)}
       >
@@ -100,7 +99,7 @@ export default function UpcomingEventCard({
             <span>{toTitleCase(event.restaurantId)}</span>
           </div>
         </div>
-      </button>
+      </Card>
       <Dialog
         open={open}
         onClose={() => setOpen(false)}

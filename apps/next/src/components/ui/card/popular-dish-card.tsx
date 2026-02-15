@@ -1,6 +1,6 @@
 import type { DishInfo } from "@api/index";
 import { Star } from "@mui/icons-material";
-import { Dialog } from "@mui/material";
+import { Card, Dialog } from "@mui/material";
 import Image from "next/image";
 import { useState } from "react";
 import { formatFoodName, getFoodIcon, toTitleCase } from "@/utils/funcs";
@@ -34,8 +34,7 @@ export default function PopularDishCard({
 
   return (
     <>
-      <button
-        type="button"
+      <Card
         className="w-full h-full min-h-[210px] flex flex-col rounded-xl border border-neutral-200 dark:border-neutral-700 overflow-hidden shadow-sm hover:shadow-md transition cursor-pointer text-left bg-transparent p-0"
         onClick={() => setOpen(true)}
       >
@@ -72,7 +71,7 @@ export default function PopularDishCard({
             <span>{averageRating > 0 ? averageRating.toFixed(1) : "—"}</span>
           </div>
         </div>
-      </button>
+      </Card>
       <Dialog
         open={open}
         onClose={() => setOpen(false)}
