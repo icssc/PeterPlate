@@ -1,7 +1,16 @@
 "use client";
 
+import CssBaseline from "@mui/material/CssBaseline";
+import {
+  createTheme,
+  ThemeProvider as MUIThemeProvider,
+} from "@mui/material/styles";
+import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
-import type * as React from "react";
+
+const theme = createTheme({
+  cssVariables: true,
+});
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   return (
@@ -11,7 +20,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       enableSystem
       disableTransitionOnChange
     >
-      {children}
+      <AppRouterCacheProvider>
+        <MUIThemeProvider theme={theme}>
+          <CssBaseline />
+          {children}
+        </MUIThemeProvider>
+      </AppRouterCacheProvider>
     </NextThemesProvider>
   );
 }
