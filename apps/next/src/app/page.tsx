@@ -109,7 +109,7 @@ function DesktopHome(): React.JSX.Element {
 
   // Popular Today
   const allDishes = [...brandywineDishes, ...anteateryDishes];
-  const popularDishes = getPopularDishes(allDishes);
+  const popularDishes = getPopularDishes(allDishes, 5);
 
   return (
     <div className="min-h-screen bg-white dark:bg-neutral-950">
@@ -241,7 +241,7 @@ function DesktopHome(): React.JSX.Element {
             <p className="text-neutral-500">No upcoming events.</p>
           ) : (
             <div className="grid grid-cols-4 gap-4">
-              {sortedEvents(events).map((event, idx) => (
+              {sortedEvents(events, 4).map((event, idx) => (
                 <UpcomingEventCard
                   key={`${event.title}-${idx}`}
                   event={event}
@@ -281,7 +281,7 @@ function MobileHome(): React.JSX.Element {
 
   // Popular Today
   const allDishes = [...brandywineDishes, ...anteateryDishes];
-  const popularDishes = getPopularDishes(allDishes);
+  const popularDishes = getPopularDishes(allDishes, 3);
 
   return (
     <div className="min-h-screen bg-white dark:bg-neutral-950">
@@ -420,11 +420,11 @@ function MobileHome(): React.JSX.Element {
               <ChevronRight className="text-sky-600" style={{ fontSize: 16 }} />
             </Link>
           </div>
-          {!events || sortedEvents.length === 0 ? (
+          {!events || events.length === 0 ? (
             <p className="text-sm text-neutral-500">No upcoming events.</p>
           ) : (
             <div className="flex gap-3 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              {sortedEvents(events).map((event, idx) => (
+              {sortedEvents(events, 3).map((event, idx) => (
                 <UpcomingEventCard
                   key={`${event.title}-${idx}`}
                   event={event}
@@ -480,7 +480,7 @@ export function getHallDishData<TDish extends Record<string, any>>(
   return { status, dishes };
 }
 
-// Handles Popular Today: gets top 5 unique dishes sorted by average rating (descending)
+// Handles Popular Today: gets top unique dishes sorted by average rating (descending)
 type DishRatings = {
   name: string;
   numRatings: number;
@@ -489,6 +489,7 @@ type DishRatings = {
 
 export function getPopularDishes<T extends DishRatings>(
   allDishes: T[] | null | undefined,
+  numCards: number,
 ): T[] {
   const seenNames = new Set<string>();
 
@@ -504,16 +505,17 @@ export function getPopularDishes<T extends DishRatings>(
       const avgB = b.numRatings > 0 ? b.totalRating / b.numRatings : 0;
       return avgB - avgA;
     })
-    .slice(0, 5);
+    .slice(0, numCards);
 }
 
-// Handles Upcoming Events: gets top 4 upcoming events sorted by start time (ascending)
+// Handles Upcoming Events: gets top upcoming events sorted by start time (ascending)
 type EventItem = {
   start?: string | Date | null;
 };
 
 export function sortedEvents<T extends EventItem>(
   events: T[] | null | undefined,
+  numCards: number,
 ): T[] {
   return [...(events ?? [])]
     .sort((event, nextEvent) => {
@@ -524,7 +526,7 @@ export function sortedEvents<T extends EventItem>(
 
       return eventStartTime - nextEventStartTime;
     })
-    .slice(0, 4);
+    .slice(0, numCards);
 }
 
 // Get open/close status for each hall
