@@ -1,4 +1,5 @@
 "use client";
+import { AppRouterCacheProvider } from "@mui/material-nextjs/v16-appRouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink } from "@trpc/client";
 import { ThemeProvider } from "next-themes";
@@ -68,7 +69,7 @@ export function RootClient({ children }: { children: React.ReactNode }) {
         <QueryClientProvider client={queryClient}>
           <DateProvider>
             <Toolbar />
-            {children}
+            <AppRouterCacheProvider>{children}</AppRouterCacheProvider>
           </DateProvider>
         </QueryClientProvider>
       </trpc.Provider>
