@@ -171,7 +171,10 @@ export default function Side({
         )}
       </div>
 
-      <div className="p-5 flex flex-col flex-grow h-1" id="side-content">
+      <div
+        className="p-5 flex flex-col flex-grow h-1 dark:bg-zinc-900"
+        id="side-content"
+      >
         <div className="flex flex-col gap-4 sm:gap-6 items-center">
           <div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-4 w-full">
             {isLoading && <SelectSkeleton />}
@@ -181,7 +184,7 @@ export default function Side({
                   value={selectedPeriod}
                   onValueChange={(value) => setSelectedPeriod(value || "")}
                 >
-                  <SelectTrigger className=" w-full sm:w-52">
+                  <SelectTrigger className="w-full sm:w-52">
                     <SelectValue placeholder="Select Meal" />
                   </SelectTrigger>
                   <SelectContent>
