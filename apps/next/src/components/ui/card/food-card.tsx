@@ -227,10 +227,10 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                           : `${Math.round(parseFloat(dish.nutritionInfo.calories))} cal`}
                       </span>
                     </div>
-                    <div className="flex gap-1 items-center text-gray-500">
+                    <div className="flex gap-1 items-center text-zinc-500">
                       <StarBorder
-                        className="w-4 h-4 stroke-gray-500"
-                        strokeWidth={1.5}
+                        className="w-4 h-4 stroke-zinc-500"
+                        strokeWidth={0.15}
                       />
                       <span>
                         {averageRating.toFixed(1)} ({ratingCount})
