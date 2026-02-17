@@ -9,15 +9,16 @@ import { trpc } from "@/utils/trpc";
 
 export default function MealTracker() {
   const router = useRouter();
-  const userId = useUserStore((s) => s.userId);
+  const { userId, isInitialized } = useUserStore();
 
   useEffect(() => {
-    // TODO: use [MUI snackbar](https://mui.com/material-ui/react-snackbar/) to warn users of issue
+    if (!isInitialized) return;
+
     if (!userId) {
       alert("Login to track meals!");
       router.push("/");
     }
-  }, [userId, router.push]);
+  }, [userId, isInitialized, router]);
 
   const {
     data: meals,

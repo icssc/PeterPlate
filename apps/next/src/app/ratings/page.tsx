@@ -10,15 +10,17 @@ import { trpc } from "@/utils/trpc";
 
 export default function RatedFoods() {
   const router = useRouter();
-  const userId = useUserStore((s) => s.userId);
+  const { userId, isInitialized } = useUserStore();
 
   useEffect(() => {
+    if (!isInitialized) return;
+
     // TODO: use [MUI snackbar](https://mui.com/material-ui/react-snackbar/) to warn users of issue
     if (!userId) {
       alert("Login to rate meals!");
       router.push("/");
     }
-  }, [userId, router]);
+  }, [userId, isInitialized, router]);
 
   const {
     data: ratedFoods,

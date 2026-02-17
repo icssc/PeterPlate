@@ -11,15 +11,17 @@ type FavoriteEntry = ReturnType<typeof useFavorites>["favorites"][number];
 
 export default function MyFavoritesPage() {
   const router = useRouter();
-  const userId = useUserStore((s) => s.userId);
+  const { userId, isInitialized } = useUserStore();
 
   useEffect(() => {
+    if (!isInitialized) return;
+
     // TODO: use [MUI snackbar](https://mui.com/material-ui/react-snackbar/) to warn users.
     if (!userId) {
       alert("Login to favorite meals!");
       router.push("/");
     }
-  }, [userId, router.push]);
+  }, [userId, isInitialized, router]);
 
   const {
     favorites,
