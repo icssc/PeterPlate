@@ -45,7 +45,14 @@ import { useHallDerived, useHallStore } from "@/context/useHallStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { formatOpenCloseTime, isSameDay, toTitleCase } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
-import { HallEnum, HallStatusEnum } from "@/utils/types";
+import {
+  ANTEATERY_MAP_EMBED_URL,
+  ANTEATERY_MAP_LINK_URL,
+  BRANDYWINE_MAP_EMBED_URL,
+  BRANDYWINE_MAP_LINK_URL,
+  HallEnum,
+  HallStatusEnum,
+} from "@/utils/types";
 
 interface RestaurantPageProps {
   hall: HallEnum;
@@ -754,161 +761,204 @@ export function RestaurantPage({
           {isDesktop && (
             <div className="w-full md:basis-[325px] md:max-w-[325px] md:min-h-[740px]">
               {/* Hours of operation card */}
-              <Paper elevation={1} className="p-4 mb-4 h-fit">
-                <Typography variant="subtitle1" fontWeight={700}>
-                  Hours of Operation
-                </Typography>
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  className="mt-0.5 mb-2"
-                >
-                  Today (
-                  {displayDate.toLocaleDateString(undefined, {
-                    month: "2-digit",
-                    day: "2-digit",
-                    year: "numeric",
-                  })}
-                  )
-                </Typography>
-                <Divider className="mb-2" />
-                {periods.length > 0 ? (
-                  periods.map((periodKey) => {
-                    const periodTimes = availablePeriodTimes?.[periodKey];
-                    const periodName = toTitleCase(periodKey);
-                    const hasTimes = periodTimes && periodTimes.length >= 2;
-
-                    return (
-                      <div
-                        key={periodKey}
-                        className="flex justify-between mb-0.5"
-                      >
-                        <Typography variant="body2">{periodName}</Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {hasTimes
-                            ? formatOpenCloseTime(
-                                periodTimes[0],
-                                periodTimes[1],
-                              )
-                            : "Closed"}
-                        </Typography>
-                      </div>
-                    );
-                  })
-                ) : (
-                  <Typography variant="body2" color="text.secondary">
-                    No hours data for this date.
+              <Paper elevation={1} className="mb-4 overflow-hidden">
+                <div className="bg-sky-500/20 px-4 py-3 border-b-2 border-sky-700">
+                  <Typography
+                    variant="h6"
+                    className="!text-sky-700 !font-bold !text-center"
+                  >
+                    Hours of Operation
                   </Typography>
-                )}
-              </Paper>
-              {/* Location card */}
-              <Paper elevation={1} className="p-4 mb-4 h-fit">
-                <Typography variant="subtitle1" fontWeight={700}>
-                  Location
-                </Typography>
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  className="my-2"
-                >
-                  {hall === HallEnum.ANTEATERY
-                    ? "4001 Mesa Rd, Irvine, CA 92617"
-                    : "Middle Earth Community Irvine, CA 92697"}
-                </Typography>
-                <div className="w-full h-[150px] rounded overflow-hidden mb-2">
-                  <iframe
-                    title="Campus map location"
-                    width="100%"
-                    height="100%"
-                    style={{ border: 0 }}
-                    loading="lazy"
-                    allowFullScreen
-                    referrerPolicy="no-referrer-when-downgrade"
-                    src={
-                      hall === HallEnum.ANTEATERY
-                        ? "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3321.2343796515447!2d-117.84751608771703!3d33.651088373199414!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80dcde12deb776f1%3A0x766314500f8813c2!2sThe%20Anteatery!5e0!3m2!1sen!2sus!4v1770860208235!5m2!1sen!2sus"
-                        : "https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d3429.7763637757234!2d-117.84095176884651!3d33.64518667561823!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80dcde0f35ca653d%3A0xf33e49e0efd9eea5!2sBrandywine%20Commons!5e0!3m2!1sen!2sus!4v1770858688774!5m2!1sen!2sus"
-                    }
-                  />
                 </div>
-                <Link
-                  href={
-                    hall === HallEnum.ANTEATERY
-                      ? "https://maps.app.goo.gl/f6KDnq227caCRyoBA"
-                      : "https://maps.app.goo.gl/vTiuJzbKSwtZwZgi9"
-                  }
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm"
-                >
-                  Directions
-                </Link>
-              </Paper>
+                <div className="p-4">
+                  <Typography
+                    variant="body2"
+                    fontWeight={600}
+                    className="mb-3 pb-2"
+                  >
+                    Today (
+                    {displayDate.toLocaleDateString(undefined, {
+                      month: "2-digit",
+                      day: "2-digit",
+                      year: "numeric",
+                    })}
+                    )
+                  </Typography>
+                  {periods.length > 0 ? (
+                    <div className="space-y-2">
+                      {periods.map((periodKey) => {
+                        const periodTimes = availablePeriodTimes?.[periodKey];
+                        const periodName = toTitleCase(periodKey);
+                        const hasTimes = periodTimes && periodTimes.length >= 2;
 
-              <Paper elevation={1} className="p-4">
-                <Typography
-                  variant="subtitle1"
-                  fontWeight={700}
-                  className="mb-2"
-                >
-                  Special Schedules
-                </Typography>
-                {hallEvents.length > 0 ? (
-                  hallEvents.map((event) => {
-                    const start = event.start ? new Date(event.start) : null;
-                    const end = event.end ? new Date(event.end) : null;
-                    const now = new Date();
-                    const isActive = start && end && now >= start && now <= end;
-                    const dateRange =
-                      start && end
-                        ? `${start.toLocaleDateString(undefined, {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          })} - ${end.toLocaleDateString(undefined, {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          })}`
-                        : "";
-
-                    return (
-                      <Accordion
-                        key={`${event.title}-${String(event.start)}-${event.restaurantId}`}
-                      >
-                        <AccordionSummary expandIcon={<ExpandMore />}>
-                          <div className="flex flex-col w-full pr-2">
-                            <div className="flex justify-between items-center w-full">
-                              <Typography variant="body2">
-                                {event.title}
-                              </Typography>
-                              {isActive && (
-                                <Chip
-                                  label="Active"
-                                  size="small"
-                                  color="primary"
-                                  className="h-5 text-[0.7rem]"
-                                />
-                              )}
-                            </div>
-                            <Typography variant="body2" color="text.secondary">
-                              {dateRange}
+                        return (
+                          <div
+                            key={periodKey}
+                            className="flex justify-between items-center"
+                          >
+                            <Typography variant="body2">
+                              {periodName}
+                            </Typography>
+                            <Typography
+                              variant="body2"
+                              color="text.secondary"
+                              className="!text-right"
+                            >
+                              {hasTimes
+                                ? formatOpenCloseTime(
+                                    periodTimes[0],
+                                    periodTimes[1],
+                                  )
+                                : "Closed"}
                             </Typography>
                           </div>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                          <Typography variant="body2" color="text.secondary">
-                            {event.shortDescription ?? dateRange}
-                          </Typography>
-                        </AccordionDetails>
-                      </Accordion>
-                    );
-                  })
-                ) : (
-                  <Typography variant="body2" color="text.secondary">
-                    No special schedules.
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <Typography variant="body2" color="text.secondary">
+                      No hours data for this date.
+                    </Typography>
+                  )}
+                </div>
+              </Paper>
+
+              {/* Location card */}
+              <Paper elevation={1} className="mb-4 overflow-hidden">
+                <div className="bg-sky-500/20 px-4 py-3 border-b-2 border-sky-600">
+                  <Typography
+                    variant="h6"
+                    className="!text-sky-700 !font-bold !text-center"
+                  >
+                    Location
                   </Typography>
-                )}
+                </div>
+                <div className="p-4">
+                  <Typography variant="body2" className="mb-3 pb-2">
+                    {hall === HallEnum.ANTEATERY
+                      ? "4001 Mesa Rd, Irvine, CA 92617"
+                      : "Middle Earth Community Irvine, CA 92697"}
+                  </Typography>
+                  <div className="w-full h-[150px] rounded overflow-hidden mb-3">
+                    <iframe
+                      title="Campus map location"
+                      width="100%"
+                      height="100%"
+                      style={{ border: 0 }}
+                      loading="lazy"
+                      allowFullScreen
+                      referrerPolicy="no-referrer-when-downgrade"
+                      src={
+                        hall === HallEnum.ANTEATERY
+                          ? ANTEATERY_MAP_EMBED_URL
+                          : BRANDYWINE_MAP_EMBED_URL
+                      }
+                    />
+                  </div>
+                  <Link
+                    href={
+                      hall === HallEnum.ANTEATERY
+                        ? ANTEATERY_MAP_LINK_URL
+                        : BRANDYWINE_MAP_LINK_URL
+                    }
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    underline="always"
+                    className="!text-sm"
+                  >
+                    Directions
+                  </Link>
+                </div>
+              </Paper>
+
+              {/* Special Schedules card */}
+              <Paper elevation={1} className="overflow-hidden">
+                <div className="bg-sky-500/20 px-4 py-3 border-b-2 border-sky-600">
+                  <Typography
+                    variant="h6"
+                    className="!text-sky-700 !font-bold !text-center"
+                  >
+                    Special Schedules
+                  </Typography>
+                </div>
+                <div className="p-4">
+                  {hallEvents.length > 0 ? (
+                    <div className="space-y-2">
+                      {hallEvents.map((event) => {
+                        const start = event.start
+                          ? new Date(event.start)
+                          : null;
+                        const end = event.end ? new Date(event.end) : null;
+                        const now = new Date();
+                        const isActive =
+                          start && end && now >= start && now <= end;
+                        const dateRange =
+                          start && end
+                            ? `${start.toLocaleDateString(undefined, {
+                                month: "short",
+                                day: "numeric",
+                                year: "numeric",
+                              })} - ${end.toLocaleDateString(undefined, {
+                                month: "short",
+                                day: "numeric",
+                                year: "numeric",
+                              })}`
+                            : "";
+
+                        return (
+                          <Accordion
+                            key={`${event.title}-${String(event.start)}-${event.restaurantId}`}
+                            className="!border !border-sky-200 !rounded-lg !shadow-none before:!hidden"
+                          >
+                            <AccordionSummary
+                              expandIcon={
+                                <ExpandMore className="!text-sky-600" />
+                              }
+                              className="!min-h-0 !py-2"
+                            >
+                              <div className="flex flex-col w-full pr-2">
+                                <div className="flex justify-between items-center w-full gap-2">
+                                  <Typography
+                                    variant="body2"
+                                    className="!text-sky-700 !font-semibold"
+                                  >
+                                    {event.title}
+                                  </Typography>
+                                  {isActive && (
+                                    <Chip
+                                      label="ACTIVE"
+                                      size="small"
+                                      className="!h-5 !text-[0.65rem] !font-bold !bg-sky-600 !text-white !rounded-full"
+                                    />
+                                  )}
+                                </div>
+                                <Typography
+                                  variant="caption"
+                                  color="text.secondary"
+                                  className="!text-xs !mt-0.5"
+                                >
+                                  {dateRange}
+                                </Typography>
+                              </div>
+                            </AccordionSummary>
+                            <AccordionDetails className="!pt-0 !pb-2">
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                              >
+                                {event.shortDescription ?? dateRange}
+                              </Typography>
+                            </AccordionDetails>
+                          </Accordion>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <Typography variant="body2" color="text.secondary">
+                      No special schedules.
+                    </Typography>
+                  )}
+                </div>
               </Paper>
             </div>
           )}

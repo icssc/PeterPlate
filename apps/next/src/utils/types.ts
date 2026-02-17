@@ -93,6 +93,24 @@ const numToMonth: { [num: number]: string } = {
 };
 
 /**
+ * Google Maps embed URLs for dining hall locations.
+ * Used for displaying embedded maps in the location card.
+ */
+const ANTEATERY_MAP_EMBED_URL =
+  "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3321.2343796515447!2d-117.84751608771703!3d33.651088373199414!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80dcde12deb776f1%3A0x766314500f8813c2!2sThe%20Anteatery!5e0!3m2!1sen!2sus!4v1770860208235!5m2!1sen!2sus";
+
+const BRANDYWINE_MAP_EMBED_URL =
+  "https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d3429.7763637757234!2d-117.84095176884651!3d33.64518667561823!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80dcde0f35ca653d%3A0xf33e49e0efd9eea5!2sBrandywine%20Commons!5e0!3m2!1sen!2sus!4v1770858688774!5m2!1sen!2sus";
+
+/**
+ * Google Maps link URLs for dining hall locations.
+ * Used for "Open in Google Maps" links.
+ */
+const ANTEATERY_MAP_LINK_URL = "https://maps.app.goo.gl/f6KDnq227caCRyoBA";
+
+const BRANDYWINE_MAP_LINK_URL = "https://maps.app.goo.gl/vTiuJzbKSwtZwZgi9";
+
+/**
  * Defines the preferred order for displaying food categories.
  * Categories listed here will appear first and in this specific order.
  * Other categories will be sorted alphabetically after these.
@@ -317,6 +335,10 @@ export {
   MealTimeEnum,
   nutrientToUnit,
   numToMonth,
+  ANTEATERY_MAP_EMBED_URL,
+  BRANDYWINE_MAP_EMBED_URL,
+  ANTEATERY_MAP_LINK_URL,
+  BRANDYWINE_MAP_LINK_URL,
   preferredCategoryOrder,
   foodIconKeywords,
   foodIcons,
