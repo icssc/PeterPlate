@@ -218,11 +218,11 @@ export function RestaurantPage({
             <Typography
               variant="h3"
               fontWeight={700}
-              className="mb-1 text-white"
+              className="mb-1 text-blue-500"
             >
               {hall === HallEnum.ANTEATERY ? "Anteatery" : "Brandywine"}
             </Typography>
-            <div className="flex items-center gap-2 text-sm font-medium mb-1">
+            <div className="flex items-center gap-2 text-sm font-medium mb-1 text-blue-590">
               {openTime && closeTime ? (
                 <>
                   <div
@@ -256,7 +256,11 @@ export function RestaurantPage({
             {/* Desktop Header Title - Hidden on Mobile */}
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2 mb-2 flex-wrap md:flex-nowrap">
               {isDesktop && (
-                <Typography variant="h4" fontWeight={700}>
+                <Typography
+                  variant="h4"
+                  fontWeight={700}
+                  className="text-sky-700"
+                >
                   {hall === HallEnum.ANTEATERY ? "Anteatery" : "Brandywine"}
                 </Typography>
               )}
@@ -265,21 +269,7 @@ export function RestaurantPage({
                 {/* Desktop Status */}
                 {isDesktop && (
                   <div>
-                    {openTime && closeTime ? (
-                      <DiningHallStatus
-                        status={derivedHallStatus}
-                        openTime={openTime.toLocaleTimeString(undefined, {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                        closeTime={closeTime.toLocaleTimeString(undefined, {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      />
-                    ) : (
-                      <DiningHallStatus status={derivedHallStatus} />
-                    )}
+                    <DiningHallStatus status={derivedHallStatus} />
                   </div>
                 )}
 

@@ -35,10 +35,6 @@ function StatusDot({ status }: StatusDotProps) {
 interface StatusProps {
   /** The current status of the dining hall. */
   status: HallStatusEnum;
-  /** The opening time of the dining hall (if applicable). */
-  openTime?: string;
-  /** The closing time of the dining hall (if applicable). */
-  closeTime?: string;
 }
 
 /**
@@ -46,16 +42,12 @@ interface StatusProps {
  * @param {StatusProps} props - The props for the component.
  * @returns A JSX element representing the dining hall status.
  */
-function DiningHallStatus({
-  status,
-  openTime,
-  closeTime,
-}: StatusProps): React.JSX.Element {
+function DiningHallStatus({ status }: StatusProps): React.JSX.Element {
   let statusMessage: string = "";
 
   switch (status) {
     case HallStatusEnum.OPEN:
-      statusMessage = `Open (${openTime} - ${closeTime})`;
+      statusMessage = "Open";
       break;
     case HallStatusEnum.CLOSED:
       statusMessage = `Closed`;
@@ -65,6 +57,7 @@ function DiningHallStatus({
       break;
     case HallStatusEnum.PREVIEW:
       statusMessage = `Preview`;
+      break;
     default:
       break;
   }
