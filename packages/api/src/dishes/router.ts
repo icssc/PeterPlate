@@ -2,13 +2,11 @@ import {
   deleteRating,
   getAverageRating,
   getUserRatedDishes,
-  getUserRating,
   upsertRating,
 } from "@api/ratings/services";
 import { createTRPCRouter, publicProcedure } from "@api/trpc";
-import { upsertUser } from "@api/users/services";
+import { dishes, RatingSchema } from "@peterplate/db";
 import { TRPCError } from "@trpc/server";
-import { dishes, RatingSchema } from "@zotmeal/db";
 import { z } from "zod";
 
 const getDishProcedure = publicProcedure

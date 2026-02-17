@@ -1,5 +1,5 @@
 {
-  "name": "@zotmeal/validators",
+  "name": "@peterplate/validators",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -14,21 +14,21 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@zotmeal/db": "workspace:*",
+    "@peterplate/db": "workspace:*",
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@zotmeal/eslint-config": "workspace:*",
-    "@zotmeal/prettier-config": "workspace:*",
-    "@zotmeal/tsconfig": "workspace:*",
+    "@peterplate/eslint-config": "workspace:*",
+    "@peterplate/prettier-config": "workspace:*",
+    "@peterplate/tsconfig": "workspace:*",
     "eslint": "catalog:",
     "prettier": "catalog:",
     "typescript": "catalog:"
   },
   "eslintConfig": {
     "extends": [
-      "@zotmeal/eslint-config/base"
+      "@peterplate/eslint-config/base"
     ]
   },
-  "prettier": "@zotmeal/prettier-config"
+  "prettier": "@peterplate/prettier-config"
 }

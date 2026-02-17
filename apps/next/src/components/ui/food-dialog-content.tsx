@@ -2,7 +2,7 @@
 
 import { Add, StarBorder } from "@mui/icons-material";
 import { Button, DialogContent } from "@mui/material";
-import type { DishInfo } from "@zotmeal/api";
+import type { DishInfo } from "@peterplate/api";
 import Image from "next/image";
 import { useState } from "react";
 import {
@@ -30,7 +30,7 @@ import InteractiveStarRating from "./interactive-star-rating";
  *
  * This component is typically used as the content for a `Dialog` triggered by a {@link FoodCard}.
  *
- * @param {DishInfo} dish - The dish data to display. See {@link DishInfo} (from `@zotmeal/api`) for detailed property descriptions.
+ * @param {DishInfo} dish - The dish data to display. See {@link DishInfo} (from `@peterplate/api`) for detailed property descriptions.
  * @param {OnAddToMealTracker} onAddToMealTracker - Called when the user clicks "Add to Meal Tracker"
  * @param {boolean} isAddingToMealTracker - Whether the add-to-tracker mutation is pending.
  * @returns {JSX.Element} The rendered content for the food item dialog.
@@ -45,6 +45,11 @@ export default function FoodDialogContent({
   isAddingToMealTracker?: boolean;
 }) {
   const [showAllNutrients, setShowAllNutrients] = useState(false);
+  const [imageError, setImageError] = useState(false);
+  const showImage =
+    typeof dish.image_url === "string" &&
+    dish.image_url.trim() !== "" &&
+    !imageError;
   const initialNutrients = [
     "calories",
     "totalFatG",
@@ -76,13 +81,24 @@ export default function FoodDialogContent({
 
   return (
     <div className="font-poppins flex flex-col max-h-[90vh]">
-      <Image
-        src={"/zm-card-header.webp"}
-        alt={"An image of zotmeal logo."}
-        width={1200}
-        height={700}
-        className="w-full h-40 object-cover shrink-0"
-      />
+      {showImage ? (
+        <Image
+          src={dish.image_url as string}
+          alt={formatFoodName(dish.name)}
+          width={800}
+          height={160}
+          className="w-full h-40 object-cover"
+          onError={() => setImageError(true)}
+        />
+      ) : (
+        <Image
+          src={"/zm-card-header.webp"}
+          alt={"An image of peterplate logo."}
+          width={1200}
+          height={700}
+          className="w-full h-40 object-cover"
+        />
+      )}
       <div className="max-w-lg mx-auto w-full flex-1 min-h-0 flex flex-col">
         <DialogContent
           sx={{ padding: "0 16px !important", flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}

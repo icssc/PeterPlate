@@ -1,8 +1,7 @@
 import { logger } from "@api/logger";
 
-import type { Drizzle, RestaurantName } from "@zotmeal/db";
+import type { Drizzle, RestaurantName } from "@peterplate/db";
 import { upsertMenusForDate } from "./upsert";
-
 
 export async function daily(
   db: Drizzle,

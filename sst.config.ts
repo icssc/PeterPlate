@@ -14,7 +14,7 @@ function getDomain() {
 function getClientId() {
   if ($app.stage === "production" || $app.stage.match(/^staging-(\d+)$/))
     return "peterplate";
-  
+
   return "peterplate-dev";
 }
 
@@ -122,12 +122,12 @@ export default $config({
     });
 
     // ! TODO @KevinWu098: figure out the router
-    // Redirect zotmeal.com and www.zotmeal.com to peterplate.com
+    // Redirect peterplate.com and www.peterplate.com to peterplate.com
     // if ($app.stage === "production") {
-    //   new sst.aws.Router("ZotmealRedirect", {
+    //   new sst.aws.Router("PeterplateRedirect", {
     //     domain: {
-    //       name: "zotmeal.com",
-    //       redirects: ["www.zotmeal.com"],
+    //       name: "peterplate.com",
+    //       redirects: ["www.peterplate.com"],
     //       dns: sst.aws.dns({
     //         zone: "Z05683903NC7KZ5HQGFOI",
     //       }),

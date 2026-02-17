@@ -1,5 +1,5 @@
-import { daily } from "@zotmeal/api";
-import { createDrizzle, pool, restaurantNames } from "@zotmeal/db";
+import { daily } from "@peterplate/api";
+import { createDrizzle, pool, restaurantNames } from "@peterplate/db";
 
 import { logger } from "../../../logger";
 import { env } from "../env";

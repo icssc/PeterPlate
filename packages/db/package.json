@@ -1,5 +1,5 @@
 {
-  "name": "@zotmeal/db",
+  "name": "@peterplate/db",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -15,7 +15,7 @@
     "build": "echo 'Add build script here'",
     "test": "echo 'Add test script here'",
     "lint": "eslint .",
-    "db:generate": "pnpm with-env drizzle-kit generate --name zotmeal",
+    "db:generate": "pnpm with-env drizzle-kit generate --name peterplate",
     "db:migrate": "pnpm with-env drizzle-kit migrate",
     "db:studio": "pnpm with-env drizzle-kit studio",
     "db:drop": "pnpm with-env drizzle-kit drop",
@@ -36,10 +36,10 @@
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@peterplate/eslint-config": "workspace:*",
+    "@peterplate/prettier-config": "workspace:*",
+    "@peterplate/tsconfig": "workspace:*",
     "@types/pg": "catalog:",
-    "@zotmeal/eslint-config": "workspace:*",
-    "@zotmeal/prettier-config": "workspace:*",
-    "@zotmeal/tsconfig": "workspace:*",
     "drizzle-kit": "^0.31.8",
     "eslint": "catalog:",
     "prettier": "catalog:",
@@ -48,8 +48,8 @@
   "eslintConfig": {
     "root": true,
     "extends": [
-      "@zotmeal/eslint-config/base"
+      "@peterplate/eslint-config/base"
     ]
   },
-  "prettier": "@zotmeal/prettier-config"
+  "prettier": "@peterplate/prettier-config"
 }

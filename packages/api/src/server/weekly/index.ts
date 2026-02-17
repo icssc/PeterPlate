@@ -4,8 +4,8 @@ import { logger } from "@api/logger";
 import { upsert } from "@api/utils";
 import type { RestEndpointMethodTypes } from "@octokit/rest";
 import { Octokit } from "@octokit/rest";
-import type { Drizzle } from "@zotmeal/db";
-import { contributors, type InsertContributor } from "@zotmeal/db";
+import type { Drizzle } from "@peterplate/db";
+import { contributors, type InsertContributor } from "@peterplate/db";
 import { getAEMEvents } from "../daily/parse";
 import { upsertMenusForWeek } from "./upsert";
 
@@ -59,7 +59,7 @@ export async function weeklyJob(db: Drizzle): Promise<void> {
 type ContributorsList =
   RestEndpointMethodTypes["repos"]["listContributors"]["response"]["data"];
 /**
- * Query the GitHub API to obtain the contributors to ZotMeal's GH Repo.
+ * Query the GitHub API to obtain the contributors to PeterPlate's GH Repo.
  * @param db The Drizzle database instance to insert into.
  */
 export async function contributorsJob(db: Drizzle) {
@@ -71,7 +71,7 @@ export async function contributorsJob(db: Drizzle) {
   while (hasNextPage) {
     const { data } = await octokit.rest.repos.listContributors({
       owner: "icssc",
-      repo: "ZotMeal",
+      repo: "PeterPlate",
       per_page: 100,
       page,
     });
@@ -144,10 +144,10 @@ export async function weekly(db: Drizzle): Promise<void> {
   const results = await Promise.allSettled([
     eventJob(db),
     contributorsJob(db),
-    weeklyJob(db)
+    weeklyJob(db),
   ]);
 
-  results.forEach(result => {
+  results.forEach((result) => {
     if (result.status === "rejected") {
       logger.error(result.reason, "weekly() failed:");
     }

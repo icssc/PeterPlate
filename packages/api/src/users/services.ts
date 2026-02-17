@@ -1,14 +1,13 @@
 import { upsert } from "@api/utils";
-import { TRPCError } from "@trpc/server";
-
 import type {
   Drizzle,
   InsertUser,
   SelectFavorite,
   SelectRating,
   SelectUser,
-} from "@zotmeal/db";
-import { users } from "@zotmeal/db";
+} from "@peterplate/db";
+import { users } from "@peterplate/db";
+import { TRPCError } from "@trpc/server";
 
 export async function getUser(
   db: Drizzle,

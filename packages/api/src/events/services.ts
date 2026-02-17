@@ -2,8 +2,8 @@ import { logger } from "@api/logger";
 import { upsertRestaurant } from "@api/restaurants/services";
 import { upsert } from "@api/utils";
 
-import type { Drizzle, InsertEvent } from "@zotmeal/db";
-import { events, getRestaurantNameById, restaurantIds } from "@zotmeal/db";
+import type { Drizzle, InsertEvent } from "@peterplate/db";
+import { events, getRestaurantNameById, restaurantIds } from "@peterplate/db";
 
 export const upsertEvent = async (db: Drizzle, event: InsertEvent) =>
   await upsert(db, events, event, {

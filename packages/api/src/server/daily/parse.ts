@@ -11,7 +11,7 @@ import {
   type InsertDishWithRelations,
   type InsertEvent,
   type RestaurantName,
-} from "@zotmeal/db";
+} from "@peterplate/db";
 import {
   AEMEventListSchema,
   type DiningHallInformation,
@@ -25,7 +25,7 @@ import {
   type MealPeriodWithHours,
   type Schedule,
   type WeekTimes,
-} from "@zotmeal/validators";
+} from "@peterplate/validators";
 import axios, { type AxiosError, type AxiosResponse } from "axios";
 import {
   AEMEventListQuery,
@@ -246,6 +246,7 @@ export async function getAdobeEcommerceMenuDaily(
         description: item?.description ?? "",
         category: item?.category ?? "",
         ingredients: item?.ingredients ?? "",
+        image_url: item?.image_url ?? null,
         nutritionInfo: item?.nutritionInfo ?? {},
         recipeAllergenCodes: item?.allergenIntolerances ?? new Set<number>(),
         recipePreferenceCodes: item?.recipePreferences ?? new Set<number>(),
@@ -309,6 +310,7 @@ export async function getAdobeEcommerceMenuWeekly(
           description: item?.description ?? "",
           category: item?.category ?? "",
           ingredients: item?.ingredients ?? "",
+          image_url: item?.image_url ?? null,
           nutritionInfo: item?.nutritionInfo ?? {},
           recipeAllergenCodes: item?.allergenIntolerances ?? new Set<number>(),
           recipePreferenceCodes: item?.recipePreferences ?? new Set<number>(),
@@ -336,6 +338,7 @@ type ProductAttributes = {
   description: string;
   category: string;
   ingredients: string;
+  image_url: string | null;
   allergenIntolerances: Set<number>;
   recipePreferences: Set<number>;
   nutritionInfo: InsertDishWithRelations["nutritionInfo"];
@@ -344,7 +347,8 @@ type ProductAttributes = {
 type ProductDictionary = { [sku: string]: ProductAttributes };
 
 const parseNumericAttribute = (value: unknown): string | null => {
-  if (typeof value === "number") return Number.isFinite(value) ? `${value}` : null;
+  if (typeof value === "number")
+    return Number.isFinite(value) ? `${value}` : null;
   if (typeof value !== "string") return null;
   const match = value.match(/-?\d+(\.\d+)?/);
   return match ? match[0] : null;
@@ -407,7 +411,9 @@ function parseProducts(products: WeeklyProducts): ProductDictionary {
       sugarsG: parseNumericAttribute(attributesMap.get("sugars")),
       ironMg: parseNumericAttribute(attributesMap.get("iron")),
       cholesterolMg: parseNumericAttribute(attributesMap.get("cholesterol")),
-      totalCarbsG: parseNumericAttribute(attributesMap.get("total_carbohydrates")),
+      totalCarbsG: parseNumericAttribute(
+        attributesMap.get("total_carbohydrates"),
+      ),
       dietaryFiberG: parseNumericAttribute(attributesMap.get("dietary_fiber")),
       proteinG: parseNumericAttribute(attributesMap.get("protein")),
       calciumMg: parseNumericAttribute(attributesMap.get("calcium")),
@@ -419,11 +425,18 @@ function parseProducts(products: WeeklyProducts): ProductDictionary {
       // attributes["recipe_additional_data"]
     } as InsertDishWithRelations["nutritionInfo"];
 
+    const firstImageUrl =
+      product.images?.[0]?.url != null &&
+      String(product.images[0].url).trim() !== ""
+        ? String(product.images[0].url)
+        : null;
+
     parsedProducts[product.sku] = {
       name: product.name,
       description: (attributesMap.get("marketing_description") as string) ?? "",
       category: (attributesMap.get("master_recipe_type") as string) ?? "",
       ingredients: (attributesMap.get("recipe_ingredients") as string) ?? "",
+      image_url: firstImageUrl,
       allergenIntolerances,
       recipePreferences,
       nutritionInfo,
