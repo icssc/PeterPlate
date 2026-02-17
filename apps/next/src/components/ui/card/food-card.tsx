@@ -202,9 +202,8 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
       event.preventDefault();
       event.stopPropagation();
 
-      // TODO: use [MUI snackbar](https://mui.com/material-ui/react-snackbar/) to warn users of
       if (!userId) {
-        alert("Login to favorite meals!");
+        showSnackbar("Login to favorite meals!", "error");
         return;
       }
 

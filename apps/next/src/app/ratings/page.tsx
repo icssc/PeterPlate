@@ -5,22 +5,23 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import RatingsCard from "@/components/ui/card/ratings-card";
 import MealDivider from "@/components/ui/meal-divider";
+import { useSnackbarStore } from "@/context/useSnackbar";
 import { useUserStore } from "@/context/useUserStore";
 import { trpc } from "@/utils/trpc";
 
 export default function RatedFoods() {
   const router = useRouter();
   const { userId, isInitialized } = useUserStore();
+  const { showSnackbar } = useSnackbarStore();
 
   useEffect(() => {
     if (!isInitialized) return;
 
-    // TODO: use [MUI snackbar](https://mui.com/material-ui/react-snackbar/) to warn users of issue
     if (!userId) {
-      alert("Login to rate meals!");
+      showSnackbar("Login to rate meals!", "error");
       router.push("/");
     }
-  }, [userId, isInitialized, router]);
+  }, [userId, isInitialized, router, showSnackbar]);
 
   const {
     data: ratedFoods,

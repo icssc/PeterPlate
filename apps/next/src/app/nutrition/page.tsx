@@ -4,21 +4,23 @@ import type { SelectLoggedMeal } from "@peterplate/db";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import NutritionBreakdown from "@/components/ui/nutrition-breakdown";
+import { useSnackbarStore } from "@/context/useSnackbar";
 import { useUserStore } from "@/context/useUserStore";
 import { trpc } from "@/utils/trpc";
 
 export default function MealTracker() {
   const router = useRouter();
   const { userId, isInitialized } = useUserStore();
+  const { showSnackbar } = useSnackbarStore();
 
   useEffect(() => {
     if (!isInitialized) return;
 
     if (!userId) {
-      alert("Login to track meals!");
+      showSnackbar("Login to track meals!", "error");
       router.push("/");
     }
-  }, [userId, isInitialized, router]);
+  }, [userId, isInitialized, router, showSnackbar]);
 
   const {
     data: meals,

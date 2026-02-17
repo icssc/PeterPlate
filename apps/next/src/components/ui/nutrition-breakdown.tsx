@@ -1,3 +1,4 @@
+import { useSnackbarStore } from "@/context/useSnackbar";
 import { trpc } from "@/utils/trpc";
 import type { SelectLoggedMeal } from "../../../../../packages/db/src/schema";
 import { ProgressDonut } from "../progress-donut";
@@ -48,13 +49,13 @@ interface Props {
 }
 
 const NutritionBreakdown = ({ dateString, mealsEaten }: Props) => {
+  const { showSnackbar } = useSnackbarStore();
   const nutrition: NutritionData = compileMealData(mealsEaten);
 
   const utils = trpc.useUtils();
   const deleteLoggedMealMutation = trpc.nutrition.deleteLoggedMeal.useMutation({
     onSuccess: () => {
-      //TODO: Replace this with a shad/cn sonner or equivalent.
-      alert(`Removed dish from your log`);
+      showSnackbar("Removed dish from your log", "success");
       utils.nutrition.invalidate();
     },
     onError: (error) => {

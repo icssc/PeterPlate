@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import FoodCard from "@/components/ui/card/food-card";
 import FoodCardSkeleton from "@/components/ui/skeleton/food-card-skeleton";
+import { useSnackbarStore } from "@/context/useSnackbar";
 import { useUserStore } from "@/context/useUserStore";
 import { useFavorites } from "@/hooks/useFavorites";
 
@@ -12,16 +13,16 @@ type FavoriteEntry = ReturnType<typeof useFavorites>["favorites"][number];
 export default function MyFavoritesPage() {
   const router = useRouter();
   const { userId, isInitialized } = useUserStore();
+  const { showSnackbar } = useSnackbarStore();
 
   useEffect(() => {
     if (!isInitialized) return;
 
-    // TODO: use [MUI snackbar](https://mui.com/material-ui/react-snackbar/) to warn users.
     if (!userId) {
-      alert("Login to favorite meals!");
+      showSnackbar("Login to favorite meals!", "error");
       router.push("/");
     }
-  }, [userId, isInitialized, router]);
+  }, [userId, isInitialized, router, showSnackbar]);
 
   const {
     favorites,
