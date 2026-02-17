@@ -12,6 +12,7 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Button,
   Chip,
   Container,
   Divider,
@@ -20,7 +21,10 @@ import {
   Link,
   MenuItem,
   Paper,
+  Popover,
   Select,
+  Tab,
+  Tabs,
   Typography,
 } from "@mui/material";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -31,13 +35,6 @@ import type { DateList } from "@peterplate/db";
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import DishesInfo from "@/components/ui/dishes-info";
-import { Button } from "@/components/ui/shadcn/button";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/shadcn/popover";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/shadcn/tabs";
 import { DiningHallStatus } from "@/components/ui/status";
 import type { CalendarRange } from "@/components/ui/toolbar";
 import { useDate } from "@/context/date-context";
@@ -136,6 +133,10 @@ export function RestaurantPage({
   const [selectedPeriod, setSelectedPeriod] = useState("");
   const [selectedStation, setSelectedStation] = useState("");
   const [isCompactView, setIsCompactView] = useState(false);
+  const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
+  const [scheduleAnchor, setScheduleAnchor] = useState<HTMLElement | null>(
+    null,
+  );
 
   useEffect(() => {
     if (!selectedDate || periods.length === 0) {
@@ -203,7 +204,8 @@ export function RestaurantPage({
 
   return (
     <div>
-      <div className="relative w-full h-[200px] md:h-[260px]">
+      {/* Hero image & mobile header */}
+      <div className="relative w-full h-[200px] md:h-[350px]">
         <Image
           src={hero.src}
           alt={hero.alt}
@@ -218,11 +220,11 @@ export function RestaurantPage({
             <Typography
               variant="h3"
               fontWeight={700}
-              className="mb-1 text-blue-500"
+              className="mb-1 text-white"
             >
               {hall === HallEnum.ANTEATERY ? "Anteatery" : "Brandywine"}
             </Typography>
-            <div className="flex items-center gap-2 text-sm font-medium mb-1 text-blue-590">
+            <div className="flex items-center gap-2 text-sm font-medium mb-1 text-sky-500">
               {openTime && closeTime ? (
                 <>
                   <div
@@ -246,15 +248,18 @@ export function RestaurantPage({
         )}
       </div>
 
+      {/* Main content container */}
       <Container
         maxWidth={false}
         disableGutters
         className="mt-4 pb-[50px] mx-auto w-full max-w-[1400px] px-2 md:px-8"
       >
         <div className="flex flex-col md:flex-row items-start gap-3">
+          {/* Left column: menu controls & dishes */}
           <div className="w-full flex-1 md:min-h-[740px] min-w-0">
-            {/* Desktop Header Title - Hidden on Mobile */}
+            {/* Header title & controls row */}
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2 mb-2 flex-wrap md:flex-nowrap">
+              {/* Desktop title */}
               {isDesktop && (
                 <Typography
                   variant="h4"
@@ -273,7 +278,7 @@ export function RestaurantPage({
                   </div>
                 )}
 
-                {/* Shared Controls (Meal & Date) */}
+                {/* Meal & date selectors */}
                 <div
                   className={
                     isDesktop ? "flex gap-2" : "grid grid-cols-2 gap-2 w-full"
@@ -283,7 +288,7 @@ export function RestaurantPage({
                     <FormControl fullWidth size="small" variant="outlined">
                       <InputLabel
                         id="meal-select-label"
-                        className="!text-blue-500 [&.Mui-focused]:!text-blue-500"
+                        className="!text-sky-700 [&.Mui-focused]:!text-sky-700"
                       >
                         Meal
                       </InputLabel>
@@ -293,7 +298,17 @@ export function RestaurantPage({
                         label="Meal"
                         onChange={(e) => setSelectedPeriod(e.target.value)}
                         IconComponent={ArrowDropDownRounded}
-                        className="bg-white [&_.MuiOutlinedInput-notchedOutline]:!border-blue-500 [&:hover_.MuiOutlinedInput-notchedOutline]:!border-blue-500 [&.Mui-focused_.MuiOutlinedInput-notchedOutline]:!border-blue-500 [&_.MuiSelect-select]:!py-[8px] [&_.MuiSelect-select]:!px-[12px] [&_.MuiSvgIcon-root]:!text-blue-500"
+                        className="bg-white [&_fieldset]:!border-sky-700 [&:hover_fieldset]:!border-sky-700 [&_.Mui-focused_fieldset]:!border-sky-700 [&_.MuiSvgIcon-root]:!text-sky-700"
+                        MenuProps={{
+                          anchorOrigin: {
+                            vertical: "bottom",
+                            horizontal: "left",
+                          },
+                          transformOrigin: {
+                            vertical: "top",
+                            horizontal: "left",
+                          },
+                        }}
                         renderValue={(selected) => {
                           if (!selected) {
                             return <em>Select Meal</em>;
@@ -357,13 +372,13 @@ export function RestaurantPage({
                               size: "small",
                               fullWidth: true,
                               InputLabelProps: {
-                                className: "!text-blue-500",
+                                className: "!text-sky-700",
                               },
                               className:
-                                "bg-white [&_.MuiOutlinedInput-notchedOutline]:!border-blue-500 [&:hover_.MuiOutlinedInput-notchedOutline]:!border-blue-500 [&.Mui-focused_.MuiOutlinedInput-notchedOutline]:!border-blue-500 [&_.MuiSvgIcon-root]:!text-blue-500",
+                                "bg-white [&_fieldset]:!border-sky-700 [&:hover_fieldset]:!border-sky-700 [&_.Mui-focused_fieldset]:!border-sky-700 [&_.MuiSvgIcon-root]:!text-sky-700",
                             },
                             openPickerIcon: {
-                              className: "!text-blue-500",
+                              className: "!text-sky-700",
                             },
                             popper: {
                               placement: "bottom-end",
@@ -409,22 +424,36 @@ export function RestaurantPage({
                       isDesktop ? "flex gap-2" : "w-full flex gap-1 mt-2"
                     }
                   >
+                    {/* Mobile-only dropdowns */}
                     {!isDesktop && (
                       <>
-                        {/* Mobile Menu Dropdown */}
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              className="flex-1 justify-between h-8 px-2 text-xs"
-                              type="button"
-                            >
-                              Menu <Menu className="h-3 w-3 ml-1" />
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent
-                            className="w-[200px] p-2"
-                            align="start"
+                        {/* Station menu dropdown */}
+                        <>
+                          <Button
+                            variant="outlined"
+                            className="flex-1 justify-between h-8 px-2 text-xs border-slate-200 text-slate-700 hover:bg-slate-50"
+                            type="button"
+                            onClick={(e) => setMenuAnchor(e.currentTarget)}
+                          >
+                            Menu <Menu className="h-3 w-3 ml-1" />
+                          </Button>
+                          <Popover
+                            open={Boolean(menuAnchor)}
+                            anchorEl={menuAnchor}
+                            onClose={() => setMenuAnchor(null)}
+                            anchorOrigin={{
+                              vertical: "bottom",
+                              horizontal: "left",
+                            }}
+                            transformOrigin={{
+                              vertical: "top",
+                              horizontal: "left",
+                            }}
+                            slotProps={{
+                              paper: {
+                                className: "w-[200px] p-2 mt-1",
+                              },
+                            }}
                           >
                             <div className="flex flex-col gap-1">
                               {stations.map((station) => (
@@ -447,30 +476,44 @@ export function RestaurantPage({
                                     } else {
                                       setSelectedStation(val);
                                     }
+                                    setMenuAnchor(null);
                                   }}
                                 >
                                   {toTitleCase(station.name)}
                                 </button>
                               ))}
                             </div>
-                          </PopoverContent>
-                        </Popover>
+                          </Popover>
+                        </>
 
-                        {/* Mobile Special Schedules Dropdown */}
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              className="flex-[1.5] justify-between h-8 px-2 text-xs"
-                              type="button"
-                            >
-                              Special Schedules{" "}
-                              <MoreVert className="h-3 w-3 ml-1" />
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent
-                            className="w-[300px] p-0"
-                            align="start"
+                        {/* Special schedules dropdown */}
+                        <>
+                          <Button
+                            variant="outlined"
+                            className="flex-[1.5] justify-between h-8 px-2 text-xs border-slate-200 text-slate-700 hover:bg-slate-50"
+                            type="button"
+                            onClick={(e) => setScheduleAnchor(e.currentTarget)}
+                          >
+                            Special Schedules{" "}
+                            <MoreVert className="h-3 w-3 ml-1" />
+                          </Button>
+                          <Popover
+                            open={Boolean(scheduleAnchor)}
+                            anchorEl={scheduleAnchor}
+                            onClose={() => setScheduleAnchor(null)}
+                            anchorOrigin={{
+                              vertical: "bottom",
+                              horizontal: "left",
+                            }}
+                            transformOrigin={{
+                              vertical: "top",
+                              horizontal: "left",
+                            }}
+                            slotProps={{
+                              paper: {
+                                className: "w-[300px] p-0 mt-1",
+                              },
+                            }}
                           >
                             <div className="p-4 max-h-[400px] overflow-y-auto">
                               <Typography
@@ -509,7 +552,7 @@ export function RestaurantPage({
                                           <div className="flex justify-between items-center w-full">
                                             <Typography
                                               variant="body2"
-                                              fontWeight={500}
+                                              fontWeight={700}
                                             >
                                               {event.title}
                                             </Typography>
@@ -550,54 +593,29 @@ export function RestaurantPage({
                                 </Typography>
                               )}
                             </div>
-                          </PopoverContent>
-                        </Popover>
+                          </Popover>
+                        </>
                       </>
                     )}
-
-                    {/* View Toggles */}
-                    <div
-                      className={`flex rounded-md border border-slate-200 bg-white p-1 shrink-0 ${isDesktop ? "" : "h-8 items-center"}`}
-                    >
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        type="button"
-                        onClick={() => setIsCompactView(false)}
-                        className={`${isDesktop ? "h-8 px-3" : "h-6 px-2"} ${!isCompactView ? "bg-slate-100 text-slate-900 font-semibold shadow-sm" : "text-slate-500 hover:text-slate-900"}`}
-                      >
-                        <Menu className={isDesktop ? "h-4 w-4" : "h-3 w-3"} />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        type="button"
-                        onClick={() => setIsCompactView(true)}
-                        className={`${isDesktop ? "h-8 px-3" : "h-6 px-2"} ${isCompactView ? "bg-slate-100 text-slate-900 font-semibold shadow-sm" : "text-slate-500 hover:text-slate-900"}`}
-                      >
-                        <GridView
-                          className={isDesktop ? "h-4 w-4" : "h-3 w-3"}
-                        />
-                      </Button>
-                    </div>
                   </div>
                 )}
               </div>
             </div>
 
+            {/* Desktop station tabs & view toggles */}
             {isDesktop && (
               <div className="mt-3">
                 {!isLoading && !isError && stations.length > 0 && (
                   <Tabs
-                    value={selectedStation}
-                    onValueChange={(value) => {
+                    value={selectedStation || false}
+                    onChange={(_event, value: string) => {
                       const val = value || "";
                       if (isCompactView) {
                         const element = document.getElementById(val);
                         if (element) {
                           element.scrollIntoView({
                             behavior: "smooth",
-                            block: "start", // Adjust alignment
+                            block: "start",
                           });
                         }
                         setSelectedStation(val);
@@ -605,27 +623,56 @@ export function RestaurantPage({
                         setSelectedStation(val);
                       }
                     }}
-                    className="flex w-full justify-start overflow-x-auto no-scrollbar"
+                    className="flex w-full justify-start overflow-x-auto no-scrollbar !bg-sky-700/40 !rounded-lg !p-2"
+                    variant="scrollable"
+                    scrollButtons={false}
+                    sx={{
+                      "& .MuiTabs-flexContainer": {
+                        gap: "0.5rem",
+                      },
+                      "& .MuiTabs-indicator": {
+                        display: "none",
+                      },
+                    }}
                   >
-                    <TabsList className="bg-transparent p-0 gap-2 h-auto flex-nowrap justify-start">
-                      {stations.map((station) => (
-                        <TabsTrigger
-                          key={station.name}
-                          value={station.name.toLowerCase()}
-                          className="rounded-full border border-slate-200 bg-white px-4 py-1.5 text-sm font-medium text-slate-700 data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:shadow-none"
-                        >
-                          {toTitleCase(station.name)}
-                        </TabsTrigger>
-                      ))}
-                    </TabsList>
+                    {stations.map((station) => (
+                      <Tab
+                        key={station.name}
+                        value={station.name.toLowerCase()}
+                        label={toTitleCase(station.name)}
+                        className="!rounded !border !border-transparent !bg-transparent !px-4 !py-1.5 !text-sm !font-medium !text-slate-700 !normal-case !min-h-0 aria-selected:!bg-white aria-selected:!text-slate-900 aria-selected:!border-slate-200 aria-selected:!shadow-sm"
+                      />
+                    ))}
                   </Tabs>
                 )}
+                {/* Card/compact view toggles */}
+                <div className="flex justify-end mt-2">
+                  <div className="flex rounded-md border border-slate-200 bg-white p-1 shrink-0">
+                    <Button
+                      variant="text"
+                      size="small"
+                      type="button"
+                      onClick={() => setIsCompactView(false)}
+                      className={`!min-w-0 !h-8 !px-3 ${!isCompactView ? "!bg-slate-100 !text-slate-900 !font-semibold !shadow-sm" : "!text-slate-500 hover:!text-slate-900"}`}
+                    >
+                      <Menu className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="text"
+                      size="small"
+                      type="button"
+                      onClick={() => setIsCompactView(true)}
+                      className={`!min-w-0 !h-8 !px-3 ${isCompactView ? "!bg-slate-100 !text-slate-900 !font-semibold !shadow-sm" : "!text-slate-500 hover:!text-slate-900"}`}
+                    >
+                      <GridView className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
               </div>
             )}
 
-            {/* Removed the Separate Buttons block as it's moved up */}
-
-            <div className="mt-3">
+            {/* Dishes display area */}
+            <div className="w-full">
               {isCompactView
                 ? // Compact View: Render ALL stations
                   stations.map((station) => (
@@ -678,8 +725,10 @@ export function RestaurantPage({
             </div>
           </div>
 
+          {/* Right column: hours & location (desktop only) */}
           {isDesktop && (
             <div className="w-full md:basis-[325px] md:max-w-[325px] md:min-h-[740px]">
+              {/* Hours of operation card */}
               <Paper elevation={1} className="p-4 mb-4 h-fit">
                 <Typography variant="subtitle1" fontWeight={700}>
                   Hours of Operation
@@ -727,8 +776,8 @@ export function RestaurantPage({
                   </Typography>
                 )}
               </Paper>
-
-              <Paper elevation={1} className="p-4 mb-4">
+              {/* Location card */}
+              <Paper elevation={1} className="p-4 mb-4 h-fit">
                 <Typography variant="subtitle1" fontWeight={700}>
                   Location
                 </Typography>
