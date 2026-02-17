@@ -13,6 +13,7 @@
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^7.3.7",
     "@mui/material": "^7.3.7",
+    "@mui/x-date-pickers": "^8.27.0",
     "@peterplate/api": "workspace:*",
     "@peterplate/db": "workspace:*",
     "@radix-ui/react-aspect-ratio": "^1.1.2",

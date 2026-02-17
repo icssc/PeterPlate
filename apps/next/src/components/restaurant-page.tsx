@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  ArrowDropDownRounded,
   ExpandMore,
   GridView,
   LocationOn,
@@ -14,29 +15,28 @@ import {
   Chip,
   Container,
   Divider,
+  FormControl,
+  InputLabel,
   Link,
+  MenuItem,
   Paper,
+  Select,
   Typography,
 } from "@mui/material";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import type { RestaurantInfo } from "@peterplate/api";
 import type { DateList } from "@peterplate/db";
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import DishesInfo from "@/components/ui/dishes-info";
 import { Button } from "@/components/ui/shadcn/button";
-import { DatePicker } from "@/components/ui/shadcn/date-picker";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/shadcn/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/shadcn/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/shadcn/tabs";
 import { DiningHallStatus } from "@/components/ui/status";
 import type { CalendarRange } from "@/components/ui/toolbar";
@@ -280,34 +280,124 @@ export function RestaurantPage({
                   }
                 >
                   <div className={isDesktop ? "w-52" : "w-full"}>
-                    <Select
-                      value={selectedPeriod}
-                      onValueChange={(value) => setSelectedPeriod(value || "")}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select Meal" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {periods.map((time) => {
-                          const mealTimeKey = time.toLowerCase();
-                          return (
-                            <SelectItem key={time} value={mealTimeKey}>
-                              {toTitleCase(time)}
-                            </SelectItem>
-                          );
-                        })}
-                      </SelectContent>
-                    </Select>
+                    <FormControl fullWidth size="small" variant="outlined">
+                      <InputLabel
+                        id="meal-select-label"
+                        className="!text-blue-500 [&.Mui-focused]:!text-blue-500"
+                      >
+                        Meal
+                      </InputLabel>
+                      <Select
+                        labelId="meal-select-label"
+                        value={selectedPeriod}
+                        label="Meal"
+                        onChange={(e) => setSelectedPeriod(e.target.value)}
+                        IconComponent={ArrowDropDownRounded}
+                        className="bg-white [&_.MuiOutlinedInput-notchedOutline]:!border-blue-500 [&:hover_.MuiOutlinedInput-notchedOutline]:!border-blue-500 [&.Mui-focused_.MuiOutlinedInput-notchedOutline]:!border-blue-500 [&_.MuiSelect-select]:!py-[8px] [&_.MuiSelect-select]:!px-[12px] [&_.MuiSvgIcon-root]:!text-blue-500"
+                        renderValue={(selected) => {
+                          if (!selected) {
+                            return <em>Select Meal</em>;
+                          }
+                          return toTitleCase(selected);
+                        }}
+                      >
+                        {periods.length === 0 ? (
+                          <MenuItem value="" disabled>
+                            Select Meal
+                          </MenuItem>
+                        ) : (
+                          periods.map((time) => {
+                            const mealTimeKey = time.toLowerCase();
+                            const periodTimes = availablePeriodTimes?.[time];
+                            const hasTimes =
+                              periodTimes && periodTimes.length >= 2;
+                            const timeString = hasTimes
+                              ? formatOpenCloseTime(
+                                  periodTimes[0],
+                                  periodTimes[1],
+                                )
+                              : "Closed";
+
+                            return (
+                              <MenuItem
+                                key={time}
+                                value={mealTimeKey}
+                                className="!flex !justify-between !items-center !gap-4"
+                              >
+                                <span>{toTitleCase(time)}</span>
+                                <span className="text-gray-500 text-sm">
+                                  {timeString}
+                                </span>
+                              </MenuItem>
+                            );
+                          })
+                        )}
+                      </Select>
+                    </FormControl>
                   </div>
 
                   {calendarRange && enabledDates && (
                     <div className={isDesktop ? "w-[240px]" : "w-full"}>
-                      <DatePicker
-                        date={selectedDate}
-                        enabledDates={enabledDates}
-                        range={calendarRange}
-                        onSelect={handleDateSelect}
-                      />
+                      <LocalizationProvider dateAdapter={AdapterDateFns}>
+                        <DatePicker
+                          label="Select date"
+                          value={selectedDate || null}
+                          onChange={(newValue) =>
+                            handleDateSelect(newValue || undefined)
+                          }
+                          minDate={calendarRange.earliest}
+                          maxDate={calendarRange.latest}
+                          shouldDisableDate={(date) =>
+                            !enabledDates.some((enabledDate) =>
+                              isSameDay(date, enabledDate),
+                            )
+                          }
+                          slotProps={{
+                            textField: {
+                              size: "small",
+                              fullWidth: true,
+                              InputLabelProps: {
+                                className: "!text-blue-500",
+                              },
+                              className:
+                                "bg-white [&_.MuiOutlinedInput-notchedOutline]:!border-blue-500 [&:hover_.MuiOutlinedInput-notchedOutline]:!border-blue-500 [&.Mui-focused_.MuiOutlinedInput-notchedOutline]:!border-blue-500 [&_.MuiSvgIcon-root]:!text-blue-500",
+                            },
+                            openPickerIcon: {
+                              className: "!text-blue-500",
+                            },
+                            popper: {
+                              placement: "bottom-end",
+                              modifiers: [
+                                {
+                                  name: "flip",
+                                  enabled: true,
+                                  options: {
+                                    altBoundary: true,
+                                    rootBoundary: "document",
+                                    padding: 8,
+                                  },
+                                },
+                                {
+                                  name: "preventOverflow",
+                                  enabled: true,
+                                  options: {
+                                    altAxis: true,
+                                    altBoundary: true,
+                                    tether: true,
+                                    rootBoundary: "document",
+                                    padding: 8,
+                                  },
+                                },
+                              ],
+                              sx: {
+                                "& .MuiPaper-root": {
+                                  marginTop: "4px",
+                                },
+                              },
+                            },
+                          }}
+                        />
+                      </LocalizationProvider>
                     </div>
                   )}
                 </div>
