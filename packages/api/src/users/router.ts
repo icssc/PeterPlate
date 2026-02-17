@@ -1,9 +1,9 @@
 import { getUserRating } from "@api/ratings/services";
 import { createTRPCRouter, publicProcedure } from "@api/trpc";
-import { UserSchema } from "@peterplate/db";
+import { UserSchema, users } from "@peterplate/db";
 import { TRPCError } from "@trpc/server";
+import { eq } from "drizzle-orm";
 import { z } from "zod";
-
 import { getUser, upsertUser } from "./services";
 
 const getUserProcedure = publicProcedure
@@ -38,8 +38,36 @@ const getUserRatingProcedure = publicProcedure
     return await getUserRating(db, input.userId, input.dishId);
   });
 
+const onboardProcedure = publicProcedure
+  .input(z.object({ id: z.string() }))
+  .mutation(async ({ ctx: { db }, input }) => {
+    try {
+      const result = await db
+        .update(users)
+        .set({
+          hasOnboarded: true,
+          updatedAt: new Date(),
+        })
+        .where(eq(users.id, input.id))
+        .returning();
+
+      if (result.length === 0)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "error onboarding user",
+        });
+    } catch (error) {
+      console.error("Error onboading user:", error);
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "error getting user",
+      });
+    }
+  });
+
 export const userRouter = createTRPCRouter({
   get: getUserProcedure,
   upsert: upsertUserProcedure,
+  onboard: onboardProcedure,
   getUserRating: getUserRatingProcedure,
 });

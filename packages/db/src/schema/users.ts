@@ -4,6 +4,8 @@ import { createInsertSchema } from "drizzle-zod";
 
 import { favorites } from "./favorites";
 import { ratings } from "./ratings";
+import { userAllergies } from "./userAllergies";
+import { userDietaryPreferences } from "./userDietaryPreferences";
 import { metadataColumns } from "./utils";
 
 export const users = pgTable("users", {
@@ -11,6 +13,7 @@ export const users = pgTable("users", {
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
   emailVerified: boolean("emailVerified").notNull().default(false),
+  hasOnboarded: boolean("hasOnboarded").default(false).notNull(),
   image: text("image"),
   ...metadataColumns,
 });
@@ -18,6 +21,8 @@ export const users = pgTable("users", {
 export const usersRelations = relations(users, ({ many }) => ({
   favorites: many(favorites),
   ratings: many(ratings),
+  allergies: many(userAllergies),
+  dietaryPreferences: many(userDietaryPreferences),
 }));
 
 /**
