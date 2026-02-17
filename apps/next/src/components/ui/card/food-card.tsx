@@ -13,6 +13,9 @@ import { cn } from "@/utils/tw";
 import FoodDialogContent from "../food-dialog-content";
 import FoodDrawerContent from "../food-drawer-content";
 
+/** Handler for "Add to meal tracker" used by card, dialog, and drawer. */
+export type OnAddToMealTracker = (e: React.MouseEvent) => void;
+
 /**
  * Props for the FoodCardContent component.
  */
@@ -34,6 +37,11 @@ interface FoodCardContentProps extends React.HTMLAttributes<HTMLDivElement> {
    */
   onToggleFavorite?: (dishId: string, currentlyFavorite: boolean) => void;
   /**
+   * Handler invoked when a user clicks "Add to meal tracker" (card, dialog, or drawer).
+   */
+  onAddToMealTracker?: OnAddToMealTracker;
+
+  /**
    * Whether to render a simplified version of the card.
    */
   isSimplified?: boolean;
@@ -51,6 +59,7 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
       isFavorited,
       favoriteDisabled,
       onToggleFavorite,
+      onAddToMealTracker,
       isSimplified = false,
       className,
       ...divProps
@@ -243,6 +252,18 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                     </p>
                   )}
                 </div>
+
+                {/*//TODO: Add user feedback on clicking button (e.g. changing Icon, making it green) */}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onAddToMealTracker?.(e);
+                  }}
+                >
+                  <AddCircleOutline />
+                </button>
+
               </div>
               <div className="flex items-center">
                 <button
@@ -309,9 +330,35 @@ export default function FoodCard({
 }: FoodCardProps): React.JSX.Element {
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const [open, setOpen] = React.useState(false);
+  const userId = useUserStore((s) => s.userId);
+  const utils = trpc.useUtils();
+  const logMealMutation = trpc.nutrition.logMeal.useMutation({
+    onSuccess: () => {
+      // TODO: Replace with shadcn sonner or equivalent
+      alert(`Added ${formatFoodName(dish.name)} to your log`);
+      utils.nutrition.invalidate();
+    },
+    onError: (error) => {
+      console.error(error.message);
+    },
+  });
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+
+  const handleAddToMealTracker = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!userId) {
+      alert("Login to track meals!");
+      return;
+    }
+    logMealMutation.mutate({
+      dishId: dish.id,
+      userId,
+      dishName: dish.name,
+      servings: 1,
+    });
+  };
 
   if (isDesktop)
     return (
@@ -321,6 +368,7 @@ export default function FoodCard({
           isFavorited={isFavorited}
           favoriteDisabled={favoriteIsLoading}
           onToggleFavorite={onToggleFavorite}
+          onAddToMealTracker={handleAddToMealTracker}
           isSimplified={isSimplified}
           onClick={handleOpen}
         />
@@ -333,15 +381,22 @@ export default function FoodCard({
               sx: {
                 width: "460px",
                 maxWidth: "90vw",
+                maxHeight: "90vh",
                 margin: 2,
                 padding: 0,
                 overflow: "hidden",
+                display: "flex",
+                flexDirection: "column",
                 borderRadius: "16px",
               },
             },
           }}
         >
-          <FoodDialogContent dish={dish} />
+          <FoodDialogContent
+            dish={dish}
+            onAddToMealTracker={handleAddToMealTracker}
+            isAddingToMealTracker={logMealMutation.isPending}
+          />
         </Dialog>
       </>
     );
@@ -353,6 +408,7 @@ export default function FoodCard({
           isFavorited={isFavorited}
           favoriteDisabled={favoriteIsLoading}
           onToggleFavorite={onToggleFavorite}
+          onAddToMealTracker={handleAddToMealTracker}
           isSimplified={isSimplified}
           onClick={handleOpen}
         />
@@ -365,9 +421,12 @@ export default function FoodCard({
               sx: {
                 width: "460px",
                 maxWidth: "90vw",
+                maxHeight: "85vh",
                 margin: 2,
                 padding: 0,
                 overflow: "hidden",
+                display: "flex",
+                flexDirection: "column",
                 borderRadius: "16px",
               },
             },
@@ -378,10 +437,15 @@ export default function FoodCard({
               borderTopRightRadius: "10px",
               marginTop: "96px",
               height: "auto",
+              maxHeight: "85vh",
             },
           }}
         >
-          <FoodDrawerContent dish={dish} />
+          <FoodDrawerContent
+            dish={dish}
+            onAddToMealTracker={handleAddToMealTracker}
+            isAddingToMealTracker={logMealMutation.isPending}
+          />
         </Drawer>
       </>
     );
