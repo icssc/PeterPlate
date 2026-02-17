@@ -88,12 +88,18 @@ function ToolbarDropdown({ element }: { element: ToolbarElement }) {
       <Button
         onClick={handleClick}
         endIcon={<ArrowDropDownIcon fontSize="small" />}
-        className="!capitalize !text-[16px] !font-medium
-        group-hover:!text-white !text-white/60 !bg-transparent"
+        className="capitalize text-[16px] font-medium
+        group-hover:text-white text-white/60 bg-transparent"
       >
         {element.title}
       </Button>
-      <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+      <Menu
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        className="capitalize text-[16px] font-medium
+        group-hover:text-white text-white/60 bg-transparent"
+      >
         {element.children?.map((child) => (
           <MenuItem
             key={child.title}
@@ -123,49 +129,12 @@ export default function Toolbar(): React.JSX.Element {
   const { data: session, isPending } = useSession();
   const user = session?.user;
 
-  // const { selectedDate, setSelectedDate } = useDate();
-  // const [enabledDates, setEnabledDates] = useState<DateList>([new Date()]);
-  // const [calendarRange, setCalendarRange] = useState<CalendarRange>({
-  //   earliest: new Date(),
-  //   latest: new Date(),
-  // });
-
-  // const { data: dateRes } = trpc.pickableDates.useQuery();
-
-  // useEffect(() => {  ---  MOVED TO RESTAURANT PAGE
-  //   if (dateRes) {
-  //     console.log("Pickable Dates (Front):", dateRes);
-  //     setEnabledDates(dateRes);
-  //     setCalendarRange({
-  //       earliest: dateRes[0],
-  //       latest: dateRes[dateRes.length - 1],
-  //     });
-  //   }
-  // }, [dateRes]);
-
-  // const handleDateSelect = (newDateFromPicker: Date | undefined) => {
-  //   if (newDateFromPicker) {
-  //     const today = new Date();
-  //     if (
-  //       newDateFromPicker.getFullYear() === today.getFullYear() &&
-  //       newDateFromPicker.getMonth() === today.getMonth() &&
-  //       newDateFromPicker.getDate() === today.getDate()
-  //     ) {
-  //       setSelectedDate(new Date());
-  //     } else {
-  //       setSelectedDate(newDateFromPicker);
-  //     }
-  //   } else {
-  //     setSelectedDate(undefined);
-  //   }
-  // };
-
   return (
     <>
       <AppBar
         position="absolute"
-        className="!bg-transparent !shadow-none 
-        hover:!bg-gradient-to-b !from-black/50 !to-black/0"
+        className="bg-transparent shadow-none 
+        hover:bg-gradient-to-b from-black/50 to-black/0"
       >
         <MuiToolbar className="justify-between px-4 py-1 group">
           <div className="flex-none flex items-center">
@@ -195,8 +164,8 @@ export default function Toolbar(): React.JSX.Element {
                   key={element.title}
                   component={Link}
                   href={element.href || "#"}
-                  className="group-hover:!text-white !normal-case !text-[16px] 
-                  !font-medium !text-white/60"
+                  className="group-hover:text-white normal-case text-[16px] 
+                  !font-medium text-white/60"
                 >
                   {element.title}
                 </Button>
