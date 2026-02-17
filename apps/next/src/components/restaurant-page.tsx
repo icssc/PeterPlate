@@ -25,6 +25,8 @@ import {
   Select,
   Tab,
   Tabs,
+  ToggleButton,
+  ToggleButtonGroup,
   Typography,
 } from "@mui/material";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -224,7 +226,7 @@ export function RestaurantPage({
             >
               {hall === HallEnum.ANTEATERY ? "Anteatery" : "Brandywine"}
             </Typography>
-            <div className="flex items-center gap-2 text-sm font-medium mb-1 text-sky-500">
+            <div className="flex items-center gap-2 text-sm font-medium mb-1 text-sky-700">
               {openTime && closeTime ? (
                 <>
                   <div
@@ -252,7 +254,7 @@ export function RestaurantPage({
       <Container
         maxWidth={false}
         disableGutters
-        className="mt-4 pb-[50px] mx-auto w-full max-w-[1400px] px-2 md:px-8"
+        className="mt-4 pb-[50px] mx-auto w-full max-w-[1600px] px-2 md:px-8"
       >
         <div className="flex flex-col md:flex-row items-start gap-3">
           {/* Left column: menu controls & dishes */}
@@ -307,6 +309,11 @@ export function RestaurantPage({
                           transformOrigin: {
                             vertical: "top",
                             horizontal: "left",
+                          },
+                          PaperProps: {
+                            style: {
+                              minWidth: "280px",
+                            },
                           },
                         }}
                         renderValue={(selected) => {
@@ -382,6 +389,7 @@ export function RestaurantPage({
                             },
                             popper: {
                               placement: "bottom-end",
+                              className: "[&_.MuiPaper-root]:mt-1",
                               modifiers: [
                                 {
                                   name: "flip",
@@ -404,11 +412,6 @@ export function RestaurantPage({
                                   },
                                 },
                               ],
-                              sx: {
-                                "& .MuiPaper-root": {
-                                  marginTop: "4px",
-                                },
-                              },
                             },
                           }}
                         />
@@ -597,6 +600,34 @@ export function RestaurantPage({
                         </>
                       </>
                     )}
+
+                    {/* Mobile view toggles */}
+                    {!isDesktop && (
+                      <ToggleButtonGroup
+                        value={isCompactView ? "compact" : "card"}
+                        exclusive
+                        onChange={(_event, newValue) => {
+                          if (newValue !== null) {
+                            setIsCompactView(newValue === "compact");
+                          }
+                        }}
+                        size="small"
+                        className="!h-8"
+                      >
+                        <ToggleButton
+                          value="card"
+                          className="!border-sky-700 !px-2 !min-w-0 aria-pressed:!bg-sky-700 aria-pressed:!text-white !bg-white !text-sky-700"
+                        >
+                          <Menu className="h-4 w-4" />
+                        </ToggleButton>
+                        <ToggleButton
+                          value="compact"
+                          className="!border-sky-700 !px-2 !min-w-0 aria-pressed:!bg-sky-700 aria-pressed:!text-white !bg-white !text-sky-700"
+                        >
+                          <GridView className="h-4 w-4" />
+                        </ToggleButton>
+                      </ToggleButtonGroup>
+                    )}
                   </div>
                 )}
               </div>
@@ -623,17 +654,9 @@ export function RestaurantPage({
                         setSelectedStation(val);
                       }
                     }}
-                    className="flex w-full justify-start overflow-x-auto no-scrollbar !bg-sky-700/40 !rounded-lg !p-2"
+                    className="flex w-full overflow-x-auto no-scrollbar !bg-sky-700/40 !rounded-lg !p-2 [&_.MuiTabs-flexContainer]:justify-between [&_.MuiTabs-flexContainer]:gap-2 [&_.MuiTabs-indicator]:hidden"
                     variant="scrollable"
                     scrollButtons={false}
-                    sx={{
-                      "& .MuiTabs-flexContainer": {
-                        gap: "0.5rem",
-                      },
-                      "& .MuiTabs-indicator": {
-                        display: "none",
-                      },
-                    }}
                   >
                     {stations.map((station) => (
                       <Tab
@@ -647,24 +670,26 @@ export function RestaurantPage({
                 )}
                 {/* Card/compact view toggles */}
                 <div className="flex justify-end mt-2">
-                  <div className="flex rounded-md border border-slate-200 bg-white p-1 shrink-0">
+                  <div className="flex gap-2">
                     <Button
-                      variant="text"
+                      variant="outlined"
                       size="small"
                       type="button"
                       onClick={() => setIsCompactView(false)}
-                      className={`!min-w-0 !h-8 !px-3 ${!isCompactView ? "!bg-slate-100 !text-slate-900 !font-semibold !shadow-sm" : "!text-slate-500 hover:!text-slate-900"}`}
+                      className={`!border-sky-700 !normal-case ${!isCompactView ? "!bg-sky-700 !text-white hover:!bg-sky-700" : "!bg-white !text-sky-700 hover:!bg-sky-50"}`}
+                      startIcon={<Menu className="h-4 w-4" />}
                     >
-                      <Menu className="h-4 w-4" />
+                      Card View
                     </Button>
                     <Button
-                      variant="text"
+                      variant="outlined"
                       size="small"
                       type="button"
                       onClick={() => setIsCompactView(true)}
-                      className={`!min-w-0 !h-8 !px-3 ${isCompactView ? "!bg-slate-100 !text-slate-900 !font-semibold !shadow-sm" : "!text-slate-500 hover:!text-slate-900"}`}
+                      className={`!border-sky-700 !normal-case ${isCompactView ? "!bg-sky-700 !text-white hover:!bg-sky-700" : "!bg-white !text-sky-700 hover:!bg-sky-50"}`}
+                      startIcon={<GridView className="h-4 w-4" />}
                     >
-                      <GridView className="h-4 w-4" />
+                      Compact View
                     </Button>
                   </div>
                 </div>
