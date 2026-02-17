@@ -1,6 +1,11 @@
 "use client";
 
-import { FavoriteBorder, Restaurant, StarBorder } from "@mui/icons-material";
+import {
+  AddCircleOutline,
+  FavoriteBorder,
+  Restaurant,
+  StarBorder,
+} from "@mui/icons-material";
 import { Card, CardContent, Dialog, Drawer } from "@mui/material";
 import type { DishInfo } from "@peterplate/api";
 import Image from "next/image";
