@@ -212,7 +212,6 @@ function DesktopHome(): React.JSX.Element {
   );
 }
 
-/* ────────────────────────────── Mobile Home ────────────────────────────── */
 function MobileHome(): React.JSX.Element {
   const { selectedDate } = useDate();
   const today = selectedDate ?? new Date();
