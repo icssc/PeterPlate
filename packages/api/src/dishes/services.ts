@@ -20,6 +20,8 @@ export async function upsertDish(
     const result = await db.transaction<
       Omit<InsertDishWithRelations, "stationId">
     >(async (tx) => {
+      const txDb = tx as unknown as Drizzle;
+
       // Only update image_url when the incoming value is a valid non-empty string; do not overwrite existing image_url with null/empty.
       const dishSet = { ...dishData };
       if (
@@ -36,7 +38,7 @@ export async function upsertDish(
       });
 
       const upsertedDietRestriction = await upsert(
-        tx,
+        txDb,
         dietRestrictions,
         dietRestriction,
         {
@@ -46,7 +48,7 @@ export async function upsertDish(
       );
 
       const upsertedNutritionInfo = await upsert(
-        tx,
+        txDb,
         nutritionInfos,
         nutritionInfo,
         {

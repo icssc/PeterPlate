@@ -1,3 +1,12 @@
+import {
+  DeleteOutline,
+  KeyboardArrowDown,
+  KeyboardArrowUp,
+} from "@mui/icons-material";
+import { IconButton, Stack } from "@mui/material";
+import type React from "react";
+import { useSnackbarStore } from "@/context/useSnackbar";
+import { formatFoodName } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
 import type { SelectLoggedMeal } from "../../../../../packages/db/src/schema";
 import { ProgressDonut } from "../progress-donut";
@@ -45,32 +54,81 @@ function compileMealData(
 interface Props {
   dateString: string;
   mealsEaten: LoggedMealJoinedWithNutrition[];
+  userId: string;
 }
 
 const NutritionBreakdown = ({ dateString, mealsEaten }: Props) => {
+  const { showSnackbar } = useSnackbarStore();
   const nutrition: NutritionData = compileMealData(mealsEaten);
 
   const utils = trpc.useUtils();
-  const deleteLoggedMealMutation = trpc.nutrition.deleteLoggedMeal.useMutation({
-    onSuccess: () => {
-      //TODO: Replace this with a shad/cn sonner or equivalent.
-      alert(`Removed dish from your log`);
+
+  const updateMealMutation = trpc.nutrition.updateLoggedMeal.useMutation({
+    onSuccess: (data) => {
+      showSnackbar(
+        `Updated ${formatFoodName(data.dishName)} quantity`,
+        "success",
+      );
       utils.nutrition.invalidate();
     },
-    onError: (error: Error) => {
-      console.error(error.message);
+    onError: (error) => {
+      console.error(error);
+      showSnackbar("Failed to update quantity", "error");
     },
   });
 
-  const removeBtnOnClick = (
-    e: React.MouseEvent,
-    userId: string | null,
-    dishId: string | null,
-  ) => {
-    e.preventDefault();
-    if (!userId || !dishId) return;
+  const deleteMealMutation = trpc.nutrition.deleteLoggedMeal.useMutation({
+    onSuccess: (data) => {
+      showSnackbar(
+        `Removed ${formatFoodName(data.dishName)} from your log`,
+        "success",
+      );
+      utils.nutrition.invalidate();
+    },
+    onError: (error) => {
+      console.error(error);
+      showSnackbar("Failed to remove meal from your log", "error");
+    },
+  });
 
-    deleteLoggedMealMutation.mutate({ userId, dishId });
+  const handleAdjustQuantity = (
+    meal: LoggedMealJoinedWithNutrition,
+    newServings: number,
+  ) => {
+    if (newServings < 0.5) {
+      showSnackbar("Minimum serving size is 0.5", "error");
+      return;
+    }
+
+    updateMealMutation.mutate({
+      id: meal.id,
+      servings: newServings,
+    });
+  };
+
+  const handleIncreaseQuantity = (
+    e: React.MouseEvent,
+    meal: LoggedMealJoinedWithNutrition,
+  ) => {
+    e.stopPropagation();
+    const newServings = meal.servings + 0.5;
+    handleAdjustQuantity(meal, newServings);
+  };
+
+  const handleDecreaseQuantity = (
+    e: React.MouseEvent,
+    meal: LoggedMealJoinedWithNutrition,
+  ) => {
+    e.stopPropagation();
+    const newServings = Math.max(0.5, meal.servings - 0.5);
+    handleAdjustQuantity(meal, newServings);
+  };
+
+  const removeBtnOnClick = (e: React.MouseEvent, id: string | null) => {
+    e.preventDefault();
+    if (!id) return;
+
+    deleteMealMutation.mutate({ id });
   };
 
   return (
@@ -116,7 +174,7 @@ const NutritionBreakdown = ({ dateString, mealsEaten }: Props) => {
             key={meal.id}
             className="flex items-center justify-between gap-4 rounded-lg border p-4 mb-3"
           >
-            <div className="flex flex-col">
+            <div className="flex flex-col flex-1">
               <h3 className="font-medium">
                 {meal.servings} serving{meal.servings > 1 ? "s" : ""} of{" "}
                 {meal.dishName}
@@ -129,13 +187,51 @@ const NutritionBreakdown = ({ dateString, mealsEaten }: Props) => {
               </p>
             </div>
 
-            <button
-              type="button"
-              className="h-8 rounded-md border px-3 text-sm transition-colors hover:bg-accent hover:text-accent-foreground"
-              onClick={(e) => removeBtnOnClick(e, meal.userId, meal.dishId)}
+            <Stack direction="column" spacing={0.5}>
+              <IconButton
+                size="small"
+                onClick={(e) => handleIncreaseQuantity(e, meal)}
+                sx={{
+                  border: "1px solid",
+                  borderColor: "divider",
+                  borderRadius: "4px",
+                  padding: "2px",
+                }}
+              >
+                <KeyboardArrowUp fontSize="small" />
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={(e) => handleDecreaseQuantity(e, meal)}
+                disabled={meal.servings <= 0.5}
+                sx={{
+                  border: "1px solid",
+                  borderColor: "divider",
+                  borderRadius: "4px",
+                  padding: "2px",
+                }}
+              >
+                <KeyboardArrowDown fontSize="small" />
+              </IconButton>
+            </Stack>
+
+            <IconButton
+              aria-label="delete"
+              size="small"
+              color="error"
+              onClick={(e) => removeBtnOnClick(e, meal.id)}
+              sx={{
+                border: "1px solid",
+                borderColor: "error.main",
+                borderRadius: "6px",
+                "&:hover": {
+                  backgroundColor: "error.main",
+                  color: "white",
+                },
+              }}
             >
-              Remove
-            </button>
+              <DeleteOutline fontSize="small" />
+            </IconButton>
           </div>
         ))}
       </div>

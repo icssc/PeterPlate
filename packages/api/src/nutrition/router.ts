@@ -39,6 +39,31 @@ export const nutritionRouter = createTRPCRouter({
 
       return result[0];
     }),
+  updateLoggedMeal: publicProcedure
+    .input(
+      z.object({
+        id: z.string().uuid(),
+        servings: z.number().min(0.5),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const result = await ctx.db
+        .update(loggedMeals)
+        .set({
+          servings: input.servings,
+        })
+        .where(eq(loggedMeals.id, input.id))
+        .returning();
+
+      if (!result[0]) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Logged meal not found",
+        });
+      }
+
+      return result[0];
+    }),
   getMealsInLastWeek: publicProcedure
     .input(
       z.object({
@@ -80,19 +105,13 @@ export const nutritionRouter = createTRPCRouter({
   deleteLoggedMeal: publicProcedure
     .input(
       z.object({
-        userId: z.string(),
-        dishId: z.string(),
+        id: z.string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       const result = await ctx.db
         .delete(loggedMeals)
-        .where(
-          and(
-            eq(loggedMeals.userId, input.userId),
-            eq(loggedMeals.dishId, input.dishId),
-          ),
-        )
+        .where(eq(loggedMeals.id, input.id))
         .returning();
 
       if (!result[0]) {

@@ -14,9 +14,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "lh4.googleusercontent.com" },
       { protocol: "https", hostname: "lh5.googleusercontent.com" },
       { protocol: "https", hostname: "lh6.googleusercontent.com" },
-
       { protocol: "https", hostname: "delivery-p140432-e1469601.adobeaemcloud.com" },
-      
     ],
   },
   /* webpack: (config) => {

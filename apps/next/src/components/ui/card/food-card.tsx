@@ -1,10 +1,16 @@
 "use client";
 
-import { FavoriteBorder, Restaurant, StarBorder } from "@mui/icons-material";
+import {
+  AddCircleOutline,
+  FavoriteBorder,
+  Restaurant,
+  StarBorder,
+} from "@mui/icons-material";
 import { Card, CardContent, Dialog, Drawer } from "@mui/material";
 import type { DishInfo } from "@peterplate/api";
 import Image from "next/image";
 import React from "react";
+import { useSnackbarStore } from "@/context/useSnackbar";
 import { useUserStore } from "@/context/useUserStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { formatFoodName, getFoodIcon } from "@/utils/funcs";
@@ -67,6 +73,7 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
     ref,
   ) => {
     const userId = useUserStore((state) => state.userId);
+    const { showSnackbar } = useSnackbarStore();
     const IconComponent = getFoodIcon(dish.name) ?? Restaurant;
     const [imageError, setImageError] = React.useState(false);
     const showImage =
@@ -85,48 +92,14 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
     const averageRating = ratingData?.averageRating ?? 0;
     const ratingCount = ratingData?.ratingCount ?? 0;
 
-    // const caloricInformationAvailable: boolean =
-    //   dish.nutritionInfo.calories != null &&
-    //   dish.nutritionInfo.calories.length > 0;
-
-    const utils = trpc.useUtils();
-    const logMealMutation = trpc.nutrition.logMeal.useMutation({
-      onSuccess: () => {
-        //TODO: Replace this with a shad/cn sonner or equivalent.
-        alert(`Added ${formatFoodName(dish.name)} to your log`);
-        utils.nutrition.invalidate();
-      },
-      onError: (error) => {
-        console.error(error.message);
-      },
-    });
-
-    const _handleLogMeal = (e: React.MouseEvent) => {
-      e.stopPropagation();
-
-      // TODO: use [MUI snackbar](https://mui.com/material-ui/react-snackbar/) to warn users.
-      if (!userId) {
-        alert("Login to track meals!");
-        return;
-      }
-
-      logMealMutation.mutate({
-        dishId: dish.id,
-        userId: userId,
-        dishName: dish.name,
-        servings: 1, // Default to 1 serving (TODO: add ability to manually input servings. Maybe a popup will ask to input a multiple of 0.5)
-      });
-    };
-
     const handleFavoriteClick = (
       event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     ) => {
       event.preventDefault();
       event.stopPropagation();
 
-      // TODO: use [MUI snackbar](https://mui.com/material-ui/react-snackbar/) to warn users of
       if (!userId) {
-        alert("Login to favorite meals!");
+        showSnackbar("Login to favorite meals!", "error");
         return;
       }
 
@@ -252,18 +225,6 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                     </p>
                   )}
                 </div>
-
-                {/*//TODO: Add user feedback on clicking button (e.g. changing Icon, making it green) */}
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onAddToMealTracker?.(e);
-                  }}
-                >
-                  <AddCircleOutline />
-                </button>
-
               </div>
               <div className="flex items-center">
                 <button
@@ -332,10 +293,10 @@ export default function FoodCard({
   const [open, setOpen] = React.useState(false);
   const userId = useUserStore((s) => s.userId);
   const utils = trpc.useUtils();
+  const { showSnackbar } = useSnackbarStore();
   const logMealMutation = trpc.nutrition.logMeal.useMutation({
     onSuccess: () => {
-      // TODO: Replace with shadcn sonner or equivalent
-      alert(`Added ${formatFoodName(dish.name)} to your log`);
+      showSnackbar(`Added ${formatFoodName(dish.name)} to your log`, "success");
       utils.nutrition.invalidate();
     },
     onError: (error) => {
@@ -349,7 +310,7 @@ export default function FoodCard({
   const handleAddToMealTracker = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!userId) {
-      alert("Login to track meals!");
+      showSnackbar("Login to track meals!", "error");
       return;
     }
     logMealMutation.mutate({
@@ -450,80 +411,3 @@ export default function FoodCard({
       </>
     );
 }
-
-// <div ref={ref} {...divProps} className={cn("w-full", className)}>
-//   <Card
-//     className="cursor-pointer hover:shadow-lg transition w-full border"
-//     sx={{ borderRadius: "16px" }}
-//   >
-//     <CardContent sx={{ padding: "0 !important" }}>
-//       <div className="flex justify-between h-full p-6">
-//         <div className="flex items-center gap-6 w-full">
-//           {IconComponent && (
-//             <IconComponent className="w-10 h-10 text-slate-700" />
-//           )}
-//           <div className="flex flex-col">
-//             <strong>{formatFoodName(dish.name)}</strong>
-//             <div className="flex gap-2 items-center">
-//               <span>
-//                 {dish.nutritionInfo.calories == null
-//                   ? "-"
-//                   : `${Math.round(parseFloat(dish.nutritionInfo.calories))} cal`}
-//               </span>
-//               {dish.restaurant && (
-//                 <>
-//                   <span className="text-zinc-400">•</span>
-//                   <span className="text-zinc-500">
-//                     {toTitleCase(dish.restaurant)}
-//                   </span>
-//                 </>
-//               )}
-//               {/* Average rating display - grey outline star */}
-//               <div className="flex gap-1 items-center">
-//                 <Star
-//                   className="w-4 h-4 stroke-zinc-200"
-//                   strokeWidth={1}
-//                 />
-//                 <span className="text-zinc-400 text-sm">
-//                   {averageRating.toFixed(1)} ({ratingCount})
-//                 </span>
-//               </div>
-//             </div>
-//           </div>
-//           {/*//TODO: Add user feedback on clicking button (e.g. changing Icon, making it green) */}
-//           <button onClick={handleLogMeal}>
-//             <CirclePlus />
-//           </button>
-//         </div>
-//         <div className="flex items-start">
-//           <button
-//             type="button"
-//             aria-label={
-//               isFavorited
-//                 ? "Remove meal from favorites"
-//                 : "Add meal to favorites"
-//             }
-//             aria-pressed={isFavorited}
-//             disabled={favoriteDisabled}
-//             onClick={handleFavoriteClick}
-//             className={cn(
-//               "rounded-full p-2 transition",
-//               favoriteDisabled
-//                 ? "opacity-60"
-//                 : "hover:bg-rose-50 hover:text-rose-600",
-//             )}
-//           >
-//             <Heart
-//               className={cn(
-//                 "w-5 h-5",
-//                 isFavorited
-//                   ? "fill-rose-500 stroke-rose-500"
-//                   : "stroke-zinc-500",
-//               )}
-//             />
-//           </button>
-//         </div>
-//       </div>
-//     </CardContent>
-//   </Card>
-// </div>

@@ -70,6 +70,7 @@ export default function MyAccountPage() {
           {isLoggedIn ? (
             // Logged-in password reset
             <div className="space-y-2">
+              {/* TODO: Replace these inputs with MUI inputs */}
               <input
                 type="password"
                 placeholder="Current password"
@@ -114,6 +115,7 @@ export default function MyAccountPage() {
         </section>
 
         {/* Debug button just for testing change in UI */}
+        {/* TODO: Remove */}
         <button
           type="button"
           onClick={() => setIsLoggedIn(!isLoggedIn)}

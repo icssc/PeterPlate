@@ -1,3 +1,4 @@
+import type React from "react";
 import { cn } from "@/utils/tw";
 import { HallStatusEnum } from "@/utils/types";
 
@@ -49,7 +50,7 @@ function DiningHallStatus({
   status,
   openTime,
   closeTime,
-}: StatusProps): JSX.Element {
+}: StatusProps): React.JSX.Element {
   let statusMessage: string = "";
 
   switch (status) {
