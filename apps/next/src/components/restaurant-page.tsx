@@ -146,6 +146,7 @@ export function RestaurantPage({
   const [scheduleAnchor, setScheduleAnchor] = useState<HTMLElement | null>(
     null,
   );
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
 
   useEffect(() => {
     if (!selectedDate || periods.length === 0) {
@@ -226,33 +227,44 @@ export function RestaurantPage({
         {/* Mobile Header Overlay */}
         {!isDesktop && (
           <div className="absolute bottom-0 left-0 p-4 w-full text-white">
-            <Typography
-              variant="h3"
-              fontWeight={700}
-              className="mb-1 text-white"
-            >
-              {hall === HallEnum.ANTEATERY ? "Anteatery" : "Brandywine"}
-            </Typography>
-            <div className="flex items-center gap-2 text-sm font-medium mb-1 text-sky-700">
-              {openTime && closeTime ? (
-                <>
-                  <div
-                    className={`w-2.5 h-2.5 rounded-full ${derivedHallStatus === HallStatusEnum.OPEN ? "bg-green-500" : "bg-red-500"}`}
-                  />
-                  <span>
-                    {derivedHallStatus === HallStatusEnum.OPEN
-                      ? "Open"
-                      : "Closed"}
-                  </span>
-                </>
-              ) : null}
+            <div className="flex items-center gap-2">
+              <Typography
+                variant="h4"
+                fontWeight={700}
+                className="mb-1 text-white"
+              >
+                {hall === HallEnum.ANTEATERY ? "Anteatery" : "Brandywine"}
+              </Typography>
+              <div className="flex items-center gap-2 pl-1 text-md font-small text-white">
+                {openTime && closeTime ? (
+                  <>
+                    <div
+                      className={`w-2.5 h-2.5 rounded-full ${derivedHallStatus === HallStatusEnum.OPEN ? "bg-green-500" : "bg-red-500"}`}
+                    />
+                    <span>
+                      {derivedHallStatus === HallStatusEnum.OPEN
+                        ? "Open"
+                        : "Closed"}
+                    </span>
+                  </>
+                ) : null}
+              </div>
             </div>
-            <p className="text-xs text-gray-200 flex items-center gap-1">
+            <Link
+              href={
+                hall === HallEnum.ANTEATERY
+                  ? ANTEATERY_MAP_LINK_URL
+                  : BRANDYWINE_MAP_LINK_URL
+              }
+              target="_blank"
+              rel="noopener noreferrer"
+              className="!text-xs !text-gray-200 flex items-center gap-1 underline-offset-2 !underline !decoration-white"
+            >
               <LocationOn className="text-[14px]" />
               {hall === HallEnum.ANTEATERY
                 ? "4001 Mesa Rd, Irvine, CA 92617"
                 : "Middle Earth Community Irvine, CA 92697"}
-            </p>
+            </Link>
           </div>
         )}
       </div>
@@ -381,15 +393,23 @@ export function RestaurantPage({
                               isSameDay(date, enabledDate),
                             )
                           }
+                          open={isDatePickerOpen}
+                          onOpen={() => setIsDatePickerOpen(true)}
+                          onClose={() => setIsDatePickerOpen(false)}
                           slotProps={{
                             textField: {
                               size: "small",
                               fullWidth: true,
+                              onClick: () => setIsDatePickerOpen(true),
                               InputLabelProps: {
                                 className: "!text-sky-700",
                               },
+                              inputProps: {
+                                readOnly: true,
+                                className: "!cursor-pointer",
+                              },
                               className:
-                                "bg-white [&_fieldset]:!border-sky-700 [&:hover_fieldset]:!border-sky-700 [&_.Mui-focused_fieldset]:!border-sky-700 [&_.MuiSvgIcon-root]:!text-sky-700",
+                                "bg-white [&_fieldset]:!border-sky-700 [&:hover_fieldset]:!border-sky-700 [&_.Mui-focused_fieldset]:!border-sky-700 [&_.MuiSvgIcon-root]:!text-sky-700 !cursor-pointer",
                             },
                             openPickerIcon: {
                               className: "!text-sky-700",
@@ -431,7 +451,7 @@ export function RestaurantPage({
                 {!isLoading && !isError && dishes.length > 0 && (
                   <div
                     className={
-                      isDesktop ? "flex gap-2" : "w-full flex gap-1 mt-2"
+                      isDesktop ? "flex gap-2" : "w-full flex gap-2 mt-2"
                     }
                   >
                     {/* Mobile-only dropdowns */}
@@ -441,7 +461,7 @@ export function RestaurantPage({
                         <>
                           <Button
                             variant="outlined"
-                            className="flex-1 justify-between h-8 px-2 text-xs border-slate-200 text-slate-700 hover:bg-slate-50"
+                            className="!flex-[1] !h-8 !px-1 text-xs !border-sky-700 !text-black hover:bg-sky-100 !flex-nowrap !items-center"
                             type="button"
                             onClick={(e) => setMenuAnchor(e.currentTarget)}
                           >
@@ -500,12 +520,14 @@ export function RestaurantPage({
                         <>
                           <Button
                             variant="outlined"
-                            className="flex-[1.5] justify-between h-8 px-2 text-xs border-slate-200 text-slate-700 hover:bg-slate-50"
+                            className="!flex-[1.5] !h-8 !px-1 text-xs !border-sky-700 !text-black hover:bg-sky-100 !flex-nowrap !items-center"
                             type="button"
                             onClick={(e) => setScheduleAnchor(e.currentTarget)}
                           >
-                            Special Schedules{" "}
-                            <MoreVert className="h-3 w-3 ml-1" />
+                            <span className="whitespace-nowrap overflow-hidden text-ellipsis">
+                              Special Schedules
+                            </span>
+                            <MoreVert className="h-3 w-3 ml-1 shrink-0" />
                           </Button>
                           <Popover
                             open={Boolean(scheduleAnchor)}
