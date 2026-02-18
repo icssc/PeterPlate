@@ -66,7 +66,7 @@ const EventCardContent = React.forwardRef<
   return (
     <div ref={ref} {...divProps}>
       <Card
-        className="cursor-pointer hover:shadow-lg transition h-full"
+        className="cursor-pointer hover:shadow-lg transition h-full dark:bg-zinc-900 dark:border-zinc-800"
         sx={{ borderRadius: "6px" }}
       >
         <div className="p-7 pb-2 relative">
@@ -81,10 +81,12 @@ const EventCardContent = React.forwardRef<
         </div>
         <CardContent className="flex flex-col gap-2 p-4">
           <div className="flex flex-row gap-2 items-center">
-            <h3 className="text-lg font-semibold text-sky-700">{props.name}</h3>
+            <h3 className="text-lg font-semibold text-sky-700 dark:text-sky-400">
+              {props.name}
+            </h3>
             {props.isOngoing && <OngoingBadge />}
           </div>
-          <div className="flex flex-col gap-2 text-sm text-zinc-500 mt-1">
+          <div className="flex flex-col gap-2 text-sm text-zinc-500 dark:text-zinc-400 mt-1">
             <div className="flex gap-3 items-center">
               <CalendarTodayOutlinedIcon sx={{ fontSize: 16 }} />
               <span>
@@ -106,7 +108,9 @@ const EventCardContent = React.forwardRef<
               <span>{toTitleCase(HallEnum[props.location])}</span>
             </div>
           </div>
-          <p className="text-sm text-zinc-900 mt-2">{props.longDesc}</p>
+          <p className="text-sm text-zinc-900 dark:text-zinc-100 mt-2">
+            {props.longDesc}
+          </p>
         </CardContent>
       </Card>
     </div>
@@ -143,6 +147,7 @@ export default function EventCard(props: EventInfo): React.JSX.Element {
           slotProps={{
             paper: {
               sx: {
+                bgcolor: "background.paper",
                 width: "570px",
                 maxWidth: "90vw",
                 margin: 2,
@@ -168,6 +173,7 @@ export default function EventCard(props: EventInfo): React.JSX.Element {
           slotProps={{
             paper: {
               sx: {
+                bgcolor: "background.paper",
                 maxWidth: "100vw", // ✅ Full width on mobile
                 margin: 0, // ✅ Remove side margins
                 overflow: "hidden",
@@ -178,6 +184,7 @@ export default function EventCard(props: EventInfo): React.JSX.Element {
           }}
           sx={{
             "& .MuiDrawer-paper": {
+              bgcolor: "background.paper",
               maxHeight: "90vh", // ✅ Don't take full screen
               height: "auto",
             },

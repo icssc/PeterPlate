@@ -35,7 +35,7 @@ export default function EventDialogContent(
       </div>
       <DialogContent
         sx={{ padding: "20px 24px 24px !important" }}
-        className="flex flex-col gap-2"
+        className="flex flex-col gap-2 dark:bg-zinc-800 dark:text-zinc-400"
       >
         <h2 className="text-2xl font-semibold text-sky-700 leading-tight">
           {props.name}

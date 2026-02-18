@@ -101,17 +101,17 @@ const Events = () => {
 
   return (
     <div className="max-w-full h-screen ">
-      <div className="fixed top-0 left-0 w-full h-16 bg-sky-700/30 z-0" />
+      <div className="fixed top-0 left-0 w-full h-16 bg-sky-700/30 dark:bg-sky-900/40 z-0" />
       <div className="z-0 flex flex-col h-full overflow-x-hidden">
         <div
           className="flex flex-col gap-4 justify-center w-full p-5 pt-16 sm:px-12 sm:py-8 sm:pt-20"
           id="event-scroll"
         >
           <div>
-            <h1 className="text-4xl font-bold text-sky-700">
+            <h1 className="text-4xl font-bold text-sky-700 dark:text-sky-400">
               Dining Hall Events
             </h1>
-            <p className="text-zinc-600 mt-1 font-medium">
+            <p className="text-zinc-600 dark:text-zinc-400 mt-1 font-medium">
               Join us for special events and celebrations hosted at your local
               dining halls!
             </p>
@@ -150,9 +150,9 @@ const Events = () => {
             </div>
 
             {/* Filter Bar */}
-            <div className="flex flex-wrap gap-8 w-full bg-sky-100 rounded-lg p-5 pb-8 mt-4">
+            <div className="flex flex-wrap gap-8 w-full bg-sky-100 dark:bg-zinc-900/50 border dark:border-zinc-800 rounded-lg p-5 pb-8 mt-4">
               <div className="flex flex-col gap-3">
-                <span className="text-sm font-medium text-slate-900">
+                <span className="text-sm font-medium text-slate-900 dark:text-zinc-200">
                   Event Type
                 </span>
                 <div className="flex gap-3">
@@ -162,8 +162,8 @@ const Events = () => {
                     onClick={() => setSelectedEventType("both")}
                     className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
                       selectedEventType === "both"
-                        ? "!bg-sky-700 dark:!bg-sky-400 !text-white !border-sky-700 dark:!border-sky-400 hover:!bg-sky-800 dark:hover:!bg-sky-500 hover:!text-white"
-                        : "!bg-white dark:!bg-zinc-800 !border-sky-700 dark:!border-sky-400 !text-slate-900 dark:!text-zinc-100 hover:!bg-sky-50 dark:hover:!bg-zinc-700 hover:!text-slate-900"
+                        ? "!bg-sky-700 dark:!bg-sky-400 !text-white !border-sky-700 dark:!border-sky-400 hover:!bg-sky-800 dark:hover:!bg-sky-500"
+                        : "!bg-white dark:!bg-zinc-800 !border-sky-700 dark:!border-sky-400 !text-slate-900 dark:!text-zinc-100 hover:!bg-sky-50 dark:hover:!bg-zinc-700"
                     }`}
                   >
                     All Events
@@ -256,7 +256,7 @@ const Events = () => {
           {/* GRID DISPLAY: Map over the fetched events once loaded */}
           {!isLoading && !error && viewMode === "grid" && (
             <>
-              <p className="text-sm text-zinc-700">
+              <p className="text-sm text-zinc-700 dark:text-zinc-400">
                 Showing {filteredEvents.length} event
                 {filteredEvents.length !== 1 ? "s" : ""}
               </p>

@@ -66,7 +66,7 @@ const CalendarView = ({
     isSameMonth(currentDate, new Date());
 
   return (
-    <div className="border-2 border-sky-700 p-4 rounded-lg">
+    <div className="border-2 border-sky-700 p-4 rounded-lg bg-white dark:bg-zinc-950 transition-colors events-calendar-wrapper">
       {/* CUSTOM TOOLBAR */}
       <div className="flex items-center justify-center">
         <div className="text-center flex items-center justify-center text-sky-700 font-medium">
@@ -89,20 +89,22 @@ const CalendarView = ({
       </div>
 
       {/* MAIN CALENDAR */}
-      <Calendar
-        localizer={localizer}
-        events={calendarEvents}
-        date={currentDate}
-        onNavigate={() => {}}
-        startAccessor="start"
-        endAccessor="end"
-        style={{ height: 500 }}
-        defaultView="month"
-        views={["month"]}
-        toolbar={false}
-        selectable
-        onSelectEvent={onSelectEvent}
-      />
+      <div className="dark:[&_.rbc-today]:!bg-sky-900/30 dark:[&_.rbc-header]:!border-zinc-700">
+        <Calendar
+          localizer={localizer}
+          events={calendarEvents}
+          date={currentDate}
+          onNavigate={() => {}}
+          startAccessor="start"
+          endAccessor="end"
+          style={{ height: 500 }}
+          defaultView="month"
+          views={["month"]}
+          toolbar={false}
+          selectable
+          onSelectEvent={onSelectEvent}
+        />
+      </div>
 
       {/* DESKTOP MODAL */}
       {isDesktop && (
