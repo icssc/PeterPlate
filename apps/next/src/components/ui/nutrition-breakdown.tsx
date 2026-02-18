@@ -1,4 +1,5 @@
 import { useSnackbarStore } from "@/context/useSnackbar";
+import { formatFoodName } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
 import type { SelectLoggedMeal } from "../../../../../packages/db/src/schema";
 import { ProgressDonut } from "../progress-donut";
@@ -46,9 +47,10 @@ function compileMealData(
 interface Props {
   dateString: string;
   mealsEaten: LoggedMealJoinedWithNutrition[];
+  userId: string;
 }
 
-const NutritionBreakdown = ({ dateString, mealsEaten }: Props) => {
+const NutritionBreakdown = ({ dateString, mealsEaten, userId }: Props) => {
   const { showSnackbar } = useSnackbarStore();
   const nutrition: NutritionData = compileMealData(mealsEaten);
 
@@ -72,6 +74,95 @@ const NutritionBreakdown = ({ dateString, mealsEaten }: Props) => {
     if (!userId || !dishId) return;
 
     deleteLoggedMealMutation.mutate({ userId, dishId });
+  };
+
+  const logMealMutation = trpc.nutrition.logMeal.useMutation({
+    onSuccess: () => {
+      showSnackbar(`Added ${formatFoodName(dish.name)} to your log`, "success");
+      utils.nutrition.invalidate();
+    },
+    onError: (error) => {
+      console.error(error);
+      showSnackbar("Failed to add meal to your log", "error");
+    },
+  });
+
+  const deleteMealMutation = trpc.nutrition.deleteLoggedMeal.useMutation({
+    onSuccess: () => {
+      showSnackbar(
+        `Removed ${formatFoodName(dish.name)} from your log`,
+        "success",
+      );
+      utils.nutrition.invalidate();
+    },
+    onError: (error) => {
+      console.error(error);
+      showSnackbar("Failed to remove meal from your log", "error");
+    },
+  });
+
+  const _handleLogMeal = (e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    if (!userId) {
+      showSnackbar(
+        "You must be signed in to track meals. Please sign in to continue.",
+        "error",
+      );
+      return;
+    }
+
+    logMealMutation.mutate({
+      dishId: dish.id,
+      userId: userId,
+      dishName: dish.name,
+      servings: 1,
+    });
+  };
+
+  const handleAdjustQuantity = (newServings: number) => {
+    // Servings are multiples of 0.5
+    if (newServings < 0.5) {
+      showSnackbar("Minimum serving size is 0.5", "error");
+      return;
+    }
+
+    // Delete and insert again with new servings
+    deleteMealMutation.mutate(
+      { userId: userId, dishId: dish.id },
+      {
+        onSuccess: () => {
+          logMealMutation.mutate({
+            dishId: dish.id,
+            userId: userId,
+            dishName: dish.name,
+            servings: newServings,
+          });
+        },
+      },
+    );
+  };
+
+  const _handleRemoveMeal = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!userId) return;
+
+    deleteMealMutation.mutate({
+      userId: userId,
+      dishId: dish.id,
+    });
+  };
+
+  const _handleIncreaseQuantity = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const newServings = loggedMeal.servings + 0.5;
+    handleAdjustQuantity(newServings);
+  };
+
+  const _handleDecreaseQuantity = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const newServings = Math.max(0.5, loggedMeal.servings - 0.5);
+    handleAdjustQuantity(newServings);
   };
 
   return (
