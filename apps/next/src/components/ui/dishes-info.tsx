@@ -111,7 +111,7 @@ export default function DishesInfo({
                       !!isFavoritesLoading || !!isFavoritePending?.(dish.id)
                     }
                     onToggleFavorite={onToggleFavorite}
-                    isSimplified={isCompactView}
+                    isCompact={isCompactView}
                   />
                 ))}
               </div>

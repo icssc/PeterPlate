@@ -133,7 +133,7 @@ export default function Toolbar(): React.JSX.Element {
     <>
       <AppBar
         position="absolute"
-        className="bg-transparent shadow-none 
+        className="bg-transparent shadow-none bg-none
         hover:bg-gradient-to-b from-black/50 to-black/0"
       >
         <MuiToolbar className="justify-between px-4 py-1 group">

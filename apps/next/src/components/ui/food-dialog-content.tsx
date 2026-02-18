@@ -1,10 +1,11 @@
 "use client"; // Need state for toggling nutrient visibility
 
 import { Add, StarBorder } from "@mui/icons-material";
-import { Button, DialogContent } from "@mui/material";
+import { Button, DialogContent, Tooltip } from "@mui/material";
 import type { DishInfo } from "@peterplate/api";
 import Image from "next/image";
 import { useState } from "react";
+import { useUserStore } from "@/context/useUserStore";
 import {
   enhanceDescription,
   formatFoodName,
@@ -15,10 +16,10 @@ import {
 import { trpc } from "@/utils/trpc";
 import { cn } from "@/utils/tw";
 import { nutrientToUnit } from "@/utils/types";
-import type { OnAddToMealTracker } from "./card/food-card";
 import IngredientsDialog from "../ingredients-dialog";
 import { AllergenBadge } from "./allergen-badge";
-import InteractiveStarRating from "./interactive-star-rating";
+import type { OnAddToMealTracker } from "./card/food-card";
+import Rating from "./rating";
 
 /**
  * `FoodDialogContent` renders the detailed view of a food item (dish) within a dialog.
@@ -77,7 +78,7 @@ export default function FoodDialogContent({
     { staleTime: 5 * 60 * 1000 },
   );
   const averageRating = ratingData?.averageRating ?? 0;
-  // const ratingCount = ratingData?.ratingCount ?? 0;
+  const userId = useUserStore((s) => s.userId);
 
   return (
     <div className="font-poppins flex flex-col max-h-[90vh]">
@@ -101,7 +102,13 @@ export default function FoodDialogContent({
       )}
       <div className="max-w-lg mx-auto w-full flex-1 min-h-0 flex flex-col">
         <DialogContent
-          sx={{ padding: "0 16px !important", flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}
+          sx={{
+            padding: "0 16px !important",
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            minHeight: 0,
+          }}
         >
           <div className="flex-1 min-h-0 overflow-y-auto flex flex-col gap-6 pt-4 pb-4">
             <div className="flex flex-col gap-2">
@@ -109,15 +116,21 @@ export default function FoodDialogContent({
                 className="flex justify-between px-4 items-center"
                 id="food-header-info"
               >
-                <div className="flex gap-3 items-center">
-                  <h2 className="text-3xl font-bold leading-tight tracking-normal text-sky-700">
+                <div className="flex gap-3 items-center pr-2">
+                  <h2
+                    className={cn(
+                      "text-3xl font-bold leading-tight tracking-normal",
+                      "text-sky-700 dark:text-sky-600",
+                      dish.name.length > 10 && "text-2xl",
+                      dish.name.length > 30 && "text-md",
+                    )}
+                  >
                     {formatFoodName(dish.name)}
                   </h2>
-                  {/* <Pin className="stroke-zinc-500"/> */}
                 </div>
-                <InteractiveStarRating dishId={dish.id} />
+                <Rating dishId={dish.id} />
               </div>
-              <div className="px-4 flex flex-wrap items-center gap-2 text-zinc-500">
+              <div className="px-4 flex flex-wrap items-center gap-2 text-zinc-500 dark:text-zinc-400">
                 <span className="whitespace-nowrap flex items-center gap-1">
                   <StarBorder
                     className="w-4 h-4 stroke-zinc-400"
@@ -143,7 +156,7 @@ export default function FoodDialogContent({
                   )}
                 </div>
               </div>
-              <p className="text-black px-4 leading-relaxed">
+              <p className="text-black dark:text-zinc-300 px-4 leading-relaxed">
                 {enhanceDescription(dish.name, dish.description)}
               </p>
               <div>
@@ -170,10 +183,12 @@ export default function FoodDialogContent({
                           <div
                             key={nutrientKey}
                             className={cn(
-                              "grid grid-cols-subgrid col-span-2 transition-all duration-500 ease-in-out overflow-hidden", // Base styles for transition
+                              "grid grid-cols-subgrid col-span-2",
+                              "transition-all duration-500 ease-in-out",
+                              "overflow-hidden dark:text-zinc-300",
                               !isInitial && !showAllNutrients
                                 ? "max-h-0 opacity-0 py-0"
-                                : "max-h-8 opacity-100 py-0.5", // Conditional styles for collapse/expand
+                                : "max-h-8 opacity-100 py-0.5",
                             )}
                           >
                             <strong
@@ -181,7 +196,7 @@ export default function FoodDialogContent({
                                 "col-span-1",
                                 (nutrientKey === "transFatG" ||
                                   nutrientKey === "saturatedFatG") &&
-                                  "text-gray-500 pl-4",
+                                  "text-zinc-500 pl-4",
                               )}
                             >
                               {formatNutrientLabel(nutrientKey)}
@@ -191,7 +206,7 @@ export default function FoodDialogContent({
                                 "col-span-1 text-right",
                                 (nutrientKey === "transFatG" ||
                                   nutrientKey === "saturatedFatG") &&
-                                  "text-gray-500",
+                                  "text-zinc-500",
                               )}
                             >
                               {value == null
@@ -245,7 +260,36 @@ export default function FoodDialogContent({
               </div>
             </div>
           </div>
-          {onAddToMealTracker && (
+          {!userId && (
+            <Tooltip
+              title="Log in to add meals to your tracker!"
+              placement="top"
+              slotProps={{
+                popper: {
+                  modifiers: [
+                    {
+                      name: "offset",
+                      options: {
+                        offset: [0, -16],
+                      },
+                    },
+                  ],
+                },
+              }}
+            >
+              <div className="px-4 pt-2 pb-6 shrink-0">
+                <button
+                  type="button"
+                  disabled={true}
+                  className="w-full inline-flex h-[30px] justify-center items-center gap-0.5 rounded-md border border-gray-300 bg-white text-[12px] font-normal leading-[18px] text-zinc-500 hover:bg-zinc-50 disabled:opacity-60"
+                >
+                  <Add sx={{ fontSize: 18, width: 18, height: 18 }} />
+                  Add to Meal Tracker
+                </button>
+              </div>
+            </Tooltip>
+          )}
+          {userId && onAddToMealTracker && (
             <div className="px-4 pt-2 pb-6 shrink-0">
               <button
                 type="button"
