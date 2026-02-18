@@ -225,17 +225,6 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                     </p>
                   )}
                 </div>
-
-                {/*//TODO: Add user feedback on clicking button (e.g. changing Icon, making it green) */}
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onAddToMealTracker?.(e);
-                  }}
-                >
-                  <AddCircleOutline />
-                </button>
               </div>
               <div className="flex items-center">
                 <button
