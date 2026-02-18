@@ -1,6 +1,6 @@
 "use client";
 
-import { AddCircleOutline, Restaurant, StarBorder } from "@mui/icons-material";
+import { Restaurant, StarBorder } from "@mui/icons-material";
 import { Card, CardContent, Dialog, Drawer, Typography } from "@mui/material";
 import type { DishInfo } from "@peterplate/api";
 import Image from "next/image";
@@ -182,17 +182,6 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                     </Typography>
                   )}
                 </div>
-
-                {/*//TODO: Add user feedback on clicking button (e.g. changing Icon, making it green) */}
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onAddToMealTracker?.(e);
-                  }}
-                >
-                  <AddCircleOutline />
-                </button>
               </div>
               <div className="flex items-center">
                 <Favorite
