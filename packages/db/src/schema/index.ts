@@ -13,6 +13,8 @@ export * from "./pushTokens";
 export * from "./ratings";
 export * from "./restaurants";
 export * from "./stations";
+export * from "./userAllergies";
+export * from "./userDietaryPreferences";
 export * from "./users";
 
 // import { drizzle } from 'drizzle-orm/node-postgres'; // or your DB driver

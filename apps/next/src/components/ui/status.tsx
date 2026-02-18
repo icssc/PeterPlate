@@ -64,6 +64,7 @@ function DiningHallStatus({
       break;
     case HallStatusEnum.PREVIEW:
       statusMessage = `Preview`;
+      break;
     default:
       break;
   }

@@ -1,9 +1,9 @@
 "use client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink } from "@trpc/client";
-import { ThemeProvider } from "next-themes";
 import { useEffect, useState } from "react";
 import superjson from "superjson";
+import { ThemeProvider } from "@/components/theme-provider";
 import Toolbar from "@/components/ui/toolbar";
 import { DateProvider } from "@/context/date-context";
 import { useUserStore } from "@/context/useUserStore";
@@ -58,12 +58,7 @@ export function RootClient({ children }: { children: React.ReactNode }) {
   }, [session, isPending, setUserId, clearUser]);
 
   return (
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="system"
-      enableSystem
-      disableTransitionOnChange
-    >
+    <ThemeProvider>
       <trpc.Provider client={trpcClient} queryClient={queryClient}>
         <QueryClientProvider client={queryClient}>
           <DateProvider>

@@ -7,32 +7,17 @@ import {
   LocationOn,
   Star,
 } from "@mui/icons-material";
-import { Dialog } from "@mui/material";
-import type { DishInfo } from "@peterplate/api";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
 
-import type { EventInfo } from "@/components/ui/card/event-card";
 import PopularDishCard from "@/components/ui/card/popular-dish-card";
 import UpcomingEventCard from "@/components/ui/card/upcoming-event-card";
-import EventDialogContent from "@/components/ui/event-dialog-content";
-import FoodDialogContent from "@/components/ui/food-dialog-content";
+import OnboardingDialog from "@/components/ui/onboarding";
 import Side from "@/components/ui/side";
 import { useDate } from "@/context/date-context";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-import {
-  formatFoodName,
-  getFoodIcon,
-  getHallDishData,
-  getPopularDishes,
-  militaryToStandard,
-  sortedEvents,
-  timeToString,
-  toTitleCase,
-} from "@/utils/funcs";
+import { getHallDishData, getPopularDishes, sortedEvents } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
-import { HallEnum, numToMonth } from "@/utils/types";
 
 export default function Home() {
   const isDesktop = useMediaQuery("(min-width: 768px)");
@@ -73,7 +58,7 @@ function DesktopHome(): React.JSX.Element {
 
   return (
     <div className="min-h-screen bg-white dark:bg-neutral-950">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-10">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8 mt-14">
         <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 dark:text-neutral-100">
           See what's on the menu today!
         </h1>
