@@ -43,7 +43,7 @@ export default function Favorite({
       )}
     >
       {!userId && (
-        <Tooltip title="Login to favorite dishes!" placement="top">
+        <Tooltip title="Log in to favorite dishes!" placement="top">
           <FavoriteBorder className="w-6 h-6 fill-zinc-300 dark:fill-zinc-600" />
         </Tooltip>
       )}

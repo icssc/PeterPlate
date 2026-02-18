@@ -12,7 +12,7 @@ export default function Rating({ dishId }: { dishId: string }) {
   if (userId == null)
     return (
       <Tooltip
-        title="Login to rate dishes!"
+        title="Log in to rate dishes!"
         placement="top"
         slotProps={{
           popper: {
