@@ -58,26 +58,6 @@ const NutritionBreakdown = ({ dateString, mealsEaten }: Props) => {
   const nutrition: NutritionData = compileMealData(mealsEaten);
 
   const utils = trpc.useUtils();
-  const deleteLoggedMealMutation = trpc.nutrition.deleteLoggedMeal.useMutation({
-    onSuccess: () => {
-      showSnackbar("Removed dish from your log", "success");
-      utils.nutrition.invalidate();
-    },
-    onError: (error) => {
-      console.error(error.message);
-    },
-  });
-
-  const removeBtnOnClick = (
-    e: React.MouseEvent,
-    userId: string | null,
-    dishId: string | null,
-  ) => {
-    e.preventDefault();
-    if (!userId || !dishId) return;
-
-    deleteLoggedMealMutation.mutate({ userId, dishId });
-  };
 
   const logMealMutation = trpc.nutrition.logMeal.useMutation({
     onSuccess: (data) => {
@@ -108,7 +88,7 @@ const NutritionBreakdown = ({ dateString, mealsEaten }: Props) => {
   });
 
   const handleAdjustQuantity = (
-    dish: LoggedMealJoinedWithNutrition,
+    meal: LoggedMealJoinedWithNutrition,
     newServings: number,
   ) => {
     if (newServings < 0.5) {
@@ -116,20 +96,12 @@ const NutritionBreakdown = ({ dateString, mealsEaten }: Props) => {
       return;
     }
 
-    // Delete and insert again with new servings
-    deleteMealMutation.mutate(
-      { userId: dish.userId, dishId: dish.id },
-      {
-        onSuccess: () => {
-          logMealMutation.mutate({
-            dishId: dish.id,
-            userId: dish.userId,
-            dishName: dish.dishName,
-            servings: newServings,
-          });
-        },
-      },
-    );
+    logMealMutation.mutate({
+      dishId: meal.dishId,
+      userId: meal.userId,
+      dishName: meal.dishName,
+      servings: newServings,
+    });
   };
 
   const handleIncreaseQuantity = (
@@ -148,6 +120,17 @@ const NutritionBreakdown = ({ dateString, mealsEaten }: Props) => {
     e.stopPropagation();
     const newServings = Math.max(0.5, meal.servings - 0.5);
     handleAdjustQuantity(meal, newServings);
+  };
+
+  const removeBtnOnClick = (
+    e: React.MouseEvent,
+    userId: string | null,
+    dishId: string | null,
+  ) => {
+    e.preventDefault();
+    if (!userId || !dishId) return;
+
+    deleteMealMutation.mutate({ userId, dishId });
   };
 
   return (

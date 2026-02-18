@@ -28,6 +28,12 @@ export const nutritionRouter = createTRPCRouter({
           servings: input.servings,
           eatenAt: input.eatenAt ?? new Date(),
         })
+        .onConflictDoUpdate({
+          target: loggedMeals.id,
+          set: {
+            servings: input.servings,
+          },
+        })
         .returning();
 
       if (!result[0]) {
