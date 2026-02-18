@@ -195,7 +195,10 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                 </button>
               </div>
               <div className="flex items-center">
-                <Favorite />
+                <Favorite
+                  dishId={dish.id}
+                  {...{ isFavorited, favoriteDisabled }}
+                />
               </div>
             </div>
           </CardContent>
