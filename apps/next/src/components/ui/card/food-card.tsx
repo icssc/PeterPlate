@@ -1,6 +1,11 @@
 "use client";
 
-import { FavoriteBorder, Restaurant, StarBorder } from "@mui/icons-material";
+import {
+  AddCircleOutline,
+  FavoriteBorder,
+  Restaurant,
+  StarBorder,
+} from "@mui/icons-material";
 import { Card, CardContent, Dialog, Drawer } from "@mui/material";
 import type { DishInfo } from "@peterplate/api";
 import Image from "next/image";
@@ -263,7 +268,6 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                 >
                   <AddCircleOutline />
                 </button>
-
               </div>
               <div className="flex items-center">
                 <button
@@ -319,6 +323,8 @@ interface FoodCardProps extends DishInfo {
   onToggleFavorite?: (dishId: string, currentlyFavorite: boolean) => void;
   /** Whether to render a simplified version of the card. */
   isSimplified?: boolean;
+  /** Optional class name for styling. */
+  className?: string;
 }
 
 export default function FoodCard({
@@ -326,6 +332,7 @@ export default function FoodCard({
   favoriteIsLoading = false,
   onToggleFavorite,
   isSimplified = false,
+  className,
   ...dish
 }: FoodCardProps): React.JSX.Element {
   const isDesktop = useMediaQuery("(min-width: 768px)");
@@ -371,6 +378,7 @@ export default function FoodCard({
           onAddToMealTracker={handleAddToMealTracker}
           isSimplified={isSimplified}
           onClick={handleOpen}
+          className={className}
         />
         <Dialog
           open={open}
@@ -411,6 +419,7 @@ export default function FoodCard({
           onAddToMealTracker={handleAddToMealTracker}
           isSimplified={isSimplified}
           onClick={handleOpen}
+          className={className}
         />
         <Drawer
           anchor="bottom"

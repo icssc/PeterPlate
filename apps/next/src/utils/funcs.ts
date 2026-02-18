@@ -271,7 +271,7 @@ function militaryToStandard(militaryTime: string): Date {
 }
 
 /**
- * Formats a time range from two Date objects into a string like "10:00a-2:30p".
+ * Formats a time range from two Date objects into a string like "10:00am-2:30pm".
  * @param openTime The start time.
  * @param closeTime The end time.
  * @returns A formatted string representing the time range.
@@ -289,7 +289,7 @@ function formatOpenCloseTime(openTime: Date, closeTime: Date): string {
   const openTimeMinutes: string = padMinutes(openTime.getMinutes());
   const closeTimeMinutes: string = padMinutes(closeTime.getMinutes());
 
-  return `${openTimeHours}:${openTimeMinutes}${openTimeIsAfternoon ? "p" : "a"}-${closeTimeHours}:${closeTimeMinutes}${closeTimeIsAfternoon ? "p" : "a"}`;
+  return `${openTimeHours}:${openTimeMinutes}${openTimeIsAfternoon ? "pm" : "am"}-${closeTimeHours}:${closeTimeMinutes}${closeTimeIsAfternoon ? "pm" : "am"}`;
 }
 
 /**

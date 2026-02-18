@@ -25,14 +25,14 @@ export function DatePicker({
     <Popover>
       <PopoverTrigger asChild>
         <Button
-          variant={"ghost"}
+          variant="ghost"
           className={cn(
-            "w-full justify-start text-left font-normal",
+            "w-full justify-between font-normal border border-[rgba(0,0,0,0.23)] rounded-md h-9 px-3 text-left",
             !date && "text-muted-foreground",
           )}
         >
-          <CalendarToday className="mr-2 h-4 w-4" />
-          {date ? format(date, "PPP") : <span>Pick a date</span>}
+          <span>{date ? format(date, "PPP") : "Pick a date"}</span>
+          <CalendarToday className="ml-2 h-4 w-4 shrink-0" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0">

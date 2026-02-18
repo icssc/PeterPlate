@@ -21,8 +21,8 @@ function formatMealDividerTitle(title: string): string {
  */
 export default function MealDivider({ title }: { title: string }): JSX.Element {
   return (
-    <div className="border-b-2">
-      <h1 className="font-bold text-3xl">{formatMealDividerTitle(title)}</h1>
+    <div className="mb-2">
+      <h2 className="font-bold text-xl">{formatMealDividerTitle(title)}</h2>
     </div>
   );
 }
