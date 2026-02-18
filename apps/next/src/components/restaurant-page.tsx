@@ -215,7 +215,7 @@ export function RestaurantPage({
   return (
     <div>
       {/* Hero image & mobile header */}
-      <div className="relative w-full h-[200px] md:h-[350px]">
+      <div className="relative w-full h-[200px] md:h-[250px]">
         <Image
           src={hero.src}
           alt={hero.alt}
@@ -359,25 +359,14 @@ export function RestaurantPage({
                                 )
                               : "Closed";
 
-                            const isSelected = selectedPeriod === mealTimeKey;
                             return (
                               <MenuItem
                                 key={time}
                                 value={mealTimeKey}
-                                className={`!flex !justify-between !items-center !gap-4 ${
-                                  isSelected
-                                    ? "!bg-sky-700 !text-white hover:!bg-sky-800"
-                                    : ""
-                                }`}
+                                className="!flex !justify-between !items-center !gap-4"
                               >
                                 <span>{toTitleCase(time)}</span>
-                                <span
-                                  className={`text-sm ${
-                                    isSelected
-                                      ? "!text-sky-100"
-                                      : "text-gray-500"
-                                  }`}
-                                >
+                                <span className="text-gray-500 text-sm">
                                   {timeString}
                                 </span>
                               </MenuItem>

@@ -1,6 +1,11 @@
 "use client";
 
-import { FavoriteBorder, Restaurant, StarBorder } from "@mui/icons-material";
+import {
+  AddCircleOutline,
+  FavoriteBorder,
+  Restaurant,
+  StarBorder,
+} from "@mui/icons-material";
 import { Card, CardContent, Dialog, Drawer } from "@mui/material";
 import type { DishInfo } from "@peterplate/api";
 import Image from "next/image";
@@ -263,7 +268,6 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                 >
                   <AddCircleOutline />
                 </button>
-
               </div>
               <div className="flex items-center">
                 <button
