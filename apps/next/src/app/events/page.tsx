@@ -50,15 +50,6 @@ const Events = () => {
         )
       : [];
 
-  // Sort events by start date
-  // const sortedEvents =
-  //   upcomingEvents?.length > 0
-  //     ? upcomingEvents.sort(
-  //         (a: any, b: any) =>
-  //           new Date(a.start).getTime() - new Date(b.start).getTime(),
-  //       )
-  //     : [];
-
   const filteredEvents = sortedEvents.filter((event: any) => {
     const matchesDiningHall =
       selectedDiningHall === "both" ||
