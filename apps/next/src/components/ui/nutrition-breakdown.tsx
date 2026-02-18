@@ -1,4 +1,8 @@
-import { KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
+import {
+  DeleteOutline,
+  KeyboardArrowDown,
+  KeyboardArrowUp,
+} from "@mui/icons-material";
 import { IconButton, Stack } from "@mui/material";
 import type React from "react";
 import { useSnackbarStore } from "@/context/useSnackbar";
@@ -217,13 +221,23 @@ const NutritionBreakdown = ({ dateString, mealsEaten }: Props) => {
               </IconButton>
             </Stack>
 
-            <button
-              type="button"
-              className="h-8 rounded-md border px-3 text-sm transition-colors hover:bg-accent hover:text-accent-foreground"
+            <IconButton
+              aria-label="delete"
+              size="small"
+              color="error"
               onClick={(e) => removeBtnOnClick(e, meal.userId, meal.dishId)}
+              sx={{
+                border: "1px solid",
+                borderColor: "error.main",
+                borderRadius: "6px",
+                "&:hover": {
+                  backgroundColor: "error.main",
+                  color: "white",
+                },
+              }}
             >
-              Remove
-            </button>
+              <DeleteOutline fontSize="small" />
+            </IconButton>
           </div>
         ))}
       </div>
