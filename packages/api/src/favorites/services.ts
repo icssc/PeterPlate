@@ -1,6 +1,6 @@
 import { upsert } from "@api/utils";
-import type { Drizzle, InsertFavorite, SelectFavorite } from "@peterplate/db";
-import { dishes, favorites, users } from "@peterplate/db";
+import type { Drizzle, SelectFavorite } from "@peterplate/db";
+import { favorites } from "@peterplate/db";
 import { TRPCError } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
 

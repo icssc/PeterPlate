@@ -43,6 +43,13 @@
       "when": 1770945432350,
       "tag": "0005_peterplate",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1771019416483,
+      "tag": "0006_peterplate",
+      "breakpoints": true
     }
   ]
 }
