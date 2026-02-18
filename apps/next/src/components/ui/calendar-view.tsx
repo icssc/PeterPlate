@@ -4,43 +4,41 @@ import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import Dialog from "@mui/material/Dialog";
 import Drawer from "@mui/material/Drawer";
-import moment from "moment";
-import React from "react";
-import { Calendar, momentLocalizer } from "react-big-calendar";
+import {
+  format,
+  getDay,
+  isAfter,
+  isSameMonth,
+  parse,
+  startOfMonth,
+  startOfWeek,
+} from "date-fns";
+import { enUS } from "date-fns/locale";
+import { Calendar, dateFnsLocalizer } from "react-big-calendar";
 import EventDialogContent from "./event-dialog-content";
 import EventDrawerContent from "./event-drawer-content";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 
-const localizer = momentLocalizer(moment);
+const locales = {
+  "en-US": enUS,
+};
 
-const months = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
+const localizer = dateFnsLocalizer({
+  format,
+  parse,
+  startOfWeek,
+  getDay,
+  locales,
+});
 
 interface CalendarViewProps {
-  // Logic props
   isDesktop: boolean;
   viewMode: string;
   isLoading?: boolean;
   error?: any;
-
-  // Data props
   currentDate: Date;
   calendarEvents: any[];
   selectedEventData: any | null;
-
-  // Handlers
   onPreviousMonth: () => void;
   onNextMonth: () => void;
   onSelectEvent: (event: any) => void;
@@ -62,6 +60,11 @@ const CalendarView = ({
 }: CalendarViewProps) => {
   if (isLoading || error || viewMode !== "calendar") return null;
 
+  // Logic to disable the "next" button if viewing current or future months
+  const isFutureOrCurrent =
+    isAfter(startOfMonth(currentDate), startOfMonth(new Date())) ||
+    isSameMonth(currentDate, new Date());
+
   return (
     <div className="border-2 border-sky-700 p-4 rounded-lg">
       {/* CUSTOM TOOLBAR */}
@@ -72,15 +75,15 @@ const CalendarView = ({
             onClick={onPreviousMonth}
           />
           <span className="inline-block mb-6 text-3xl">
-            {months[currentDate.getMonth()]} {currentDate.getFullYear()}
+            {format(currentDate, "MMMM yyyy")}
           </span>
           <ArrowForwardIosIcon
             className={`mb-6 ml-4 ${
-              moment(currentDate).isSameOrAfter(moment(), "month")
+              isFutureOrCurrent
                 ? "opacity-30 cursor-not-allowed"
                 : "cursor-pointer"
             }`}
-            onClick={onNextMonth}
+            onClick={isFutureOrCurrent ? undefined : onNextMonth}
           />
         </div>
       </div>
