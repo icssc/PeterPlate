@@ -4,22 +4,17 @@ import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import GridOnIcon from "@mui/icons-material/GridOn";
 import Button from "@mui/material/Button";
 import { useState } from "react";
-import { momentLocalizer } from "react-big-calendar";
 import { trpc } from "@/utils/trpc";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import { Dialog, Drawer } from "@mui/material";
 import moment from "moment";
 import CalendarView from "@/components/ui/calendar-view";
 import EventCard, { type EventInfo } from "@/components/ui/card/event-card";
-import EventDialogContent from "@/components/ui/event-dialog-content";
-import EventDrawerContent from "@/components/ui/event-drawer-content";
 import EventCardSkeleton from "@/components/ui/skeleton/event-card-skeleton";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { getEventType } from "@/utils/funcs";
 import { HallEnum } from "@/utils/types";
 
 const Events = () => {
-  const localizer = momentLocalizer(moment);
   const [selectedDiningHall, setSelectedDiningHall] = useState<
     "both" | "anteatery" | "brandywine"
   >("both");
