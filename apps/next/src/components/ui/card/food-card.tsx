@@ -6,7 +6,7 @@ import {
   Restaurant,
   StarBorder,
 } from "@mui/icons-material";
-import { Card, CardContent, Dialog, Drawer } from "@mui/material";
+import { Card, CardContent, Dialog, Drawer, Typography } from "@mui/material";
 import type { DishInfo } from "@peterplate/api";
 import Image from "next/image";
 import React from "react";
@@ -130,7 +130,7 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
       <div
         ref={ref}
         {...divProps}
-        className={cn("max-w-xs flex-shrink-0", className)}
+        className={cn("w-xs flex-shrink-0", className)}
       >
         <Card
           className="cursor-pointer hover:shadow-lg transition w-full border"
@@ -152,19 +152,19 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                   />
                 )}
                 {!isCompact && !showImage && IconComponent && (
-                  <IconComponent className="w-12 h-12 text-slate-700 flex-shrink-0" />
+                  <IconComponent className="w-12 h-12 text-zinc-700 dark:text-zinc-400 flex-shrink-0" />
                 )}
                 <div className="flex flex-col gap-1">
                   <span
                     className={cn(
-                      "font-semibold text-base text-sky-700 dark:text-sky-900",
+                      "font-semibold text-base text-sky-700 dark:text-sky-600",
                       isCompact && "font-bold",
                     )}
                   >
                     {formatFoodName(dish.name)}
                   </span>
-                  <div className="flex gap-2 items-center text-slate-700 text-sm">
-                    <div className="text-slate-900 font-normal">
+                  <div className="flex gap-2 items-center text-zinc-700 text-sm">
+                    <div className="text-zinc-900 dark:text-zinc-300 font-normal">
                       <span>
                         {dish.nutritionInfo.calories == null
                           ? "-"
@@ -183,9 +183,12 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                     </div>
                   </div>
                   {dish.description && (
-                    <p className="text-slate-900 text-sm font-normal">
+                    <Typography
+                      noWrap
+                      className="text-zinc-900 text-sm font-normal dark:text-zinc-300 md:w-72"
+                    >
                       {dish.description}
-                    </p>
+                    </Typography>
                   )}
                 </div>
               </div>
@@ -205,7 +208,7 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                     favoriteDisabled && "opacity-60",
                   )}
                 >
-                  {isFavorited && (
+                  {!isFavorited && (
                     <FavoriteBorder
                       className={cn(
                         "w-6 h-6 fill-zinc-500",
@@ -214,8 +217,8 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                       )}
                     />
                   )}
-                  {!isFavorited && (
-                    <Favorite className="w-6 h-6 fill-red-500 group-hover:fill-red-400" />
+                  {isFavorited && (
+                    <Favorite className="w-6 h-6 fill-red-500 group-hover:fill-red-400 dark:fill-red-700 dark:group-hover:fill-red-500" />
                   )}
                 </button>
               </div>
