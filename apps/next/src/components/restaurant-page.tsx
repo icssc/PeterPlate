@@ -329,6 +329,7 @@ export function RestaurantPage({
                             vertical: "top",
                             horizontal: "left",
                           },
+                          disableScrollLock: true,
                           PaperProps: {
                             style: {
                               minWidth: "280px",
@@ -414,6 +415,9 @@ export function RestaurantPage({
                             openPickerIcon: {
                               className: "!text-sky-700",
                             },
+                            dialog: {
+                              disableScrollLock: true,
+                            },
                             popper: {
                               placement: "bottom-end",
                               className: "[&_.MuiPaper-root]:mt-1",
@@ -471,6 +475,7 @@ export function RestaurantPage({
                             open={Boolean(menuAnchor)}
                             anchorEl={menuAnchor}
                             onClose={() => setMenuAnchor(null)}
+                            disableScrollLock
                             anchorOrigin={{
                               vertical: "bottom",
                               horizontal: "left",
@@ -533,6 +538,7 @@ export function RestaurantPage({
                             open={Boolean(scheduleAnchor)}
                             anchorEl={scheduleAnchor}
                             onClose={() => setScheduleAnchor(null)}
+                            disableScrollLock
                             anchorOrigin={{
                               vertical: "bottom",
                               horizontal: "left",
