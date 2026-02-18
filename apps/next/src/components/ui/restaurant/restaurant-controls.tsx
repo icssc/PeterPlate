@@ -1,4 +1,5 @@
 import type { DateList } from "@peterplate/db";
+import { DiningHallStatus } from "@/components/ui/status";
 import type { CalendarRange } from "@/components/ui/toolbar";
 import type { HallEnum, HallStatusEnum } from "@/utils/types";
 import { DesktopTabs } from "./header/desktop-tabs";
@@ -67,16 +68,20 @@ export function RestaurantControls({
     <>
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2 mb-2 flex-wrap md:flex-nowrap">
         {/* Desktop title & status (Header) */}
-        <RestaurantHeader
-          isDesktop={isDesktop}
-          hall={hall}
-          derivedHallStatus={derivedHallStatus}
-        />
+        <RestaurantHeader isDesktop={isDesktop} hall={hall} />
 
         <div className="flex flex-col gap-3 w-full md:w-auto md:flex-row md:items-center md:justify-end">
+          {/* Desktop Status - now next to selectors */}
+          {isDesktop && (
+            <div>
+              <DiningHallStatus status={derivedHallStatus} />
+            </div>
+          )}
+
           {/* Meal & date selectors (Filters) */}
           <RestaurantFilters
             isDesktop={isDesktop}
+            // ... filters props
             periods={periods}
             availablePeriodTimes={availablePeriodTimes}
             selectedPeriod={selectedPeriod}
@@ -91,6 +96,7 @@ export function RestaurantControls({
 
           {/* Mobile Actions */}
           <MobileActions
+            // ... mobile actions props
             isDesktop={isDesktop}
             isLoading={isLoading}
             isError={isError}
