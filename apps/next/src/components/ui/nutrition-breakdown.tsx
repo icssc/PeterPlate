@@ -63,17 +63,17 @@ const NutritionBreakdown = ({ dateString, mealsEaten }: Props) => {
 
   const utils = trpc.useUtils();
 
-  const logMealMutation = trpc.nutrition.logMeal.useMutation({
+  const updateMealMutation = trpc.nutrition.updateLoggedMeal.useMutation({
     onSuccess: (data) => {
       showSnackbar(
-        `Added ${formatFoodName(data.dishName)} to your log`,
+        `Updated ${formatFoodName(data.dishName)} quantity`,
         "success",
       );
       utils.nutrition.invalidate();
     },
     onError: (error) => {
       console.error(error);
-      showSnackbar("Failed to add meal to your log", "error");
+      showSnackbar("Failed to update quantity", "error");
     },
   });
 
@@ -100,10 +100,8 @@ const NutritionBreakdown = ({ dateString, mealsEaten }: Props) => {
       return;
     }
 
-    logMealMutation.mutate({
-      dishId: meal.dishId,
-      userId: meal.userId,
-      dishName: meal.dishName,
+    updateMealMutation.mutate({
+      id: meal.id,
       servings: newServings,
     });
   };

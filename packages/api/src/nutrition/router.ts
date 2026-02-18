@@ -28,18 +28,37 @@ export const nutritionRouter = createTRPCRouter({
           servings: input.servings,
           eatenAt: input.eatenAt ?? new Date(),
         })
-        .onConflictDoUpdate({
-          target: loggedMeals.id,
-          set: {
-            servings: input.servings,
-          },
-        })
         .returning();
 
       if (!result[0]) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to log meal",
+        });
+      }
+
+      return result[0];
+    }),
+  updateLoggedMeal: publicProcedure
+    .input(
+      z.object({
+        id: z.string().uuid(),
+        servings: z.number().min(0.5),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const result = await ctx.db
+        .update(loggedMeals)
+        .set({
+          servings: input.servings,
+        })
+        .where(eq(loggedMeals.id, input.id))
+        .returning();
+
+      if (!result[0]) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Logged meal not found",
         });
       }
 
