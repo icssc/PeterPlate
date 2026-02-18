@@ -294,73 +294,21 @@ const Events = () => {
             </>
           )}
 
-          {/* CALENDAR DISPLAY: Map over the fetched events once loaded */}
+          {/* CALENDAR DISPLAY */}
           {!isLoading && !error && viewMode === "calendar" && (
             <CalendarView
+              isDesktop={isDesktop}
+              viewMode={viewMode}
+              isLoading={isLoading}
+              error={error}
               currentDate={currentDate}
               calendarEvents={calendarEvents}
+              selectedEventData={selectedEventData}
               onPreviousMonth={viewPreviousMonthsEvents}
               onNextMonth={viewNextMonthsEvents}
               onSelectEvent={handleSelectEvent}
+              onCloseDetails={handleClose}
             />
-          )}
-
-          {/* DESKTOP MODAL */}
-          {isDesktop && (
-            <Dialog
-              open={Boolean(selectedEventData)}
-              onClose={handleClose}
-              maxWidth={false}
-              slotProps={{
-                paper: {
-                  sx: {
-                    width: "570px",
-                    maxWidth: "90vw",
-                    borderRadius: "6px",
-                    overflow: "hidden",
-                  },
-                },
-              }}
-            >
-              {selectedEventData && (
-                <EventDialogContent
-                  alt={selectedEventData.alt}
-                  imgSrc={selectedEventData.imgSrc}
-                  startTime={selectedEventData.startTime}
-                  endTime={selectedEventData.endTime}
-                  name={selectedEventData.name}
-                  location={selectedEventData.location}
-                  longDesc={selectedEventData.longDesc}
-                  shortDesc={selectedEventData.shortDesc}
-                  key={
-                    selectedEventData.startTime +
-                    "|" +
-                    selectedEventData.endTime
-                  }
-                  isOngoing={selectedEventData.isOngoing}
-                />
-              )}
-            </Dialog>
-          )}
-
-          {/* MOBILE DRAWER */}
-          {!isDesktop && (
-            <Drawer
-              anchor="bottom"
-              open={Boolean(selectedEventData)}
-              onClose={handleClose}
-              sx={{
-                "& .MuiDrawer-paper": {
-                  borderTopLeftRadius: "10px",
-                  borderTopRightRadius: "10px",
-                  height: "auto",
-                },
-              }}
-            >
-              {selectedEventData && (
-                <EventDrawerContent {...selectedEventData} />
-              )}
-            </Drawer>
           )}
         </div>
       </div>
