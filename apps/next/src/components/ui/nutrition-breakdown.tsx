@@ -1,3 +1,5 @@
+import { KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
+import { IconButton, Stack } from "@mui/material";
 import type React from "react";
 import { useSnackbarStore } from "@/context/useSnackbar";
 import { formatFoodName } from "@/utils/funcs";
@@ -191,7 +193,7 @@ const NutritionBreakdown = ({ dateString, mealsEaten }: Props) => {
             key={meal.id}
             className="flex items-center justify-between gap-4 rounded-lg border p-4 mb-3"
           >
-            <div className="flex flex-col">
+            <div className="flex flex-col flex-1">
               <h3 className="font-medium">
                 {meal.servings} serving{meal.servings > 1 ? "s" : ""} of{" "}
                 {meal.dishName}
@@ -203,6 +205,34 @@ const NutritionBreakdown = ({ dateString, mealsEaten }: Props) => {
                 {Math.round(meal.fat * meal.servings)}g fat
               </p>
             </div>
+
+            <Stack direction="column" spacing={0.5}>
+              <IconButton
+                size="small"
+                onClick={(e) => handleIncreaseQuantity(e, meal)}
+                sx={{
+                  border: "1px solid",
+                  borderColor: "divider",
+                  borderRadius: "4px",
+                  padding: "2px",
+                }}
+              >
+                <KeyboardArrowUp fontSize="small" />
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={(e) => handleDecreaseQuantity(e, meal)}
+                disabled={meal.servings <= 0.5}
+                sx={{
+                  border: "1px solid",
+                  borderColor: "divider",
+                  borderRadius: "4px",
+                  padding: "2px",
+                }}
+              >
+                <KeyboardArrowDown fontSize="small" />
+              </IconButton>
+            </Stack>
 
             <button
               type="button"
