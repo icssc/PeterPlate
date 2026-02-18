@@ -66,7 +66,6 @@ export default function FoodDialogContent({ dish }: { dish: DishInfo }) {
     { staleTime: 5 * 60 * 1000 },
   );
   const averageRating = ratingData?.averageRating ?? 0;
-  // const ratingCount = ratingData?.ratingCount ?? 0;
 
   return (
     <div className="font-poppins">
@@ -97,14 +96,20 @@ export default function FoodDialogContent({ dish }: { dish: DishInfo }) {
                 id="food-header-info"
               >
                 <div className="flex gap-3 items-center">
-                  <h2 className="text-3xl font-bold leading-tight tracking-normal text-sky-700">
+                  <h2
+                    className={cn(
+                      "text-3xl font-bold leading-tight tracking-normal",
+                      "text-sky-700 dark:text-sky-600",
+                      dish.name.length > 10 && "text-2xl",
+                      dish.name.length > 30 && "text-md",
+                    )}
+                  >
                     {formatFoodName(dish.name)}
                   </h2>
-                  {/* <Pin className="stroke-zinc-500"/> */}
                 </div>
                 <InteractiveStarRating dishId={dish.id} />
               </div>
-              <div className="px-4 flex flex-wrap items-center gap-2 text-zinc-500">
+              <div className="px-4 flex flex-wrap items-center gap-2 text-zinc-500 dark:text-zinc-400">
                 <span className="whitespace-nowrap flex items-center gap-1">
                   <StarBorder
                     className="w-4 h-4 stroke-zinc-400"
@@ -130,7 +135,7 @@ export default function FoodDialogContent({ dish }: { dish: DishInfo }) {
                   )}
                 </div>
               </div>
-              <p className="text-black px-4 leading-relaxed">
+              <p className="text-black dark:text-zinc-300 px-4 leading-relaxed">
                 {enhanceDescription(dish.name, dish.description)}
               </p>
               <div>
@@ -157,10 +162,12 @@ export default function FoodDialogContent({ dish }: { dish: DishInfo }) {
                           <div
                             key={nutrientKey}
                             className={cn(
-                              "grid grid-cols-subgrid col-span-2 transition-all duration-500 ease-in-out overflow-hidden", // Base styles for transition
+                              "grid grid-cols-subgrid col-span-2",
+                              "transition-all duration-500 ease-in-out",
+                              "overflow-hidden dark:text-zinc-300",
                               !isInitial && !showAllNutrients
                                 ? "max-h-0 opacity-0 py-0"
-                                : "max-h-8 opacity-100 py-0.5", // Conditional styles for collapse/expand
+                                : "max-h-8 opacity-100 py-0.5",
                             )}
                           >
                             <strong
@@ -168,7 +175,7 @@ export default function FoodDialogContent({ dish }: { dish: DishInfo }) {
                                 "col-span-1",
                                 (nutrientKey === "transFatG" ||
                                   nutrientKey === "saturatedFatG") &&
-                                  "text-gray-500 pl-4",
+                                  "text-zinc-500 pl-4",
                               )}
                             >
                               {formatNutrientLabel(nutrientKey)}
@@ -178,7 +185,7 @@ export default function FoodDialogContent({ dish }: { dish: DishInfo }) {
                                 "col-span-1 text-right",
                                 (nutrientKey === "transFatG" ||
                                   nutrientKey === "saturatedFatG") &&
-                                  "text-gray-500",
+                                  "text-zinc-500",
                               )}
                             >
                               {value == null

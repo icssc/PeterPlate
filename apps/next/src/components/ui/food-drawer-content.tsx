@@ -69,7 +69,14 @@ export default function FoodDrawerContent({ dish }: { dish: DishInfo }) {
         )}
         <Box className="px-4 pt-4 flex flex-col gap-2">
           <div className="flex items-center justify-between">
-            <h2 className="text-3xl font-bold leading-tight tracking-normal text-sky-700">
+            <h2
+              className={cn(
+                "text-3xl font-bold leading-tight tracking-normal",
+                "text-sky-700 dark:text-sky-600",
+                dish.name.length > 10 && "text-2xl",
+                dish.name.length > 30 && "text-md",
+              )}
+            >
               {formatFoodName(dish.name)}
             </h2>
           </div>
