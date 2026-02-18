@@ -174,8 +174,8 @@ export default function EventCard(props: EventInfo): React.JSX.Element {
             paper: {
               sx: {
                 bgcolor: "background.paper",
-                maxWidth: "100vw", // ✅ Full width on mobile
-                margin: 0, // ✅ Remove side margins
+                maxWidth: "100vw",
+                margin: 0,
                 overflow: "hidden",
                 borderTopLeftRadius: "16px",
                 borderTopRightRadius: "16px",
@@ -185,7 +185,7 @@ export default function EventCard(props: EventInfo): React.JSX.Element {
           sx={{
             "& .MuiDrawer-paper": {
               bgcolor: "background.paper",
-              maxHeight: "90vh", // ✅ Don't take full screen
+              maxHeight: "90vh",
               height: "auto",
             },
           }}
