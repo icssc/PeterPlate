@@ -106,7 +106,9 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
         dishId: dish.id,
         userId: userId,
         dishName: dish.name,
-        servings: 1, // Default to 1 serving (TODO: add ability to manually input servings. Maybe a popup will ask to input a multiple of 0.5)
+        // TODO: add ability to manually input servings. Maybe a popup to ask
+        //       for an input of a multiple of 0.5
+        servings: 1,
       });
     };
 
