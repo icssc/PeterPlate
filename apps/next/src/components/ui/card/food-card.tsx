@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  AddCircleOutline,
-  Favorite,
-  FavoriteBorder,
-  Restaurant,
-  StarBorder,
-} from "@mui/icons-material";
+import { AddCircleOutline, Restaurant, StarBorder } from "@mui/icons-material";
 import { Card, CardContent, Dialog, Drawer, Typography } from "@mui/material";
 import type { DishInfo } from "@peterplate/api";
 import Image from "next/image";
@@ -16,6 +10,7 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { formatFoodName, getFoodIcon } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
 import { cn } from "@/utils/tw";
+import Favorite from "../favorite";
 import FoodDialogContent from "../food-dialog-content";
 import FoodDrawerContent from "../food-drawer-content";
 
@@ -122,22 +117,6 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
       });
     };
 
-    const handleFavoriteClick = (
-      event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-    ) => {
-      event.preventDefault();
-      event.stopPropagation();
-
-      // TODO: use [MUI snackbar](https://mui.com/material-ui/react-snackbar/) to warn users of
-      if (!userId) {
-        alert("Login to favorite meals!");
-        return;
-      }
-
-      if (favoriteDisabled || !onToggleFavorite) return;
-      onToggleFavorite(dish.id, Boolean(isFavorited));
-    };
-
     return (
       <div
         ref={ref}
@@ -216,34 +195,7 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                 </button>
               </div>
               <div className="flex items-center">
-                <button
-                  type="button"
-                  aria-label={
-                    isFavorited
-                      ? "Remove meal from favorites"
-                      : "Add meal to favorites"
-                  }
-                  aria-pressed={isFavorited}
-                  disabled={favoriteDisabled}
-                  onClick={handleFavoriteClick}
-                  className={cn(
-                    "rounded-full p-1 transition group",
-                    favoriteDisabled && "opacity-60",
-                  )}
-                >
-                  {!isFavorited && (
-                    <FavoriteBorder
-                      className={cn(
-                        "w-6 h-6 fill-zinc-500",
-                        !favoriteDisabled &&
-                          "group-hover:fill-red-500 dark:group-hover:fill-red-700",
-                      )}
-                    />
-                  )}
-                  {isFavorited && (
-                    <Favorite className="w-6 h-6 fill-red-500 group-hover:fill-red-400 dark:fill-red-700 dark:group-hover:fill-red-500" />
-                  )}
-                </button>
+                <Favorite />
               </div>
             </div>
           </CardContent>

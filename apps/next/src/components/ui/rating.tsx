@@ -1,8 +1,3 @@
-/** biome-ignore-all lint/a11y/useKeyWithClickEvents: Will fix when using MUI.*/
-/** biome-ignore-all lint/a11y/noStaticElementInteractions: Will fix when using MUI. */
-/** biome-ignore-all lint/a11y/useSemanticElements: Will fix when using MUI. */
-/** biome-ignore-all lint/a11y/useFocusableInteractive: Will fix when using MUI. */
-
 "use client";
 
 import { Rating as MUIRating, Tooltip } from "@mui/material";
