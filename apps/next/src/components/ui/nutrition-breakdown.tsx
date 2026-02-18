@@ -1,3 +1,4 @@
+import type React from "react";
 import { useSnackbarStore } from "@/context/useSnackbar";
 import { formatFoodName } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
@@ -50,7 +51,7 @@ interface Props {
   userId: string;
 }
 
-const NutritionBreakdown = ({ dateString, mealsEaten, userId }: Props) => {
+const NutritionBreakdown = ({ dateString, mealsEaten }: Props) => {
   const { showSnackbar } = useSnackbarStore();
   const nutrition: NutritionData = compileMealData(mealsEaten);
 
@@ -77,8 +78,11 @@ const NutritionBreakdown = ({ dateString, mealsEaten, userId }: Props) => {
   };
 
   const logMealMutation = trpc.nutrition.logMeal.useMutation({
-    onSuccess: () => {
-      showSnackbar(`Added ${formatFoodName(dish.name)} to your log`, "success");
+    onSuccess: (data) => {
+      showSnackbar(
+        `Added ${formatFoodName(data.dishName)} to your log`,
+        "success",
+      );
       utils.nutrition.invalidate();
     },
     onError: (error) => {
@@ -88,9 +92,9 @@ const NutritionBreakdown = ({ dateString, mealsEaten, userId }: Props) => {
   });
 
   const deleteMealMutation = trpc.nutrition.deleteLoggedMeal.useMutation({
-    onSuccess: () => {
+    onSuccess: (data) => {
       showSnackbar(
-        `Removed ${formatFoodName(dish.name)} from your log`,
+        `Removed ${formatFoodName(data.dishName)} from your log`,
         "success",
       );
       utils.nutrition.invalidate();
@@ -101,27 +105,10 @@ const NutritionBreakdown = ({ dateString, mealsEaten, userId }: Props) => {
     },
   });
 
-  const _handleLogMeal = (e: React.MouseEvent) => {
-    e.stopPropagation();
-
-    if (!userId) {
-      showSnackbar(
-        "You must be signed in to track meals. Please sign in to continue.",
-        "error",
-      );
-      return;
-    }
-
-    logMealMutation.mutate({
-      dishId: dish.id,
-      userId: userId,
-      dishName: dish.name,
-      servings: 1,
-    });
-  };
-
-  const handleAdjustQuantity = (newServings: number) => {
-    // Servings are multiples of 0.5
+  const handleAdjustQuantity = (
+    dish: LoggedMealJoinedWithNutrition,
+    newServings: number,
+  ) => {
     if (newServings < 0.5) {
       showSnackbar("Minimum serving size is 0.5", "error");
       return;
@@ -129,13 +116,13 @@ const NutritionBreakdown = ({ dateString, mealsEaten, userId }: Props) => {
 
     // Delete and insert again with new servings
     deleteMealMutation.mutate(
-      { userId: userId, dishId: dish.id },
+      { userId: dish.userId, dishId: dish.id },
       {
         onSuccess: () => {
           logMealMutation.mutate({
             dishId: dish.id,
-            userId: userId,
-            dishName: dish.name,
+            userId: dish.userId,
+            dishName: dish.dishName,
             servings: newServings,
           });
         },
@@ -143,26 +130,22 @@ const NutritionBreakdown = ({ dateString, mealsEaten, userId }: Props) => {
     );
   };
 
-  const _handleRemoveMeal = (e: React.MouseEvent) => {
+  const handleIncreaseQuantity = (
+    e: React.MouseEvent,
+    meal: LoggedMealJoinedWithNutrition,
+  ) => {
     e.stopPropagation();
-    if (!userId) return;
-
-    deleteMealMutation.mutate({
-      userId: userId,
-      dishId: dish.id,
-    });
+    const newServings = meal.servings + 0.5;
+    handleAdjustQuantity(meal, newServings);
   };
 
-  const _handleIncreaseQuantity = (e: React.MouseEvent) => {
+  const handleDecreaseQuantity = (
+    e: React.MouseEvent,
+    meal: LoggedMealJoinedWithNutrition,
+  ) => {
     e.stopPropagation();
-    const newServings = loggedMeal.servings + 0.5;
-    handleAdjustQuantity(newServings);
-  };
-
-  const _handleDecreaseQuantity = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const newServings = Math.max(0.5, loggedMeal.servings - 0.5);
-    handleAdjustQuantity(newServings);
+    const newServings = Math.max(0.5, meal.servings - 0.5);
+    handleAdjustQuantity(meal, newServings);
   };
 
   return (
