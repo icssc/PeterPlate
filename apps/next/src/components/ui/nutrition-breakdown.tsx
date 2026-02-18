@@ -126,15 +126,11 @@ const NutritionBreakdown = ({ dateString, mealsEaten }: Props) => {
     handleAdjustQuantity(meal, newServings);
   };
 
-  const removeBtnOnClick = (
-    e: React.MouseEvent,
-    userId: string | null,
-    dishId: string | null,
-  ) => {
+  const removeBtnOnClick = (e: React.MouseEvent, id: string | null) => {
     e.preventDefault();
-    if (!userId || !dishId) return;
+    if (!id) return;
 
-    deleteMealMutation.mutate({ userId, dishId });
+    deleteMealMutation.mutate({ id });
   };
 
   return (
@@ -225,7 +221,7 @@ const NutritionBreakdown = ({ dateString, mealsEaten }: Props) => {
               aria-label="delete"
               size="small"
               color="error"
-              onClick={(e) => removeBtnOnClick(e, meal.userId, meal.dishId)}
+              onClick={(e) => removeBtnOnClick(e, meal.id)}
               sx={{
                 border: "1px solid",
                 borderColor: "error.main",

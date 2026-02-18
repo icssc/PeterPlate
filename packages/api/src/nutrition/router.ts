@@ -86,19 +86,13 @@ export const nutritionRouter = createTRPCRouter({
   deleteLoggedMeal: publicProcedure
     .input(
       z.object({
-        userId: z.string(),
-        dishId: z.string(),
+        id: z.string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       const result = await ctx.db
         .delete(loggedMeals)
-        .where(
-          and(
-            eq(loggedMeals.userId, input.userId),
-            eq(loggedMeals.dishId, input.dishId),
-          ),
-        )
+        .where(eq(loggedMeals.id, input.id))
         .returning();
 
       if (!result[0]) {
