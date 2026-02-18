@@ -18,7 +18,7 @@ import { nutrientToUnit } from "@/utils/types";
 import IngredientsDialog from "../ingredients-dialog";
 import { AllergenBadge } from "./allergen-badge";
 import type { OnAddToMealTracker } from "./card/food-card";
-import InteractiveStarRating from "./interactive-star-rating";
+import Rating from "./rating";
 
 /**
  * `FoodDialogContent` renders the detailed view of a food item (dish) within a dialog.
@@ -114,7 +114,7 @@ export default function FoodDialogContent({
                 className="flex justify-between px-4 items-center"
                 id="food-header-info"
               >
-                <div className="flex gap-3 items-center">
+                <div className="flex gap-3 items-center pr-2">
                   <h2
                     className={cn(
                       "text-3xl font-bold leading-tight tracking-normal",
@@ -126,7 +126,7 @@ export default function FoodDialogContent({
                     {formatFoodName(dish.name)}
                   </h2>
                 </div>
-                <InteractiveStarRating dishId={dish.id} />
+                <Rating dishId={dish.id} />
               </div>
               <div className="px-4 flex flex-wrap items-center gap-2 text-zinc-500 dark:text-zinc-400">
                 <span className="whitespace-nowrap flex items-center gap-1">

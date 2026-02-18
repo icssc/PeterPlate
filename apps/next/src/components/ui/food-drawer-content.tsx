@@ -17,7 +17,7 @@ import { nutrientToUnit } from "@/utils/types";
 import IngredientsDialog from "../ingredients-dialog";
 import { AllergenBadge } from "./allergen-badge";
 import type { OnAddToMealTracker } from "./card/food-card";
-import InteractiveStarRating from "./interactive-star-rating";
+import InteractiveStarRating from "./rating";
 
 export default function FoodDrawerContent({
   dish,

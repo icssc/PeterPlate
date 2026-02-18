@@ -14,7 +14,7 @@ import { formatFoodName, getFoodIcon } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
 import { cn } from "@/utils/tw";
 import FoodDialogContent from "../food-dialog-content";
-import InteractiveStarRating from "../interactive-star-rating";
+import InteractiveStarRating from "../rating";
 
 interface RatingsCardProps {
   food: DishInfo & {
