@@ -1,5 +1,5 @@
-CREATE TYPE "public"."restaurant_id_enum" AS ENUM('anteatery', 'brandywine');--> statement-breakpoint
-CREATE TYPE "public"."restaurant_name_enum" AS ENUM('anteatery', 'brandywine');--> statement-breakpoint
+CREATE TYPE IF NOT EXISTS "public"."restaurant_id_enum" AS ENUM('anteatery', 'brandywine');--> statement-breakpoint
+CREATE TYPE IF NOT EXISTS "public"."restaurant_name_enum" AS ENUM('anteatery', 'brandywine');--> statement-breakpoint
 CREATE TABLE "contributors" (
 	"login" text PRIMARY KEY NOT NULL,
 	"avatar_url" text NOT NULL,
