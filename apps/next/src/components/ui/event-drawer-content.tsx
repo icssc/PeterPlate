@@ -28,7 +28,7 @@ export default function EventDrawerContent(
           alt={props.alt}
           width={600}
           height={600}
-          className="w-full h-56 object-cover object-top"
+          className="w-full object-contain"
         />
         <EventTypeBadge title={props.name} />
       </div>
