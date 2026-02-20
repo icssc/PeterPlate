@@ -1,5 +1,6 @@
 "use client";
 
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import FavoriteBorder from "@mui/icons-material/FavoriteBorder";
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
@@ -18,7 +19,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in";
 import { useSession } from "@/utils/auth-client";
 import SidebarContent from "./sidebar/sidebar-content";
@@ -162,6 +163,7 @@ function DesktopToolbar(): React.JSX.Element {
   const handleProfileClose = () => {
     setProfileAnchor(null);
   };
+
   const { data: session, isPending } = useSession();
   const user = session?.user;
 
@@ -290,6 +292,23 @@ function DesktopToolbar(): React.JSX.Element {
 
 function MobileToolbar(): React.JSX.Element {
   const pathname = usePathname();
+  const [profileAnchor, setProfileAnchor] = useState<null | HTMLElement>(null);
+  const profileOpen = Boolean(profileAnchor);
+  const { data: session, isPending } = useSession();
+  const user = session?.user;
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  const handleProfileOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setProfileAnchor(event.currentTarget);
+  };
+
+  const handleProfileClose = () => {
+    setProfileAnchor(null);
+  };
 
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";
@@ -299,7 +318,33 @@ function MobileToolbar(): React.JSX.Element {
   return (
     <>
       <div className="fixed top-4 right-4 z-50">
-        <DesktopToolbar />
+        {!isMounted || isPending ? (
+          <IconButton className="!p-0" aria-label="Open profile menu" disabled>
+            <AccountCircleIcon sx={{ fontSize: 40, color: "#bdbdbd" }} />
+          </IconButton>
+        ) : user ? (
+          <IconButton
+            onClick={handleProfileOpen}
+            className="!p-0"
+            aria-label="Open profile menu"
+          >
+            <Image
+              src={user.image || "/default-avatar.png"}
+              alt={user.name || "User profile"}
+              width={40}
+              height={40}
+              className="w-10 h-10 rounded-full"
+            />
+          </IconButton>
+        ) : (
+          <IconButton
+            onClick={handleProfileOpen}
+            className="!p-0"
+            aria-label="Open profile menu"
+          >
+            <AccountCircleIcon sx={{ fontSize: 40, color: "#bdbdbd" }} />
+          </IconButton>
+        )}
       </div>
 
       <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-[520px]">
@@ -352,6 +397,37 @@ function MobileToolbar(): React.JSX.Element {
           </div>
         </div>
       </div>
+
+      <Menu
+        anchorEl={profileAnchor}
+        open={profileOpen}
+        onClose={handleProfileClose}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "right",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "right",
+        }}
+        PaperProps={{
+          sx: {
+            backgroundColor: "transparent",
+            boxShadow: "none",
+            padding: 0,
+            width: 357,
+            maxHeight: 658,
+            mt: 1,
+          },
+        }}
+        MenuListProps={{
+          sx: {
+            padding: 0,
+          },
+        }}
+      >
+        <SidebarContent onClose={handleProfileClose} />
+      </Menu>
     </>
   );
 }
