@@ -325,7 +325,7 @@ function MobileToolbar(): React.JSX.Element {
   return (
     <>
       {/* Sticky top header bar */}
-      <div className="sticky top-0 z-50 w-full bg-white dark:bg-neutral-950 border-b border-neutral-200 dark:border-neutral-800 px-4 py-2.5 flex items-center justify-between shadow-sm">
+      <div className="sticky top-0 z-50 w-full bg-white dark:bg-neutral-950 px-4 py-2.5 flex items-center justify-between">
         <span className="text-[15px] font-semibold text-neutral-800 dark:text-neutral-100 truncate pr-2">
           {greeting}
         </span>
