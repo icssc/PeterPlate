@@ -315,36 +315,53 @@ function MobileToolbar(): React.JSX.Element {
     return pathname?.startsWith(href);
   };
 
+  const greeting =
+    !isMounted || isPending
+      ? "Hi, welcome back!"
+      : user
+        ? `Hi ${user.name?.split(" ")[0]}, welcome back!`
+        : "Hi, welcome back!";
+
   return (
     <>
-      <div className="fixed top-4 right-4 z-50">
-        {!isMounted || isPending ? (
-          <IconButton className="!p-0" aria-label="Open profile menu" disabled>
-            <AccountCircleIcon sx={{ fontSize: 40, color: "#bdbdbd" }} />
-          </IconButton>
-        ) : user ? (
-          <IconButton
-            onClick={handleProfileOpen}
-            className="!p-0"
-            aria-label="Open profile menu"
-          >
-            <Image
-              src={user.image || "/default-avatar.png"}
-              alt={user.name || "User profile"}
-              width={40}
-              height={40}
-              className="w-10 h-10 rounded-full"
-            />
-          </IconButton>
-        ) : (
-          <IconButton
-            onClick={handleProfileOpen}
-            className="!p-0"
-            aria-label="Open profile menu"
-          >
-            <AccountCircleIcon sx={{ fontSize: 40, color: "#bdbdbd" }} />
-          </IconButton>
-        )}
+      {/* Sticky top header bar */}
+      <div className="sticky top-0 z-50 w-full bg-white dark:bg-neutral-950 border-b border-neutral-200 dark:border-neutral-800 px-4 py-2.5 flex items-center justify-between shadow-sm">
+        <span className="text-[15px] font-semibold text-neutral-800 dark:text-neutral-100 truncate pr-2">
+          {greeting}
+        </span>
+        <div className="flex-shrink-0">
+          {!isMounted || isPending ? (
+            <IconButton
+              className="!p-0"
+              aria-label="Open profile menu"
+              disabled
+            >
+              <AccountCircleIcon sx={{ fontSize: 36, color: "#bdbdbd" }} />
+            </IconButton>
+          ) : user ? (
+            <IconButton
+              onClick={handleProfileOpen}
+              className="!p-0"
+              aria-label="Open profile menu"
+            >
+              <Image
+                src={user.image || "/default-avatar.png"}
+                alt={user.name || "User profile"}
+                width={36}
+                height={36}
+                className="w-9 h-9 rounded-full"
+              />
+            </IconButton>
+          ) : (
+            <IconButton
+              onClick={handleProfileOpen}
+              className="!p-0"
+              aria-label="Open profile menu"
+            >
+              <AccountCircleIcon sx={{ fontSize: 36, color: "#bdbdbd" }} />
+            </IconButton>
+          )}
+        </div>
       </div>
 
       <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-[520px]">
