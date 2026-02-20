@@ -16,6 +16,7 @@ import OnboardingDialog from "@/components/ui/onboarding";
 import Side from "@/components/ui/side";
 import { useDate } from "@/context/date-context";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { useSession } from "@/utils/auth-client";
 import { getHallDishData, getPopularDishes, sortedEvents } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
 
@@ -213,6 +214,10 @@ function MobileHome(): React.JSX.Element {
     staleTime: 5 * 60 * 1000,
   });
 
+  // Get user session
+  const { data: session } = useSession();
+  const user = session?.user;
+
   // Get hall information
   const brandywine = getHallDishData(data?.brandywine, "Brandywine");
   const anteatery = getHallDishData(data?.anteatery, "Anteatery");
@@ -231,7 +236,7 @@ function MobileHome(): React.JSX.Element {
     <div className="min-h-screen bg-white dark:bg-neutral-950">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-3">
         <h1 className="text-1xl sm:text-3xl font-bold text-neutral-900 dark:text-neutral-100">
-          Welcome back, Peter!
+          {user ? `Hi ${user.name}, welcome back!` : "Hi, welcome back!"}
         </h1>
 
         {/* ── Dining Halls ── */}
