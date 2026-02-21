@@ -1,70 +1,250 @@
 "use client";
 
-import Image from "next/image";
-import EventCard from "@/components/ui/card/event-card";
-import MealDivider from "@/components/ui/meal-divider";
-import EventCardSkeleton from "@/components/ui/skeleton/event-card-skeleton";
-import MealDividerSkeleton from "@/components/ui/skeleton/meal-divider-skeleton";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import GridOnIcon from "@mui/icons-material/GridOn";
+import Button from "@mui/material/Button";
+import { useState } from "react";
 import { trpc } from "@/utils/trpc";
+import "react-big-calendar/lib/css/react-big-calendar.css";
+import moment from "moment";
+import CalendarView from "@/components/ui/calendar-view";
+import EventCard, { type EventInfo } from "@/components/ui/card/event-card";
+import EventCardSkeleton from "@/components/ui/skeleton/event-card-skeleton";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { getEventType } from "@/utils/funcs";
 import { HallEnum } from "@/utils/types";
 
-export default function Events() {
-  // Destructure the result from useQuery
+const Events = () => {
+  const [selectedDiningHall, setSelectedDiningHall] = useState<
+    "both" | "anteatery" | "brandywine"
+  >("both");
+  const [selectedEventType, setSelectedEventType] = useState<
+    "both" | "special" | "celebration"
+  >("both");
+  const [viewMode, setViewMode] = useState<"grid" | "calendar">("grid");
+  const [selectedEventData, setSelectedEventData] = useState<EventInfo | null>(
+    null,
+  );
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const now = new Date();
+
   const {
-    data: upcomingEvents,
+    data: events,
     isLoading,
     error,
-  } = trpc.event.upcoming.useQuery();
-
-  // Sort events by start time if data is available
-  const sortedEvents = upcomingEvents
-    ? [...upcomingEvents].sort((a, b) => {
-        const dateA = new Date(a.start);
-        const dateB = new Date(b.start);
-        return dateA.getTime() - dateB.getTime();
-      })
-    : [];
-
-  const now = new Date();
-  const endOfWeek = new Date(now);
-  const daysUntilSunday = (7 - now.getDay()) % 7;
-  endOfWeek.setDate(now.getDate() + daysUntilSunday);
-  endOfWeek.setHours(23, 59, 59, 999);
-
-  const eventsThisWeek = sortedEvents.filter((event) => {
-    const eventStartDate = new Date(event.start ?? "");
-    return eventStartDate >= now && eventStartDate <= endOfWeek;
+  } = trpc.event.inBetween.useQuery({
+    after: moment(currentDate).startOf("month").toDate(),
+    before: moment(currentDate).endOf("month").toDate(),
   });
 
-  const futureEvents = sortedEvents.filter((event) => {
-    const eventStartDate = new Date(event.start ?? "");
-    return eventStartDate > endOfWeek;
+  const sortedEvents =
+    events?.length > 0
+      ? [...events].sort(
+          (a: any, b: any) =>
+            new Date(a.start).getTime() - new Date(b.start).getTime(),
+        )
+      : [];
+
+  const filteredEvents = sortedEvents.filter((event: any) => {
+    const matchesDiningHall =
+      selectedDiningHall === "both" ||
+      (selectedDiningHall === "anteatery" &&
+        event.restaurantId === "anteatery") ||
+      (selectedDiningHall === "brandywine" &&
+        event.restaurantId === "brandywine");
+    const matchesEventType =
+      selectedEventType === "both" ||
+      getEventType(event.title) === selectedEventType;
+    return matchesDiningHall && matchesEventType;
   });
+
+  const calendarEvents = filteredEvents.map((event: any) => ({
+    title: event.title,
+    start: new Date(event.start),
+    end: new Date(event.end),
+    resource: event,
+    allDay: true,
+  }));
+
+  const isDesktop = useMediaQuery("(min-width: 768px)");
+
+  const handleSelectEvent = (calendarEvent: any) => {
+    const resource = calendarEvent.resource;
+    setSelectedEventData({
+      name: resource.title,
+      shortDesc: resource.shortDescription,
+      longDesc: resource.longDescription,
+      imgSrc: resource.image,
+      alt: resource.title + " promotion image",
+      startTime: resource.start,
+      endTime: resource.end,
+      location:
+        resource.restaurantId === "anteatery"
+          ? HallEnum.ANTEATERY
+          : HallEnum.BRANDYWINE,
+      isOngoing: resource.start <= now && resource.end >= now,
+    });
+  };
+
+  const handleClose = () => setSelectedEventData(null);
+
+  const viewPreviousMonthsEvents = () => {
+    setCurrentDate(moment(currentDate).subtract(1, "month").toDate());
+  };
+
+  const viewNextMonthsEvents = () => {
+    const _now = moment();
+    const calendarDate = moment(currentDate);
+    if (calendarDate.isSameOrAfter(_now, "month")) return;
+    setCurrentDate(calendarDate.add(1, "month").toDate());
+  };
 
   return (
-    <div className="max-w-full h-screen">
+    <div className="max-w-full h-screen ">
+      <div className="fixed top-0 left-0 w-full h-16 bg-sky-700/30 dark:bg-sky-900/40 z-0" />
       <div className="z-0 flex flex-col h-full overflow-x-hidden">
-        <div className="relative w-full min-h-80 max-h-80">
-          <div className="absolute inset-0 bg-gradient-to-b from-black/65 to-transparent" />
-          <Image
-            className="object-cover w-full h-full"
-            src="/uci.webp"
-            alt="An Image of UCI's signage."
-            width={2000}
-            height={2000}
-          />
-        </div>
         <div
-          className="flex flex-col gap-4 justify-center w-full p-5 sm:px-12 sm:py-8"
+          className="flex flex-col gap-4 justify-center w-full p-5 pt-16 sm:px-12 sm:py-8 sm:pt-20"
           id="event-scroll"
         >
+          <div>
+            <h1 className="text-4xl font-bold text-sky-700 dark:text-sky-400">
+              Dining Hall Events
+            </h1>
+            <p className="text-zinc-600 dark:text-zinc-400 mt-1 font-medium">
+              Join us for special events and celebrations hosted at your local
+              dining halls!
+            </p>
+            <div className="flex gap-2 mt-3 items-center">
+              <span className="text-sm font-medium text-slate-900">View:</span>
+
+              {/* Grid View Button */}
+              <Button
+                onClick={() => setViewMode("grid")}
+                variant="outlined"
+                size="small"
+                className={`!px-4 !py-1 flex items-center justify-center !normal-case ${
+                  viewMode === "grid"
+                    ? "!bg-sky-700 dark:!bg-sky-400 !text-white !border-sky-700 dark:!border-sky-400 hover:!bg-sky-800 dark:hover:!bg-sky-500"
+                    : "!bg-white dark:!bg-zinc-800 !border-sky-700 dark:!border-sky-400 !text-slate-900 dark:!text-zinc-100 hover:!bg-sky-50 dark:hover:!bg-zinc-700"
+                }`}
+              >
+                <GridOnIcon className="mr-1" sx={{ fontSize: 18 }} />
+                Grid View
+              </Button>
+
+              {/* Calendar View Button */}
+              <Button
+                onClick={() => setViewMode("calendar")}
+                variant="outlined"
+                size="small"
+                className={`!px-4 !py-1 flex items-center justify-center !normal-case ${
+                  viewMode === "calendar"
+                    ? "!bg-sky-700 dark:!bg-sky-400 !text-white !border-sky-700 dark:!border-sky-400 hover:!bg-sky-800 dark:hover:!bg-sky-500"
+                    : "!bg-white dark:!bg-zinc-800 !border-sky-700 dark:!border-sky-400 !text-slate-900 dark:!text-zinc-100 hover:!bg-sky-50 dark:hover:!bg-zinc-700"
+                }`}
+              >
+                <CalendarTodayIcon className="mr-1" sx={{ fontSize: 18 }} />
+                Calendar View
+              </Button>
+            </div>
+
+            {/* Filter Bar */}
+            <div className="flex flex-wrap gap-8 w-full bg-sky-100 dark:bg-zinc-900/50 border dark:border-zinc-800 rounded-lg p-5 pb-8 mt-4">
+              <div className="flex flex-col gap-3">
+                <span className="text-sm font-medium text-slate-900 dark:text-zinc-200">
+                  Event Type
+                </span>
+                <div className="flex gap-3">
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={() => setSelectedEventType("both")}
+                    className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
+                      selectedEventType === "both"
+                        ? "!bg-sky-700 dark:!bg-sky-400 !text-white !border-sky-700 dark:!border-sky-400 hover:!bg-sky-800 dark:hover:!bg-sky-500"
+                        : "!bg-white dark:!bg-zinc-800 !border-sky-700 dark:!border-sky-400 !text-slate-900 dark:!text-zinc-100 hover:!bg-sky-50 dark:hover:!bg-zinc-700"
+                    }`}
+                  >
+                    All Events
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={() => setSelectedEventType("special")}
+                    className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
+                      selectedEventType === "special"
+                        ? "!bg-sky-700 dark:!bg-sky-400 !text-white !border-sky-700 dark:!border-sky-400 hover:!bg-sky-800 dark:hover:!bg-sky-500 hover:!text-white"
+                        : "!bg-white dark:!bg-zinc-800 !border-sky-700 dark:!border-sky-400 !text-slate-900 dark:!text-zinc-100 hover:!bg-sky-50 dark:hover:!bg-zinc-700 hover:!text-slate-900"
+                    }`}
+                  >
+                    Special Meals
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={() => setSelectedEventType("celebration")}
+                    className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
+                      selectedEventType === "celebration"
+                        ? "!bg-sky-700 dark:!bg-sky-400 !text-white !border-sky-700 dark:!border-sky-400 hover:!bg-sky-800 dark:hover:!bg-sky-500 hover:!text-white"
+                        : "!bg-white dark:!bg-zinc-800 !border-sky-700 dark:!border-sky-400 !text-slate-900 dark:!text-zinc-100 hover:!bg-sky-50 dark:hover:!bg-zinc-700 hover:!text-slate-900"
+                    }`}
+                  >
+                    Celebration
+                  </Button>
+                </div>
+              </div>
+              <div className="flex flex-col gap-3">
+                <span className="text-sm font-medium text-slate-900">
+                  Location
+                </span>
+                <div className="flex gap-3">
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={() => setSelectedDiningHall("both")}
+                    className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
+                      selectedDiningHall === "both"
+                        ? "!bg-sky-700 dark:!bg-sky-400 !text-white !border-sky-700 dark:!border-sky-400 hover:!bg-sky-800 dark:hover:!bg-sky-500 hover:!text-white"
+                        : "!bg-white dark:!bg-zinc-800 !border-sky-700 dark:!border-sky-400 !text-slate-900 dark:!text-zinc-100 hover:!bg-sky-50 dark:hover:!bg-zinc-700 hover:!text-slate-900"
+                    }`}
+                  >
+                    All Locations
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={() => setSelectedDiningHall("brandywine")}
+                    className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
+                      selectedDiningHall === "brandywine"
+                        ? "!bg-sky-700 dark:!bg-sky-400 !text-white !border-sky-700 dark:!border-sky-400 hover:!bg-sky-800 dark:hover:!bg-sky-500 hover:!text-white"
+                        : "!bg-white dark:!bg-zinc-800 !border-sky-700 dark:!border-sky-400 !text-slate-900 dark:!text-zinc-100 hover:!bg-sky-50 dark:hover:!bg-zinc-700 hover:!text-slate-900"
+                    }`}
+                  >
+                    Brandywine
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={() => setSelectedDiningHall("anteatery")}
+                    className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
+                      selectedDiningHall === "anteatery"
+                        ? "!bg-sky-700 dark:!bg-sky-400 !text-white !border-sky-700 dark:!border-sky-400 hover:!bg-sky-800 dark:hover:!bg-sky-500 hover:!text-white"
+                        : "!bg-white dark:!bg-zinc-800 !border-sky-700 dark:!border-sky-400 !text-slate-900 dark:!text-zinc-100 hover:!bg-sky-50 dark:hover:!bg-zinc-700 hover:!text-slate-900"
+                    }`}
+                  >
+                    Anteatery
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Show skeletons while loading */}
           {isLoading && (
             <>
-              <MealDividerSkeleton />
               <EventCardSkeleton />
               <EventCardSkeleton />
-              <MealDividerSkeleton />
               <EventCardSkeleton />
             </>
           )}
@@ -73,12 +253,16 @@ export default function Events() {
               Error loading data: {error.message}
             </p>
           )}
-          {/* Map over the fetched events once loaded */}
-          {!isLoading && !error && (
+          {/* GRID DISPLAY: Map over the fetched events once loaded */}
+          {!isLoading && !error && viewMode === "grid" && (
             <>
-              <MealDivider title="This Week's Events" />
-              {eventsThisWeek.length > 0 &&
-                eventsThisWeek.map((event) => (
+              <p className="text-sm text-zinc-700 dark:text-zinc-400">
+                Showing {filteredEvents.length} event
+                {filteredEvents.length !== 1 ? "s" : ""}
+              </p>
+
+              <div className="flex sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12 overflow-x-auto sm:overflow-visible pb-2 sm:pb-0">
+                {filteredEvents.map((event: any): any => (
                   <EventCard
                     key={`${event.title}|${event.start.toISOString()}|${event.restaurantId}`}
                     name={event.title}
@@ -96,40 +280,35 @@ export default function Events() {
                     isOngoing={event.start <= now && event.end >= now}
                   />
                 ))}
-              {eventsThisWeek.length === 0 && (
+              </div>
+              {filteredEvents.length === 0 && (
                 <p className="text-center text-zinc-700 py-5">
-                  No events scheduled for this week :(
-                </p>
-              )}
-              <MealDivider title="Upcoming Events" />
-              {futureEvents.length > 0 &&
-                futureEvents.map((event) => (
-                  <EventCard
-                    key={`${event.title}|${event.start.toISOString()}|${event.restaurantId}`}
-                    name={event.title}
-                    imgSrc={event.image}
-                    alt={`${event.title} promotion image.`}
-                    startTime={event.start}
-                    endTime={event.end}
-                    location={
-                      event.restaurantId === "anteatery"
-                        ? HallEnum.ANTEATERY
-                        : HallEnum.BRANDYWINE
-                    }
-                    shortDesc={event.shortDescription}
-                    longDesc={event.longDescription}
-                    isOngoing={event.start <= now && event.end >= now}
-                  />
-                ))}
-              {futureEvents.length === 0 && (
-                <p className="text-center text-zinc-700 py-5">
-                  No upcoming events found :(
+                  No events found :(
                 </p>
               )}
             </>
+          )}
+
+          {/* CALENDAR DISPLAY */}
+          {!isLoading && !error && viewMode === "calendar" && (
+            <CalendarView
+              isDesktop={isDesktop}
+              viewMode={viewMode}
+              isLoading={isLoading}
+              error={error}
+              currentDate={currentDate}
+              calendarEvents={calendarEvents}
+              selectedEventData={selectedEventData}
+              onPreviousMonth={viewPreviousMonthsEvents}
+              onNextMonth={viewNextMonthsEvents}
+              onSelectEvent={handleSelectEvent}
+              onCloseDetails={handleClose}
+            />
           )}
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default Events;

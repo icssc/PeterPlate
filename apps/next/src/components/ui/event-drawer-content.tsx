@@ -1,9 +1,10 @@
 import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import PinDropOutlinedIcon from "@mui/icons-material/PinDropOutlined";
-import { Box, Button, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import Image from "next/image";
-import { dateToString, generateGCalLink, toTitleCase } from "@/utils/funcs";
+import EventTypeBadge from "@/components/ui/event-type-badge";
+import { timeToString, toTitleCase } from "@/utils/funcs";
 import { HallEnum } from "@/utils/types";
 import type { EventInfo } from "./card/event-card";
 
@@ -21,57 +22,45 @@ export default function EventDrawerContent(
 ): React.JSX.Element {
   return (
     <Box>
-      <Image
-        src={props.imgSrc}
-        alt={props.alt}
-        width={600}
-        height={600}
-        className="w-full h-auto max-h-64 object-cover"
-      />
+      <div className="relative">
+        <Image
+          src={props.imgSrc}
+          alt={props.alt}
+          width={600}
+          height={600}
+          className="w-full object-contain"
+        />
+        <EventTypeBadge title={props.name} />
+      </div>
       <Box sx={{ padding: "20px 24px 24px" }} className="flex flex-col gap-2">
-        <Typography
-          variant="h4"
-          sx={{ fontWeight: 600 }}
-          className="text-3xl leading-tight tracking-normal text-left"
-        >
+        <h2 className="text-2xl font-semibold text-sky-700 leading-tight">
           {props.name}
-        </Typography>
-        <div
-          className="flex flex-wrap gap-x-2 gap-y-1 text-zinc-400 items-center"
-          id="event-card-subheader"
-        >
-          <div className="flex gap-1 items-center whitespace-nowrap">
-            <AccessTimeOutlinedIcon />
-            <p>{dateToString(props.startTime, props.endTime)}</p>
+        </h2>
+        <div className="flex flex-col gap-2 text-sm text-zinc-500 mt-1">
+          <div className="flex gap-2 items-center">
+            <CalendarTodayOutlinedIcon sx={{ fontSize: 16 }} />
+            <span>
+              {props.startTime.toLocaleDateString(undefined, {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </span>
           </div>
-          <div className="flex gap-1 items-center whitespace-nowrap">
-            <PinDropOutlinedIcon />
-            <p>{toTitleCase(HallEnum[props.location])}</p>
+          <div className="flex gap-2 items-center">
+            <AccessTimeOutlinedIcon sx={{ fontSize: 16 }} />
+            <span>
+              {timeToString(props.startTime)} – {timeToString(props.endTime)}
+            </span>
+          </div>
+          <div className="flex gap-2 items-center">
+            <PinDropOutlinedIcon sx={{ fontSize: 16 }} />
+            <span>{toTitleCase(HallEnum[props.location])}</span>
           </div>
         </div>
-        <Typography variant="body2" className="text-sm leading-relaxed mt-2">
+        <p className="text-sm leading-relaxed mt-2">
           {props.longDesc?.replace(/\u00A0+/g, " ")}
-        </Typography>
-        <div className="w-full flex items-center justify-center pt-4">
-          <a
-            href={generateGCalLink(
-              props.name,
-              props.longDesc,
-              props.location,
-              props.startTime,
-            )}
-            rel="noreferrer"
-            target="_blank"
-          >
-            <Button
-              variant="contained"
-              className="[&_svg]:size-5 whitespace-nowrap"
-              startIcon={<CalendarTodayOutlinedIcon />}
-            >
-              Add to Google Calendar
-            </Button>
-          </a>
-        </div>
+        </p>
       </Box>
     </Box>
   );
