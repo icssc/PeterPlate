@@ -261,7 +261,7 @@ const Events = () => {
                 {filteredEvents.length !== 1 ? "s" : ""}
               </p>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12 max-w-10xl">
+              <div className="flex sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12 overflow-x-auto sm:overflow-visible pb-2 sm:pb-0">
                 {filteredEvents.map((event: any): any => (
                   <EventCard
                     key={`${event.title}|${event.start.toISOString()}|${event.restaurantId}`}
