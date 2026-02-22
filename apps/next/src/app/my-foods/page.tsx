@@ -11,7 +11,7 @@ import { trpc } from "@/utils/trpc";
 import { cn } from "@/utils/tw";
 
 type LocationFilter = "all" | "brandywine" | "anteatery";
-type SortOption = "recent" | "oldest" | "az" | "rating";
+type SortOption = "recent" | "oldest" | "az" | "highest";
 
 interface MergedEntry {
   dishId: string;
@@ -29,8 +29,8 @@ const LOCATION_LABELS: Record<LocationFilter, string> = {
 const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: "recent", label: "Date Modified (Recent)" },
   { value: "oldest", label: "Date Modified (Oldest)" },
-  { value: "az", label: "Name (A–Z)" },
-  { value: "rating", label: "Highest Rated" },
+  { value: "az", label: "A-Z" },
+  { value: "highest", label: "Rating (Highest)" },
 ];
 
 export default function MyFoodsPage() {
@@ -113,7 +113,7 @@ export default function MyFoodsPage() {
           return a.modifiedAt.getTime() - b.modifiedAt.getTime();
         case "az":
           return a.dish.name.localeCompare(b.dish.name);
-        case "rating":
+        case "highest":
           return (b.dish.numRatings ?? 0) - (a.dish.numRatings ?? 0);
         default:
           return 0;
@@ -128,9 +128,7 @@ export default function MyFoodsPage() {
     <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 pb-8 pt-20 sm:px-6 lg:px-8">
       {/* Header */}
       <header className="space-y-1">
-        <h1 className="text-3xl text-sky-700 font-bold tracking-tight">
-          My Foods
-        </h1>
+        <h1 className="text-3xl text-sky-700 font-bold mb-4">My Foods</h1>
         <p className="text-sm">
           View all the dishes you have favorited or rated across UCI dining
           halls!

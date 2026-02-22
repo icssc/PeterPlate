@@ -108,13 +108,13 @@ const MyFoodsCardContent = React.forwardRef<
             <div className="flex flex-col">
               <div className="flex items-start gap-3 p-4 pb-3">
                 {/* Thumbnail */}
-                <div className="flex-shrink-0 w-[84px] h-[84px] rounded-lg overflow-hidden bg-slate-100 flex items-center justify-center">
+                <div className="flex-shrink-0 w-[96px] h-[96px] rounded-lg overflow-hidden bg-slate-100 flex items-center justify-center">
                   {showImage ? (
                     <Image
                       src={dish.image_url}
                       alt={formatFoodName(dish.name)}
-                      width={84}
-                      height={84}
+                      width={96}
+                      height={96}
                       className="w-full h-full object-cover"
                       onError={() => setImageError(true)}
                     />
