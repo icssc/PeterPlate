@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in";
 import { useSession } from "@/utils/auth-client";
@@ -71,7 +72,15 @@ const TOOLBAR_ELEMENTS: ToolbarElement[] = [
   },
 ];
 
-function ToolbarDropdown({ element }: { element: ToolbarElement }) {
+const TRANSPARENT_PAGES = ["/", "/about", "/brandywine", "/anteatery"];
+
+function ToolbarDropdown({
+  element,
+  isTransparent,
+}: {
+  element: ToolbarElement;
+  isTransparent: boolean;
+}) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -88,8 +97,11 @@ function ToolbarDropdown({ element }: { element: ToolbarElement }) {
       <Button
         onClick={handleClick}
         endIcon={<ArrowDropDownIcon fontSize="small" />}
-        className="capitalize text-[16px] font-medium
-        group-hover:text-white text-white/60 bg-transparent"
+        className={`capitalize text-[16px] !font-medium bg-transparent ${
+          isTransparent
+            ? "text-white/60 group-hover:text-white"
+            : "!text-black dark:!text-white"
+        }`}
       >
         {element.title}
       </Button>
@@ -116,6 +128,9 @@ function ToolbarDropdown({ element }: { element: ToolbarElement }) {
 }
 
 export default function Toolbar(): React.JSX.Element {
+  const pathname = usePathname();
+  const isTransparent = TRANSPARENT_PAGES.includes(pathname);
+
   const [profileAnchor, setProfileAnchor] = useState<null | HTMLElement>(null);
   const profileOpen = Boolean(profileAnchor);
 
@@ -133,8 +148,11 @@ export default function Toolbar(): React.JSX.Element {
     <>
       <AppBar
         position="absolute"
-        className="bg-transparent shadow-none 
-        hover:bg-gradient-to-b from-black/50 to-black/0"
+        className={`shadow-none ${
+          isTransparent
+            ? "bg-transparent hover:bg-gradient-to-b from-black/50 to-black/0"
+            : "!bg-white dark:!bg-zinc-900"
+        }`}
       >
         <MuiToolbar className="justify-between px-4 py-1 group">
           <div className="flex-none flex items-center">
@@ -146,7 +164,11 @@ export default function Toolbar(): React.JSX.Element {
                 width={40}
                 height={40}
               />
-              <span className="text-white font-poppins font-bold text-[28px] leading-[24px]">
+              <span
+                className={`font-poppins font-bold text-[28px] leading-[24px] ${
+                  isTransparent ? "text-white" : "text-sky-700 dark:text-white"
+                }`}
+              >
                 PeterPlate
               </span>
             </Link>
@@ -156,7 +178,11 @@ export default function Toolbar(): React.JSX.Element {
             {TOOLBAR_ELEMENTS.map((element) => {
               if (element.children) {
                 return (
-                  <ToolbarDropdown key={element.title} element={element} />
+                  <ToolbarDropdown
+                    key={element.title}
+                    element={element}
+                    isTransparent={isTransparent}
+                  />
                 );
               }
               return (
@@ -164,8 +190,11 @@ export default function Toolbar(): React.JSX.Element {
                   key={element.title}
                   component={Link}
                   href={element.href || "#"}
-                  className="group-hover:text-white normal-case text-[16px] 
-                  !font-medium text-white/60"
+                  className={`normal-case text-[16px] !font-medium ${
+                    isTransparent
+                      ? "text-white/60 group-hover:text-white"
+                      : "!text-black dark:!text-white"
+                  }`}
                 >
                   {element.title}
                 </Button>
@@ -183,7 +212,9 @@ export default function Toolbar(): React.JSX.Element {
                     aria-label="Open sidebar"
                     disabled
                   >
-                    <MenuIcon style={{ color: "white" }} />
+                    <MenuIcon
+                      style={{ color: isTransparent ? "white" : "black" }}
+                    />
                   </IconButton>
                 </>
               ) : user ? (
