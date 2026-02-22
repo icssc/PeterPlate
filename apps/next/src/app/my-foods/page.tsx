@@ -189,21 +189,19 @@ export default function MyFoodsPage() {
               placeholder="Search meals..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-zinc-200 bg-white focus:ring-2 focus:ring-sky-700 focus:outline-none"
+              className="w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-sky-700 bg-white focus:ring-2 focus:ring-sky-700 focus:outline-none"
             />
           </div>
 
           {/* Sort */}
           <div className="flex flex-col gap-1 sm:gap-0">
             {!isDesktop && (
-              <span className="text-xs font-medium text-zinc-500 uppercase tracking-wide">
-                Filter by
-              </span>
+              <span className="text-sm font-medium">Filter by</span>
             )}
             <select
               value={sortOption}
               onChange={(e) => setSortOption(e.target.value as SortOption)}
-              className="px-4 py-2 text-sm rounded-xl border border-zinc-200 bg-white focus:ring-2 focus:ring-sky-700 focus:outline-none cursor-pointer w-full sm:w-auto"
+              className="px-4 py-2 text-sm rounded-xl border border-sky-700 bg-white focus:ring-2 focus:ring-sky-700 focus:outline-none cursor-pointer w-full sm:w-auto"
             >
               {SORT_OPTIONS.map(({ value, label }) => (
                 <option key={value} value={value}>

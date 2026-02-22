@@ -119,7 +119,7 @@ const MyFoodsCardContent = React.forwardRef<
                       onError={() => setImageError(true)}
                     />
                   ) : IconComponent ? (
-                    <IconComponent className="w-10 h-10 text-slate-500" />
+                    <IconComponent className="w-10 h-10 text-slate-700" />
                   ) : (
                     <div className="w-10 h-10 bg-slate-200 rounded" />
                   )}
