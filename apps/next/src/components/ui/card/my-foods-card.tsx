@@ -294,13 +294,19 @@ export default function MyFoodsCard({
           anchor="bottom"
           open={open}
           onClose={handleClose}
-          sx={{
-            "& .MuiDrawer-paper": {
-              borderTopLeftRadius: "10px",
-              borderTopRightRadius: "10px",
-              marginTop: "96px",
-              height: "auto",
-              maxHeight: "85vh",
+          slotProps={{
+            paper: {
+              sx: {
+                width: "460px",
+                maxWidth: "90vw",
+                maxHeight: "90vh",
+                margin: 2,
+                padding: 0,
+                overflow: "hidden",
+                display: "flex",
+                flexDirection: "column",
+                borderRadius: "16px",
+              },
             },
           }}
         >
