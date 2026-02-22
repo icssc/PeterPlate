@@ -151,9 +151,9 @@ export default function MyFoodsPage() {
                 type="button"
                 onClick={() => setLocationFilter(loc)}
                 className={cn(
-                  "rounded-full px-4 py-1.5 text-sm font-medium transition",
+                  "rounded-lg px-4 py-1.5 text-sm font-medium transition",
                   locationFilter === loc
-                    ? "bg-sky-600 text-white shadow-sm"
+                    ? "bg-sky-700 text-white shadow-sm"
                     : "bg-white text-zinc-700 border border-zinc-200 hover:bg-zinc-50",
                 )}
               >
