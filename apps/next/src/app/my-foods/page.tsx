@@ -11,7 +11,7 @@ import { trpc } from "@/utils/trpc";
 import { cn } from "@/utils/tw";
 
 type LocationFilter = "all" | "brandywine" | "anteatery";
-type SortOption = "recent" | "oldest" | "az" | "highest";
+type SortOption = "recent" | "oldest" | "highest" | "lowest" | "az" | "za";
 
 interface MergedEntry {
   dishId: string;
@@ -29,8 +29,10 @@ const LOCATION_LABELS: Record<LocationFilter, string> = {
 const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: "recent", label: "Date Modified (Recent)" },
   { value: "oldest", label: "Date Modified (Oldest)" },
-  { value: "az", label: "A-Z" },
   { value: "highest", label: "Rating (Highest)" },
+  { value: "lowest", label: "Rating (Lowest)" },
+  { value: "az", label: "A-Z" },
+  { value: "za", label: "Z-A" },
 ];
 
 export default function MyFoodsPage() {
@@ -111,10 +113,14 @@ export default function MyFoodsPage() {
           return b.modifiedAt.getTime() - a.modifiedAt.getTime();
         case "oldest":
           return a.modifiedAt.getTime() - b.modifiedAt.getTime();
-        case "az":
-          return a.dish.name.localeCompare(b.dish.name);
         case "highest":
           return (b.dish.numRatings ?? 0) - (a.dish.numRatings ?? 0);
+        case "lowest":
+          return (a.dish.numRatings ?? 0) - (b.dish.numRatings ?? 0);
+        case "az":
+          return a.dish.name.localeCompare(b.dish.name);
+        case "za":
+          return b.dish.name.localeCompare(a.dish.name);
         default:
           return 0;
       }
