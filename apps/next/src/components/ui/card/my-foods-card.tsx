@@ -294,21 +294,7 @@ export default function MyFoodsCard({
           anchor="bottom"
           open={open}
           onClose={handleClose}
-          slotProps={{
-            paper: {
-              sx: {
-                width: "460px",
-                maxWidth: "90vw",
-                maxHeight: "90vh",
-                margin: 2,
-                padding: 0,
-                overflow: "hidden",
-                display: "flex",
-                flexDirection: "column",
-                borderRadius: "16px",
-              },
-            },
-          }}
+          slotProps={dialogSlotProps}
         >
           <FoodDrawerContent
             dish={dish}
