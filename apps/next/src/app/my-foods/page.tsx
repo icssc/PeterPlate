@@ -142,12 +142,10 @@ export default function MyFoodsPage() {
       </header>
 
       {/* Filter bar */}
-      <div className="flex flex-col sm:flex-row items-start gap-4 rounded-2xl border border-sky-100 bg-sky-50 p-4">
+      <div className="flex flex-col sm:flex-row items-start gap-4 rounded-2xl bg-sky-100 p-4">
         {/* Location buttons */}
         <div className="flex flex-col gap-1.5">
-          <span className="text-xs font-medium text-zinc-500 uppercase tracking-wide">
-            Location
-          </span>
+          <span className="text-sm font-medium">Location</span>
           <div className="flex flex-wrap gap-2">
             {(Object.keys(LOCATION_LABELS) as LocationFilter[]).map((loc) => (
               <button
@@ -155,10 +153,10 @@ export default function MyFoodsPage() {
                 type="button"
                 onClick={() => setLocationFilter(loc)}
                 className={cn(
-                  "rounded-lg px-4 py-1.5 text-sm font-medium transition",
+                  "rounded-lg px-4 py-1.5 w-26 h-8 text-sm font-medium transition",
                   locationFilter === loc
                     ? "bg-sky-700 text-white shadow-sm"
-                    : "bg-white text-zinc-700 border border-zinc-200 hover:bg-zinc-50",
+                    : "bg-white border border-sky-700 hover:bg-zinc-100",
                 )}
               >
                 {LOCATION_LABELS[loc]}
