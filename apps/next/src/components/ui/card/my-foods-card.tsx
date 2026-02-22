@@ -28,7 +28,7 @@ function UserRatingDisplay({ dishId }: { dishId: string }) {
   );
 
   if (!userId || userRating == null) {
-    return <span className="text-xs text-zinc-400 italic">Not rated yet</span>;
+    return <span className="text-xs">Not rated yet</span>;
   }
 
   return (
@@ -40,7 +40,7 @@ function UserRatingDisplay({ dishId }: { dishId: string }) {
             "w-3.5 h-3.5",
             n <= userRating
               ? "fill-amber-400 stroke-amber-400 text-amber-400"
-              : "stroke-zinc-300 text-zinc-300",
+              : "stroke-gray-400 text-gray-400",
           )}
           strokeWidth={n <= userRating ? 0 : 1}
         />
@@ -150,7 +150,7 @@ const MyFoodsCardContent = React.forwardRef<
                       {isFavorited ? (
                         <Favorite className="w-5 h-5 text-rose-500" />
                       ) : (
-                        <FavoriteBorder className="w-5 h-5 text-zinc-400" />
+                        <FavoriteBorder className="w-5 h-5 text-gray-500" />
                       )}
                     </button>
                   </div>
@@ -187,7 +187,7 @@ const MyFoodsCardContent = React.forwardRef<
 
               {/* Location and user rating */}
               <div className="flex items-center justify-between px-4 py-2.5 gap-2">
-                <div className="flex items-center gap-1 text-zinc-500 text-xs min-w-0">
+                <div className="flex items-center gap-1 text-gray-500 text-xs min-w-0">
                   <LocationOn className="w-3.5 h-3.5 flex-shrink-0" />
                   <span className="truncate">
                     {toTitleCase(dish.restaurant)}
@@ -195,7 +195,7 @@ const MyFoodsCardContent = React.forwardRef<
                 </div>
 
                 <div className="flex items-center gap-1.5 flex-shrink-0">
-                  <span className="text-xs text-zinc-600 whitespace-nowrap">
+                  <span className="text-xs whitespace-nowrap">
                     Your rating:
                   </span>
                   <UserRatingDisplay dishId={dish.id} />
