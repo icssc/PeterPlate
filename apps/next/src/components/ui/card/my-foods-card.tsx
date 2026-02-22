@@ -111,7 +111,7 @@ const MyFoodsCardContent = React.forwardRef<
                 <div className="flex-shrink-0 w-[84px] h-[84px] rounded-lg overflow-hidden bg-slate-100 flex items-center justify-center">
                   {showImage ? (
                     <Image
-                      src={dish.image_url as string}
+                      src={dish.image_url}
                       alt={formatFoodName(dish.name)}
                       width={84}
                       height={84}
@@ -183,7 +183,7 @@ const MyFoodsCardContent = React.forwardRef<
               </div>
 
               {/* Divider */}
-              <div className="h-px bg-slate-100 mx-4" />
+              <div className="h-px bg-sky-700 mx-4" />
 
               {/* Location and user rating */}
               <div className="flex items-center justify-between px-4 py-2.5 gap-2">
