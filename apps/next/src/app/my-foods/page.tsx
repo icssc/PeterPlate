@@ -125,7 +125,7 @@ export default function MyFoodsPage() {
   const hasError = !!favoritesError || !!ratedError;
 
   return (
-    <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 pb-16 pt-24 sm:px-6 lg:px-8">
+    <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 pb-8 pt-20 sm:px-6 lg:px-8">
       {/* Header */}
       <header className="space-y-1">
         <h1 className="text-3xl text-sky-700 font-bold tracking-tight">
