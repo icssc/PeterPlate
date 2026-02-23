@@ -69,6 +69,10 @@ const TOOLBAR_ELEMENTS: ToolbarElement[] = [
     title: "My Foods",
     href: "/my-foods",
   },
+  {
+    title: "Nutrition",
+    href: "/nutrition",
+  },
 ];
 
 function ToolbarDropdown({ element }: { element: ToolbarElement }) {

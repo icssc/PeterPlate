@@ -58,26 +58,24 @@ export default function MealTracker() {
     activeDayIndex !== null ? mealsGroupedByDay[activeDayIndex] : null;
 
   return (
-    <div className="cols-container min-h-screen flex">
-      <div className="mt-12 w-[300px] border-r p-4 flex flex-col gap-2">
-        {mealsGroupedByDay.map((day, index) => (
-          <button
-            type="button"
-            key={day.dateLabel}
-            onClick={() => setActiveDayIndex(index)}
-            className={`text-left p-2 hover:bg-gray-100 ${activeDayIndex === index ? "font-bold bg-gray-200" : ""}`}
-          >
-            {day.dateLabel}
-          </button>
-        ))}
-        {mealsGroupedByDay.length === 0 && <div>No meals logged recently.</div>}
+    <div className="min-h-screen p-8 mt-12 flex justify-between">
+      <div className="pl-8">
+        <h1 className="text-4xl font-bold text-sky-700 dark:text-sky-400">
+          Tracker
+        </h1>
+        <p className="text-zinc-800 dark:text-zinc-400 mt-1 ">
+          Keep track of your health using out Nutrition Tracker! Add dishes to
+          count them towards your totals!
+        </p>
       </div>
 
-      <div className="mt-12 p-4">
-        {selectedDay && (
+      <div className="pr-8">
+        {mealsGroupedByDay.length === 0 ? (
+          <div>No meals logged recently.</div>
+        ) : (
           <NutritionBreakdown
-            dateString={selectedDay.dateLabel}
-            mealsEaten={selectedDay.items}
+            dateString={mealsGroupedByDay[0].dateLabel}
+            mealsEaten={mealsGroupedByDay[0].items}
           />
         )}
       </div>

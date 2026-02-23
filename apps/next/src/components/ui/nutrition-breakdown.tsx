@@ -75,69 +75,39 @@ const NutritionBreakdown = ({ dateString, mealsEaten }: Props) => {
 
   return (
     <div>
-      <center className="text-[2rem] font-bold">{dateString}</center>
-      <div className="flex align-items mt-4">
-        <div className="flex flex-col">
-          <center className="text-[2rem] font-bold">Calories</center>
+      <div className="bg-sky-600/20 rounded-xl p-6 flex flex-col gap-6 mt-4 w-fit">
+        <div className="bg-white rounded-xl p-4 flex flex-col items-center w-48 h-48">
+          <span className="text-xl text-sky-700 font-semibold">Calories</span>
           <ProgressDonut
             progress_value={nutrition.calories}
             max_value={2000}
             display_unit=""
           />
         </div>
-        <div className="flex flex-col">
-          <center className="text-[2rem] font-bold">Protein</center>
+        <div className="bg-white rounded-xl p-4 flex flex-col items-center w-48 h-48">
+          <span className="text-xl text-sky-700 font-semibold">Protein</span>
           <ProgressDonut
             progress_value={nutrition.protein_g}
             max_value={75}
             display_unit="g"
           />
         </div>
-        <div className="flex flex-col">
-          <center className="text-[2rem] font-bold">Carbs</center>
+        <div className="bg-white rounded-xl p-4 flex flex-col items-center w-48 h-48">
+          <span className="text-xl text-sky-700 font-semibold">Carbs</span>
           <ProgressDonut
             progress_value={nutrition.carbs_g}
             max_value={250}
             display_unit="g"
           />
         </div>
-        <div className="flex flex-col">
-          <center className="text-[2rem] font-bold">Fat</center>
+        <div className="bg-white rounded-xl p-4 flex flex-col items-center w-48 h-48">
+          <span className="text-xl text-sky-700 font-semibold">Fat</span>
           <ProgressDonut
             progress_value={nutrition.fat_g}
             max_value={50}
             display_unit="g"
           />
         </div>
-      </div>
-      <div className="meal-history">
-        {mealsEaten?.map((meal) => (
-          <div
-            key={meal.id}
-            className="flex items-center justify-between gap-4 rounded-lg border p-4 mb-3"
-          >
-            <div className="flex flex-col">
-              <h3 className="font-medium">
-                {meal.servings} serving{meal.servings > 1 ? "s" : ""} of{" "}
-                {meal.dishName}
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                {Math.round(meal.calories * meal.servings)} calories |&nbsp;
-                {Math.round(meal.protein * meal.servings)}g protein |&nbsp;
-                {Math.round(meal.carbs * meal.servings)}g carbs |&nbsp;
-                {Math.round(meal.fat * meal.servings)}g fat
-              </p>
-            </div>
-
-            <button
-              type="button"
-              className="h-8 rounded-md border px-3 text-sm transition-colors hover:bg-accent hover:text-accent-foreground"
-              onClick={(e) => removeBtnOnClick(e, meal.userId, meal.dishId)}
-            >
-              Remove
-            </button>
-          </div>
-        ))}
       </div>
     </div>
   );
