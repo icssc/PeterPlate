@@ -43,7 +43,6 @@ function compileMealData(
 }
 
 interface Props {
-  dateString: string;
   mealsEaten: LoggedMealJoinedWithNutrition[];
   calorieGoal: number;
   proteinGoal: number;
@@ -52,7 +51,6 @@ interface Props {
 }
 
 const NutritionBreakdown = ({
-  dateString,
   mealsEaten,
   calorieGoal,
   proteinGoal,
