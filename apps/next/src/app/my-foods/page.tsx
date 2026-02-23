@@ -1,5 +1,6 @@
 "use client";
 
+import { MenuItem, Select } from "@mui/material";
 import type { DishInfo } from "@peterplate/api";
 import { useMemo, useState } from "react";
 import MyFoodsCard from "@/components/ui/card/my-foods-card";
@@ -198,17 +199,17 @@ export default function MyFoodsPage() {
             {!isDesktop && (
               <span className="text-sm font-medium">Filter by</span>
             )}
-            <select
+            <Select
+              className="px-4 py-2 text-sm rounded-xl border border-sky-700 bg-white focus:ring-2 focus:ring-sky-700 focus:outline-none cursor-pointer w-full sm:w-auto"
               value={sortOption}
               onChange={(e) => setSortOption(e.target.value as SortOption)}
-              className="px-4 py-2 text-sm rounded-xl border border-sky-700 bg-white focus:ring-2 focus:ring-sky-700 focus:outline-none cursor-pointer w-full sm:w-auto"
             >
               {SORT_OPTIONS.map(({ value, label }) => (
-                <option key={value} value={value}>
+                <MenuItem key={value} value={value}>
                   {label}
-                </option>
+                </MenuItem>
               ))}
-            </select>
+            </Select>
           </div>
         </div>
       </div>
