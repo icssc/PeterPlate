@@ -3,7 +3,9 @@
 import type { SelectLoggedMeal } from "@peterplate/db";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import TrackedMealCard from "@/components/ui/card/tracked-meal-card";
 import NutritionBreakdown from "@/components/ui/nutrition-breakdown";
+import NutritionGoals from "@/components/ui/nutrition-goals";
 import { useUserStore } from "@/context/useUserStore";
 import { trpc } from "@/utils/trpc";
 
@@ -23,7 +25,12 @@ export default function MealTracker() {
     data: meals,
     isLoading,
     error,
-  } = trpc.nutrition.getMealsInLastWeek.useQuery({ userId: userId! });
+  } = trpc.nutrition.getMealsInLastWeek.useQuery({ userId: userId ?? "" });
+
+  const { data: goals } = trpc.nutrition.getGoals.useQuery({
+    userId: userId ?? "",
+  });
+
   const [activeDayIndex, setActiveDayIndex] = useState<number | null>(null);
 
   const mealsGroupedByDay = useMemo(() => {
@@ -63,10 +70,17 @@ export default function MealTracker() {
         <h1 className="text-4xl font-bold text-sky-700 dark:text-sky-400">
           Tracker
         </h1>
-        <p className="text-zinc-800 dark:text-zinc-400 mt-1 ">
+        <p className="text-zinc-800 dark:text-zinc-400 mt-1">
           Keep track of your health using out Nutrition Tracker! Add dishes to
           count them towards your totals!
         </p>
+        {userId && <NutritionGoals userId={userId} />}
+
+        <div className="flex flex-wrap gap-4 mt-6">
+          {selectedDay?.items.map((meal) => (
+            <TrackedMealCard key={meal.id} meal={meal} />
+          ))}
+        </div>
       </div>
 
       <div className="pr-8">
@@ -76,6 +90,10 @@ export default function MealTracker() {
           <NutritionBreakdown
             dateString={mealsGroupedByDay[0].dateLabel}
             mealsEaten={mealsGroupedByDay[0].items}
+            calorieGoal={goals?.calorieGoal ?? 2000}
+            proteinGoal={goals?.proteinGoal ?? 75}
+            carbGoal={goals?.carbGoal ?? 250}
+            fatGoal={goals?.fatGoal ?? 50}
           />
         )}
       </div>

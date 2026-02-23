@@ -1,5 +1,5 @@
 import { createTRPCRouter, publicProcedure } from "@api/trpc";
-import { loggedMeals, nutritionInfos } from "@peterplate/db";
+import { loggedMeals, nutritionInfos, userGoals } from "@peterplate/db";
 import { TRPCError } from "@trpc/server";
 import { and, desc, eq, gt } from "drizzle-orm";
 import { z } from "zod";
@@ -101,6 +101,43 @@ export const nutritionRouter = createTRPCRouter({
           message: "Logged meal not found",
         });
       }
+
+      return result[0];
+    }),
+
+  getGoals: publicProcedure
+    .input(z.object({ userId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const result = await ctx.db.query.userGoals.findFirst({
+        where: (userGoals, { eq }) => eq(userGoals.userId, input.userId),
+      });
+      return result ?? null;
+    }),
+
+  upsertGoals: publicProcedure
+    .input(
+      z.object({
+        userId: z.string(),
+        calorieGoal: z.number().min(100).max(10000),
+        proteinGoal: z.number().min(1).max(500),
+        carbGoal: z.number().min(1).max(1000),
+        fatGoal: z.number().min(1).max(500),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const result = await ctx.db
+        .insert(userGoals)
+        .values(input)
+        .onConflictDoUpdate({
+          target: userGoals.userId,
+          set: {
+            calorieGoal: input.calorieGoal,
+            proteinGoal: input.proteinGoal,
+            carbGoal: input.carbGoal,
+            fatGoal: input.fatGoal,
+          },
+        })
+        .returning();
 
       return result[0];
     }),

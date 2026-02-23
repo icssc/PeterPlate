@@ -45,9 +45,20 @@ function compileMealData(
 interface Props {
   dateString: string;
   mealsEaten: LoggedMealJoinedWithNutrition[];
+  calorieGoal: number;
+  proteinGoal: number;
+  carbGoal: number;
+  fatGoal: number;
 }
 
-const NutritionBreakdown = ({ dateString, mealsEaten }: Props) => {
+const NutritionBreakdown = ({
+  dateString,
+  mealsEaten,
+  calorieGoal,
+  proteinGoal,
+  carbGoal,
+  fatGoal,
+}: Props) => {
   const nutrition: NutritionData = compileMealData(mealsEaten);
 
   const utils = trpc.useUtils();
@@ -75,12 +86,12 @@ const NutritionBreakdown = ({ dateString, mealsEaten }: Props) => {
 
   return (
     <div>
-      <div className="bg-sky-600/20 rounded-xl p-6 flex flex-col gap-6 mt-4 w-fit">
+      <div className="bg-sky-100 rounded-xl p-6 flex flex-col gap-6 mt-4 w-fit">
         <div className="bg-white rounded-xl p-4 flex flex-col items-center w-48 h-48">
           <span className="text-xl text-sky-700 font-semibold">Calories</span>
           <ProgressDonut
             progress_value={nutrition.calories}
-            max_value={2000}
+            max_value={calorieGoal}
             display_unit=""
           />
         </div>
@@ -88,7 +99,7 @@ const NutritionBreakdown = ({ dateString, mealsEaten }: Props) => {
           <span className="text-xl text-sky-700 font-semibold">Protein</span>
           <ProgressDonut
             progress_value={nutrition.protein_g}
-            max_value={75}
+            max_value={proteinGoal}
             display_unit="g"
           />
         </div>
@@ -96,7 +107,7 @@ const NutritionBreakdown = ({ dateString, mealsEaten }: Props) => {
           <span className="text-xl text-sky-700 font-semibold">Carbs</span>
           <ProgressDonut
             progress_value={nutrition.carbs_g}
-            max_value={250}
+            max_value={carbGoal}
             display_unit="g"
           />
         </div>
@@ -104,7 +115,7 @@ const NutritionBreakdown = ({ dateString, mealsEaten }: Props) => {
           <span className="text-xl text-sky-700 font-semibold">Fat</span>
           <ProgressDonut
             progress_value={nutrition.fat_g}
-            max_value={50}
+            max_value={fatGoal}
             display_unit="g"
           />
         </div>

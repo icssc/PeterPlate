@@ -30,6 +30,7 @@ export default defineConfig({
     "./src/schema/loggedMeals.ts",
     "./src/schema/userAllergies.ts",
     "./src/schema/userDietaryPreferences.ts",
+    "./src/schema/userGoals.ts",
   ],
   dbCredentials: { url: process.env.DATABASE_URL, ssl: false },
   verbose: !process.env.CI,
