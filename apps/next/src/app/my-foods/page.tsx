@@ -1,6 +1,6 @@
 "use client";
 
-import { MenuItem, Select } from "@mui/material";
+import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import type { DishInfo } from "@peterplate/api";
 import { useMemo, useState } from "react";
 import MyFoodsCard from "@/components/ui/card/my-foods-card";
@@ -196,20 +196,39 @@ export default function MyFoodsPage() {
 
           {/* Sort */}
           <div className="flex flex-col gap-1 sm:gap-0">
-            {!isDesktop && (
-              <span className="text-sm font-medium">Filter by</span>
-            )}
-            <Select
-              className="px-4 py-2 text-sm rounded-xl border border-sky-700 bg-white focus:ring-2 focus:ring-sky-700 focus:outline-none cursor-pointer w-full sm:w-auto"
-              value={sortOption}
-              onChange={(e) => setSortOption(e.target.value as SortOption)}
+            <FormControl
+              variant="outlined"
+              size="small"
+              sx={{
+                minWidth: 260,
+              }}
             >
-              {SORT_OPTIONS.map(({ value, label }) => (
-                <MenuItem key={value} value={value}>
-                  {label}
-                </MenuItem>
-              ))}
-            </Select>
+              <InputLabel
+                id="sort-label"
+                shrink
+                sx={{
+                  color: "#0369a1", // sky-700
+                  fontSize: 12,
+                  fontWeight: 600,
+                  transform: "translate(0, -18px) scale(1)",
+                  "&.Mui-focused": { color: "#0369a1" },
+                }}
+              >
+                Filter by
+              </InputLabel>
+              <Select
+                className="px-4 py-2 text-sm rounded-xl border border-sky-700 bg-white focus:ring-2 focus:ring-sky-700 focus:outline-none cursor-pointer w-full sm:w-auto"
+                value={sortOption}
+                onChange={(e) => setSortOption(e.target.value as SortOption)}
+                label="Filter by"
+              >
+                {SORT_OPTIONS.map(({ value, label }) => (
+                  <MenuItem key={value} value={value}>
+                    {label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </div>
         </div>
       </div>
