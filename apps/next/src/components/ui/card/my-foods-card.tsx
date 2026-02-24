@@ -36,9 +36,9 @@ function UserRatingDisplay({ dishId }: { dishId: string }) {
     <div className="flex gap-0.5 items-center">
       {[1, 2, 3, 4, 5].map((n) =>
         n <= userRating ? (
-          <Star key={n} className="w-3.5 h-3.5 text-amber-400" />
+          <Star key={n} className="w-5 h-5 text-amber-400" />
         ) : (
-          <StarBorder key={n} className="w-3.5 h-3.5 text-gray-500" />
+          <StarBorder key={n} className="w-5 h-5 text-gray-400" />
         ),
       )}
     </div>
