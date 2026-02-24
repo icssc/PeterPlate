@@ -184,7 +184,7 @@ const MyFoodsCardContent = React.forwardRef<
               <div className="h-px bg-sky-700 mx-4" />
 
               {/* Location and user rating */}
-              <div className="flex items-center justify-between px-4 py-2.5 gap-2">
+              <div className="flex items-center justify-between px-4 py-4 gap-2">
                 <div className="flex items-center gap-1 text-gray-500 text-xs min-w-0">
                   <LocationOn className="w-3.5 h-3.5 flex-shrink-0" />
                   <span className="truncate">
