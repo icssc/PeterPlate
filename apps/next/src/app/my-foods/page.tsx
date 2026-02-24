@@ -43,6 +43,7 @@ export default function MyFoodsPage() {
   const [locationFilter, setLocationFilter] = useState<LocationFilter>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOption, setSortOption] = useState<SortOption>("recent");
+  const [showMobileSort, setShowMobileSort] = useState(false);
 
   const {
     favorites,
@@ -132,10 +133,10 @@ export default function MyFoodsPage() {
   const hasError = !!favoritesError || !!ratedError;
 
   return (
-    <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 pb-8 pt-20 sm:px-6 lg:px-8">
+    <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 pb-8 pt-20 sm:px-6 lg:px-8">
       {/* Header */}
       <header className="space-y-1">
-        <h1 className="text-3xl text-sky-700 font-bold mb-4">My Foods</h1>
+        <h1 className="text-4xl text-sky-700 font-bold mb-4">My Foods</h1>
         <p className="text-sm">
           View all the dishes you have favorited or rated across UCI dining
           halls!
@@ -143,18 +144,96 @@ export default function MyFoodsPage() {
       </header>
 
       {/* Filter bar */}
-      <div className="flex flex-col sm:flex-row items-start gap-4 rounded-2xl bg-sky-100 p-4">
-        {/* Location buttons */}
-        <div className="flex flex-col gap-1.5">
-          <span className="text-sm font-medium">Location</span>
-          <div className="flex flex-wrap gap-2">
+      {isDesktop ? (
+        /* ── Desktop: single row ── */
+        <div className="flex flex-row items-center gap-4 rounded-2xl bg-sky-100 p-4">
+          {/* Location */}
+          <div className="flex flex-col gap-1.5 flex-shrink-0">
+            <span className="text-sm font-medium">Location</span>
+            <div className="flex flex-row gap-2">
+              {(Object.keys(LOCATION_LABELS) as LocationFilter[]).map((loc) => (
+                <button
+                  key={loc}
+                  type="button"
+                  onClick={() => setLocationFilter(loc)}
+                  className={cn(
+                    "rounded-lg px-4 py-1.5 h-8 text-sm font-medium transition whitespace-nowrap",
+                    locationFilter === loc
+                      ? "bg-sky-700 text-white shadow-sm"
+                      : "bg-white border border-sky-700 hover:bg-zinc-100",
+                  )}
+                >
+                  {LOCATION_LABELS[loc]}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex gap-3 ml-auto flex-row items-center">
+            {/* Search */}
+            <div className="relative w-64">
+              <svg
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <circle cx={11} cy={11} r={8} />
+                <path d="m21 21-4.35-4.35" />
+              </svg>
+              <input
+                type="text"
+                placeholder="Search meals..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-sky-700 bg-white focus:ring-2 focus:ring-sky-700 focus:outline-none"
+              />
+            </div>
+
+            {/* Sort */}
+            <div className="flex flex-col justify-end">
+              <FormControl
+                variant="outlined"
+                size="small"
+                className="!min-w-[220px]"
+              >
+                <InputLabel
+                  id="sort-label"
+                  shrink
+                  className="!text-sky-700 !text-sm !font-semibold [&.Mui-focused]:!text-sky-700"
+                >
+                  Filter by
+                </InputLabel>
+                <Select
+                  value={sortOption}
+                  onChange={(e) => setSortOption(e.target.value as SortOption)}
+                  label="Filter by"
+                  className="!h-9 !text-sm !rounded-xl !bg-white [&_.MuiOutlinedInput-notchedOutline]:!border-sky-700 [&:hover_.MuiOutlinedInput-notchedOutline]:!border-sky-700 [&.Mui-focused_.MuiOutlinedInput-notchedOutline]:!border-sky-700 [&_.MuiSelect-select]:!py-1.5"
+                >
+                  {SORT_OPTIONS.map(({ value, label }) => (
+                    <MenuItem key={value} value={value}>
+                      {label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </div>
+          </div>
+        </div>
+      ) : (
+        /* ── Mobile: stacked layout ── */
+        <div className="flex flex-col gap-3 rounded-2xl bg-sky-100 p-4">
+          {/* Location buttons — no label */}
+          <div className="flex flex-row gap-2">
             {(Object.keys(LOCATION_LABELS) as LocationFilter[]).map((loc) => (
               <button
                 key={loc}
                 type="button"
                 onClick={() => setLocationFilter(loc)}
                 className={cn(
-                  "rounded-lg px-4 py-1.5 w-26 h-8 text-sm font-medium transition",
+                  "rounded-lg px-4 py-1.5 h-8 text-sm font-medium transition whitespace-nowrap",
                   locationFilter === loc
                     ? "bg-sky-700 text-white shadow-sm"
                     : "bg-white border border-sky-700 hover:bg-zinc-100",
@@ -164,74 +243,82 @@ export default function MyFoodsPage() {
               </button>
             ))}
           </div>
-        </div>
 
-        <div
-          className={cn(
-            "flex gap-3 w-full",
-            isDesktop ? "ml-auto flex-row items-center" : "flex-col",
+          {/* Search + filter icon */}
+          <div className="flex flex-row gap-2 items-center">
+            <div className="relative flex-1">
+              <svg
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <circle cx={11} cy={11} r={8} />
+                <path d="m21 21-4.35-4.35" />
+              </svg>
+              <input
+                type="text"
+                placeholder="Search meals..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-sky-700 bg-white focus:ring-2 focus:ring-sky-700 focus:outline-none"
+              />
+            </div>
+
+            {/* Filter icon button */}
+            <button
+              type="button"
+              aria-label="Toggle sort options"
+              onClick={() => setShowMobileSort((v) => !v)}
+              className={cn(
+                "flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-xl border transition",
+                showMobileSort
+                  ? "bg-sky-700 border-sky-700 text-white"
+                  : "bg-white border-sky-700 text-sky-700 hover:bg-sky-50",
+              )}
+            >
+              {/* Filter / funnel icon */}
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="w-4 h-4"
+                aria-hidden="true"
+              >
+                <line x1="4" y1="6" x2="20" y2="6" />
+                <line x1="7" y1="12" x2="17" y2="12" />
+                <line x1="10" y1="18" x2="14" y2="18" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Collapsible sort options as buttons */}
+          {showMobileSort && (
+            <div className="flex flex-wrap gap-2">
+              {SORT_OPTIONS.map(({ value, label }) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => setSortOption(value)}
+                  className={cn(
+                    "rounded-lg px-3 py-1.5 text-xs font-medium transition whitespace-nowrap border",
+                    sortOption === value
+                      ? "bg-sky-700 text-white border-sky-700 shadow-sm"
+                      : "bg-white border-sky-700 text-sky-700 hover:bg-sky-50",
+                  )}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
           )}
-        >
-          {/* Search */}
-          <div className="relative w-full sm:w-64">
-            <svg
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2}
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <circle cx={11} cy={11} r={8} />
-              <path d="m21 21-4.35-4.35" />
-            </svg>
-            <input
-              type="text"
-              placeholder="Search meals..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-sky-700 bg-white focus:ring-2 focus:ring-sky-700 focus:outline-none"
-            />
-          </div>
-
-          {/* Sort */}
-          <div className="flex flex-col gap-1 sm:gap-0">
-            <FormControl
-              variant="outlined"
-              size="small"
-              sx={{
-                minWidth: 260,
-              }}
-            >
-              <InputLabel
-                id="sort-label"
-                shrink
-                sx={{
-                  color: "#0369a1", // sky-700
-                  fontSize: 12,
-                  fontWeight: 600,
-                  transform: "translate(0, -18px) scale(1)",
-                  "&.Mui-focused": { color: "#0369a1" },
-                }}
-              >
-                Filter by
-              </InputLabel>
-              <Select
-                className="px-4 py-2 text-sm rounded-xl border border-sky-700 bg-white focus:ring-2 focus:ring-sky-700 focus:outline-none cursor-pointer w-full sm:w-auto"
-                value={sortOption}
-                onChange={(e) => setSortOption(e.target.value as SortOption)}
-                label="Filter by"
-              >
-                {SORT_OPTIONS.map(({ value, label }) => (
-                  <MenuItem key={value} value={value}>
-                    {label}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </div>
         </div>
-      </div>
+      )}
 
       {/* Error */}
       {hasError && (
@@ -269,7 +356,7 @@ export default function MyFoodsPage() {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {filteredEntries.map((entry) => (
                 <MyFoodsCard
                   key={entry.dishId}
