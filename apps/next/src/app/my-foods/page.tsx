@@ -18,6 +18,7 @@ interface MergedEntry {
   dishId: string;
   dish: DishInfo;
   isFavorited: boolean;
+  stationName?: string;
   modifiedAt: Date;
 }
 
@@ -69,6 +70,8 @@ export default function MyFoodsPage() {
         dishId: fav.dishId,
         dish: fav.dish as unknown as DishInfo,
         isFavorited: true,
+        stationName: (fav.dish as unknown as { stationName?: string })
+          .stationName,
         modifiedAt: ts ? new Date(ts) : new Date(0),
       });
     }
@@ -87,6 +90,8 @@ export default function MyFoodsPage() {
           dishId: rated.id,
           dish: rated as unknown as DishInfo,
           isFavorited: false,
+          stationName: (rated as unknown as { stationName?: string })
+            .stationName,
           modifiedAt: ratedAt,
         });
       }
@@ -356,12 +361,13 @@ export default function MyFoodsPage() {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
               {filteredEntries.map((entry) => (
                 <MyFoodsCard
                   key={entry.dishId}
                   dish={entry.dish}
                   isFavorited={entry.isFavorited}
+                  stationName={entry.stationName}
                   favoriteDisabled={!!isFavoritePending?.(entry.dishId)}
                   onToggleFavorite={toggleFavorite}
                 />

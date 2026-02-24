@@ -117,6 +117,7 @@ export const getUserRatedDishes = async (db: Drizzle, userId: string) => {
         return {
           ...dish,
           restaurant: dish.station?.restaurant?.name || "Unknown Restaurant",
+          stationName: dish.station?.name ?? "",
           rating: rating.rating,
           ratedAt: rating.updatedAt,
         };

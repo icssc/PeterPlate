@@ -4,6 +4,7 @@ import {
   Favorite,
   FavoriteBorder,
   LocationOn,
+  Star,
   StarBorder,
 } from "@mui/icons-material";
 import { Card, CardContent, Dialog, Drawer } from "@mui/material";
@@ -33,18 +34,13 @@ function UserRatingDisplay({ dishId }: { dishId: string }) {
 
   return (
     <div className="flex gap-0.5 items-center">
-      {[1, 2, 3, 4, 5].map((n) => (
-        <StarBorder
-          key={n}
-          className={cn(
-            "w-3.5 h-3.5",
-            n <= userRating
-              ? "fill-amber-400 stroke-amber-400 text-amber-400"
-              : "stroke-gray-400 text-gray-400",
-          )}
-          strokeWidth={n <= userRating ? 0 : 1}
-        />
-      ))}
+      {[1, 2, 3, 4, 5].map((n) =>
+        n <= userRating ? (
+          <Star key={n} className="w-3.5 h-3.5 text-amber-400" />
+        ) : (
+          <StarBorder key={n} className="w-3.5 h-3.5 text-gray-500" />
+        ),
+      )}
     </div>
   );
 }
@@ -52,6 +48,7 @@ function UserRatingDisplay({ dishId }: { dishId: string }) {
 interface MyFoodsCardProps {
   dish: DishInfo;
   isFavorited: boolean;
+  stationName?: string;
   favoriteDisabled?: boolean;
   onToggleFavorite?: (dishId: string, currentlyFavorite: boolean) => void;
   className?: string;
@@ -65,6 +62,7 @@ const MyFoodsCardContent = React.forwardRef<
     {
       dish,
       isFavorited,
+      stationName,
       favoriteDisabled,
       onToggleFavorite,
       className,
@@ -191,6 +189,7 @@ const MyFoodsCardContent = React.forwardRef<
                   <LocationOn className="w-3.5 h-3.5 flex-shrink-0" />
                   <span className="truncate">
                     {toTitleCase(dish.restaurant)}
+                    {stationName ? ` • ${toTitleCase(stationName)}` : ""}
                   </span>
                 </div>
 
@@ -213,6 +212,7 @@ MyFoodsCardContent.displayName = "MyFoodsCardContent";
 export default function MyFoodsCard({
   dish,
   isFavorited,
+  stationName,
   favoriteDisabled,
   onToggleFavorite,
   className,
@@ -270,6 +270,7 @@ export default function MyFoodsCard({
       <MyFoodsCardContent
         dish={dish}
         isFavorited={isFavorited}
+        stationName={stationName}
         favoriteDisabled={favoriteDisabled}
         onToggleFavorite={onToggleFavorite}
         onClick={handleOpen}
