@@ -391,6 +391,8 @@ export default function OnboardingDialog(): React.JSX.Element {
 
   const handleClose = () => setOpen(false);
 
+  window.localStorage.setItem("has-seen-onboarding-popup", "true");
+
   if (isDesktop)
     return (
       <Dialog

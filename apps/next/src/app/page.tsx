@@ -12,15 +12,17 @@ export default function Home() {
 
   const [activeHall, setActiveHall] = useState<HallEnum>(HallEnum.BRANDYWINE);
   const isDesktop = useMediaQuery("(min-width: 768px)"); // Tailwind's `md` breakpoint
+  const hasSeenPopup =
+    window.localStorage.getItem("has-seen-onboarding-popup") === "true";
 
   // Desktop layout: two Side components side-by-side
   if (isDesktop) {
     return (
       <div className="grid grid-cols-2 h-screen">
         {((!isPending && !session) ||
-          (session?.user && session.user.hasOnboarded === false)) && (
-          <OnboardingDialog />
-        )}
+          (session?.user &&
+            session.user.hasOnboarded === false &&
+            !hasSeenPopup)) && <OnboardingDialog />}
         <Side hall={HallEnum.BRANDYWINE} />
         <Side hall={HallEnum.ANTEATERY} />
       </div>
