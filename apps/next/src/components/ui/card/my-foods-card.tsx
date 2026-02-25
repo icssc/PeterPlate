@@ -21,7 +21,15 @@ import FoodDrawerContent from "../food-drawer-content";
 import type { OnAddToMealTracker } from "./food-card";
 
 // Compact read-only star display for the card footer
-function UserRatingDisplay({ dishId }: { dishId: string }) {
+function UserRatingDisplay({
+  dishId,
+  showLabel = true,
+  showUnratedText = true,
+}: {
+  dishId: string;
+  showLabel?: boolean;
+  showUnratedText?: boolean;
+}) {
   const userId = useUserStore((s) => s.userId);
   const { data: userRating } = trpc.user.getUserRating.useQuery(
     { userId: userId ?? "", dishId },
@@ -29,6 +37,10 @@ function UserRatingDisplay({ dishId }: { dishId: string }) {
   );
 
   if (!userId || userRating == null) {
+    if (!showUnratedText) {
+      return null;
+    }
+
     return (
       <span className="text-sm whitespace-nowrap text-gray-500">
         Not rated yet
@@ -38,7 +50,9 @@ function UserRatingDisplay({ dishId }: { dishId: string }) {
 
   return (
     <div className="flex items-center gap-1.5 flex-shrink-0">
-      <span className="text-sm whitespace-nowrap">Your rating:</span>
+      {showLabel && (
+        <span className="text-sm whitespace-nowrap">Your rating:</span>
+      )}
       <div className="flex gap-0.5 items-center">
         {[1, 2, 3, 4, 5].map((n) =>
           n <= userRating ? (
@@ -78,6 +92,7 @@ const MyFoodsCardContent = React.forwardRef<
     ref,
   ) => {
     const userId = useUserStore((s) => s.userId);
+    const isDesktop = useMediaQuery("(min-width: 768px)");
     const IconComponent = getFoodIcon(dish.name);
     const [imageError, setImageError] = React.useState(false);
     const showImage =
@@ -200,7 +215,11 @@ const MyFoodsCardContent = React.forwardRef<
                   </span>
                 </div>
 
-                <UserRatingDisplay dishId={dish.id} />
+                <UserRatingDisplay
+                  dishId={dish.id}
+                  showLabel={isDesktop}
+                  showUnratedText={isDesktop}
+                />
               </div>
             </div>
           </CardContent>
