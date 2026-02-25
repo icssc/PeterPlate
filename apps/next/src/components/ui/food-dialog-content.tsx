@@ -15,9 +15,9 @@ import {
 import { trpc } from "@/utils/trpc";
 import { cn } from "@/utils/tw";
 import { nutrientToUnit } from "@/utils/types";
-import type { OnAddToMealTracker } from "./card/food-card";
 import IngredientsDialog from "../ingredients-dialog";
 import { AllergenBadge } from "./allergen-badge";
+import type { OnAddToMealTracker } from "./card/food-card";
 import InteractiveStarRating from "./interactive-star-rating";
 
 /**
@@ -39,10 +39,12 @@ export default function FoodDialogContent({
   dish,
   onAddToMealTracker,
   isAddingToMealTracker = false,
+  doesNotMeetPreferences,
 }: {
   dish: DishInfo;
   onAddToMealTracker?: OnAddToMealTracker;
   isAddingToMealTracker?: boolean;
+  doesNotMeetPreferences: boolean;
 }) {
   const [showAllNutrients, setShowAllNutrients] = useState(false);
   const [imageError, setImageError] = useState(false);
@@ -101,7 +103,13 @@ export default function FoodDialogContent({
       )}
       <div className="max-w-lg mx-auto w-full flex-1 min-h-0 flex flex-col">
         <DialogContent
-          sx={{ padding: "0 16px !important", flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}
+          sx={{
+            padding: "0 16px !important",
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            minHeight: 0,
+          }}
         >
           <div className="flex-1 min-h-0 overflow-y-auto flex flex-col gap-6 pt-4 pb-4">
             <div className="flex flex-col gap-2">
@@ -114,6 +122,11 @@ export default function FoodDialogContent({
                     {formatFoodName(dish.name)}
                   </h2>
                   {/* <Pin className="stroke-zinc-500"/> */}
+                  {/* {doesNotMeetPreferences && (
+                  <span className="bg-red-500 text-white text-xs font-medium px-2 py-1 rounded-md shadow-sm whitespace-nowrap">
+                    ⚠ Conflict
+                  </span>
+                )} */}
                 </div>
                 <InteractiveStarRating dishId={dish.id} />
               </div>
