@@ -8,10 +8,17 @@ import {
 } from "@mui/icons-material";
 import { Card, CardContent, Dialog, Drawer } from "@mui/material";
 import type { DishInfo } from "@peterplate/api";
+import { dietRestrictions } from "@peterplate/db";
 import Image from "next/image";
 import React from "react";
 import { useUserStore } from "@/context/useUserStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import {
+  ALLERGY_MAP,
+  type AllergyName,
+  PREFERENCE_MAP,
+  type PreferenceName,
+} from "@/utils/dietary";
 import { formatFoodName, getFoodIcon } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
 import { cn } from "@/utils/tw";
@@ -34,6 +41,10 @@ interface FoodCardContentProps extends React.HTMLAttributes<HTMLDivElement> {
    */
   isFavorited?: boolean;
   /**
+   * Whether the dish meets the current user's dietary & allergen preferences
+   */
+  doesNotMeetPreferences?: boolean;
+  /**
    * Whether the favorite toggle button should be disabled.
    */
   favoriteDisabled?: boolean;
@@ -45,7 +56,6 @@ interface FoodCardContentProps extends React.HTMLAttributes<HTMLDivElement> {
    * Handler invoked when a user clicks "Add to meal tracker" (card, dialog, or drawer).
    */
   onAddToMealTracker?: OnAddToMealTracker;
-
   /**
    * Whether to render a simplified version of the card.
    */
@@ -85,6 +95,17 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
     const { data: ratingData } = trpc.dish.getAverageRating.useQuery(
       { dishId: dish.id },
       { staleTime: 5 * 60 * 1000 },
+    );
+
+    const { data: preferences } =
+      trpc.preference.getDietaryPreferences.useQuery(
+        { userId: userId ?? "" },
+        { enabled: !!userId },
+      );
+
+    const { data: allergies } = trpc.allergy.getAllergies.useQuery(
+      { userId: userId ?? "" },
+      { enabled: !!userId },
     );
 
     const averageRating = ratingData?.averageRating ?? 0;
@@ -139,6 +160,26 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
       onToggleFavorite(dish.id, Boolean(isFavorited));
     };
 
+    const doesNotMeetPreferences = React.useMemo(() => {
+      if (!preferences || !allergies) return false;
+
+      const flags = dish.dietRestriction;
+
+      const violatesAllergy = allergies.some((allergy) => {
+        if (!(allergy in ALLERGY_MAP)) return false;
+        const key = ALLERGY_MAP[allergy as AllergyName];
+        return flags[key] === true;
+      });
+
+      const violatesPreferences = preferences.some((pref) => {
+        if (!(pref in PREFERENCE_MAP)) return false;
+        const key = PREFERENCE_MAP[pref as PreferenceName];
+        return flags[key] === false;
+      });
+
+      return violatesAllergy || violatesPreferences;
+    }, [preferences, allergies, dish.dietRestriction]);
+
     if (isSimplified) {
       return (
         <div
@@ -147,9 +188,19 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
           className={cn("w-full max-w-xs", className)}
         >
           <Card
-            className="cursor-pointer hover:shadow-lg trasnsition w-full border"
+            className={cn(
+              "relative cursor-pointer hover:shadow-lg transition w-full border",
+              doesNotMeetPreferences && "opacity-70",
+            )}
             sx={{ borderRadius: "12px" }}
           >
+            {doesNotMeetPreferences && (
+              <div className="absolute top-2 right-2 z-10">
+                <span className="bg-red-500 text-white text-xs font-medium px-2 py-1 rounded-md shadow">
+                  ⚠ Conflict
+                </span>
+              </div>
+            )}
             <CardContent sx={{ padding: "0 !important" }}>
               <div className="flex justify-between items-center h-full p-4">
                 <div className="flex flex-col gap-1">
@@ -209,9 +260,19 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
         className={cn("max-w-xs flex-shrink-0", className)}
       >
         <Card
-          className="cursor-pointer hover:shadow-lg transition w-full border"
+          className={cn(
+            "relative cursor-pointer hover:shadow-lg transition w-full border",
+            doesNotMeetPreferences && "opacity-70",
+          )}
           sx={{ borderRadius: "12px" }}
         >
+          {doesNotMeetPreferences && (
+            <div className="absolute top-2 right-2 z-10">
+              <span className="bg-red-500 text-white text-xs font-medium px-2 py-1 rounded-md shadow">
+                ⚠ Conflict
+              </span>
+            </div>
+          )}
           <CardContent sx={{ padding: "0 !important" }}>
             <div className="flex justify-between h-full p-4 gap-4">
               <div className="flex items-center gap-4 w-full">
@@ -459,80 +520,3 @@ export default function FoodCard({
       </>
     );
 }
-
-// <div ref={ref} {...divProps} className={cn("w-full", className)}>
-//   <Card
-//     className="cursor-pointer hover:shadow-lg transition w-full border"
-//     sx={{ borderRadius: "16px" }}
-//   >
-//     <CardContent sx={{ padding: "0 !important" }}>
-//       <div className="flex justify-between h-full p-6">
-//         <div className="flex items-center gap-6 w-full">
-//           {IconComponent && (
-//             <IconComponent className="w-10 h-10 text-slate-700" />
-//           )}
-//           <div className="flex flex-col">
-//             <strong>{formatFoodName(dish.name)}</strong>
-//             <div className="flex gap-2 items-center">
-//               <span>
-//                 {dish.nutritionInfo.calories == null
-//                   ? "-"
-//                   : `${Math.round(parseFloat(dish.nutritionInfo.calories))} cal`}
-//               </span>
-//               {dish.restaurant && (
-//                 <>
-//                   <span className="text-zinc-400">•</span>
-//                   <span className="text-zinc-500">
-//                     {toTitleCase(dish.restaurant)}
-//                   </span>
-//                 </>
-//               )}
-//               {/* Average rating display - grey outline star */}
-//               <div className="flex gap-1 items-center">
-//                 <Star
-//                   className="w-4 h-4 stroke-zinc-200"
-//                   strokeWidth={1}
-//                 />
-//                 <span className="text-zinc-400 text-sm">
-//                   {averageRating.toFixed(1)} ({ratingCount})
-//                 </span>
-//               </div>
-//             </div>
-//           </div>
-//           {/*//TODO: Add user feedback on clicking button (e.g. changing Icon, making it green) */}
-//           <button onClick={handleLogMeal}>
-//             <CirclePlus />
-//           </button>
-//         </div>
-//         <div className="flex items-start">
-//           <button
-//             type="button"
-//             aria-label={
-//               isFavorited
-//                 ? "Remove meal from favorites"
-//                 : "Add meal to favorites"
-//             }
-//             aria-pressed={isFavorited}
-//             disabled={favoriteDisabled}
-//             onClick={handleFavoriteClick}
-//             className={cn(
-//               "rounded-full p-2 transition",
-//               favoriteDisabled
-//                 ? "opacity-60"
-//                 : "hover:bg-rose-50 hover:text-rose-600",
-//             )}
-//           >
-//             <Heart
-//               className={cn(
-//                 "w-5 h-5",
-//                 isFavorited
-//                   ? "fill-rose-500 stroke-rose-500"
-//                   : "stroke-zinc-500",
-//               )}
-//             />
-//           </button>
-//         </div>
-//       </div>
-//     </CardContent>
-//   </Card>
-// </div>
