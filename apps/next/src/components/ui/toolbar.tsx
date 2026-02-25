@@ -5,6 +5,8 @@ import MenuIcon from "@mui/icons-material/Menu";
 import {
   AppBar,
   Button,
+  Dialog,
+  Drawer,
   IconButton,
   Menu,
   MenuItem,
@@ -12,9 +14,12 @@ import {
 } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
+import type { MouseEvent } from "react";
 import { useState } from "react";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useSession } from "@/utils/auth-client";
+import EditPreferencesContent from "./edit-preferences-content";
 import SidebarContent from "./sidebar/sidebar-content";
 
 export type CalendarRange = {
@@ -75,7 +80,7 @@ function ToolbarDropdown({ element }: { element: ToolbarElement }) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
 
@@ -115,16 +120,24 @@ function ToolbarDropdown({ element }: { element: ToolbarElement }) {
   );
 }
 
-export default function Toolbar(): React.JSX.Element {
+export default function Toolbar() {
+  const isDesktop = useMediaQuery("(min-width: 768px)");
   const [profileAnchor, setProfileAnchor] = useState<null | HTMLElement>(null);
   const profileOpen = Boolean(profileAnchor);
+  const [editPreferencesOpen, setEditPreferencesOpen] = useState(false);
 
-  const handleProfileOpen = (event: React.MouseEvent<HTMLElement>) => {
+  const handleProfileOpen = (event: MouseEvent<HTMLElement>) => {
     setProfileAnchor(event.currentTarget);
   };
 
   const handleProfileClose = () => {
     setProfileAnchor(null);
+  };
+  const handleEditPreferencesOpen = () => {
+    setEditPreferencesOpen(true);
+  };
+  const handleEditPreferencesClose = () => {
+    setEditPreferencesOpen(false);
   };
   const { data: session, isPending } = useSession();
   const user = session?.user;
@@ -230,24 +243,44 @@ export default function Toolbar(): React.JSX.Element {
           horizontal: "right",
         }}
         PaperProps={{
-          sx: {
-            backgroundColor: "transparent",
-            boxShadow: "none",
-            padding: 0,
-            width: 357,
-            maxHeight: 658,
-            // borderRadius: 3,
-            mt: 1,
-          },
+          className:
+            "bg-transparent shadow-none p-0 w-[357px] max-h-[658px] mt-1",
         }}
         MenuListProps={{
-          sx: {
-            padding: 0,
-          },
+          className: "p-0",
         }}
       >
-        <SidebarContent onClose={handleProfileClose} />
+        <SidebarContent
+          onClose={handleProfileClose}
+          onEditPreferencesClick={handleEditPreferencesOpen}
+        />
       </Menu>
+
+      {isDesktop ? (
+        <Dialog
+          open={editPreferencesOpen}
+          onClose={handleEditPreferencesClose}
+          maxWidth={false}
+          PaperProps={{
+            className:
+              "w-[460px] max-w-[90vw] max-h-[90vh] m-2 p-0 overflow-hidden flex flex-col rounded-2xl",
+          }}
+        >
+          <EditPreferencesContent />
+        </Dialog>
+      ) : (
+        <Drawer
+          anchor="bottom"
+          open={editPreferencesOpen}
+          onClose={handleEditPreferencesClose}
+          PaperProps={{
+            className:
+              "w-[460px] max-w-[90vw] max-h-[85vh] m-2 p-0 overflow-hidden flex flex-col rounded-t-[10px] mt-24 h-auto",
+          }}
+        >
+          <EditPreferencesContent />
+        </Drawer>
+      )}
 
       {/* <SidebarContent
         open={drawerOpen}
