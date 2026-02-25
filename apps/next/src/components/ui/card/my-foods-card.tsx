@@ -29,18 +29,25 @@ function UserRatingDisplay({ dishId }: { dishId: string }) {
   );
 
   if (!userId || userRating == null) {
-    return <span className="text-xs">Not rated yet</span>;
+    return (
+      <span className="text-sm whitespace-nowrap text-gray-500">
+        Not rated yet
+      </span>
+    );
   }
 
   return (
-    <div className="flex gap-0.5 items-center">
-      {[1, 2, 3, 4, 5].map((n) =>
-        n <= userRating ? (
-          <Star key={n} className="w-5 h-5 text-amber-400" />
-        ) : (
-          <StarBorder key={n} className="w-5 h-5 text-gray-400" />
-        ),
-      )}
+    <div className="flex items-center gap-1.5 flex-shrink-0">
+      <span className="text-sm whitespace-nowrap">Your rating:</span>
+      <div className="flex gap-0.5 items-center">
+        {[1, 2, 3, 4, 5].map((n) =>
+          n <= userRating ? (
+            <Star key={n} className="w-5 h-5 text-amber-400" />
+          ) : (
+            <StarBorder key={n} className="w-5 h-5 text-gray-400" />
+          ),
+        )}
+      </div>
     </div>
   );
 }
@@ -185,20 +192,15 @@ const MyFoodsCardContent = React.forwardRef<
 
               {/* Location and user rating */}
               <div className="flex items-center justify-between px-4 py-4 gap-2">
-                <div className="flex items-center gap-1 text-gray-500 text-xs min-w-0">
-                  <LocationOn className="w-3.5 h-3.5 flex-shrink-0" />
-                  <span className="truncate">
+                <div className="flex items-center gap-1 text-gray-500 text-sm min-w-0">
+                  <LocationOn className="w-5 h-5 flex-shrink-0" />
+                  <span>
                     {toTitleCase(dish.restaurant)}
                     {stationName ? ` • ${toTitleCase(stationName)}` : ""}
                   </span>
                 </div>
 
-                <div className="flex items-center gap-1.5 flex-shrink-0">
-                  <span className="text-xs whitespace-nowrap">
-                    Your rating:
-                  </span>
-                  <UserRatingDisplay dishId={dish.id} />
-                </div>
+                <UserRatingDisplay dishId={dish.id} />
               </div>
             </div>
           </CardContent>
