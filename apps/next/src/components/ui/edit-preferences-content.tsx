@@ -21,7 +21,6 @@ import {
 
 export default function EditPreferencesContent() {
   const { data: session } = useSession();
-  const firstName = session?.user?.name?.split(" ")[0] || "User";
   const [activeStep, setActiveStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
@@ -136,7 +135,7 @@ export default function EditPreferencesContent() {
             <Avatar
               src="/peterplate-icon.webp"
               alt="PeterPlate Icon"
-              className="!w-[60px] !h-[60px] mt-10"
+              className="!w-[60px] !h-[60px]"
             />
             <Typography
               variant="h5"
@@ -212,7 +211,7 @@ export default function EditPreferencesContent() {
             <Avatar
               src="/peterplate-icon.webp"
               alt="PeterPlate Icon"
-              className="!w-[60px] !h-[60px] mt-10"
+              className="!w-[60px] !h-[60px]"
             />
             <Typography
               variant="h5"
