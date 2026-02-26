@@ -8,6 +8,7 @@ import {
   MobileStepper,
   ToggleButton,
   ToggleButtonGroup,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
@@ -27,6 +28,8 @@ export default function EditPreferencesContent() {
     allergies: [] as string[],
     preferences: [] as string[],
   });
+
+  const isGuest = !session?.user; // Check if logged out
 
   const { data: existingAllergies, isLoading: loadingAllergies } =
     trpc.allergy.getAllergies.useQuery(
@@ -144,7 +147,9 @@ export default function EditPreferencesContent() {
               Edit Preferences
             </Typography>
             <Typography fontFamily="Poppins, sans-serif" color="white">
-              Update your dining profile
+              {isGuest
+                ? "Log in to update your dining profile"
+                : "Update your dining profile"}
             </Typography>
           </div>
 
@@ -167,31 +172,38 @@ export default function EditPreferencesContent() {
             </Typography>
           </div>
 
-          <ToggleButtonGroup
-            value={formData.allergies}
-            onChange={(_, newValues) => handleToggle("allergies", newValues)}
-            aria-label="select allergies"
-            exclusive={false}
-            fullWidth
-            className="pt-2 px-10 grid grid-cols-2 sm:grid-cols-3 gap-2 [&_.MuiToggleButtonGroup-grouped]:!border-2 [&_.MuiToggleButtonGroup-grouped]:!rounded-[10px] [&_.MuiToggleButtonGroup-grouped]:!border-gray-400"
-          >
-            {AllergenKeys.map((option) => (
-              <ToggleButton
-                key={option}
-                value={option}
-                className="!py-3 !normal-case !text-black !h-10 [&.Mui-selected]:!bg-[rgba(0,105,168,0.2)] [&.Mui-selected]:!text-[#0069A8] [&.Mui-selected]:!border-[#0069A8] [&.Mui-selected:hover]:!bg-[rgba(0,105,168,0.4)]"
+          <Tooltip title={isGuest ? "Log in to edit preferences" : ""} arrow>
+            <div className="px-10">
+              <ToggleButtonGroup
+                value={formData.allergies}
+                onChange={(_, newValues) =>
+                  handleToggle("allergies", newValues)
+                }
+                aria-label="select allergies"
+                exclusive={false}
+                fullWidth
+                disabled={isGuest}
+                className="pt-2 grid grid-cols-2 sm:grid-cols-3 gap-2 [&_.MuiToggleButtonGroup-grouped]:!border-2 [&_.MuiToggleButtonGroup-grouped]:!rounded-[10px] [&_.MuiToggleButtonGroup-grouped]:!border-gray-400"
               >
-                <Typography
-                  fontFamily="Poppins, sans-serif"
-                  fontSize={16}
-                  fontWeight={500}
-                  lineHeight={1}
-                >
-                  {option}
-                </Typography>
-              </ToggleButton>
-            ))}
-          </ToggleButtonGroup>
+                {AllergenKeys.map((option) => (
+                  <ToggleButton
+                    key={option}
+                    value={option}
+                    className="!py-3 !normal-case !text-black !h-10 [&.Mui-selected]:!bg-[rgba(0,105,168,0.2)] [&.Mui-selected]:!text-[#0069A8] [&.Mui-selected]:!border-[#0069A8] [&.Mui-selected:hover]:!bg-[rgba(0,105,168,0.4)]"
+                  >
+                    <Typography
+                      fontFamily="Poppins, sans-serif"
+                      fontSize={16}
+                      fontWeight={500}
+                      lineHeight={1}
+                    >
+                      {option}
+                    </Typography>
+                  </ToggleButton>
+                ))}
+              </ToggleButtonGroup>
+            </div>
+          </Tooltip>
         </div>
       )}
       {activeStep === 1 && (
@@ -211,7 +223,9 @@ export default function EditPreferencesContent() {
               Edit Preferences
             </Typography>
             <Typography fontFamily="Poppins, sans-serif" color="white">
-              Update your dining profile
+              {isGuest
+                ? "Log in to update your dining profile"
+                : "Update your dining profile"}
             </Typography>
           </div>
 
@@ -234,31 +248,38 @@ export default function EditPreferencesContent() {
             </Typography>
           </div>
 
-          <ToggleButtonGroup
-            value={formData.preferences}
-            onChange={(_, newValues) => handleToggle("preferences", newValues)}
-            aria-label="select preferences"
-            exclusive={false}
-            fullWidth
-            className="pt-2 px-10 grid grid-cols-2 sm:grid-cols-3 gap-2 [&_.MuiToggleButtonGroup-grouped]:!border-2 [&_.MuiToggleButtonGroup-grouped]:!rounded-[10px] [&_.MuiToggleButtonGroup-grouped]:!border-gray-400"
-          >
-            {PreferenceKeys.map((option) => (
-              <ToggleButton
-                key={option}
-                value={option}
-                className="!py-3 !normal-case !text-black !h-10 [&.Mui-selected]:!bg-[rgba(0,105,168,0.2)] [&.Mui-selected]:!text-[#0069A8] [&.Mui-selected]:!border-[#0069A8] [&.Mui-selected:hover]:!bg-[rgba(0,105,168,0.4)]"
+          <Tooltip title={isGuest ? "Log in to edit preferences" : ""} arrow>
+            <div className="px-10">
+              <ToggleButtonGroup
+                value={formData.preferences}
+                onChange={(_, newValues) =>
+                  handleToggle("preferences", newValues)
+                }
+                aria-label="select preferences"
+                exclusive={false}
+                fullWidth
+                disabled={isGuest}
+                className="pt-2 grid grid-cols-2 sm:grid-cols-3 gap-2 [&_.MuiToggleButtonGroup-grouped]:!border-2 [&_.MuiToggleButtonGroup-grouped]:!rounded-[10px] [&_.MuiToggleButtonGroup-grouped]:!border-gray-400"
               >
-                <Typography
-                  fontFamily="Poppins, sans-serif"
-                  fontSize={16}
-                  fontWeight={500}
-                  lineHeight={1}
-                >
-                  {option}
-                </Typography>
-              </ToggleButton>
-            ))}
-          </ToggleButtonGroup>
+                {PreferenceKeys.map((option) => (
+                  <ToggleButton
+                    key={option}
+                    value={option}
+                    className="!py-3 !normal-case !text-black !h-10 [&.Mui-selected]:!bg-[rgba(0,105,168,0.2)] [&.Mui-selected]:!text-[#0069A8] [&.Mui-selected]:!border-[#0069A8] [&.Mui-selected:hover]:!bg-[rgba(0,105,168,0.4)]"
+                  >
+                    <Typography
+                      fontFamily="Poppins, sans-serif"
+                      fontSize={16}
+                      fontWeight={500}
+                      lineHeight={1}
+                    >
+                      {option}
+                    </Typography>
+                  </ToggleButton>
+                ))}
+              </ToggleButtonGroup>
+            </div>
+          </Tooltip>
         </div>
       )}
 
@@ -269,28 +290,32 @@ export default function EditPreferencesContent() {
         activeStep={activeStep}
         className="px-10"
         nextButton={
-          activeStep === 1 ? (
-            <Button
-              size="small"
-              variant="contained"
-              disabled={isSubmitting}
-              onClick={handleSubmit}
-              className="!h-[45px] !w-20 !bg-[#0069A8] hover:!brightness-90"
-            >
-              {isSubmitting ? "Saving..." : "Save"}
-            </Button>
-          ) : (
-            <Button
-              variant="contained"
-              size="small"
-              onClick={handleNext}
-              disabled={isSubmitting}
-              className="!h-[45px] !w-20 !bg-[#0069A8] hover:!brightness-90"
-            >
-              Next
-              <KeyboardArrowRight />
-            </Button>
-          )
+          <Tooltip title={isGuest ? "Log in to edit preferences" : ""} arrow>
+            <span>
+              {activeStep === 1 ? (
+                <Button
+                  size="small"
+                  variant="contained"
+                  disabled={isSubmitting || isGuest}
+                  onClick={handleSubmit}
+                  className="!h-[45px] !w-20 !bg-[#0069A8] hover:!brightness-90"
+                >
+                  {isSubmitting ? "Saving..." : "Save"}
+                </Button>
+              ) : (
+                <Button
+                  variant="contained"
+                  size="small"
+                  onClick={handleNext}
+                  disabled={isSubmitting || isGuest}
+                  className="!h-[45px] !w-20 !bg-[#0069A8] hover:!brightness-90"
+                >
+                  Next
+                  <KeyboardArrowRight />
+                </Button>
+              )}
+            </span>
+          </Tooltip>
         }
         backButton={
           <Button
