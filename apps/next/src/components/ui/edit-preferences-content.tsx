@@ -27,7 +27,7 @@ export default function EditPreferencesContent() {
     allergies: [] as string[],
     preferences: [] as string[],
   });
-
+  const utils = trpc.useUtils();
   const isGuest = !session?.user; // Check if logged out
 
   const { data: existingAllergies, isLoading: loadingAllergies } =
@@ -102,6 +102,9 @@ export default function EditPreferencesContent() {
         userId: session.user.id,
         preferences: formData.preferences,
       });
+
+      await utils.allergy.getAllergies.invalidate();
+      await utils.preference.getDietaryPreferences.invalidate();
 
       alert("Preferences updated successfully!");
     } catch (error) {
