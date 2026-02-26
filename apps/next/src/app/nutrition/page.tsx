@@ -1,36 +1,41 @@
 "use client";
 
-import type { SelectLoggedMeal } from "@peterplate/db";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import NutritionBreakdown from "@/components/ui/nutrition-breakdown";
+import { useSnackbarStore } from "@/context/useSnackbar";
 import { useUserStore } from "@/context/useUserStore";
 import { trpc } from "@/utils/trpc";
 
 export default function MealTracker() {
   const router = useRouter();
-  const userId = useUserStore((s) => s.userId);
+  const { userId, isInitialized } = useUserStore();
+  const { showSnackbar } = useSnackbarStore();
 
   useEffect(() => {
-    // TODO: use [MUI snackbar](https://mui.com/material-ui/react-snackbar/) to warn users of issue
+    if (!isInitialized) return;
+
     if (!userId) {
-      alert("Login to track meals!");
+      showSnackbar("Login to track meals!", "error");
       router.push("/");
     }
-  }, [userId, router.push]);
+  }, [userId, isInitialized, router, showSnackbar]);
 
   const {
     data: meals,
     isLoading,
     error,
-  } = trpc.nutrition.getMealsInLastWeek.useQuery({ userId: userId! });
+  } = trpc.nutrition.getMealsInLastWeek.useQuery(
+    { userId: userId ?? "" },
+    { enabled: !!userId },
+  );
   const [activeDayIndex, setActiveDayIndex] = useState<number | null>(null);
 
   const mealsGroupedByDay = useMemo(() => {
     if (!meals) return [];
     const groups: Record<string, typeof meals> = {};
 
-    meals.forEach((meal: SelectLoggedMeal) => {
+    meals.forEach((meal) => {
       const dateKey = new Date(meal.eatenAt).toDateString();
       if (!groups[dateKey]) groups[dateKey] = [];
       groups[dateKey].push(meal);
@@ -57,6 +62,11 @@ export default function MealTracker() {
   const selectedDay =
     activeDayIndex !== null ? mealsGroupedByDay[activeDayIndex] : null;
 
+  const toNum = (v: string | null) => {
+    const n = v == null ? 0 : Number(v);
+    return Number.isFinite(n) ? n : 0;
+  };
+
   return (
     <div className="cols-container min-h-screen flex">
       <div className="mt-12 w-[300px] border-r p-4 flex flex-col gap-2">
@@ -77,7 +87,13 @@ export default function MealTracker() {
         {selectedDay && (
           <NutritionBreakdown
             dateString={selectedDay.dateLabel}
-            mealsEaten={selectedDay.items}
+            mealsEaten={selectedDay.items.map((m) => ({
+              ...m,
+              calories: toNum(m.calories),
+              protein: toNum(m.protein),
+              carbs: toNum(m.carbs),
+              fat: toNum(m.fat),
+            }))}
           />
         )}
       </div>
