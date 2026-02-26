@@ -7,7 +7,7 @@ const vapidPrivateKey = process.env.VAPID_PRIVATE_KEY;
 
 if (vapidPublicKey && vapidPrivateKey) {
   webpush.setVapidDetails(
-    // THIS IS A PLACEHOLDER PUT THE REAL EMAIL HERE
+    // TODO: THIS IS A PLACEHOLDER PUT THE REAL EMAIL HERE
     "mailto:your-email@example.com",
     vapidPublicKey,
     vapidPrivateKey,
