@@ -174,22 +174,25 @@ export function RestaurantFilters({
               }}
             />
           </LocalizationProvider>
-          <button
-            type="button"
-            onClick={() => setShowPreferencesOnly(!showPreferencesOnly)}
-            className={`
-            w-full h-[40px] rounded-md border text-sm font-medium transition-all duration-200
+        </div>
+      )}
+
+      <div>
+        <button
+          type="button"
+          onClick={() => setShowPreferencesOnly(!showPreferencesOnly)}
+          className={`${isDesktop ? "w-[240px]" : "w-full"}
+            h-[40px] rounded-md border text-sm font-medium transition-all duration-200
             ${
               showPreferencesOnly
                 ? "bg-sky-700 text-white border-sky-700 shadow-md"
                 : "bg-white text-sky-700 border-sky-700 hover:bg-sky-50"
             }
           `}
-          >
-            Show Preferences Only
-          </button>
-        </div>
-      )}
+        >
+          Show Preferences Only
+        </button>
+      </div>
     </div>
   );
 }
