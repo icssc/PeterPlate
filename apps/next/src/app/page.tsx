@@ -20,7 +20,7 @@ export default function Home() {
   if (isDesktop) {
     return (
       <div className="grid grid-cols-2 h-screen">
-        {((!isPending && !session) || (session?.user && hasOnboarded)) && (
+        {((!isPending && !session) || (session?.user && !hasOnboarded)) && (
           <OnboardingDialog />
         )}
         <Side hall={HallEnum.BRANDYWINE} />
