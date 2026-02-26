@@ -28,6 +28,8 @@ export default defineConfig({
     "./src/schema/users.ts",
     "./src/schema/auth-schema.ts",
     "./src/schema/loggedMeals.ts",
+    "./src/schema/userAllergies.ts",
+    "./src/schema/userDietaryPreferences.ts",
   ],
   dbCredentials: { url: process.env.DATABASE_URL, ssl: false },
   verbose: !process.env.CI,

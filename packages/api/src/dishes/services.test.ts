@@ -1,11 +1,10 @@
 import { apiTest } from "@api/apiTest";
+import { upsertMenu } from "@api/menus/services";
+import { upsertPeriod } from "@api/periods/services";
 import { upsertRestaurant } from "@api/restaurants/services";
 import { upsertStation } from "@api/stations/services";
 import { describe } from "vitest";
-
 import { upsertDish } from "./services";
-import { upsertPeriod } from "@api/periods/services";
-import { upsertMenu } from "@api/menus/services";
 
 describe("upsertDish", () => {
   apiTest("inserts a dish", async ({ db, expect, testData }) => {

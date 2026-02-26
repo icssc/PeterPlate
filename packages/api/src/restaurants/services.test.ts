@@ -1,7 +1,7 @@
 import { apiTest } from "@api/apiTest";
 import { describe } from "vitest";
 
-import { getRestaurantsByDate, upsertRestaurant } from "./services";
+import { upsertRestaurant } from "./services";
 
 describe("upsertRestaurant", () => {
   apiTest(

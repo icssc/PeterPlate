@@ -1,3 +1,5 @@
+import type { Drizzle } from "@peterplate/db";
+import { pushTokens } from "@peterplate/db";
 import type {
   ExpoPushErrorReceipt,
   ExpoPushMessage,
@@ -6,9 +8,6 @@ import type {
   ExpoPushToken,
 } from "expo-server-sdk";
 import { Expo } from "expo-server-sdk";
-
-import type { Drizzle } from "@peterplate/db";
-import { pushTokens } from "@peterplate/db";
 
 // Send Notification to all users which set up a notification id
 export interface Notification {

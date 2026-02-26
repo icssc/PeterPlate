@@ -48,7 +48,7 @@ export function useFavorites(userId: string = DEFAULT_USER_ID) {
       utils.favorite.getFavorites.invalidate({
         userId,
       }),
-      [userId, utils.favorite.getFavorites],
+    [userId, utils.favorite.getFavorites],
   );
   const addFavoriteMutation = trpc.favorite.addFavorite.useMutation({
     onSuccess: invalidateFavorites,
@@ -64,7 +64,7 @@ export function useFavorites(userId: string = DEFAULT_USER_ID) {
   // Memoized list of favorited unique dish IDs.
   const favoriteIds = useMemo(
     () => favorites.map((f) => f.dishId),
-    [favorites]
+    [favorites],
   );
 
   // Determines whether a dish should be added or removed, then triggers the
@@ -113,5 +113,3 @@ export function useFavorites(userId: string = DEFAULT_USER_ID) {
     favoritesError: favoritesQuery.error,
   };
 }
-
-

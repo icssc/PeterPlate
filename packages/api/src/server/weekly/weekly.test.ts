@@ -19,5 +19,6 @@ describe("weekly", () => {
           trx.rollback();
         }),
       ).rejects.toThrowError("Rollback");
-    });
+    },
+  );
 });

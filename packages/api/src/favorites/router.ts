@@ -26,8 +26,7 @@ const addFavoriteProcedure = publicProcedure
   )
   .mutation(async ({ ctx: { db }, input }) => {
     return await addFavorite(db, input.userId, input.dishId).catch((e) => {
-      if (e instanceof TRPCError)
-        throw e;
+      if (e instanceof TRPCError) throw e;
       console.error(e);
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
@@ -45,8 +44,7 @@ const deleteFavoriteProcedure = publicProcedure
   )
   .mutation(async ({ ctx: { db }, input }) => {
     return await deleteFavorite(db, input.userId, input.dishId).catch((e) => {
-      if (e instanceof TRPCError)
-        throw e;
+      if (e instanceof TRPCError) throw e;
       console.error(e);
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
@@ -63,4 +61,3 @@ export const favoriteRouter = createTRPCRouter({
   /** Delete a favorite for a dish ID and user ID. Idempotent - no change if doesn't exist. */
   deleteFavorite: deleteFavoriteProcedure,
 });
-

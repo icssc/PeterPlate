@@ -15,10 +15,10 @@ export const MenuProductSchema = z.object({
     DietaryInformation: z.array(
       z.object({
         IconUrl: z.string(),
-        Name: z.string(), 
-        isEnabled: z.boolean().optional()
-      })
-    ), 
+        Name: z.string(),
+        isEnabled: z.boolean().optional(),
+      }),
+    ),
     // Dietary Restrictions
     AvailableFilters: z.object({
       ContainsEggs: z.boolean().nullable().optional(),
@@ -38,13 +38,15 @@ export const MenuProductSchema = z.object({
         Name: z.string(),
         Value: z.string().nullable(),
         Unit: z.string().nullable(),
-        SubList: z.array(
-          z.object({
-            Name: z.string(),
-            Value: z.string().nullable(),
-            Unit: z.string().nullable()
-          })
-        ).nullable()
+        SubList: z
+          .array(
+            z.object({
+              Name: z.string(),
+              Value: z.string().nullable(),
+              Unit: z.string().nullable(),
+            }),
+          )
+          .nullable(),
       }),
     ),
     ServingSize: z.string().nullable(),
@@ -53,18 +55,17 @@ export const MenuProductSchema = z.object({
   }),
 });
 
-
 /* Represents the response returned from the GetMenuPeriods query. */
 export const PeriodSchema = z.object({
-  Time: z.string().time(),  // Time of request
+  Time: z.string().time(), // Time of request
   Result: z.array(
     z.object({
       PeriodId: z.number(),
       PeriodName: z.string(),
       UtcMealPeriodStartTime: z.string().time(),
-      UtcMealPeriodEndTime: z.string().time()
-    })
-  )
+      UtcMealPeriodEndTime: z.string().time(),
+    }),
+  ),
 });
 
 export type CampusDishMenuProduct = z.infer<typeof MenuProductSchema>;

@@ -1,6 +1,4 @@
 import { upsert } from "@api/utils";
-import { TRPCError } from "@trpc/server";
-
 import type {
   Drizzle,
   InsertUser,
@@ -9,6 +7,7 @@ import type {
   SelectUser,
 } from "@peterplate/db";
 import { users } from "@peterplate/db";
+import { TRPCError } from "@trpc/server";
 
 export async function getUser(
   db: Drizzle,

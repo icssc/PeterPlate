@@ -1,14 +1,11 @@
 "use client";
 
 import type { DishInfo } from "@peterplate/api";
-import React from "react";
+import type React from "react";
 import { useUserStore } from "@/context/useUserStore";
 import { useFavorites } from "@/hooks/useFavorites";
-import { sortCategoryKeys } from "@/utils/funcs";
 import FoodCard from "./card/food-card";
-import MealDivider from "./meal-divider";
 import FoodCardSkeleton from "./skeleton/food-card-skeleton";
-import MealDividerSkeleton from "./skeleton/meal-divider-skeleton";
 
 /**
  * Props for the {@link DishesInfo} component.
@@ -61,13 +58,6 @@ export default function DishesInfo({
   const onToggleFavorite = toggleFavorite;
   const isFavoritesLoading = isLoadingFavorites;
 
-  // Sort the dishes by category string
-  const categoryMap: { [dishCategory: string]: DishInfo[] } = {};
-  dishes.forEach((dish) => {
-    if (dish.category in categoryMap) categoryMap[dish.category].push(dish);
-    else categoryMap[dish.category] = [dish];
-  });
-
   return (
     <div
       className="flex flex-col gap-6 mt-6 px-2 overflow-y-auto 
@@ -76,11 +66,8 @@ export default function DishesInfo({
     >
       {isLoading && (
         <>
-          <MealDividerSkeleton />
           <FoodCardSkeleton />
           <FoodCardSkeleton />
-          <FoodCardSkeleton />
-          <MealDividerSkeleton />
           <FoodCardSkeleton />
         </>
       )}
@@ -97,26 +84,37 @@ export default function DishesInfo({
           <p className="text-center text-gray-500 py-4">
             No dishes available for this selection.
           </p>
+        ) : isCompactView ? (
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 md:gap-4">
+            {dishes.map((dish) => (
+              <FoodCard
+                key={dish.id}
+                className="max-w-none"
+                {...dish}
+                isFavorited={favoriteDishIds?.includes(dish.id)}
+                favoriteIsLoading={
+                  !!isFavoritesLoading || !!isFavoritePending?.(dish.id)
+                }
+                onToggleFavorite={onToggleFavorite}
+                isSimplified={isCompactView}
+              />
+            ))}
+          </div>
         ) : (
-          sortCategoryKeys(Object.keys(categoryMap)).map((categoryString) => (
-            <React.Fragment key={`${categoryString}`}>
-              <MealDivider title={categoryString} />
-              <div className="flex flex-wrap gap-4">
-                {categoryMap[categoryString].map((dish) => (
-                  <FoodCard
-                    key={dish.id}
-                    {...dish}
-                    isFavorited={favoriteDishIds?.includes(dish.id)}
-                    favoriteIsLoading={
-                      !!isFavoritesLoading || !!isFavoritePending?.(dish.id)
-                    }
-                    onToggleFavorite={onToggleFavorite}
-                    isSimplified={isCompactView}
-                  />
-                ))}
-              </div>
-            </React.Fragment>
-          ))
+          <div className="flex flex-wrap gap-4">
+            {dishes.map((dish) => (
+              <FoodCard
+                key={dish.id}
+                {...dish}
+                isFavorited={favoriteDishIds?.includes(dish.id)}
+                favoriteIsLoading={
+                  !!isFavoritesLoading || !!isFavoritePending?.(dish.id)
+                }
+                onToggleFavorite={onToggleFavorite}
+                isSimplified={isCompactView}
+              />
+            ))}
+          </div>
         ))}
     </div>
   );

@@ -25,8 +25,13 @@ export const dishes = pgTable(
     ingredients: text("ingredients").default(
       "Ingredient Statement Not Available",
     ),
+
     /** Defaults to "Other" if not specified. */
     category: text("category").notNull().default("Other"),
+
+    // keep your feature: dishes can have an optional image url
+    image_url: text("image_url"),
+
     numRatings: integer("num_ratings").default(0).notNull(),
     totalRating: integer("total_rating").default(0).notNull(),
     ...metadataColumns,

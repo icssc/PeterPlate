@@ -1,3 +1,4 @@
+import type { Drizzle } from "@peterplate/db";
 import type {
   PgInsert,
   PgInsertOnConflictDoUpdateConfig,
@@ -5,8 +6,6 @@ import type {
   PgTableWithColumns,
   TableConfig,
 } from "drizzle-orm/pg-core";
-
-import type { Drizzle } from "@peterplate/db";
 
 // ! typeguard only for this file
 const isNotQueryResultNever = <T extends TableConfig>(

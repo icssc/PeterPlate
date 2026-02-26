@@ -144,10 +144,10 @@ export async function weekly(db: Drizzle): Promise<void> {
   const results = await Promise.allSettled([
     eventJob(db),
     contributorsJob(db),
-    weeklyJob(db)
+    weeklyJob(db),
   ]);
 
-  results.forEach(result => {
+  results.forEach((result) => {
     if (result.status === "rejected") {
       logger.error(result.reason, "weekly() failed:");
     }

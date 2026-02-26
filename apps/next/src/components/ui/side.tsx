@@ -1,6 +1,7 @@
 "use client";
 
 import { GridView, Menu, SyncAlt } from "@mui/icons-material";
+import { Button } from "@mui/material";
 import type { RestaurantInfo } from "@peterplate/api"; // Import types
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -9,9 +10,9 @@ import { useHallDerived, useHallStore } from "@/context/useHallStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { formatOpenCloseTime, isSameDay, toTitleCase } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc"; // Import tRPC hook
+import { cn } from "@/utils/tw";
 import { HallEnum } from "@/utils/types";
 import DishesInfo from "./dishes-info";
-import { Button } from "./shadcn/button";
 import {
   Select,
   SelectContent,
@@ -161,8 +162,6 @@ export default function Side({
         <div className="absolute inset-0 bg-gradient-to-b from-black/65 to-transparent" />
         {!isDesktop && toggleHall && (
           <Button
-            variant="outline"
-            size="icon"
             className="absolute top-[68px] right-3 rounded-full bg-white shadow-md"
             onClick={() => toggleHall()}
           >
@@ -171,7 +170,10 @@ export default function Side({
         )}
       </div>
 
-      <div className="p-5 flex flex-col flex-grow h-1" id="side-content">
+      <div
+        className="p-5 flex flex-col flex-grow h-1 dark:bg-zinc-900"
+        id="side-content"
+      >
         <div className="flex flex-col gap-4 sm:gap-6 items-center">
           <div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-4 w-full">
             {isLoading && <SelectSkeleton />}
@@ -181,7 +183,7 @@ export default function Side({
                   value={selectedPeriod}
                   onValueChange={(value) => setSelectedPeriod(value || "")}
                 >
-                  <SelectTrigger className=" w-full sm:w-52">
+                  <SelectTrigger className="w-full sm:w-52">
                     <SelectValue placeholder="Select Meal" />
                   </SelectTrigger>
                   <SelectContent>
@@ -272,27 +274,23 @@ export default function Side({
           {!isLoading && !isError && dishes.length > 0 && (
             <div className="flex gap-2 w-full justify-end">
               <Button
-                variant="outline"
-                size="sm"
+                variant="outlined"
                 onClick={() => setIsCompactView(false)}
-                className={`px-4 py-1 flex items-center justify-center ${
-                  !isCompactView
-                    ? "bg-sky-700 text-white border-sky-700 hover:bg-sky-700 hover:text-white"
-                    : "border-sky-700 text-slate-900 hover:bg-sky-50 hover:text-slate-900"
-                }`}
+                className={cn(
+                  "capitalize px-4 py-1 flex items-center justify-center text-black",
+                  !isCompactView && "bg-sky-700 text-white",
+                )}
               >
                 <Menu className="mr-1" />
                 Card View
               </Button>
               <Button
-                variant="outline"
-                size="sm"
+                variant="outlined"
                 onClick={() => setIsCompactView(true)}
-                className={`px-4 py-1 flex items-center justify-center ${
-                  isCompactView
-                    ? "bg-sky-700 text-white border-sky-700 hover:bg-sky-700 hover:text-white"
-                    : "border-sky-700 text-slate-900 hover:bg-sky-50 hover:text-slate-900"
-                }`}
+                className={cn(
+                  "capitalize px-4 py-1 flex items-center justify-center text-black",
+                  isCompactView && "bg-sky-700 text-white",
+                )}
               >
                 <GridView className="mr-1" />
                 Compact View

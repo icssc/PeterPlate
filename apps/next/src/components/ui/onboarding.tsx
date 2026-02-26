@@ -1,0 +1,443 @@
+import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
+import {
+  Avatar,
+  Box,
+  Button,
+  Dialog,
+  Drawer,
+  MobileStepper,
+  ToggleButton,
+  ToggleButtonGroup,
+  Typography,
+} from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { useSession } from "@/utils/auth-client";
+import { trpc } from "@/utils/trpc";
+import {
+  AllergenKeys,
+  PreferenceKeys,
+} from "../../../../../packages/validators/src/adobe-ecommerce";
+import { GoogleSignInButton } from "../auth/google-sign-in";
+
+interface PersonalizeViewProps extends React.HTMLAttributes<HTMLDivElement> {
+  title: string;
+  description: string;
+  name: string;
+  options: readonly string[];
+  selected: string[];
+  onSelection: (newValues: string[]) => void;
+}
+
+interface OnboardingContentProps extends React.HTMLAttributes<HTMLDivElement> {
+  handleClose: () => void;
+}
+
+const WelcomeView = React.forwardRef<HTMLDivElement>((_, ref) => {
+  return (
+    <Box
+      ref={ref}
+      sx={{
+        paddingX: "40px",
+        paddingTop: "30px",
+      }}
+    >
+      <Box
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        textAlign="center"
+      >
+        <Avatar
+          src="/peterplate-icon.webp"
+          alt="PeterPlate Icon"
+          sx={{
+            width: "120px",
+            height: "120px",
+          }}
+        />
+        <Typography
+          variant="h4"
+          fontWeight={700}
+          fontFamily="Poppins, sans-serif"
+          className="text-sky-700"
+        >
+          PeterPlate
+        </Typography>
+        <Typography
+          fontFamily="Poppins, sans-serif"
+          color="gray"
+          fontWeight={500}
+          fontSize={18}
+          pt="10px"
+        >
+          Your UCI dining companion
+        </Typography>
+        <Typography
+          variant="h5"
+          fontFamily="Poppins, sans-serif"
+          color="black"
+          fontWeight={700}
+          pt="20px"
+        >
+          Welcome!
+        </Typography>
+        <Typography
+          fontFamily="Poppins, sans-serif"
+          color="gray"
+          fontWeight={500}
+          fontSize={15}
+          pt="10px"
+          pb="20px"
+        >
+          Sign in with your UCI Google account to access dining hall menus; rate
+          and favorite dishes; and personalize your dining experience.
+        </Typography>
+        <GoogleSignInButton />
+        <Typography
+          fontFamily="Poppins, sans-serif"
+          color="gray"
+          fontWeight={500}
+          fontSize={13}
+          py="10px"
+        >
+          By signing in, you agree to our Terms of Service and Privacy Policy
+        </Typography>
+      </Box>
+    </Box>
+  );
+});
+WelcomeView.displayName = "WelcomeView";
+
+const PersonalizeView = React.forwardRef<HTMLDivElement, PersonalizeViewProps>(
+  ({ title, description, name, options, selected, onSelection }, ref) => {
+    return (
+      <Box ref={ref} display="flex" flexDirection="column">
+        <Box
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+          gap={0.5}
+          sx={{
+            py: "20px",
+          }}
+          className="bg-sky-700"
+        >
+          <Avatar
+            src="/peterplate-icon.webp"
+            alt="PeterPlate Icon"
+            sx={{
+              width: "60px",
+              height: "60px",
+            }}
+          />
+          <Typography
+            variant="h5"
+            fontFamily="Poppins, sans-serif"
+            color="white"
+            fontWeight={700}
+          >
+            Welcome, {name}!
+          </Typography>
+          <Typography fontFamily="Poppins, sans-serif" color="white">
+            Let's personalize your dining experience
+          </Typography>
+        </Box>
+
+        <Box px="40px" pt="20px">
+          <Typography
+            variant="h5"
+            fontFamily="Poppins, sans-serif"
+            fontWeight={700}
+            className="text-sky-700"
+          >
+            {title}
+          </Typography>
+          <Typography
+            fontFamily="Poppins, sans-serif"
+            color="gray"
+            fontSize={16}
+            pt="16px"
+          >
+            {description}
+          </Typography>
+        </Box>
+
+        <ToggleButtonGroup
+          value={selected}
+          onChange={(_, newValues) => onSelection(newValues)}
+          aria-label="select"
+          exclusive={false}
+          fullWidth
+          sx={{
+            pt: "10px",
+            px: "40px",
+            display: "grid",
+            gridTemplateColumns: {
+              xs: "repeat(2, 1fr)",
+              sm: "repeat(3, 1fr)",
+            },
+            gap: 1.5,
+            "& .MuiToggleButtonGroup-grouped": {
+              border: "2px solid !important",
+              borderRadius: "10px !important",
+              borderColor: "grey !important",
+            },
+          }}
+        >
+          {options.map((opt) => (
+            <ToggleButton
+              key={opt}
+              value={opt}
+              sx={{
+                py: 3,
+                textTransform: "none",
+                color: "black",
+                height: "40px",
+                "&.Mui-selected": {
+                  backgroundColor: "rgba(0, 105, 168, .2)",
+                  color: "#0069A8",
+                  borderColor: "#0069A8 !important",
+                  "&:hover": {
+                    backgroundColor: "rgba(0, 105, 168, .4)",
+                  },
+                },
+              }}
+            >
+              <Typography
+                fontFamily="Poppins, sans-serif"
+                fontSize={16}
+                fontWeight={500}
+                lineHeight={1}
+              >
+                {opt}
+              </Typography>
+            </ToggleButton>
+          ))}
+        </ToggleButtonGroup>
+      </Box>
+    );
+  },
+);
+PersonalizeView.displayName = "PersonalizeView";
+
+const OnboardingContent = React.forwardRef<
+  HTMLDivElement,
+  OnboardingContentProps
+>(({ handleClose }, ref) => {
+  const { data: session, isPending } = useSession();
+  const firstName = session?.user?.name?.split(" ")[0] || "User";
+
+  const [activeStep, setActiveStep] = useState(0);
+  const [formData, setFormData] = useState({
+    allergies: [] as string[],
+    preferences: [] as string[],
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const addAllergies = trpc.allergy.addAllergies.useMutation();
+  const addPreferences = trpc.preference.addDietaryPreferences.useMutation();
+  const onboard = trpc.user.onboard.useMutation();
+
+  useEffect(() => {
+    if (!isPending && session?.user && session.user.hasOnboarded === false) {
+      setActiveStep(1);
+    }
+  }, [session, isPending]);
+
+  const handleToggle = (key: keyof typeof formData, newValues: string[]) => {
+    setFormData((prev) => ({
+      ...prev,
+      [key]: newValues,
+    }));
+  };
+
+  const handleSubmit = async () => {
+    if (!session?.user?.id) {
+      console.error("Please login first.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await addAllergies.mutateAsync({
+        userId: session.user.id,
+        allergies: formData.allergies,
+      });
+      await addPreferences.mutateAsync({
+        userId: session.user.id,
+        preferences: formData.preferences,
+      });
+      await onboard.mutateAsync({
+        id: session?.user.id,
+      });
+
+      handleClose();
+    } catch (error) {
+      console.error("Onboarding failed:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleNext = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+  };
+
+  const handleBack = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep - 1);
+  };
+
+  return (
+    <Box
+      ref={ref}
+      width="100%"
+      display="flex"
+      flexDirection="column"
+      gap={2}
+      mb="10px"
+    >
+      {activeStep === 0 && <WelcomeView />}
+      {activeStep === 1 && (
+        <PersonalizeView
+          title="Food Allergies"
+          description="Help us keep you safe by selecting your food allergies (optional)"
+          name={firstName}
+          options={AllergenKeys}
+          selected={formData.allergies}
+          onSelection={(vals) => handleToggle("allergies", vals)}
+        />
+      )}
+      {activeStep === 2 && (
+        <PersonalizeView
+          title="Dietary Preferences"
+          description="Select any dietary restrictions that apply to you (optional)"
+          name={firstName}
+          options={PreferenceKeys}
+          selected={formData.preferences}
+          onSelection={(vals) => handleToggle("preferences", vals)}
+        />
+      )}
+
+      <MobileStepper
+        variant="text"
+        steps={3}
+        position="static"
+        activeStep={activeStep}
+        sx={{ px: "40px" }}
+        nextButton={
+          activeStep === 2 ? (
+            <Button
+              size="small"
+              variant="contained"
+              disabled={isSubmitting}
+              onClick={handleSubmit}
+              sx={{
+                height: "45px",
+                width: "80px",
+                bgcolor: "#0069A8",
+                "&:hover": {
+                  filter: "brightness(0.85)",
+                },
+              }}
+            >
+              {isSubmitting ? "Saving..." : "Finish"}
+            </Button>
+          ) : (
+            <Button
+              variant="contained"
+              size="small"
+              onClick={handleNext}
+              disabled={!session?.user}
+              sx={{
+                height: "45px",
+                width: "80px",
+                bgcolor: "#0069A8",
+                "&:hover": {
+                  filter: "brightness(0.85)",
+                },
+              }}
+            >
+              Next
+            </Button>
+          )
+        }
+        backButton={
+          <Button
+            variant="contained"
+            size="small"
+            onClick={handleBack}
+            disabled={activeStep !== 2}
+            sx={{
+              height: "45px",
+              width: "80px",
+              bgcolor: "#0069A8",
+              "&:hover": {
+                filter: "brightness(0.85)",
+              },
+            }}
+          >
+            Back
+          </Button>
+        }
+      />
+    </Box>
+  );
+});
+
+export default function OnboardingDialog(): React.JSX.Element {
+  const isDesktop = useMediaQuery("(min-width: 768px)");
+  const [open, setOpen] = useState(true);
+
+  const handleClose = () => setOpen(false);
+
+  if (isDesktop)
+    return (
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        maxWidth={false}
+        slotProps={{
+          paper: {
+            sx: {
+              width: "520px",
+              maxWidth: "90vw",
+              margin: 2,
+              padding: 0,
+              overflow: "hidden",
+              borderRadius: "16px",
+            },
+          },
+        }}
+      >
+        <OnboardingContent handleClose={handleClose} />
+      </Dialog>
+    );
+  else
+    return (
+      <Drawer
+        anchor="bottom"
+        open={open}
+        onClose={handleClose}
+        slotProps={{
+          paper: {
+            sx: {
+              padding: 0,
+              overflow: "hidden",
+              borderRadius: "16px",
+            },
+          },
+        }}
+        sx={{
+          "& .MuiDrawer-paper": {
+            borderTopLeftRadius: "10px",
+            borderTopRightRadius: "10px",
+            marginTop: "96px",
+            height: "auto",
+          },
+        }}
+      >
+        <OnboardingContent handleClose={handleClose} />
+      </Drawer>
+    );
+}

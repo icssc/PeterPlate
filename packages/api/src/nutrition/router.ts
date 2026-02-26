@@ -1,8 +1,8 @@
 import { createTRPCRouter, publicProcedure } from "@api/trpc";
-import { z } from "zod";
 import { loggedMeals, nutritionInfos } from "@peterplate/db";
 import { TRPCError } from "@trpc/server";
-import { gt, eq, and, desc } from "drizzle-orm";
+import { and, desc, eq, gt } from "drizzle-orm";
+import { z } from "zod";
 
 const LoggedMealSchema = z.object({
   dishId: z.string(),
@@ -40,9 +40,11 @@ export const nutritionRouter = createTRPCRouter({
       return result[0];
     }),
   getMealsInLastWeek: publicProcedure
-    .input(z.object({
-      userId: z.string()
-    }))
+    .input(
+      z.object({
+        userId: z.string(),
+      }),
+    )
     .query(async ({ ctx, input }) => {
       const oneWeekAgo = new Date();
       oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
@@ -68,26 +70,28 @@ export const nutritionRouter = createTRPCRouter({
         .where(
           and(
             gt(loggedMeals.eatenAt, oneWeekAgo),
-            eq(loggedMeals.userId, input.userId)
-          )
+            eq(loggedMeals.userId, input.userId),
+          ),
         )
-        .orderBy(desc(loggedMeals.eatenAt));;
+        .orderBy(desc(loggedMeals.eatenAt));
 
       return meals;
     }),
   deleteLoggedMeal: publicProcedure
-    .input(z.object({
-      userId: z.string(),
-      dishId: z.string()
-    }))
+    .input(
+      z.object({
+        userId: z.string(),
+        dishId: z.string(),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
       const result = await ctx.db
         .delete(loggedMeals)
         .where(
           and(
             eq(loggedMeals.userId, input.userId),
-            eq(loggedMeals.dishId, input.dishId)
-          )
+            eq(loggedMeals.dishId, input.dishId),
+          ),
         )
         .returning();
 
@@ -99,5 +103,5 @@ export const nutritionRouter = createTRPCRouter({
       }
 
       return result[0];
-    })
+    }),
 });

@@ -10,8 +10,8 @@
 // import type { Session } from "@peterplate/auth";
 // import { auth } from "@peterplate/auth";
 
-import { initTRPC } from "@trpc/server";
 import { createDrizzle } from "@peterplate/db";
+import { initTRPC } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
 

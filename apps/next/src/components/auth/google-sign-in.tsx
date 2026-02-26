@@ -1,8 +1,8 @@
 "use client";
 /* Sign In Button */
 
-import { authClient } from "@/utils/auth-client"; 
-import { Button } from "../ui/shadcn/button"; 
+import { authClient } from "@/utils/auth-client";
+import { Button } from "../ui/shadcn/button";
 
 export function GoogleSignInButton() {
   const handleSignIn = async () => {
@@ -10,7 +10,7 @@ export function GoogleSignInButton() {
       const result = await authClient.signIn.oauth2({
         providerId: "icssc",
       });
-      
+
       console.log("Sign in result:", result);
     } catch (error) {
       console.error("Sign in error:", error);
@@ -19,13 +19,10 @@ export function GoogleSignInButton() {
         console.error("Error response body:", text);
       }
     }
-  }
+  };
 
   return (
-    <Button 
-      onClick={handleSignIn}
-      className="w-full" 
-    >
+    <Button onClick={handleSignIn} className="w-full">
       Sign In with Google
     </Button>
   );

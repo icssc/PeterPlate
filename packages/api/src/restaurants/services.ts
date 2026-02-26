@@ -1,5 +1,4 @@
 import { upsert } from "@api/utils";
-import { TRPCError } from "@trpc/server";
 import type {
   Drizzle,
   InsertRestaurant,
@@ -13,6 +12,7 @@ import type {
   SelectStation,
 } from "@peterplate/db";
 import { restaurants } from "@peterplate/db";
+import { TRPCError } from "@trpc/server";
 import { formatInTimeZone } from "date-fns-tz";
 
 export const upsertRestaurant = async (
@@ -101,6 +101,7 @@ export async function getRestaurantsByDate(
               dishes: dishesToMenus
                 .map((dishToMenu) => ({
                   ...dishToMenu.dish,
+                  image_url: dishToMenu.dish.image_url ?? null,
                   menuId: menu.id, // derived from menu we’re iterating, not from dish row
                   restaurant: restaurant.name,
                 }))
@@ -125,11 +126,11 @@ export async function getRestaurantsByDate(
 
   return firstRestaurant.name === "anteatery"
     ? {
-      anteatery: firstRestaurant,
-      brandywine: secondRestaurant,
-    }
+        anteatery: firstRestaurant,
+        brandywine: secondRestaurant,
+      }
     : {
-      anteatery: secondRestaurant,
-      brandywine: firstRestaurant,
-    };
+        anteatery: secondRestaurant,
+        brandywine: firstRestaurant,
+      };
 }
