@@ -14,9 +14,9 @@ import {
 } from "@/utils/funcs";
 import { cn } from "@/utils/tw";
 import { nutrientToUnit } from "@/utils/types";
-import type { OnAddToMealTracker } from "./card/food-card";
 import IngredientsDialog from "../ingredients-dialog";
 import { AllergenBadge } from "./allergen-badge";
+import type { OnAddToMealTracker } from "./card/food-card";
 import InteractiveStarRating from "./interactive-star-rating";
 
 export default function FoodDrawerContent({
@@ -33,7 +33,7 @@ export default function FoodDrawerContent({
     typeof dish.image_url === "string" &&
     dish.image_url.trim() !== "" &&
     !imageError;
-    
+
   const ingredientsAvailable: boolean =
     dish.ingredients != null && dish.ingredients.length > 0;
 
@@ -204,7 +204,11 @@ export default function FoodDrawerContent({
             />
           )}
           {!ingredientsAvailable && (
-            <Button variant="outlined" disabled className="w-full whitespace-nowrap">
+            <Button
+              variant="outlined"
+              disabled
+              className="w-full whitespace-nowrap"
+            >
               Ingredients Not Available
             </Button>
           )}

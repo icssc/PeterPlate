@@ -16,7 +16,7 @@ export function RootClient({ children }: { children: React.ReactNode }) {
       new QueryClient({
         defaultOptions: {
           queries: {
-            // 5m defualt stale time
+            // 5m default stale time
             staleTime: 5 * 60 * 1000,
             refetchOnWindowFocus: false,
             refetchOnReconnect: false,
@@ -63,7 +63,8 @@ export function RootClient({ children }: { children: React.ReactNode }) {
         <QueryClientProvider client={queryClient}>
           <DateProvider>
             <Toolbar />
-            {children}
+            {/* Extra spacing for mobile view so toolbar doesn't overlap content */}
+            <main className="pb-20 md:pb-0">{children}</main>
           </DateProvider>
         </QueryClientProvider>
       </trpc.Provider>
