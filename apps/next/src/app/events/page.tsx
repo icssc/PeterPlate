@@ -6,7 +6,7 @@ import Button from "@mui/material/Button";
 import { useState } from "react";
 import { trpc } from "@/utils/trpc";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import moment from "moment";
+import { addMonths, endOfMonth, startOfMonth, subMonths } from "date-fns";
 import CalendarView from "@/components/ui/calendar-view";
 import EventCard, { type EventInfo } from "@/components/ui/card/event-card";
 import EventCardSkeleton from "@/components/ui/skeleton/event-card-skeleton";
@@ -33,8 +33,8 @@ const Events = () => {
     isLoading,
     error,
   } = trpc.event.inBetween.useQuery({
-    after: moment(currentDate).startOf("month").toDate(),
-    before: moment(currentDate).endOf("month").toDate(),
+    after: startOfMonth(currentDate),
+    before: endOfMonth(currentDate),
   });
 
   const sortedEvents =
@@ -88,15 +88,12 @@ const Events = () => {
 
   const handleClose = () => setSelectedEventData(null);
 
-  const viewPreviousMonthsEvents = () => {
-    setCurrentDate(moment(currentDate).subtract(1, "month").toDate());
+  const viewNextMonthsEvents = () => {
+    setCurrentDate(addMonths(currentDate, 1));
   };
 
-  const viewNextMonthsEvents = () => {
-    const _now = moment();
-    const calendarDate = moment(currentDate);
-    if (calendarDate.isSameOrAfter(_now, "month")) return;
-    setCurrentDate(calendarDate.add(1, "month").toDate());
+  const viewPreviousMonthsEvents = () => {
+    setCurrentDate(subMonths(currentDate, 1));
   };
 
   return (
@@ -264,7 +261,7 @@ const Events = () => {
               <div className="flex sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12 overflow-x-auto sm:overflow-visible pb-2 sm:pb-0">
                 {filteredEvents.map((event: any): any => (
                   <EventCard
-                    key={`${event.title}|${event.start.toISOString()}|${event.restaurantId}`}
+                    key={`${event.title}-${event.start}-${event.restaurantId}`}
                     name={event.title}
                     imgSrc={event.image}
                     alt={`${event.title} promotion image.`}
