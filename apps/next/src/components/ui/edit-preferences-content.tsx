@@ -4,12 +4,13 @@ import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
 import {
   Avatar,
   Button,
+  CircularProgress,
   MobileStepper,
   ToggleButton,
   ToggleButtonGroup,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSession } from "@/utils/auth-client";
 import { trpc } from "@/utils/trpc";
 import {
@@ -27,6 +28,27 @@ export default function EditPreferencesContent() {
     preferences: [] as string[],
   });
 
+  const { data: existingAllergies, isLoading: loadingAllergies } =
+    trpc.allergy.getAllergies.useQuery(
+      { userId: session?.user?.id ?? "" },
+      { enabled: !!session?.user?.id },
+    );
+
+  const { data: existingPreferences, isLoading: loadingPrefs } =
+    trpc.preference.getDietaryPreferences.useQuery(
+      { userId: session?.user?.id ?? "" },
+      { enabled: !!session?.user?.id },
+    );
+
+  useEffect(() => {
+    if (existingAllergies || existingPreferences) {
+      setFormData({
+        allergies: existingAllergies || [],
+        preferences: existingPreferences || [],
+      });
+    }
+  }, [existingAllergies, existingPreferences]);
+
   const addAllergies = trpc.allergy.addAllergies.useMutation();
   const addPreferences = trpc.preference.addDietaryPreferences.useMutation();
 
@@ -38,23 +60,50 @@ export default function EditPreferencesContent() {
   };
 
   const handleSubmit = async () => {
-    if (!session?.user?.id) {
-      console.error("Please login first.");
-      return;
-    }
-
+    if (!session?.user?.id) return;
     setIsSubmitting(true);
+
     try {
+      const allergiesToDelete =
+        existingAllergies?.filter(
+          (x: any) => !formData.allergies.includes(x),
+        ) || [];
+
+      await Promise.all(
+        allergiesToDelete.map((allergy: any) =>
+          trpc.allergy.deleteAllergy.mutateAsync({
+            userId: session.user.id,
+            allergy,
+          }),
+        ),
+      );
+
       await addAllergies.mutateAsync({
         userId: session.user.id,
         allergies: formData.allergies,
       });
+
+      const prefsToDelete =
+        existingPreferences?.filter(
+          (x: any) => !formData.preferences.includes(x),
+        ) || [];
+      await Promise.all(
+        prefsToDelete.map((preference: any) =>
+          trpc.preference.deletePreference.mutateAsync({
+            userId: session.user.id,
+            preference,
+          }),
+        ),
+      );
+
       await addPreferences.mutateAsync({
         userId: session.user.id,
         preferences: formData.preferences,
       });
+
+      alert("Preferences updated successfully!");
     } catch (error) {
-      console.error("Saving preferences failed:", error);
+      console.error("Save failed", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -68,6 +117,14 @@ export default function EditPreferencesContent() {
     setActiveStep((prev) => Math.max(prev - 1, 0));
   };
 
+  if (loadingAllergies || loadingPrefs) {
+    return (
+      <div className="flex h-64 w-full items-center justify-center">
+        <CircularProgress />
+      </div>
+    );
+  }
+
   return (
     <div className="w-full flex flex-col gap-2 mb-2">
       {activeStep === 0 && (
@@ -76,7 +133,7 @@ export default function EditPreferencesContent() {
             <Avatar
               src="/peterplate-icon.webp"
               alt="PeterPlate Icon"
-              className="!w-[60px] !h-[60px]"
+              className="!w-[60px] !h-[60px] mt-10"
             />
             <Typography
               variant="h5"
@@ -143,7 +200,7 @@ export default function EditPreferencesContent() {
             <Avatar
               src="/peterplate-icon.webp"
               alt="PeterPlate Icon"
-              className="!w-[60px] !h-[60px]"
+              className="!w-[60px] !h-[60px] mt-10"
             />
             <Typography
               variant="h5"
