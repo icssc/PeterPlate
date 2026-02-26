@@ -168,7 +168,7 @@ export default function EditPreferencesContent() {
               fontFamily="Poppins, sans-serif"
               color="gray"
               fontSize={16}
-              className="pt-4"
+              className="pt-4 mb-3"
             >
               Help us keep you safe by selecting your food allergies (optional)
             </Typography>
