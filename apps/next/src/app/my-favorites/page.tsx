@@ -50,8 +50,8 @@ export default function MyFavoritesPage() {
       )}
       {isLoadingFavorites && (
         <div className="space-y-4">
-          {Array.from({ length: 3 }).map((_, index) => (
-            <FoodCardSkeleton key={crypto.randomUUID()} />
+          {["s1", "s2", "s3"].map((index) => (
+            <FoodCardSkeleton key={`favorite-skeleton-${index}`} />
           ))}
         </div>
       )}
