@@ -234,13 +234,6 @@ export default function Toolbar(): React.JSX.Element {
               ) : (
                 <div className="flex items-center gap-2">
                   <GoogleSignInButton />
-                  <IconButton
-                    onClick={handleProfileOpen}
-                    className="!text-[#1f2937] hover:!bg-[rgba(0,0,0,0.04)]"
-                    aria-label="Open sidebar"
-                  >
-                    <MenuIcon style={{ color: "white" }} />
-                  </IconButton>
                 </div>
               )}
             </div>
