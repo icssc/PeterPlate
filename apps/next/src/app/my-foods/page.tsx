@@ -142,7 +142,7 @@ export default function MyFoodsPage() {
       {/* Header */}
       <header className="space-y-1">
         <h1 className="text-4xl text-sky-700 font-bold mb-4">My Foods</h1>
-        <p className="text-sm">
+        <p className="hidden text-sm md:block">
           View all the dishes you have favorited or rated across UCI dining
           halls!
         </p>
@@ -151,7 +151,7 @@ export default function MyFoodsPage() {
       {/* Filter bar */}
       {isDesktop ? (
         /* ── Desktop: single row ── */
-        <div className="flex flex-row items-center gap-4 rounded-2xl bg-sky-100 p-4">
+        <div className="flex flex-row flex-wrap items-center gap-4 rounded-2xl bg-sky-100 p-4">
           {/* Location */}
           <div className="flex flex-col gap-1.5 flex-shrink-0">
             <span className="text-sm font-medium">Location</span>
@@ -174,7 +174,7 @@ export default function MyFoodsPage() {
             </div>
           </div>
 
-          <div className="flex gap-3 ml-auto flex-row items-center">
+          <div className="ml-auto flex flex-row flex-wrap items-center gap-3">
             {/* Search */}
             <div className="relative w-64">
               <svg
@@ -361,7 +361,7 @@ export default function MyFoodsPage() {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-10">
               {filteredEntries.map((entry) => (
                 <MyFoodsCard
                   key={entry.dishId}
