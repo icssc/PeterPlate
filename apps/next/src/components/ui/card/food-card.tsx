@@ -13,6 +13,12 @@ import React from "react";
 import { useSnackbarStore } from "@/context/useSnackbar";
 import { useUserStore } from "@/context/useUserStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import {
+  ALLERGY_MAP,
+  type AllergyName,
+  PREFERENCE_MAP,
+  type PreferenceName,
+} from "@/utils/dietary";
 import { formatFoodName, getFoodIcon } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
 import { cn } from "@/utils/tw";
@@ -35,6 +41,10 @@ interface FoodCardContentProps extends React.HTMLAttributes<HTMLDivElement> {
    */
   isFavorited?: boolean;
   /**
+   * Whether the dish meets the current user's dietary & allergen preferences
+   */
+  doesNotMeetPreferences?: boolean;
+  /**
    * Whether the favorite toggle button should be disabled.
    */
   favoriteDisabled?: boolean;
@@ -46,7 +56,6 @@ interface FoodCardContentProps extends React.HTMLAttributes<HTMLDivElement> {
    * Handler invoked when a user clicks "Add to meal tracker" (card, dialog, or drawer).
    */
   onAddToMealTracker?: OnAddToMealTracker;
-
   /**
    * Whether to render a simplified version of the card.
    */
@@ -68,6 +77,7 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
       onAddToMealTracker,
       isSimplified = false,
       className,
+      doesNotMeetPreferences,
       ...divProps
     },
     ref,
@@ -115,9 +125,19 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
           className={cn("w-full max-w-xs", className)}
         >
           <Card
-            className="cursor-pointer hover:shadow-lg trasnsition w-full border"
+            className={cn(
+              "relative cursor-pointer hover:shadow-lg transition w-full border",
+              doesNotMeetPreferences && "opacity-70",
+            )}
             sx={{ borderRadius: "12px" }}
           >
+            {doesNotMeetPreferences && (
+              <div className="absolute top-2 right-2 z-10">
+                <span className="bg-red-500 text-white text-xs font-medium px-2 py-1 rounded-md shadow">
+                  ⚠ Conflict
+                </span>
+              </div>
+            )}
             <CardContent sx={{ padding: "0 !important" }}>
               <div className="flex justify-between items-center h-full p-4">
                 <div className="flex flex-col gap-1">
@@ -177,9 +197,19 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
         className={cn("max-w-xs flex-shrink-0", className)}
       >
         <Card
-          className="cursor-pointer hover:shadow-lg transition w-full border"
+          className={cn(
+            "relative cursor-pointer hover:shadow-lg transition w-full border",
+            doesNotMeetPreferences && "opacity-70",
+          )}
           sx={{ borderRadius: "12px" }}
         >
+          {doesNotMeetPreferences && (
+            <div className="absolute top-2 right-2 z-10">
+              <span className="bg-red-500 text-white text-xs font-medium px-2 py-1 rounded-md shadow">
+                ⚠ Conflict
+              </span>
+            </div>
+          )}
           <CardContent sx={{ padding: "0 !important" }}>
             <div className="flex justify-between h-full p-4 gap-4">
               <div className="flex items-center gap-4 w-full">
@@ -281,6 +311,7 @@ interface FoodCardProps extends DishInfo {
   /** Whether to render a simplified version of the card. */
   isSimplified?: boolean;
   /** Optional class name for styling. */
+  doesNotMeetPreferences?: boolean;
   className?: string;
 }
 
@@ -296,7 +327,37 @@ export default function FoodCard({
   const [open, setOpen] = React.useState(false);
   const userId = useUserStore((s) => s.userId);
   const utils = trpc.useUtils();
-  const { showSnackbar } = useSnackbarStore();
+
+  const { data: preferences } = trpc.preference.getDietaryPreferences.useQuery(
+    { userId: userId ?? "" },
+    { enabled: !!userId },
+  );
+
+  const { data: allergies } = trpc.allergy.getAllergies.useQuery(
+    { userId: userId ?? "" },
+    { enabled: !!userId },
+  );
+
+  const doesNotMeetPreferences = React.useMemo(() => {
+    if (!preferences || !allergies) return false;
+
+    const flags = dish.dietRestriction;
+
+    const violatesAllergy = allergies.some((allergy) => {
+      if (!(allergy in ALLERGY_MAP)) return false;
+      const key = ALLERGY_MAP[allergy as AllergyName];
+      return flags[key] === true;
+    });
+
+    const violatesPreferences = preferences.some((pref) => {
+      if (!(pref in PREFERENCE_MAP)) return false;
+      const key = PREFERENCE_MAP[pref as PreferenceName];
+      return flags[key] === false;
+    });
+
+    return violatesAllergy || violatesPreferences;
+  }, [preferences, allergies, dish.dietRestriction]);
+
   const logMealMutation = trpc.nutrition.logMeal.useMutation({
     onSuccess: () => {
       showSnackbar(`Added ${formatFoodName(dish.name)} to your log`, "success");
@@ -336,6 +397,7 @@ export default function FoodCard({
           isSimplified={isSimplified}
           onClick={handleOpen}
           className={className}
+          doesNotMeetPreferences={doesNotMeetPreferences}
         />
         <Dialog
           open={open}
@@ -361,6 +423,7 @@ export default function FoodCard({
             dish={dish}
             onAddToMealTracker={handleAddToMealTracker}
             isAddingToMealTracker={logMealMutation.isPending}
+            doesNotMeetPreferences={doesNotMeetPreferences}
           />
         </Dialog>
       </>
@@ -411,6 +474,7 @@ export default function FoodCard({
             dish={dish}
             onAddToMealTracker={handleAddToMealTracker}
             isAddingToMealTracker={logMealMutation.isPending}
+            doesNotMeetPreferences={doesNotMeetPreferences}
           />
         </Drawer>
       </>

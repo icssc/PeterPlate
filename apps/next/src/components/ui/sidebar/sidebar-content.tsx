@@ -16,6 +16,7 @@ import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in";
 import { signOut, useSession } from "@/utils/auth-client";
+import { trpc } from "@/utils/trpc";
 
 interface ProfileMenuContentProps {
   onClose: () => void;
@@ -26,10 +27,22 @@ export default function SidebarContent({
 }: ProfileMenuContentProps): JSX.Element {
   const { data: session } = useSession();
   const user = session?.user;
+  const userId = user?.id;
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);
+
+  const { data: preferences } = trpc.preference.getDietaryPreferences.useQuery(
+    { userId: userId ?? "" },
+    { enabled: !!userId },
+  );
+
+  const { data: allergies } = trpc.allergy.getAllergies.useQuery(
+    { userId: userId ?? "" },
+    { enabled: !!userId },
+  );
+
   if (!mounted) return null;
 
   const handleSignOut = async () => {
@@ -79,22 +92,38 @@ export default function SidebarContent({
           <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
             Restrictions:
           </p>
+
           <div className="flex flex-wrap gap-1.5 mb-3">
-            <span className="rounded-md border border-blue-500 px-2.5 py-0.5 text-xs text-blue-600 dark:text-blue-400">
-              Kosher
-            </span>
+            {preferences?.length ? (
+              preferences.map((pref) => (
+                <span
+                  key={pref}
+                  className="rounded-md border border-blue-500 px-2.5 py-0.5 text-xs text-blue-600 dark:text-blue-400"
+                >
+                  {pref}
+                </span>
+              ))
+            ) : (
+              <span className="text-xs text-gray-400">None</span>
+            )}
           </div>
 
           <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
             Allergies:
           </p>
           <div className="flex flex-wrap gap-1.5">
-            <span className="rounded-md border border-blue-500 px-2.5 py-0.5 text-xs text-blue-600 dark:text-blue-400">
-              Tree Nuts
-            </span>
-            <span className="rounded-md border border-blue-500 px-2.5 py-0.5 text-xs text-blue-600 dark:text-blue-400">
-              Soy
-            </span>
+            {allergies?.length ? (
+              allergies.map((allergy) => (
+                <span
+                  key={allergy}
+                  className="rounded-md border border-blue-500 px-2.5 py-0.5 text-xs text-blue-600 dark:text-blue-400"
+                >
+                  {allergy}
+                </span>
+              ))
+            ) : (
+              <span className="text-xs text-gray-400">None</span>
+            )}
           </div>
         </div>
 

@@ -23,10 +23,12 @@ export default function FoodDrawerContent({
   dish,
   onAddToMealTracker,
   isAddingToMealTracker = false,
+  doesNotMeetPreferences,
 }: {
   dish: DishInfo;
   onAddToMealTracker?: OnAddToMealTracker;
   isAddingToMealTracker?: boolean;
+  doesNotMeetPreferences: boolean;
 }) {
   const [imageError, setImageError] = useState(false);
   const showImage =
@@ -107,6 +109,7 @@ export default function FoodDrawerContent({
               {dish.dietRestriction.isKosher && (
                 <AllergenBadge variant={"kosher"} />
               )}
+              {doesNotMeetPreferences && <AllergenBadge variant={"conflict"} />}
             </div>
           </div>
 
