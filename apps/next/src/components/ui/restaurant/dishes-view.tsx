@@ -88,56 +88,6 @@ export function DishesView({
     }));
   }, [stations, preferences, allergies]);
 
-  // const { data: preferences } =
-  //   trpc.preference.getDietaryPreferences.useQuery(
-  //     { userId: userId ?? "" },
-  //     { enabled: !!userId }
-  //   );
-
-  // const { data: allergies } =
-  //   trpc.allergy.getAllergies.useQuery(
-  //     { userId: userId ?? "" },
-  //     { enabled: !!userId }
-  //   );
-
-  // /**
-  //  * Pure function (NO hooks inside)
-  //  */
-  // const doesDishViolatePreferences = (dish: any) => {
-  //   if (!preferences || !allergies) return false;
-
-  //   const flags = dish.dietRestriction;
-
-  //   const violatesAllergy = allergies.some((allergy) => {
-  //     if (!(allergy in ALLERGY_MAP)) return false;
-  //     const key = ALLERGY_MAP[allergy as AllergyName];
-  //     return flags?.[key] === true;
-  //   });
-
-  //   const violatesPreferences = preferences.some((pref) => {
-  //     if (!(pref in PREFERENCE_MAP)) return false;
-  //     const key = PREFERENCE_MAP[pref as PreferenceName];
-  //     return flags?.[key] === false;
-  //   });
-
-  //   return violatesAllergy || violatesPreferences;
-  // };
-
-  // /**
-  //  * Memoize enrichment ONCE
-  //  */
-  // const enrichedStations = useMemo(() => {
-  //   if (!stations) return [];
-
-  //   return stations.map((station) => ({
-  //     ...station,
-  //     dishes: station.dishes.map((dish: any) => ({
-  //       ...dish,
-  //       doesNotMeetPreferences: doesDishViolatePreferences(dish),
-  //     })),
-  //   }));
-  // }, [stations, doesDishViolatePreferences]);
-
   const getFilteredDishes = (dishes: any[]) => {
     // console.log("running filtered dishes function")
     if (!showPreferencesOnly) return dishes;

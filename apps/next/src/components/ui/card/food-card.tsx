@@ -97,17 +97,6 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
       { staleTime: 5 * 60 * 1000 },
     );
 
-    // const { data: preferences } =
-    //   trpc.preference.getDietaryPreferences.useQuery(
-    //     { userId: userId ?? "" },
-    //     { enabled: !!userId },
-    //   );
-
-    // const { data: allergies } = trpc.allergy.getAllergies.useQuery(
-    //   { userId: userId ?? "" },
-    //   { enabled: !!userId },
-    // );
-
     const averageRating = ratingData?.averageRating ?? 0;
     const ratingCount = ratingData?.ratingCount ?? 0;
 
@@ -159,26 +148,6 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
       if (favoriteDisabled || !onToggleFavorite) return;
       onToggleFavorite(dish.id, Boolean(isFavorited));
     };
-
-    // const doesNotMeetPreferences = React.useMemo(() => {
-    //   if (!preferences || !allergies) return false;
-
-    //   const flags = dish.dietRestriction;
-
-    //   const violatesAllergy = allergies.some((allergy) => {
-    //     if (!(allergy in ALLERGY_MAP)) return false;
-    //     const key = ALLERGY_MAP[allergy as AllergyName];
-    //     return flags[key] === true;
-    //   });
-
-    //   const violatesPreferences = preferences.some((pref) => {
-    //     if (!(pref in PREFERENCE_MAP)) return false;
-    //     const key = PREFERENCE_MAP[pref as PreferenceName];
-    //     return flags[key] === false;
-    //   });
-
-    //   return violatesAllergy || violatesPreferences;
-    // }, [preferences, allergies, dish.dietRestriction]);
 
     if (isSimplified) {
       return (
