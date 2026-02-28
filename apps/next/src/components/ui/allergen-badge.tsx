@@ -14,6 +14,7 @@ import { cn } from "@/utils/tw";
  * @property {string} variants.variant.vegan - Style for vegan badges.
  * @property {string} variants.variant.gluten_free - Style for gluten-free badges.
  * @property {string} variants.variant.kosher - Style for kosher badges.
+ * @property {string} variants.variant.conflict
  */
 const badgeVariants = cva(
   "inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent shadow",
@@ -27,6 +28,7 @@ const badgeVariants = cva(
         gluten_free:
           "bg-orange-700 hover:bg-orange-700/80 text-primary-foreground",
         kosher: "bg-sky-700 hover:bg-sky-700/80 text-primary-foreground",
+        conflict: "bg-orange-700 hover:bg-red-700/80 text-primary-foreground",
       },
     },
     defaultVariants: {

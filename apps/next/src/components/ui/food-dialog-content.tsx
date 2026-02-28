@@ -154,6 +154,9 @@ export default function FoodDialogContent({
                   {dish.dietRestriction.isKosher && (
                     <AllergenBadge variant={"kosher"} />
                   )}
+                  {doesNotMeetPreferences && (
+                    <AllergenBadge variant={"conflict"} />
+                  )}
                 </div>
               </div>
               <p className="text-black px-4 leading-relaxed">
