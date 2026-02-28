@@ -11,6 +11,7 @@ import {
   Menu,
   MenuItem,
   Toolbar as MuiToolbar,
+  Snackbar,
 } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
@@ -125,6 +126,8 @@ export default function Toolbar() {
   const [profileAnchor, setProfileAnchor] = useState<null | HTMLElement>(null);
   const profileOpen = Boolean(profileAnchor);
   const [editPreferencesOpen, setEditPreferencesOpen] = useState(false);
+  const [editPreferencesSnackbarOpen, setEditPreferencesSnackbarOpen] =
+    useState(false);
 
   const handleProfileOpen = (event: MouseEvent<HTMLElement>) => {
     setProfileAnchor(event.currentTarget);
@@ -138,6 +141,10 @@ export default function Toolbar() {
   };
   const handleEditPreferencesClose = () => {
     setEditPreferencesOpen(false);
+  };
+  const handleEditPreferencesSaved = () => {
+    setEditPreferencesOpen(false);
+    setEditPreferencesSnackbarOpen(true);
   };
   const { data: session, isPending } = useSession();
   const user = session?.user;
@@ -266,7 +273,7 @@ export default function Toolbar() {
               "w-[460px] max-w-[90vw] max-h-[90vh] m-2 p-0 overflow-hidden flex flex-col rounded-2xl",
           }}
         >
-          <EditPreferencesContent />
+          <EditPreferencesContent onSaved={handleEditPreferencesSaved} />
         </Dialog>
       ) : (
         <Drawer
@@ -292,9 +299,20 @@ export default function Toolbar() {
             },
           }}
         >
-          <EditPreferencesContent />
+          <EditPreferencesContent onSaved={handleEditPreferencesSaved} />
         </Drawer>
       )}
+
+      <Snackbar
+        open={editPreferencesSnackbarOpen}
+        autoHideDuration={4000}
+        onClose={(_, reason) => {
+          if (reason === "clickaway") return;
+          setEditPreferencesSnackbarOpen(false);
+        }}
+        message="Preferences updated successfully"
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      />
 
       {/* <SidebarContent
         open={drawerOpen}

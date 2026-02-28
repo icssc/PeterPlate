@@ -19,7 +19,13 @@ import {
   PreferenceKeys,
 } from "../../../../../packages/validators/src/adobe-ecommerce";
 
-export default function EditPreferencesContent() {
+type EditPreferencesContentProps = {
+  onSaved?: () => void;
+};
+
+export default function EditPreferencesContent({
+  onSaved,
+}: EditPreferencesContentProps) {
   const { data: session } = useSession();
   const [activeStep, setActiveStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -106,7 +112,9 @@ export default function EditPreferencesContent() {
       await utils.allergy.getAllergies.invalidate();
       await utils.preference.getDietaryPreferences.invalidate();
 
-      alert("Preferences updated successfully!");
+      if (onSaved) {
+        onSaved();
+      }
     } catch (error) {
       console.error("Save failed", error);
     } finally {
@@ -131,7 +139,7 @@ export default function EditPreferencesContent() {
   }
 
   return (
-    <div className="w-full flex flex-col gap-2 mb-2">
+    <div className="w-full flex flex-col gap-2">
       {activeStep === 0 && (
         <div className="flex flex-col">
           <div className="bg-sky-700 py-5 flex flex-col items-center gap-1">

@@ -144,7 +144,7 @@ export default function SidebarContent({
                 className="w-full flex items-center gap-3 rounded-lg px-4 py-2 text-sm text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:dark:hover:bg-transparent"
               >
                 <EditIcon fontSize="small" />
-                Edit Preferences
+                <span className="font-semibold">Edit Preferences</span>
               </button>
             </span>
           </Tooltip>
