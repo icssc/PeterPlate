@@ -273,9 +273,23 @@ export default function Toolbar() {
           anchor="bottom"
           open={editPreferencesOpen}
           onClose={handleEditPreferencesClose}
-          PaperProps={{
-            className:
-              "w-[460px] max-w-[90vw] max-h-[85vh] m-2 p-0 overflow-hidden flex flex-col rounded-t-[10px] mt-24 h-auto",
+          slotProps={{
+            paper: {
+              sx: {
+                padding: 0,
+                overflow: "hidden",
+                borderRadius: "16px",
+              },
+            },
+          }}
+          sx={{
+            "& .MuiDrawer-paper": {
+              borderTopLeftRadius: "10px",
+              borderTopRightRadius: "10px",
+              marginTop: "96px",
+              height: "auto",
+              maxHeight: "85vh",
+            },
           }}
         >
           <EditPreferencesContent />
