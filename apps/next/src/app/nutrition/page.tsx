@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import TrackedMealCard from "@/components/ui/card/tracked-meal-card";
 import NutritionBreakdown from "@/components/ui/nutrition-breakdown";
 import NutritionGoals from "@/components/ui/nutrition-goals";
+import TrackerHistory from "@/components/ui/tracker-history";
 import { useUserStore } from "@/context/useUserStore";
 import { trpc } from "@/utils/trpc";
 
@@ -65,37 +66,50 @@ export default function MealTracker() {
     activeDayIndex !== null ? mealsGroupedByDay[activeDayIndex] : null;
 
   return (
-    <div className="min-h-screen p-8 mt-12 flex justify-between">
+    <div className="min-h-screen p-8 mt-12">
       <div className="pl-8">
         <h1 className="text-4xl font-bold text-sky-700 dark:text-sky-400">
           Tracker
         </h1>
-        <p className="text-zinc-800 dark:text-zinc-400 mt-1">
-          Keep track of your health using out Nutrition Tracker! Add dishes to
-          count them towards your totals!
-        </p>
-        {userId && <NutritionGoals userId={userId} />}
+        <div className="flex items-center justify-between mt-1">
+          <p className="text-zinc-800 dark:text-zinc-400">
+            Keep track of your health using our Nutrition Tracker! Add dishes to
+            count them towards your totals!
+          </p>
+          {userId && (
+            <TrackerHistory
+              onDateSelect={(date) => {
+                const index = mealsGroupedByDay.findIndex(
+                  (day) => day.rawDate.toDateString() === date.toDateString(),
+                );
+                if (index !== -1) setActiveDayIndex(index);
+              }}
+            />
+          )}
+        </div>
+
+        <div className="flex items-start gap-4">
+          {mealsGroupedByDay.length === 0 ? (
+            <div>No meals logged recently.</div>
+          ) : (
+            <NutritionBreakdown
+              mealsEaten={mealsGroupedByDay[activeDayIndex ?? 0]?.items ?? []}
+              calorieGoal={goals?.calorieGoal ?? 2000}
+              proteinGoal={goals?.proteinGoal ?? 75}
+              carbGoal={goals?.carbGoal ?? 250}
+              fatGoal={goals?.fatGoal ?? 50}
+            />
+          )}
+          <div className="relative mt-4 ml-auto">
+            {userId && <NutritionGoals userId={userId} />}
+          </div>
+        </div>
 
         <div className="flex flex-wrap gap-4 mt-6">
           {selectedDay?.items.map((meal) => (
             <TrackedMealCard key={meal.id} meal={meal} />
           ))}
         </div>
-      </div>
-
-      <div className="pr-8">
-        {mealsGroupedByDay.length === 0 ? (
-          <div>No meals logged recently.</div>
-        ) : (
-          <NutritionBreakdown
-            dateString={mealsGroupedByDay[0].dateLabel}
-            mealsEaten={mealsGroupedByDay[0].items}
-            calorieGoal={goals?.calorieGoal ?? 2000}
-            proteinGoal={goals?.proteinGoal ?? 75}
-            carbGoal={goals?.carbGoal ?? 250}
-            fatGoal={goals?.fatGoal ?? 50}
-          />
-        )}
       </div>
     </div>
   );

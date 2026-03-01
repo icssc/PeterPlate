@@ -83,40 +83,40 @@ const NutritionBreakdown = ({
   };
 
   return (
-    <div>
-      <div className="bg-sky-100 rounded-xl p-6 flex flex-col gap-6 mt-4 w-fit">
-        <div className="bg-white rounded-xl p-4 flex flex-col items-center w-48 h-48">
-          <span className="text-xl text-sky-700 font-semibold">Calories</span>
-          <ProgressDonut
-            progress_value={nutrition.calories}
-            max_value={calorieGoal}
-            display_unit=""
-          />
-        </div>
-        <div className="bg-white rounded-xl p-4 flex flex-col items-center w-48 h-48">
-          <span className="text-xl text-sky-700 font-semibold">Protein</span>
-          <ProgressDonut
-            progress_value={nutrition.protein_g}
-            max_value={proteinGoal}
-            display_unit="g"
-          />
-        </div>
-        <div className="bg-white rounded-xl p-4 flex flex-col items-center w-48 h-48">
-          <span className="text-xl text-sky-700 font-semibold">Carbs</span>
-          <ProgressDonut
-            progress_value={nutrition.carbs_g}
-            max_value={carbGoal}
-            display_unit="g"
-          />
-        </div>
-        <div className="bg-white rounded-xl p-4 flex flex-col items-center w-48 h-48">
-          <span className="text-xl text-sky-700 font-semibold">Fat</span>
-          <ProgressDonut
-            progress_value={nutrition.fat_g}
-            max_value={fatGoal}
-            display_unit="g"
-          />
-        </div>
+    <div className="flex flex-row gap-6 mt-6">
+      <div className="bg-sky-100 rounded-xl px-4 flex flex-row items-center justify-between w-80 h-36">
+        <span className="text-3xl text-sky-700 font-medium pl-3">Calories</span>
+        <ProgressDonut
+          progress_value={nutrition.calories}
+          max_value={calorieGoal}
+          display_unit=""
+          trackColor="#0084D1"
+          progressColor="#00BCFF"
+        />
+      </div>
+      <div className="bg-sky-100 rounded-xl px-4 flex flex-row items-center justify-between w-80 h-36">
+        <span className="text-3xl text-sky-700 font-medium pl-3">Protein</span>
+        <ProgressDonut
+          progress_value={nutrition.protein_g}
+          max_value={proteinGoal}
+          display_unit="g"
+        />
+      </div>
+      <div className="bg-sky-100 rounded-xl px-4  flex flex-row items-center justify-between w-80 h-36">
+        <span className="text-3xl text-sky-700 font-medium pl-3">Carbs</span>
+        <ProgressDonut
+          progress_value={nutrition.carbs_g}
+          max_value={carbGoal}
+          display_unit="g"
+        />
+      </div>
+      <div className="bg-sky-100 rounded-xl px-4 flex flex-row items-center justify-between w-80 h-36">
+        <span className="text-3xl text-sky-700 font-medium pl-3">Fat</span>
+        <ProgressDonut
+          progress_value={nutrition.fat_g}
+          max_value={fatGoal}
+          display_unit="g"
+        />
       </div>
     </div>
   );

@@ -18,41 +18,57 @@ interface Props {
    * The unit of measurement to display within the progress donut. Ex: 'g' for grams
    */
   display_unit: string;
+
+  /**
+   * ring colors, passing props to add custom colors to certain goals
+   */
+  trackColor?: string;
+  progressColor?: string;
 }
 
 export function ProgressDonut({
   progress_value,
   max_value,
   display_unit,
+  trackColor = "#ffffff",
+  progressColor = "#0084D1",
 }: Props) {
   const value = Math.max(0, Math.min(progress_value, max_value));
   const percent = value / max_value;
   const strokeDashoffset = CIRCLE_CIRCUMFERENCE * (1 - percent);
 
   return (
-    <div className="flex flex-col items-center justify-center p-4 pt-0">
+    <div className="flex flex-col items-center justify-center">
       <div className="relative w-36 h-36">
         <svg viewBox="0 0 100 100" className="w-full h-full">
           <title>Progress Donut</title>
+          {/* outer translucent white circle */}
+          <circle cx="50" cy="50" r="30" fill="white" fillOpacity="0.5" />
+          {/* inner white circle */}
+          <circle cx="50" cy="50" r="25" fill="white" fillOpacity="0.9" />
+          {/* background arc track - semicircle */}
           <circle
             cx="50"
             cy="50"
             r={CIRCLE_RADIUS}
-            stroke="#e5e7eb"
+            stroke={trackColor}
             strokeWidth="10"
-            fill="none"
-          />
-          <circle
-            cx="50"
-            cy="50"
-            r={CIRCLE_RADIUS}
-            stroke="#0369a1"
-            strokeWidth="10"
-            fill="none"
-            strokeDasharray={CIRCLE_CIRCUMFERENCE}
-            strokeDashoffset={strokeDashoffset}
             strokeLinecap="round"
-            transform="rotate(-90 50 50)"
+            fill="none"
+            strokeDasharray={`${CIRCLE_CIRCUMFERENCE * 0.75} ${CIRCLE_CIRCUMFERENCE * 0.25}`}
+            transform="rotate(135 50 50)"
+          />
+          {/* progress arc */}
+          <circle
+            cx="50"
+            cy="50"
+            r={CIRCLE_RADIUS}
+            stroke={progressColor}
+            strokeWidth="10"
+            fill="none"
+            strokeDasharray={`${CIRCLE_CIRCUMFERENCE * 0.75 * percent} ${CIRCLE_CIRCUMFERENCE}`}
+            strokeLinecap="round"
+            transform="rotate(135 50 50)"
             style={{ transition: "stroke-dashoffset 0.4s ease" }}
           />
         </svg>

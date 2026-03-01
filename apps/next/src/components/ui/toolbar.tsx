@@ -70,7 +70,7 @@ const TOOLBAR_ELEMENTS: ToolbarElement[] = [
     href: "/my-foods",
   },
   {
-    title: "Nutrition",
+    title: "Tracker",
     href: "/nutrition",
   },
 ];
