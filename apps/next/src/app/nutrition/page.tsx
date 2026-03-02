@@ -34,6 +34,11 @@ export default function MealTracker() {
 
   const [activeDayIndex, setActiveDayIndex] = useState<number | null>(null);
 
+  // Diet plan toggle
+  const [dietPlanByMealId, setDietPlanByMealId] = useState<
+    Record<string, boolean>
+  >({});
+
   const mealsGroupedByDay = useMemo(() => {
     if (!meals) return [];
     const groups: Record<string, typeof meals> = {};
@@ -81,20 +86,34 @@ export default function MealTracker() {
         }
       }
     }
-
     return set;
   }, [hallData]);
 
   const isUnavailable = (dishId: string) =>
     Boolean(hallData) && !availableDishIds.has(dishId);
 
-  const countedMeals = (selectedDay?.items ?? []).filter(
+  // remove dish from tracker if unavailable AND diet plan toggle off
+  const visibleMeals = useMemo(() => {
+    const items = selectedDay?.items ?? [];
+
+    return items.filter((m) => {
+      const unavailable = Boolean(hallData) && !availableDishIds.has(m.dishId);
+
+      const dietOn = Boolean(dietPlanByMealId[m.id]);
+
+      return !(unavailable && !dietOn);
+    });
+  }, [selectedDay, availableDishIds, dietPlanByMealId, hallData]);
+
+  const countedMeals = visibleMeals.filter(
     (m) => (m.servings ?? 0) > 0 && !isUnavailable(m.dishId),
   );
 
-  const uncountedMeals = (selectedDay?.items ?? []).filter(
-    (m) => (m.servings ?? 0) === 0 || isUnavailable(m.dishId),
-  );
+  const uncountedMeals = visibleMeals.filter((m) => {
+    const unavailable = isUnavailable(m.dishId);
+    const dietOn = Boolean(dietPlanByMealId[m.id]);
+    return (m.servings ?? 0) === 0 || (unavailable && dietOn);
+  });
 
   if (isLoading) return <div>Loading meals...</div>;
   if (error) return <div>Error loading meals</div>;
@@ -168,6 +187,13 @@ export default function MealTracker() {
                 <TrackedMealCard
                   key={meal.id}
                   isUnavailable={isUnavailable(meal.dishId)}
+                  dietPlanActive={Boolean(dietPlanByMealId[meal.id])}
+                  onToggleDietPlan={() =>
+                    setDietPlanByMealId((prev) => ({
+                      ...prev,
+                      [meal.id]: !prev[meal.id],
+                    }))
+                  }
                   meal={{
                     ...meal,
                     calories: toNum(meal.calories),
@@ -194,6 +220,13 @@ export default function MealTracker() {
                 <TrackedMealCard
                   key={meal.id}
                   isUnavailable={isUnavailable(meal.dishId)}
+                  dietPlanActive={Boolean(dietPlanByMealId[meal.id])}
+                  onToggleDietPlan={() =>
+                    setDietPlanByMealId((prev) => ({
+                      ...prev,
+                      [meal.id]: !prev[meal.id],
+                    }))
+                  }
                   meal={{
                     ...meal,
                     calories: toNum(meal.calories),

@@ -30,6 +30,10 @@ type LoggedMealJoinedWithNutrition = SelectLoggedMeal & {
 interface Props {
   meal: LoggedMealJoinedWithNutrition;
   isUnavailable?: boolean;
+
+  // diet plan toggle
+  dietPlanActive?: boolean;
+  onToggleDietPlan?: () => void;
 }
 
 interface TrackedMealCardContentProps
@@ -218,6 +222,9 @@ TrackedMealCardContent.displayName = "TrackedMealCardContent";
 export default function TrackedMealCard({
   meal,
   isUnavailable = false,
+
+  dietPlanActive,
+  onToggleDietPlan,
 }: Props) {
   /* Handle Display Food Card Info */
   const isDesktop = useMediaQuery("(min-width: 768px)");
@@ -269,9 +276,16 @@ export default function TrackedMealCard({
     updateServings.mutate({ id: meal.id, servings: next });
   };
 
-  /* Handle Diet Plan Button */
-  const [dietPlanActive, setDietPlanActive] = React.useState(false);
-  //TODO : Implement diet plan logic
+  /* Handle Diet Plan Toggle */
+  const [dietPlanLocal, setDietPlanLocal] = React.useState(false);
+
+  const dietPlanActiveFinal =
+    typeof dietPlanActive === "boolean" ? dietPlanActive : dietPlanLocal;
+
+  const toggleDietPlanFinal = () => {
+    if (onToggleDietPlan) onToggleDietPlan();
+    else setDietPlanLocal((v) => !v);
+  };
 
   /* Handle Delete Button */
   const deleteLoggedMeal = trpc.nutrition.deleteLoggedMeal.useMutation({
@@ -304,8 +318,8 @@ export default function TrackedMealCard({
           servingsDraft={servingsDraft}
           onChangeServings={handleChangeServings}
           servingsDisabled={updateServings.isPending}
-          dietPlanActive={dietPlanActive}
-          onToggleDietPlan={() => setDietPlanActive((v) => !v)}
+          dietPlanActive={dietPlanActiveFinal}
+          onToggleDietPlan={toggleDietPlanFinal}
           onDelete={handleDelete}
           deleteDisabled={deleteLoggedMeal.isPending}
           onClick={handleOpen}
@@ -352,8 +366,8 @@ export default function TrackedMealCard({
         servingsDraft={servingsDraft}
         onChangeServings={handleChangeServings}
         servingsDisabled={updateServings.isPending}
-        dietPlanActive={dietPlanActive}
-        onToggleDietPlan={() => setDietPlanActive((v) => !v)}
+        dietPlanActive={dietPlanActiveFinal}
+        onToggleDietPlan={toggleDietPlanFinal}
         onDelete={handleDelete}
         deleteDisabled={deleteLoggedMeal.isPending}
         onClick={handleOpen}
