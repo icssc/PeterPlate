@@ -1,7 +1,7 @@
 import { createTRPCRouter, publicProcedure } from "@api/trpc";
 import { loggedMeals, nutritionInfos, userGoals } from "@peterplate/db";
 import { TRPCError } from "@trpc/server";
-import { and, desc, eq, gt } from "drizzle-orm";
+import { and, desc, eq, gt, gte, lt } from "drizzle-orm";
 import { z } from "zod";
 
 const LoggedMealSchema = z.object({
@@ -19,6 +19,52 @@ export const nutritionRouter = createTRPCRouter({
   logMeal: publicProcedure
     .input(LoggedMealSchema)
     .mutation(async ({ ctx, input }) => {
+      // Check if the user has already logged this dish today
+      const eatenAt = input.eatenAt ?? new Date();
+
+      const startOfDay = new Date(eatenAt);
+      startOfDay.setHours(0, 0, 0, 0);
+
+      const startOfNextDay = new Date(startOfDay);
+      startOfNextDay.setDate(startOfNextDay.getDate() + 1);
+
+      const existing = await ctx.db
+        .select({
+          id: loggedMeals.id,
+          servings: loggedMeals.servings,
+        })
+        .from(loggedMeals)
+        .where(
+          and(
+            eq(loggedMeals.userId, input.userId),
+            eq(loggedMeals.dishId, input.dishId),
+            gte(loggedMeals.eatenAt, startOfDay),
+            lt(loggedMeals.eatenAt, startOfNextDay),
+          ),
+        )
+        .limit(1);
+
+      // If already logged today, update servings instead of creating a new entry
+      if (existing[0]) {
+        const updated = await ctx.db
+          .update(loggedMeals)
+          .set({
+            servings: existing[0].servings + input.servings,
+          })
+          .where(eq(loggedMeals.id, existing[0].id))
+          .returning();
+
+        if (!updated[0]) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to update logged meal",
+          });
+        }
+
+        return updated[0];
+      }
+
+      // Log entry as usual
       const result = await ctx.db
         .insert(loggedMeals)
         .values({
@@ -26,7 +72,7 @@ export const nutritionRouter = createTRPCRouter({
           dishId: input.dishId,
           dishName: input.dishName,
           servings: input.servings,
-          eatenAt: input.eatenAt ?? new Date(),
+          eatenAt,
         })
         .returning();
 
