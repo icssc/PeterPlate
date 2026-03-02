@@ -104,6 +104,16 @@ export default function MealTracker() {
       <div className="pl-8">
         <h1 className="text-4xl font-bold text-sky-700 dark:text-sky-400">
           Tracker
+          {selectedDay && (
+            <span className="ml-3 font-semibold">
+              -{" "}
+              {selectedDay.rawDate.toLocaleDateString("en-US", {
+                month: "numeric",
+                day: "numeric",
+                year: "2-digit",
+              })}
+            </span>
+          )}
         </h1>
         <div className="flex items-center justify-between mt-1">
           <p className="text-zinc-800 dark:text-zinc-400">
