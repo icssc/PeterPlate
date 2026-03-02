@@ -1,6 +1,5 @@
 "use client";
 
-import type { SelectLoggedMeal } from "@peterplate/db";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import TrackedMealCard from "@/components/ui/card/tracked-meal-card";
@@ -14,8 +13,9 @@ export default function MealTracker() {
   const router = useRouter();
   const userId = useUserStore((s) => s.userId);
 
+  const toNum = (v: string | null | undefined) => Number(v ?? 0);
+
   useEffect(() => {
-    // TODO: use [MUI snackbar](https://mui.com/material-ui/react-snackbar/) to warn users of issue
     if (!userId) {
       alert("Login to track meals!");
       router.push("/");
@@ -38,7 +38,7 @@ export default function MealTracker() {
     if (!meals) return [];
     const groups: Record<string, typeof meals> = {};
 
-    meals.forEach((meal: SelectLoggedMeal) => {
+    meals.forEach((meal) => {
       const dateKey = new Date(meal.eatenAt).toDateString();
       if (!groups[dateKey]) groups[dateKey] = [];
       groups[dateKey].push(meal);
@@ -93,7 +93,15 @@ export default function MealTracker() {
             <div>No meals logged recently.</div>
           ) : (
             <NutritionBreakdown
-              mealsEaten={mealsGroupedByDay[activeDayIndex ?? 0]?.items ?? []}
+              mealsEaten={(
+                mealsGroupedByDay[activeDayIndex ?? 0]?.items ?? []
+              ).map((m) => ({
+                ...m,
+                calories: toNum(m.calories),
+                protein: toNum(m.protein),
+                carbs: toNum(m.carbs),
+                fat: toNum(m.fat),
+              }))}
               calorieGoal={goals?.calorieGoal ?? 2000}
               proteinGoal={goals?.proteinGoal ?? 75}
               carbGoal={goals?.carbGoal ?? 250}
@@ -107,7 +115,16 @@ export default function MealTracker() {
 
         <div className="flex flex-wrap gap-4 mt-6">
           {selectedDay?.items.map((meal) => (
-            <TrackedMealCard key={meal.id} meal={meal} />
+            <TrackedMealCard
+              key={meal.id}
+              meal={{
+                ...meal,
+                calories: toNum(meal.calories),
+                protein: toNum(meal.protein),
+                carbs: toNum(meal.carbs),
+                fat: toNum(meal.fat),
+              }}
+            />
           ))}
         </div>
       </div>
