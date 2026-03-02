@@ -65,6 +65,13 @@ export default function MealTracker() {
   const selectedDay =
     activeDayIndex !== null ? mealsGroupedByDay[activeDayIndex] : null;
 
+  const countedMeals = (selectedDay?.items ?? []).filter(
+    (m) => (m.servings ?? 0) > 0,
+  );
+  const uncountedMeals = (selectedDay?.items ?? []).filter(
+    (m) => (m.servings ?? 0) === 0,
+  );
+
   return (
     <div className="min-h-screen p-8 mt-12">
       <div className="pl-8">
@@ -113,19 +120,54 @@ export default function MealTracker() {
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-4 mt-6">
-          {selectedDay?.items.map((meal) => (
-            <TrackedMealCard
-              key={meal.id}
-              meal={{
-                ...meal,
-                calories: toNum(meal.calories),
-                protein: toNum(meal.protein),
-                carbs: toNum(meal.carbs),
-                fat: toNum(meal.fat),
-              }}
-            />
-          ))}
+        {/* Counted Foods */}
+        <div className="mt-6">
+          <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
+            Counted Foods
+          </h2>
+          {countedMeals.length === 0 ? (
+            <p className="mt-2 text-sm text-zinc-500">No counted foods.</p>
+          ) : (
+            <div className="flex flex-wrap gap-4 mt-4">
+              {countedMeals.map((meal) => (
+                <TrackedMealCard
+                  key={meal.id}
+                  meal={{
+                    ...meal,
+                    calories: toNum(meal.calories),
+                    protein: toNum(meal.protein),
+                    carbs: toNum(meal.carbs),
+                    fat: toNum(meal.fat),
+                  }}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Uncounted Foods */}
+        <div className="mt-8">
+          <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
+            Uncounted Foods
+          </h2>
+          {uncountedMeals.length === 0 ? (
+            <p className="mt-2 text-sm text-zinc-500">No uncounted foods.</p>
+          ) : (
+            <div className="flex flex-wrap gap-4 mt-4">
+              {uncountedMeals.map((meal) => (
+                <TrackedMealCard
+                  key={meal.id}
+                  meal={{
+                    ...meal,
+                    calories: toNum(meal.calories),
+                    protein: toNum(meal.protein),
+                    carbs: toNum(meal.carbs),
+                    fat: toNum(meal.fat),
+                  }}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
