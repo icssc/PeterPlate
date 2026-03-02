@@ -59,18 +59,45 @@ export default function MealTracker() {
     }
   }, [mealsGroupedByDay, activeDayIndex]);
 
-  if (isLoading) return <div>Loading meals...</div>;
-  if (error) return <div>Error loading meals</div>;
-
   const selectedDay =
     activeDayIndex !== null ? mealsGroupedByDay[activeDayIndex] : null;
 
+  // Checks dish availability
+  const { data: hallData } = trpc.peterplate.useQuery(
+    { date: selectedDay?.rawDate ?? new Date() },
+    { enabled: Boolean(selectedDay) },
+  );
+
+  const availableDishIds = useMemo(() => {
+    const set = new Set<string>();
+    const halls = [hallData?.anteatery, hallData?.brandywine].filter(Boolean);
+
+    for (const hall of halls) {
+      for (const menu of hall?.menus ?? []) {
+        for (const station of menu.stations ?? []) {
+          for (const dish of station.dishes ?? []) {
+            set.add(dish.id);
+          }
+        }
+      }
+    }
+
+    return set;
+  }, [hallData]);
+
+  const isUnavailable = (dishId: string) =>
+    Boolean(hallData) && !availableDishIds.has(dishId);
+
   const countedMeals = (selectedDay?.items ?? []).filter(
-    (m) => (m.servings ?? 0) > 0,
+    (m) => (m.servings ?? 0) > 0 && !isUnavailable(m.dishId),
   );
+
   const uncountedMeals = (selectedDay?.items ?? []).filter(
-    (m) => (m.servings ?? 0) === 0,
+    (m) => (m.servings ?? 0) === 0 || isUnavailable(m.dishId),
   );
+
+  if (isLoading) return <div>Loading meals...</div>;
+  if (error) return <div>Error loading meals</div>;
 
   return (
     <div className="min-h-screen p-8 mt-12">
@@ -100,9 +127,7 @@ export default function MealTracker() {
             <div>No meals logged recently.</div>
           ) : (
             <NutritionBreakdown
-              mealsEaten={(
-                mealsGroupedByDay[activeDayIndex ?? 0]?.items ?? []
-              ).map((m) => ({
+              mealsEaten={countedMeals.map((m) => ({
                 ...m,
                 calories: toNum(m.calories),
                 protein: toNum(m.protein),
@@ -132,6 +157,7 @@ export default function MealTracker() {
               {countedMeals.map((meal) => (
                 <TrackedMealCard
                   key={meal.id}
+                  isUnavailable={isUnavailable(meal.dishId)}
                   meal={{
                     ...meal,
                     calories: toNum(meal.calories),
@@ -157,6 +183,7 @@ export default function MealTracker() {
               {uncountedMeals.map((meal) => (
                 <TrackedMealCard
                   key={meal.id}
+                  isUnavailable={isUnavailable(meal.dishId)}
                   meal={{
                     ...meal,
                     calories: toNum(meal.calories),

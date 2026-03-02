@@ -29,6 +29,7 @@ type LoggedMealJoinedWithNutrition = SelectLoggedMeal & {
 
 interface Props {
   meal: LoggedMealJoinedWithNutrition;
+  isUnavailable?: boolean;
 }
 
 interface TrackedMealCardContentProps
@@ -36,6 +37,7 @@ interface TrackedMealCardContentProps
   meal: LoggedMealJoinedWithNutrition;
   dishNameForIcon?: string;
   imageUrl?: string;
+  isUnavailable?: boolean;
   dietPlanActive?: boolean;
   onToggleDietPlan?: () => void;
   onDelete?: () => void;
@@ -54,6 +56,7 @@ const TrackedMealCardContent = React.forwardRef<
       meal,
       dishNameForIcon,
       imageUrl,
+      isUnavailable = false,
       dietPlanActive = false,
       onToggleDietPlan,
       onDelete,
@@ -77,7 +80,10 @@ const TrackedMealCardContent = React.forwardRef<
     return (
       <div ref={ref} {...divProps} className={cn("w-72", className)}>
         <Card
-          className="cursor-pointer hover:shadow-lg transition w-full border bg-white"
+          className={cn(
+            "cursor-pointer transition w-full border",
+            isUnavailable ? "bg-zinc-200/90" : "bg-white hover:shadow-lg",
+          )}
           sx={{ borderRadius: "12px" }}
         >
           <CardContent sx={{ padding: "0 !important" }}>
@@ -102,7 +108,7 @@ const TrackedMealCardContent = React.forwardRef<
                       {meal.dishName}
                     </h3>
 
-                    {/* Edit Servings */}
+                    {/* Edit Servings/Bowls */}
                     <div className="flex items-center gap-2 text-xs text-zinc-500">
                       <div className="inline-flex items-stretch rounded-md bg-sky-100 ring-1 ring-sky-200">
                         <div className="w-8 px-2 py-1 text-slate-900 tabular-nums leading-none flex items-center justify-center">
@@ -209,7 +215,10 @@ const TrackedMealCardContent = React.forwardRef<
 );
 TrackedMealCardContent.displayName = "TrackedMealCardContent";
 
-export default function TrackedMealCard({ meal }: Props) {
+export default function TrackedMealCard({
+  meal,
+  isUnavailable = false,
+}: Props) {
   /* Handle Display Food Card Info */
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const [open, setOpen] = React.useState(false);
@@ -291,6 +300,7 @@ export default function TrackedMealCard({ meal }: Props) {
           meal={meal}
           dishNameForIcon={dishNameForIcon}
           imageUrl={typeof imageUrl === "string" ? imageUrl : undefined}
+          isUnavailable={isUnavailable}
           servingsDraft={servingsDraft}
           onChangeServings={handleChangeServings}
           servingsDisabled={updateServings.isPending}
@@ -338,6 +348,7 @@ export default function TrackedMealCard({ meal }: Props) {
         meal={meal}
         dishNameForIcon={dishNameForIcon}
         imageUrl={typeof imageUrl === "string" ? imageUrl : undefined}
+        isUnavailable={isUnavailable}
         servingsDraft={servingsDraft}
         onChangeServings={handleChangeServings}
         servingsDisabled={updateServings.isPending}
