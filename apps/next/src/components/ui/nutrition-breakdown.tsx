@@ -67,7 +67,7 @@ const NutritionBreakdown = ({
       alert(`Removed dish from your log`);
       utils.nutrition.invalidate();
     },
-    onError: (error: Error) => {
+    onError: (error) => {
       console.error(error.message);
     },
   });

@@ -299,8 +299,7 @@ export default function TrackedMealCard({
 
   const handleDelete = () => {
     deleteLoggedMeal.mutate({
-      userId: meal.userId,
-      dishId: meal.dishId,
+      id: meal.id,
     });
   };
 

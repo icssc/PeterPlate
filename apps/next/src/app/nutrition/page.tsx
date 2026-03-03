@@ -6,27 +6,32 @@ import TrackedMealCard from "@/components/ui/card/tracked-meal-card";
 import NutritionBreakdown from "@/components/ui/nutrition-breakdown";
 import NutritionGoals from "@/components/ui/nutrition-goals";
 import TrackerHistory from "@/components/ui/tracker-history";
+import { useSnackbarStore } from "@/context/useSnackbar";
 import { useUserStore } from "@/context/useUserStore";
 import { trpc } from "@/utils/trpc";
 
 export default function MealTracker() {
   const router = useRouter();
-  const userId = useUserStore((s) => s.userId);
-
-  const toNum = (v: string | null | undefined) => Number(v ?? 0);
+  const { userId, isInitialized } = useUserStore();
+  const { showSnackbar } = useSnackbarStore();
 
   useEffect(() => {
+    if (!isInitialized) return;
+
     if (!userId) {
-      alert("Login to track meals!");
+      showSnackbar("Login to track meals!", "error");
       router.push("/");
     }
-  }, [userId, router.push]);
+  }, [userId, isInitialized, router, showSnackbar]);
 
   const {
     data: meals,
     isLoading,
     error,
-  } = trpc.nutrition.getMealsInLastWeek.useQuery({ userId: userId ?? "" });
+  } = trpc.nutrition.getMealsInLastWeek.useQuery(
+    { userId: userId ?? "" },
+    { enabled: !!userId },
+  );
 
   const { data: goals } = trpc.nutrition.getGoals.useQuery({
     userId: userId ?? "",
@@ -66,6 +71,11 @@ export default function MealTracker() {
 
   const selectedDay =
     activeDayIndex !== null ? mealsGroupedByDay[activeDayIndex] : null;
+
+  const toNum = (v: string | null) => {
+    const n = v == null ? 0 : Number(v);
+    return Number.isFinite(n) ? n : 0;
+  };
 
   // Checks dish availability
   const { data: hallData } = trpc.peterplate.useQuery(
