@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import TrackedMealCard from "@/components/ui/card/tracked-meal-card";
+import MobileCalorieCard from "@/components/ui/mobile-calorie-card";
+import MobileNutritionBars from "@/components/ui/mobile-nutrition-bars";
 import NutritionBreakdown from "@/components/ui/nutrition-breakdown";
 import NutritionGoals from "@/components/ui/nutrition-goals";
 import TrackerHistory from "@/components/ui/tracker-history";
@@ -130,7 +132,7 @@ export default function MealTracker() {
 
   return (
     <div className="min-h-screen p-8 mt-12">
-      <div className="pl-8">
+      <div className="px-4 md:px-8">
         <h1 className="text-4xl font-bold text-sky-700 dark:text-sky-400">
           Tracker
           {selectedDay && (
@@ -161,7 +163,8 @@ export default function MealTracker() {
           )}
         </div>
 
-        <div className="flex items-start gap-4">
+        {/* Desktop: NutritionBreakdown */}
+        <div className="hidden md:flex items-start gap-4">
           {mealsGroupedByDay.length === 0 ? (
             <div>No meals logged recently.</div>
           ) : (
@@ -182,6 +185,32 @@ export default function MealTracker() {
           <div className="relative mt-4 ml-auto">
             {userId && <NutritionGoals userId={userId} />}
           </div>
+        </div>
+
+        {/* Mobile: MobileCalorieCard + MobileNutritionBars */}
+        <div className="flex md:hidden flex-col gap-4 mt-4 px-2">
+          <MobileCalorieCard
+            mealsEaten={countedMeals.map((m) => ({
+              ...m,
+              calories: toNum(m.calories),
+              protein: toNum(m.protein),
+              carbs: toNum(m.carbs),
+              fat: toNum(m.fat),
+            }))}
+            calorieGoal={goals?.calorieGoal ?? 2000}
+          />
+          <MobileNutritionBars
+            mealsEaten={countedMeals.map((m) => ({
+              ...m,
+              calories: toNum(m.calories),
+              protein: toNum(m.protein),
+              carbs: toNum(m.carbs),
+              fat: toNum(m.fat),
+            }))}
+            proteinGoal={goals?.proteinGoal ?? 75}
+            carbGoal={goals?.carbGoal ?? 250}
+            fatGoal={goals?.fatGoal ?? 50}
+          />
         </div>
 
         {/* Counted Foods */}

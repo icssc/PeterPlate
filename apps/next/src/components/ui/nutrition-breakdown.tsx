@@ -138,3 +138,5 @@ const NutritionBreakdown = ({
 };
 
 export default NutritionBreakdown;
+export type { NutritionData, LoggedMealJoinedWithNutrition };
+export { compileMealData };
