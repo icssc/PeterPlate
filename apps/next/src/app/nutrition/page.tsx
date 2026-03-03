@@ -132,21 +132,38 @@ export default function MealTracker() {
 
   return (
     <div className="min-h-screen p-8 mt-12">
-      <div className="px-4 md:px-8">
-        <h1 className="text-4xl font-bold text-sky-700 dark:text-sky-400">
-          Tracker
-          {selectedDay && (
-            <span className="ml-3 font-semibold">
-              -{" "}
-              {selectedDay.rawDate.toLocaleDateString("en-US", {
-                month: "numeric",
-                day: "numeric",
-                year: "2-digit",
-              })}
-            </span>
-          )}
+      <div className="px-2 md:px-8">
+        <h1 className="text-2xl md:text-3xl font-bold text-sky-700 dark:text-sky-400 flex items-center justify-between">
+          <span className="flex items-center gap-2 flex-nowrap whitespace-nowrap">
+            Tracker
+            {selectedDay && (
+              <span className="font-semibold">
+                -{" "}
+                {selectedDay.rawDate.toLocaleDateString("en-US", {
+                  month: "numeric",
+                  day: "numeric",
+                  year: "2-digit",
+                })}
+              </span>
+            )}
+          </span>
+          {/* History button - mobile only */}
+          <div className="flex md:hidden">
+            {userId && (
+              <TrackerHistory
+                onDateSelect={(date) => {
+                  const index = mealsGroupedByDay.findIndex(
+                    (day) => day.rawDate.toDateString() === date.toDateString(),
+                  );
+                  if (index !== -1) setActiveDayIndex(index);
+                }}
+              />
+            )}
+          </div>
         </h1>
-        <div className="flex items-center justify-between mt-1">
+
+        {/* Subheading + History - desktop only */}
+        <div className="hidden md:flex items-center justify-between mt-1">
           <p className="text-zinc-800 dark:text-zinc-400">
             Keep track of your health using our Nutrition Tracker! Add dishes to
             count them towards your totals!
@@ -188,7 +205,7 @@ export default function MealTracker() {
         </div>
 
         {/* Mobile: MobileCalorieCard + MobileNutritionBars */}
-        <div className="flex md:hidden flex-col gap-4 mt-4 px-2">
+        <div className="flex md:hidden flex-col gap-4 mt-4 w-full">
           <MobileCalorieCard
             mealsEaten={countedMeals.map((m) => ({
               ...m,
@@ -198,6 +215,7 @@ export default function MealTracker() {
               fat: toNum(m.fat),
             }))}
             calorieGoal={goals?.calorieGoal ?? 2000}
+            userId={userId ?? ""}
           />
           <MobileNutritionBars
             mealsEaten={countedMeals.map((m) => ({
