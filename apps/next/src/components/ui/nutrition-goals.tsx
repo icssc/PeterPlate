@@ -2,7 +2,7 @@
 
 import EditIcon from "@mui/icons-material/Edit";
 import { Button, Drawer } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { trpc } from "@/utils/trpc";
 
@@ -22,7 +22,7 @@ export default function NutritionGoals({ userId }: Props) {
 
   const [open, setOpen] = useState(false);
   const [calorieGoal, setCalorieGoal] = useState(2000);
-  const [proteinGoal, setProteinGoal] = useState(75);
+  const [proteinGoal, setProteinGoal] = useState(100);
   const [carbGoal, setCarbGoal] = useState(250);
   const [fatGoal, setFatGoal] = useState(50);
 
@@ -45,6 +45,24 @@ export default function NutritionGoals({ userId }: Props) {
       ...updates,
     });
   };
+
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isMobile || !open) return;
+
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [open, isMobile]);
 
   const inputs = (
     <>
@@ -112,7 +130,7 @@ export default function NutritionGoals({ userId }: Props) {
   );
 
   return (
-    <div className="relative mt-4">
+    <div className="relative mt-4" ref={containerRef}>
       <Button
         onClick={() => setOpen(!open)}
         variant="contained"
