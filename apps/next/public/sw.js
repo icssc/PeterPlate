@@ -2,6 +2,8 @@
 // It handles push notifications
 // But not implemented yet as mentioned in the instructions
 
+// NOTE: I followed the PWA guide which uses JS (swa.js) instead of TS. Service workers are static files, so they must be plain JS unless we add a separate TS build step.
+
 self.addEventListener('push', function (event) {
     if (event.data) {
         const data = event.data.json()
