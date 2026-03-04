@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import OnboardingDialog from "@/components/ui/onboarding";
 import Side from "@/components/ui/side";
+import { useUserStore } from "@/context/useUserStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useSession } from "@/utils/auth-client";
 import { HallEnum } from "@/utils/types";
@@ -12,9 +13,10 @@ export default function Home() {
 
   const [activeHall, setActiveHall] = useState<HallEnum>(HallEnum.BRANDYWINE);
   const isDesktop = useMediaQuery("(min-width: 768px)"); // Tailwind's `md` breakpoint
-  const hasOnboarded =
-    window.localStorage.getItem("has-seen-onboarding-popup") === "true" ||
-    session?.user.hasOnboarded;
+
+  const _hasOnboardedStore = useUserStore((state) => state.hasOnboarded);
+  const hasOnboarded = _hasOnboardedStore || session?.user.hasOnboarded;
+  console.log("KKKK", _hasOnboardedStore, session?.user.hasOnboarded);
 
   // Desktop layout: two Side components side-by-side
   if (isDesktop) {

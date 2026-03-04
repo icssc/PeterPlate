@@ -11,6 +11,7 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
+import { useUserStore } from "@/context/useUserStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useSession } from "@/utils/auth-client";
 import { trpc } from "@/utils/trpc";
@@ -389,9 +390,12 @@ export default function OnboardingDialog(): React.JSX.Element {
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const [open, setOpen] = useState(true);
 
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    setHasOnboarded(true);
+    setOpen(false);
+  };
 
-  window.localStorage.setItem("has-seen-onboarding-popup", "true");
+  const setHasOnboarded = useUserStore((state) => state.setHasOnboarded);
 
   if (isDesktop)
     return (
