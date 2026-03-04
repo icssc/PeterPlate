@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink } from "@trpc/client";
 import { useEffect, useState } from "react";
 import superjson from "superjson";
+import { PWAManager } from "@/components/PWAManager";
 import { ThemeProvider } from "@/components/theme-provider";
 import Toolbar from "@/components/ui/toolbar";
 import { DateProvider } from "@/context/date-context";
@@ -62,6 +63,7 @@ export function RootClient({ children }: { children: React.ReactNode }) {
 
   return (
     <ThemeProvider>
+      <PWAManager debug={process.env.NODE_ENV === "development"} />
       <trpc.Provider client={trpcClient} queryClient={queryClient}>
         <QueryClientProvider client={queryClient}>
           <DateProvider>
