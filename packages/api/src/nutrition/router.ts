@@ -206,28 +206,4 @@ export const nutritionRouter = createTRPCRouter({
 
       return result[0];
     }),
-
-  updateLoggedMealServings: publicProcedure
-    .input(
-      z.object({
-        id: z.string(),
-        servings: z.number().min(0.5, "The minimum is 0.5 servings"),
-      }),
-    )
-    .mutation(async ({ ctx, input }) => {
-      const result = await ctx.db
-        .update(loggedMeals)
-        .set({ servings: input.servings })
-        .where(eq(loggedMeals.id, input.id))
-        .returning();
-
-      if (!result[0]) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Logged meal not found",
-        });
-      }
-
-      return result[0];
-    }),
 });
