@@ -25,11 +25,13 @@ export default function TrackerHistoryMealTable({ mealsEaten }: Props) {
         <tbody>
           {mealsEaten.map((meal) => (
             <tr key={meal.id} className="border-t border-zinc-100">
-              <td className="py-3 flex items-center gap-2">
-                <span>{meal.dishName}</span>
-                <span className="bg-sky-700 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
-                  {meal.servings}
-                </span>
+              <td className="py-3">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span>{meal.dishName}</span>
+                  <span className="bg-sky-700 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium flex-shrink-0">
+                    {meal.servings}
+                  </span>
+                </div>
               </td>
               <td className="py-3">
                 {Math.round(meal.calories * meal.servings)}

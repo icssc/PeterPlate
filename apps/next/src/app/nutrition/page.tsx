@@ -9,8 +9,10 @@ import NutritionBreakdown from "@/components/ui/nutrition-breakdown";
 import NutritionGoals from "@/components/ui/nutrition-goals";
 import TrackerHistory from "@/components/ui/tracker-history";
 import TrackerHistoryDialog from "@/components/ui/tracker-history-dialog";
+import TrackerHistoryDrawer from "@/components/ui/tracker-history-drawer";
 import { useSnackbarStore } from "@/context/useSnackbar";
 import { useUserStore } from "@/context/useUserStore";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { trpc } from "@/utils/trpc";
 
 export default function MealTracker() {
@@ -96,12 +98,14 @@ export default function MealTracker() {
   const isUnavailable = (dishId: string) =>
     Boolean(hallData) && !availableDishIds.has(dishId);
 
-  // remove dish from tracker if unavailable AND diet plan toggle off
+  // remove dish from tracker if unavailable
   const visibleMeals = selectedDay?.items ?? [];
 
   const countedMeals = visibleMeals.filter(
     (m) => (m.servings ?? 0) > 0 && !isUnavailable(m.dishId),
   );
+
+  const isMobile = useMediaQuery("(max-width: 768px)");
 
   if (isLoading) return <div>Loading meals...</div>;
   if (error) return <div>Error loading meals</div>;
@@ -205,25 +209,47 @@ export default function MealTracker() {
           />
         </div>
 
-        <TrackerHistoryDialog
-          open={historyDialogOpen}
-          onClose={() => setHistoryDialogOpen(false)}
-          selectedDate={historyDate}
-          allMeals={
-            meals?.map((m) => ({
-              ...m,
-              calories: toNum(m.calories),
-              protein: toNum(m.protein),
-              carbs: toNum(m.carbs),
-              fat: toNum(m.fat),
-            })) ?? []
-          }
-          calorieGoal={goals?.calorieGoal ?? 2000}
-          proteinGoal={goals?.proteinGoal ?? 100}
-          carbGoal={goals?.carbGoal ?? 250}
-          fatGoal={goals?.fatGoal ?? 50}
-          userId={userId ?? ""}
-        />
+        {isMobile ? (
+          <TrackerHistoryDrawer
+            open={historyDialogOpen}
+            onClose={() => setHistoryDialogOpen(false)}
+            selectedDate={historyDate}
+            allMeals={
+              meals?.map((m) => ({
+                ...m,
+                calories: toNum(m.calories),
+                protein: toNum(m.protein),
+                carbs: toNum(m.carbs),
+                fat: toNum(m.fat),
+              })) ?? []
+            }
+            calorieGoal={goals?.calorieGoal ?? 2000}
+            proteinGoal={goals?.proteinGoal ?? 100}
+            carbGoal={goals?.carbGoal ?? 250}
+            fatGoal={goals?.fatGoal ?? 50}
+            userId={userId ?? ""}
+          />
+        ) : (
+          <TrackerHistoryDialog
+            open={historyDialogOpen}
+            onClose={() => setHistoryDialogOpen(false)}
+            selectedDate={historyDate}
+            allMeals={
+              meals?.map((m) => ({
+                ...m,
+                calories: toNum(m.calories),
+                protein: toNum(m.protein),
+                carbs: toNum(m.carbs),
+                fat: toNum(m.fat),
+              })) ?? []
+            }
+            calorieGoal={goals?.calorieGoal ?? 2000}
+            proteinGoal={goals?.proteinGoal ?? 100}
+            carbGoal={goals?.carbGoal ?? 250}
+            fatGoal={goals?.fatGoal ?? 50}
+            userId={userId ?? ""}
+          />
+        )}
 
         {/* Counted Foods */}
         <div className="mt-6">
