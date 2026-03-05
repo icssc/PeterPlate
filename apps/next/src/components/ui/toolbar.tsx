@@ -78,6 +78,10 @@ const DESKTOP_TOOLBAR_ELEMENTS: ToolbarElement[] = [
     title: "My Foods",
     href: "/my-foods",
   },
+  {
+    title: "Tracker",
+    href: "/nutrition",
+  },
 ];
 
 const MOBILE_TOOLBAR_ELEMENTS: ToolbarElement[] = [
