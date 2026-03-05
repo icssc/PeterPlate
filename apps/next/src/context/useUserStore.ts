@@ -4,6 +4,7 @@ import { persist } from "zustand/middleware";
 interface UserState {
   userId: string | null;
   hasOnboarded: boolean;
+  isInitialized: boolean;
   setUserId: (id: string | null) => void;
   setHasOnboarded: (val: boolean) => void;
   clearUser: () => void;

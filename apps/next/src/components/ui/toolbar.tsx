@@ -1,7 +1,13 @@
 "use client";
 
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import FavoriteBorder from "@mui/icons-material/FavoriteBorder";
+import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
+import InsertInvitation from "@mui/icons-material/InsertInvitation";
+import ListAltRoundedIcon from "@mui/icons-material/ListAltRounded";
 import MenuIcon from "@mui/icons-material/Menu";
+import RestaurantRoundedIcon from "@mui/icons-material/RestaurantRounded";
 import {
   AppBar,
   Button,
@@ -12,7 +18,8 @@ import {
 } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in";
 import { useSession } from "@/utils/auth-client";
 import SidebarContent from "./sidebar/sidebar-content";
@@ -32,9 +39,11 @@ type ToolbarElement = {
   href?: string;
   /* If present, will create a dropdown of each of the children */
   children?: { title: string; href: string }[];
+  /* The link's icon (for mobile) */
+  icon?: React.ReactNode;
 };
 
-const TOOLBAR_ELEMENTS: ToolbarElement[] = [
+const DESKTOP_TOOLBAR_ELEMENTS: ToolbarElement[] = [
   {
     title: "Dining Halls",
     children: [
@@ -68,6 +77,34 @@ const TOOLBAR_ELEMENTS: ToolbarElement[] = [
   {
     title: "My Foods",
     href: "/my-foods",
+  },
+];
+
+const MOBILE_TOOLBAR_ELEMENTS: ToolbarElement[] = [
+  {
+    title: "Home",
+    href: "/",
+    icon: <HomeRoundedIcon />,
+  },
+  {
+    title: "Dining",
+    href: "/brandywine", // defaults to brandywine
+    icon: <RestaurantRoundedIcon />,
+  },
+  {
+    title: "Events",
+    href: "/events",
+    icon: <InsertInvitation />,
+  },
+  {
+    title: "My Foods",
+    href: "/my-foods",
+    icon: <FavoriteBorder />,
+  },
+  {
+    title: "Tracker",
+    href: "/tracker",
+    icon: <ListAltRoundedIcon />,
   },
 ];
 
@@ -115,7 +152,7 @@ function ToolbarDropdown({ element }: { element: ToolbarElement }) {
   );
 }
 
-export default function Toolbar(): React.JSX.Element {
+function DesktopToolbar(): React.JSX.Element {
   const [profileAnchor, setProfileAnchor] = useState<null | HTMLElement>(null);
   const profileOpen = Boolean(profileAnchor);
 
@@ -126,6 +163,7 @@ export default function Toolbar(): React.JSX.Element {
   const handleProfileClose = () => {
     setProfileAnchor(null);
   };
+
   const { data: session, isPending } = useSession();
   const user = session?.user;
 
@@ -153,7 +191,7 @@ export default function Toolbar(): React.JSX.Element {
           </div>
 
           <nav className="flex-1 flex gap-0 justify-evenly">
-            {TOOLBAR_ELEMENTS.map((element) => {
+            {DESKTOP_TOOLBAR_ELEMENTS.map((element) => {
               if (element.children) {
                 return (
                   <ToolbarDropdown key={element.title} element={element} />
@@ -248,11 +286,181 @@ export default function Toolbar(): React.JSX.Element {
       >
         <SidebarContent onClose={handleProfileClose} />
       </Menu>
+    </>
+  );
+}
 
-      {/* <SidebarContent
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(!drawerOpen)}
-      /> */}
+function MobileToolbar(): React.JSX.Element {
+  const pathname = usePathname();
+  const [profileAnchor, setProfileAnchor] = useState<null | HTMLElement>(null);
+  const profileOpen = Boolean(profileAnchor);
+  const { data: session, isPending } = useSession();
+  const user = session?.user;
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  const handleProfileOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setProfileAnchor(event.currentTarget);
+  };
+
+  const handleProfileClose = () => {
+    setProfileAnchor(null);
+  };
+
+  const isActive = (href: string) => {
+    if (href === "/") return pathname === "/";
+    return pathname?.startsWith(href);
+  };
+
+  const greeting =
+    !isMounted || isPending
+      ? "Hi, welcome back!"
+      : user
+        ? `Hi ${user.name?.split(" ")[0]}, welcome back!`
+        : "Hi, welcome back!";
+
+  return (
+    <>
+      {/* Sticky top header bar */}
+      <div className="sticky top-0 z-50 w-full bg-white dark:bg-neutral-950 px-4 py-2.5 flex items-center justify-between">
+        <span className="text-[15px] font-semibold text-neutral-800 dark:text-neutral-100 truncate pr-2">
+          {greeting}
+        </span>
+        <div className="flex-shrink-0">
+          {!isMounted || isPending ? (
+            <IconButton
+              className="!p-0"
+              aria-label="Open profile menu"
+              disabled
+            >
+              <AccountCircleIcon sx={{ fontSize: 36, color: "#bdbdbd" }} />
+            </IconButton>
+          ) : user ? (
+            <IconButton
+              onClick={handleProfileOpen}
+              className="!p-0"
+              aria-label="Open profile menu"
+            >
+              <Image
+                src={user.image || "/default-avatar.png"}
+                alt={user.name || "User profile"}
+                width={36}
+                height={36}
+                className="w-9 h-9 rounded-full"
+              />
+            </IconButton>
+          ) : (
+            <IconButton
+              onClick={handleProfileOpen}
+              className="!p-0"
+              aria-label="Open profile menu"
+            >
+              <AccountCircleIcon sx={{ fontSize: 36, color: "#bdbdbd" }} />
+            </IconButton>
+          )}
+        </div>
+      </div>
+
+      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-[520px]">
+        <div
+          className="
+            rounded-[28px]
+            px-4 py-3
+            shadow-lg
+            bg-gradient-to-b from-sky-700 to-sky-900
+          "
+        >
+          <div className="flex items-center justify-between">
+            {MOBILE_TOOLBAR_ELEMENTS.map((element) => {
+              if (!element.href) return null;
+
+              const active = isActive(element.href);
+
+              return (
+                <Link
+                  key={element.title}
+                  href={element.href}
+                  className={`
+                    flex flex-col items-center justify-center
+                    w-[64px]
+                    gap-1
+                    transition
+                    ${active ? "opacity-100" : "opacity-85 hover:opacity-100"}
+                  `}
+                >
+                  <div
+                    style={{
+                      fontSize: 20,
+                      color: "white",
+                      opacity: active ? 1 : 0.9,
+                    }}
+                  >
+                    {element.icon}
+                  </div>
+                  <span
+                    className={`
+                      text-[12px] leading-none text-white
+                      ${active ? "font-semibold" : "font-medium"}
+                    `}
+                  >
+                    {element.title}
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      <Menu
+        anchorEl={profileAnchor}
+        open={profileOpen}
+        onClose={handleProfileClose}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "right",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "right",
+        }}
+        PaperProps={{
+          sx: {
+            backgroundColor: "transparent",
+            boxShadow: "none",
+            padding: 0,
+            width: 357,
+            maxHeight: 658,
+            mt: 1,
+          },
+        }}
+        MenuListProps={{
+          sx: {
+            padding: 0,
+          },
+        }}
+      >
+        <SidebarContent onClose={handleProfileClose} />
+      </Menu>
+    </>
+  );
+}
+
+export default function Toolbar() {
+  return (
+    <>
+      {/* Desktop toolbar */}
+      <div className="hidden md:block">
+        <DesktopToolbar />
+      </div>
+
+      {/* Mobile toolbar */}
+      <div className="block md:hidden">
+        <MobileToolbar />
+      </div>
     </>
   );
 }
