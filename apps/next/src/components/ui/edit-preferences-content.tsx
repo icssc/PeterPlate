@@ -1,6 +1,5 @@
 "use client";
 
-import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
 import {
   Avatar,
   Button,
@@ -11,7 +10,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSession } from "@/utils/auth-client";
 import { trpc } from "@/utils/trpc";
 import {
@@ -29,12 +28,21 @@ export default function EditPreferencesContent({
   const { data: session } = useSession();
   const [activeStep, setActiveStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const isMounted = useRef(true);
+
   const [formData, setFormData] = useState({
     allergies: [] as string[],
     preferences: [] as string[],
   });
+
   const utils = trpc.useUtils();
-  const isGuest = !session?.user; // Check if logged out
+  const isGuest = !session?.user;
+
+  useEffect(() => {
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
 
   const { data: existingAllergies, isLoading: loadingAllergies } =
     trpc.allergy.getAllergies.useQuery(
@@ -59,6 +67,8 @@ export default function EditPreferencesContent({
 
   const addAllergies = trpc.allergy.addAllergies.useMutation();
   const addPreferences = trpc.preference.addDietaryPreferences.useMutation();
+  const deleteAllergy = trpc.allergy.deleteAllergy.useMutation();
+  const deletePreference = trpc.preference.deletePreference.useMutation();
 
   const handleToggle = (key: keyof typeof formData, newValues: string[]) => {
     setFormData((prev) => ({
@@ -68,67 +78,56 @@ export default function EditPreferencesContent({
   };
 
   const handleSubmit = async () => {
-    if (!session?.user?.id) return;
+    if (!session?.user?.id || isSubmitting) return;
     setIsSubmitting(true);
 
     try {
+      const userId = session.user.id;
+
+      // 1. Handle allergies
       const allergiesToDelete =
-        existingAllergies?.filter(
-          (x: any) => !formData.allergies.includes(x),
-        ) || [];
+        existingAllergies?.filter((x) => !formData.allergies.includes(x)) || [];
 
-      await Promise.all(
-        allergiesToDelete.map((allergy: any) =>
-          trpc.allergy.deleteAllergy.mutateAsync({
-            userId: session.user.id,
-            allergy,
-          }),
+      await Promise.all([
+        ...allergiesToDelete.map((allergy) =>
+          deleteAllergy.mutateAsync({ userId, allergy }),
         ),
-      );
+        addAllergies.mutateAsync({ userId, allergies: formData.allergies }),
+      ]);
 
-      await addAllergies.mutateAsync({
-        userId: session.user.id,
-        allergies: formData.allergies,
-      });
-
+      // 2. Handle preferences
       const prefsToDelete =
-        existingPreferences?.filter(
-          (x: any) => !formData.preferences.includes(x),
-        ) || [];
-      await Promise.all(
-        prefsToDelete.map((preference: any) =>
-          trpc.preference.deletePreference.mutateAsync({
-            userId: session.user.id,
-            preference,
-          }),
+        existingPreferences?.filter((x) => !formData.preferences.includes(x)) ||
+        [];
+
+      await Promise.all([
+        ...prefsToDelete.map((preference) =>
+          deletePreference.mutateAsync({ userId, preference }),
         ),
-      );
+        addPreferences.mutateAsync({
+          userId,
+          preferences: formData.preferences,
+        }),
+      ]);
 
-      await addPreferences.mutateAsync({
-        userId: session.user.id,
-        preferences: formData.preferences,
-      });
-
-      await utils.allergy.getAllergies.invalidate();
-      await utils.preference.getDietaryPreferences.invalidate();
+      await Promise.all([
+        utils.allergy.getAllergies.invalidate(),
+        utils.preference.getDietaryPreferences.invalidate(),
+      ]);
 
       if (onSaved) {
         onSaved();
       }
     } catch (error) {
       console.error("Save failed", error);
-    } finally {
-      setIsSubmitting(false);
+      if (isMounted.current) {
+        setIsSubmitting(false);
+      }
     }
   };
 
-  const handleNext = () => {
-    setActiveStep((prev) => Math.min(prev + 1, 1));
-  };
-
-  const handleBack = () => {
-    setActiveStep((prev) => Math.max(prev - 1, 0));
-  };
+  const handleNext = () => setActiveStep(1);
+  const handleBack = () => setActiveStep(0);
 
   if (loadingAllergies || loadingPrefs) {
     return (
@@ -140,202 +139,108 @@ export default function EditPreferencesContent({
 
   return (
     <div className="w-full flex flex-col gap-2">
-      {activeStep === 0 && (
-        <div className="flex flex-col">
-          <div className="bg-sky-700 py-5 flex flex-col items-center gap-1">
-            <Avatar
-              src="/peterplate-icon.webp"
-              alt="PeterPlate Icon"
-              className="!w-[60px] !h-[60px]"
-            />
-            <Typography
-              variant="h5"
-              fontFamily="Poppins, sans-serif"
-              color="white"
-              fontWeight={700}
-            >
-              Edit Preferences
-            </Typography>
-            <Typography fontFamily="Poppins, sans-serif" color="white">
-              {isGuest
-                ? "Log in to update your dining profile"
-                : "Update your dining profile"}
-            </Typography>
-          </div>
+      {/* Header Section (Re-used for both steps) */}
+      <div className="bg-sky-700 py-5 flex flex-col items-center gap-1">
+        <Avatar src="/peterplate-icon.webp" className="!w-[60px] !h-[60px]" />
+        <Typography variant="h5" color="white" fontWeight={700}>
+          Edit Preferences
+        </Typography>
+        <Typography color="white">
+          {isGuest
+            ? "Log in to update your profile"
+            : "Update your dining profile"}
+        </Typography>
+      </div>
 
-          <div className="px-10 pt-5">
-            <Typography
-              variant="h5"
-              fontFamily="Poppins, sans-serif"
-              fontWeight={700}
-              className="text-sky-700"
-            >
+      <div className="px-10 pt-5 h-[320px] overflow-y-auto">
+        {activeStep === 0 ? (
+          <>
+            <Typography variant="h5" fontWeight={700} className="text-sky-700">
               Food Allergies
             </Typography>
-            <Typography
-              fontFamily="Poppins, sans-serif"
-              color="gray"
-              fontSize={16}
-              className="pt-4 mb-3"
-            >
+            <Typography color="gray" className="pt-4 mb-3">
               Help us keep you safe by selecting your food allergies (optional)
             </Typography>
-          </div>
-
-          <Tooltip title={isGuest ? "Log in to edit preferences" : ""} arrow>
-            <div className="px-10">
-              <ToggleButtonGroup
-                value={formData.allergies}
-                onChange={(_, newValues) =>
-                  handleToggle("allergies", newValues)
-                }
-                aria-label="select allergies"
-                exclusive={false}
-                fullWidth
-                disabled={isGuest}
-                className="pt-2 grid grid-cols-2 sm:grid-cols-3 gap-2 [&_.MuiToggleButtonGroup-grouped]:!border-2 [&_.MuiToggleButtonGroup-grouped]:!rounded-[10px] [&_.MuiToggleButtonGroup-grouped]:!border-gray-400"
-              >
-                {AllergenKeys.map((option) => (
-                  <ToggleButton
-                    key={option}
-                    value={option}
-                    className="!py-3 !normal-case !text-black !h-10 [&.Mui-selected]:!bg-[rgba(0,105,168,0.2)] [&.Mui-selected]:!text-[#0069A8] [&.Mui-selected]:!border-[#0069A8] [&.Mui-selected:hover]:!bg-[rgba(0,105,168,0.4)]"
-                  >
-                    <Typography
-                      fontFamily="Poppins, sans-serif"
-                      fontSize={16}
-                      fontWeight={500}
-                      lineHeight={1}
+            <Tooltip title={isGuest ? "Log in to edit preferences" : ""} arrow>
+              <div>
+                <ToggleButtonGroup
+                  value={formData.allergies}
+                  onChange={(_, val) => handleToggle("allergies", val)}
+                  disabled={isGuest}
+                  fullWidth
+                  className="grid grid-cols-2 gap-2"
+                >
+                  {AllergenKeys.map((opt) => (
+                    <ToggleButton
+                      key={opt}
+                      value={opt}
+                      className="!py-3 !normal-case !text-black !h-10 transition-all duration-200 [&.Mui-selected]:!bg-[rgba(0,105,168,0.2)] [&.Mui-selected]:!text-[#0069A8] [&.Mui-selected]:!border-[#0069A8] hover:!bg-gray-100"
                     >
-                      {option}
-                    </Typography>
-                  </ToggleButton>
-                ))}
-              </ToggleButtonGroup>
-            </div>
-          </Tooltip>
-        </div>
-      )}
-      {activeStep === 1 && (
-        <div className="flex flex-col">
-          <div className="bg-sky-700 py-5 flex flex-col items-center gap-1">
-            <Avatar
-              src="/peterplate-icon.webp"
-              alt="PeterPlate Icon"
-              className="!w-[60px] !h-[60px]"
-            />
-            <Typography
-              variant="h5"
-              fontFamily="Poppins, sans-serif"
-              color="white"
-              fontWeight={700}
-            >
-              Edit Preferences
-            </Typography>
-            <Typography fontFamily="Poppins, sans-serif" color="white">
-              {isGuest
-                ? "Log in to update your dining profile"
-                : "Update your dining profile"}
-            </Typography>
-          </div>
-
-          <div className="px-10 pt-5">
-            <Typography
-              variant="h5"
-              fontFamily="Poppins, sans-serif"
-              fontWeight={700}
-              className="text-sky-700"
-            >
+                      {opt}
+                    </ToggleButton>
+                  ))}
+                </ToggleButtonGroup>
+              </div>
+            </Tooltip>
+          </>
+        ) : (
+          <>
+            <Typography variant="h5" fontWeight={700} className="text-sky-700">
               Dietary Preferences
             </Typography>
-            <Typography
-              fontFamily="Poppins, sans-serif"
-              color="gray"
-              fontSize={16}
-              className="pt-4"
-            >
+            <Typography color="gray" className="pt-4 mb-3">
               Select any dietary restrictions that apply to you (optional)
             </Typography>
-          </div>
-
-          <Tooltip title={isGuest ? "Log in to edit preferences" : ""} arrow>
-            <div className="px-10">
-              <ToggleButtonGroup
-                value={formData.preferences}
-                onChange={(_, newValues) =>
-                  handleToggle("preferences", newValues)
-                }
-                aria-label="select preferences"
-                exclusive={false}
-                fullWidth
-                disabled={isGuest}
-                className="pt-2 grid grid-cols-2 sm:grid-cols-3 gap-2 [&_.MuiToggleButtonGroup-grouped]:!border-2 [&_.MuiToggleButtonGroup-grouped]:!rounded-[10px] [&_.MuiToggleButtonGroup-grouped]:!border-gray-400"
-              >
-                {PreferenceKeys.map((option) => (
-                  <ToggleButton
-                    key={option}
-                    value={option}
-                    className="!py-3 !normal-case !text-black !h-10 [&.Mui-selected]:!bg-[rgba(0,105,168,0.2)] [&.Mui-selected]:!text-[#0069A8] [&.Mui-selected]:!border-[#0069A8] [&.Mui-selected:hover]:!bg-[rgba(0,105,168,0.4)]"
-                  >
-                    <Typography
-                      fontFamily="Poppins, sans-serif"
-                      fontSize={16}
-                      fontWeight={500}
-                      lineHeight={1}
+            <Tooltip title={isGuest ? "Log in to edit preferences" : ""} arrow>
+              <div>
+                <ToggleButtonGroup
+                  value={formData.preferences}
+                  onChange={(_, val) => handleToggle("preferences", val)}
+                  disabled={isGuest}
+                  fullWidth
+                  className="grid grid-cols-2 gap-2"
+                >
+                  {PreferenceKeys.map((opt) => (
+                    <ToggleButton
+                      key={opt}
+                      value={opt}
+                      className="!py-3 !normal-case !text-black !h-10 transition-all duration-200 [&.Mui-selected]:!bg-[rgba(0,105,168,0.2)] [&.Mui-selected]:!text-[#0069A8] [&.Mui-selected]:!border-[#0069A8] hover:!bg-gray-100"
                     >
-                      {option}
-                    </Typography>
-                  </ToggleButton>
-                ))}
-              </ToggleButtonGroup>
-            </div>
-          </Tooltip>
-        </div>
-      )}
+                      {opt}
+                    </ToggleButton>
+                  ))}
+                </ToggleButtonGroup>
+              </div>
+            </Tooltip>
+          </>
+        )}
+      </div>
 
       <MobileStepper
         variant="text"
         steps={2}
         position="static"
         activeStep={activeStep}
-        className="px-10"
+        className="px-10 pb-5"
         nextButton={
-          <Tooltip title={isGuest ? "Log in to edit preferences" : ""} arrow>
-            <span>
-              {activeStep === 1 ? (
-                <Button
-                  size="small"
-                  variant="contained"
-                  disabled={isSubmitting || isGuest}
-                  onClick={handleSubmit}
-                  className="!h-[45px] !w-20 !bg-[#0069A8] hover:!brightness-90"
-                >
-                  {isSubmitting ? "Saving..." : "Save"}
-                </Button>
-              ) : (
-                <Button
-                  variant="contained"
-                  size="small"
-                  onClick={handleNext}
-                  disabled={isSubmitting || isGuest}
-                  className="!h-[45px] !w-20 !bg-[#0069A8] hover:!brightness-90"
-                >
-                  Next
-                  <KeyboardArrowRight />
-                </Button>
-              )}
-            </span>
-          </Tooltip>
+          <Button
+            variant="contained"
+            size="small"
+            disabled={isSubmitting || isGuest}
+            onClick={activeStep === 1 ? handleSubmit : handleNext}
+            className="!h-[45px] !w-24 !bg-[#0069A8]"
+          >
+            {activeStep === 1 ? (isSubmitting ? "Saving..." : "Save") : "Next"}
+          </Button>
         }
         backButton={
           <Button
             variant="contained"
             size="small"
-            onClick={handleBack}
             disabled={activeStep === 0 || isSubmitting}
-            className="!h-[45px] !w-20 !bg-[#0069A8] hover:!brightness-90"
+            onClick={handleBack}
+            className="!h-[45px] !w-24 !bg-[#0069A8]"
           >
-            <KeyboardArrowLeft />
             Back
           </Button>
         }
