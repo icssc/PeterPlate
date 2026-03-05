@@ -166,11 +166,7 @@ export default function MealTracker() {
           </p>
           {userId && (
             <TrackerHistory
-              onDateSelect={(date) => {
-                const index = mealsGroupedByDay.findIndex(
-                  (day) => day.rawDate.toDateString() === date.toDateString(),
-                );
-              }}
+              onDateSelect={() => {}}
               onDayClick={(date) => {
                 setHistoryDate(date);
                 setHistoryDialogOpen(true);
@@ -260,39 +256,6 @@ export default function MealTracker() {
           ) : (
             <div className="flex flex-wrap gap-4 mt-4">
               {countedMeals.map((meal) => (
-                <TrackedMealCard
-                  key={meal.id}
-                  isUnavailable={isUnavailable(meal.dishId)}
-                  dietPlanActive={Boolean(dietPlanByMealId[meal.id])}
-                  onToggleDietPlan={() =>
-                    setDietPlanByMealId((prev) => ({
-                      ...prev,
-                      [meal.id]: !prev[meal.id],
-                    }))
-                  }
-                  meal={{
-                    ...meal,
-                    calories: toNum(meal.calories),
-                    protein: toNum(meal.protein),
-                    carbs: toNum(meal.carbs),
-                    fat: toNum(meal.fat),
-                  }}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Uncounted Foods */}
-        <div className="mt-8">
-          <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
-            Uncounted Foods
-          </h2>
-          {uncountedMeals.length === 0 ? (
-            <p className="mt-2 text-sm text-zinc-500">No uncounted foods.</p>
-          ) : (
-            <div className="flex flex-wrap gap-4 mt-4">
-              {uncountedMeals.map((meal) => (
                 <TrackedMealCard
                   key={meal.id}
                   isUnavailable={isUnavailable(meal.dishId)}

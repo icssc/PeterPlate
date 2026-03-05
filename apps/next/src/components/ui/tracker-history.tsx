@@ -16,16 +16,21 @@ interface Props {
 export default function TrackerHistory({ onDateSelect, onDayClick }: Props) {
   const isMobile = useMediaQuery("(max-width: 768px)");
   const [open, setOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (isMobile || !open) return;
 
     const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as Node;
+      const isInsideDialog = document
+        .querySelector(".MuiDialog-root")
+        ?.contains(target);
       if (
         containerRef.current &&
-        !containerRef.current.contains(e.target as Node)
+        !containerRef.current.contains(target) &&
+        !isInsideDialog
       ) {
         setOpen(false);
       }
