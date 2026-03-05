@@ -1,5 +1,10 @@
 import { createTRPCRouter, publicProcedure } from "@api/trpc";
-import { loggedMeals, nutritionInfos, userGoals } from "@peterplate/db";
+import {
+  loggedMeals,
+  nutritionInfos,
+  userGoals,
+  userGoalsByDay,
+} from "@peterplate/db";
 import { TRPCError } from "@trpc/server";
 import { and, desc, eq, gt, gte, lt } from "drizzle-orm";
 import { z } from "zod";
@@ -195,6 +200,60 @@ export const nutritionRouter = createTRPCRouter({
         .values(input)
         .onConflictDoUpdate({
           target: userGoals.userId,
+          set: {
+            calorieGoal: input.calorieGoal,
+            proteinGoal: input.proteinGoal,
+            carbGoal: input.carbGoal,
+            fatGoal: input.fatGoal,
+          },
+        })
+        .returning();
+
+      return result[0];
+    }),
+
+  getGoalsByDay: publicProcedure
+    .input(z.object({ userId: z.string(), date: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const dayGoal = await ctx.db
+        .select()
+        .from(userGoalsByDay)
+        .where(
+          and(
+            eq(userGoalsByDay.userId, input.userId),
+            eq(userGoalsByDay.date, input.date),
+          ),
+        )
+        .limit(1);
+
+      if (dayGoal[0]) return dayGoal[0];
+
+      const defaultGoal = await ctx.db
+        .select()
+        .from(userGoals)
+        .where(eq(userGoals.userId, input.userId))
+        .limit(1);
+
+      return defaultGoal[0] ?? null;
+    }),
+
+  upsertGoalsByDay: publicProcedure
+    .input(
+      z.object({
+        userId: z.string(),
+        date: z.string(),
+        calorieGoal: z.number().min(100).max(10000),
+        proteinGoal: z.number().min(1).max(500),
+        carbGoal: z.number().min(1).max(1000),
+        fatGoal: z.number().min(1).max(500),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const result = await ctx.db
+        .insert(userGoalsByDay)
+        .values(input)
+        .onConflictDoUpdate({
+          target: [userGoalsByDay.userId, userGoalsByDay.date],
           set: {
             calorieGoal: input.calorieGoal,
             proteinGoal: input.proteinGoal,

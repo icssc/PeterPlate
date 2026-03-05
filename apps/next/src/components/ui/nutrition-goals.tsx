@@ -8,16 +8,26 @@ import { trpc } from "@/utils/trpc";
 
 interface Props {
   userId: string;
+  date?: string;
 }
 
-export default function NutritionGoals({ userId }: Props) {
+export default function NutritionGoals({ userId, date }: Props) {
   const isMobile = useMediaQuery("(max-width: 768px)");
-  const { data: goals } = trpc.nutrition.getGoals.useQuery({ userId });
   const utils = trpc.useUtils();
+
+  const { data: defaultGoals } = trpc.nutrition.getGoals.useQuery({ userId });
+  const { data: dayGoals } = trpc.nutrition.getGoalsByDay.useQuery(
+    { userId, date: date ?? "" },
+    { enabled: !!date },
+  );
+  const goals = dayGoals ?? defaultGoals;
+
   const upsertGoals = trpc.nutrition.upsertGoals.useMutation({
-    onSuccess: () => {
-      utils.nutrition.invalidate();
-    },
+    onSuccess: () => utils.nutrition.invalidate(),
+  });
+
+  const upsertGoalsByDay = trpc.nutrition.upsertGoalsByDay.useMutation({
+    onSuccess: () => utils.nutrition.invalidate(),
   });
 
   const [open, setOpen] = useState(false);
@@ -25,6 +35,7 @@ export default function NutritionGoals({ userId }: Props) {
   const [proteinGoal, setProteinGoal] = useState(100);
   const [carbGoal, setCarbGoal] = useState(250);
   const [fatGoal, setFatGoal] = useState(50);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (goals) {
@@ -35,22 +46,8 @@ export default function NutritionGoals({ userId }: Props) {
     }
   }, [goals]);
 
-  const handleUpdate = (updates: Partial<typeof upsertGoals.variables>) => {
-    upsertGoals.mutate({
-      userId,
-      calorieGoal,
-      proteinGoal,
-      carbGoal,
-      fatGoal,
-      ...updates,
-    });
-  };
-
-  const containerRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
     if (isMobile || !open) return;
-
     const handleClickOutside = (e: MouseEvent) => {
       if (
         containerRef.current &&
@@ -59,10 +56,29 @@ export default function NutritionGoals({ userId }: Props) {
         setOpen(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [open, isMobile]);
+
+  const handleUpdate = (updates: {
+    calorieGoal?: number;
+    proteinGoal?: number;
+    carbGoal?: number;
+    fatGoal?: number;
+  }) => {
+    const merged = {
+      calorieGoal,
+      proteinGoal,
+      carbGoal,
+      fatGoal,
+      ...updates,
+    };
+    if (date) {
+      upsertGoalsByDay.mutate({ userId, date, ...merged });
+    } else {
+      upsertGoals.mutate({ userId, ...merged });
+    }
+  };
 
   const inputs = (
     <>

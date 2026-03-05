@@ -12,6 +12,7 @@ interface Props {
   calorieGoal: number;
   userId: string;
   hideEditButton?: boolean;
+  date?: string;
 }
 
 export default function MobileCalorieCard({
@@ -19,13 +20,14 @@ export default function MobileCalorieCard({
   calorieGoal,
   userId,
   hideEditButton = false,
+  date,
 }: Props) {
   const nutrition = compileMealData(mealsEaten);
 
   return (
     <div className="bg-sky-100 rounded-xl px-4 flex flex-row items-center justify-between h-36 w-full relative">
       <div className="absolute bottom-2 left-3">
-        {!hideEditButton && <NutritionGoals userId={userId} />}
+        {!hideEditButton && <NutritionGoals userId={userId} date={date} />}
       </div>
       <span className="text-3xl text-sky-700 font-medium pl-3">Calories</span>
       <div className="flex items-center gap-2">

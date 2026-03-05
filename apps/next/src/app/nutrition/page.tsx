@@ -38,12 +38,29 @@ export default function MealTracker() {
     { enabled: !!userId },
   );
 
-  const { data: goals } = trpc.nutrition.getGoals.useQuery({
+  const today = new Date().toISOString().split("T")[0];
+
+  const { data: defaultGoals } = trpc.nutrition.getGoals.useQuery({
     userId: userId ?? "",
   });
+  const { data: dayGoals } = trpc.nutrition.getGoalsByDay.useQuery(
+    { userId: userId ?? "", date: today },
+    { enabled: !!userId },
+  );
+  const goals = dayGoals ?? defaultGoals;
 
   const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
   const [historyDate, setHistoryDate] = useState<Date | null>(null);
+
+  const historyDateStr = historyDate
+    ? historyDate.toISOString().split("T")[0]
+    : today;
+
+  const { data: historyDayGoals } = trpc.nutrition.getGoalsByDay.useQuery(
+    { userId: userId ?? "", date: historyDateStr },
+    { enabled: !!userId && !!historyDate },
+  );
+  const historyGoals = historyDayGoals ?? defaultGoals;
 
   const mealsGroupedByDay = useMemo(() => {
     if (!meals) return [];
@@ -178,7 +195,12 @@ export default function MealTracker() {
             />
           )}
           <div className="relative mt-4 ml-auto">
-            {userId && <NutritionGoals userId={userId} />}
+            {userId && (
+              <NutritionGoals
+                userId={userId}
+                date={new Date().toISOString().split("T")[0]}
+              />
+            )}
           </div>
         </div>
 
@@ -194,6 +216,7 @@ export default function MealTracker() {
             }))}
             calorieGoal={goals?.calorieGoal ?? 2000}
             userId={userId ?? ""}
+            date={new Date().toISOString().split("T")[0]}
           />
           <MobileNutritionBars
             mealsEaten={countedMeals.map((m) => ({
@@ -223,10 +246,10 @@ export default function MealTracker() {
                 fat: toNum(m.fat),
               })) ?? []
             }
-            calorieGoal={goals?.calorieGoal ?? 2000}
-            proteinGoal={goals?.proteinGoal ?? 100}
-            carbGoal={goals?.carbGoal ?? 250}
-            fatGoal={goals?.fatGoal ?? 50}
+            calorieGoal={historyGoals?.calorieGoal ?? 2000}
+            proteinGoal={historyGoals?.proteinGoal ?? 100}
+            carbGoal={historyGoals?.carbGoal ?? 250}
+            fatGoal={historyGoals?.fatGoal ?? 50}
             userId={userId ?? ""}
           />
         ) : (
@@ -243,10 +266,10 @@ export default function MealTracker() {
                 fat: toNum(m.fat),
               })) ?? []
             }
-            calorieGoal={goals?.calorieGoal ?? 2000}
-            proteinGoal={goals?.proteinGoal ?? 100}
-            carbGoal={goals?.carbGoal ?? 250}
-            fatGoal={goals?.fatGoal ?? 50}
+            calorieGoal={historyGoals?.calorieGoal ?? 2000}
+            proteinGoal={historyGoals?.proteinGoal ?? 100}
+            carbGoal={historyGoals?.carbGoal ?? 250}
+            fatGoal={historyGoals?.fatGoal ?? 50}
             userId={userId ?? ""}
           />
         )}
