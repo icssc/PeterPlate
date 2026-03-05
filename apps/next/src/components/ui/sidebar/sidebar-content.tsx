@@ -10,20 +10,24 @@ import {
   LightMode as LightModeIcon,
   Logout as LogoutIcon,
 } from "@mui/icons-material";
+import { Tooltip } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
 import { useTheme } from "next-themes";
+import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in";
 import { signOut, useSession } from "@/utils/auth-client";
 
 interface ProfileMenuContentProps {
   onClose: () => void;
+  onEditPreferencesClick: () => void;
 }
 
 export default function SidebarContent({
   onClose,
-}: ProfileMenuContentProps): JSX.Element {
+  onEditPreferencesClick,
+}: ProfileMenuContentProps) {
   const { data: session } = useSession();
   const user = session?.user;
   const { theme, setTheme } = useTheme();
@@ -64,7 +68,7 @@ export default function SidebarContent({
           onClick={onClose}
           className="rounded-full p-1.5 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
         >
-          <CloseIcon sx={{ fontSize: 18 }} />
+          <CloseIcon fontSize="small" />
         </button>
       </div>
 
@@ -108,19 +112,19 @@ export default function SidebarContent({
             <ThemeButton
               active={theme === "light"}
               onClick={() => setTheme("light")}
-              icon={<LightModeIcon sx={{ fontSize: 16 }} />}
+              icon={<LightModeIcon fontSize="small" />}
               label="Light"
             />
             <ThemeButton
               active={theme === "system"}
               onClick={() => setTheme("system")}
-              icon={<DesktopWindowsIcon sx={{ fontSize: 16 }} />}
+              icon={<DesktopWindowsIcon fontSize="small" />}
               label="Device"
             />
             <ThemeButton
               active={theme === "dark"}
               onClick={() => setTheme("dark")}
-              icon={<DarkModeIcon sx={{ fontSize: 16 }} />}
+              icon={<DarkModeIcon fontSize="small" />}
               label="Dark"
             />
           </div>
@@ -128,13 +132,22 @@ export default function SidebarContent({
 
         {/* Links */}
         <div className="space-y-1">
-          <MenuLink
-            href="/account"
-            onClick={onClose}
-            icon={<EditIcon fontSize="small" />}
-          >
-            Edit Preferences
-          </MenuLink>
+          <Tooltip title={!user ? "Please login to edit preferences." : ""}>
+            <span className="block">
+              <button
+                type="button"
+                disabled={!user}
+                onClick={() => {
+                  onClose();
+                  onEditPreferencesClick();
+                }}
+                className="w-full flex items-center gap-3 rounded-lg px-4 py-2 text-sm text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:dark:hover:bg-transparent"
+              >
+                <EditIcon fontSize="small" />
+                <span className="font-semibold">Edit Preferences</span>
+              </button>
+            </span>
+          </Tooltip>
 
           <MenuLink
             href="/feedback"
@@ -186,7 +199,7 @@ function ThemeButton({
 }: {
   active: boolean;
   onClick: () => void;
-  icon: React.ReactNode;
+  icon: ReactNode;
   label: string;
 }) {
   return (
@@ -211,8 +224,8 @@ function MenuLink({
 }: {
   href: string;
   onClick: () => void;
-  icon: React.ReactNode;
-  children: React.ReactNode;
+  icon: ReactNode;
+  children: ReactNode;
 }) {
   return (
     <Link
