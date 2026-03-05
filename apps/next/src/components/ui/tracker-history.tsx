@@ -1,22 +1,60 @@
 "use client";
 
 import RestoreIcon from "@mui/icons-material/Restore";
-import { Button } from "@mui/material";
+import { Button, Drawer } from "@mui/material";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { StaticDatePicker } from "@mui/x-date-pickers/StaticDatePicker";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 interface Props {
   onDateSelect: (date: Date) => void;
+  onDayClick: (date: Date) => void;
 }
 
-export default function TrackerHistory({ onDateSelect }: Props) {
+export default function TrackerHistory({ onDateSelect, onDayClick }: Props) {
+  const isMobile = useMediaQuery("(max-width: 768px)");
   const [open, setOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isMobile || !open) return;
+
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [open, isMobile]);
+
+  const calendar = (
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <StaticDatePicker
+        value={selectedDate}
+        onChange={(date) => {
+          setSelectedDate(date ?? null);
+          if (date) {
+            onDateSelect(date);
+            onDayClick(date);
+          }
+        }}
+        displayStaticWrapperAs="desktop"
+        slotProps={{ actionBar: { actions: [] } }}
+        sx={{ "& .MuiDateCalendar-root": { height: "300px" } }}
+      />
+    </LocalizationProvider>
+  );
 
   return (
-    <div className="relative">
+    <div className="relative" ref={containerRef}>
       <Button
         onClick={() => setOpen(!open)}
         variant="contained"
@@ -26,28 +64,16 @@ export default function TrackerHistory({ onDateSelect }: Props) {
         History
       </Button>
 
-      {open && (
-        <div className="absolute top-full mt-2 right-0 z-50 bg-white rounded-xl border border-sky-700/30 p-4 shadow-md">
-          <LocalizationProvider dateAdapter={AdapterDateFns}>
-            <StaticDatePicker
-              value={selectedDate}
-              onChange={(date) => {
-                setSelectedDate(date ?? null);
-                if (date) onDateSelect(date);
-              }}
-              onAccept={() => setOpen(false)}
-              displayStaticWrapperAs="desktop"
-              slotProps={{
-                actionBar: { actions: [] },
-              }}
-              sx={{
-                "& .MuiDateCalendar-root": {
-                  height: "300px",
-                },
-              }}
-            />
-          </LocalizationProvider>
-        </div>
+      {isMobile ? (
+        <Drawer anchor="bottom" open={open} onClose={() => setOpen(false)}>
+          <div className="p-4">{calendar}</div>
+        </Drawer>
+      ) : (
+        open && (
+          <div className="absolute top-full mt-2 right-0 z-50 bg-white rounded-xl border border-sky-700/30 p-4 shadow-md">
+            {calendar}
+          </div>
+        )
       )}
     </div>
   );

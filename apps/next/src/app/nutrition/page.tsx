@@ -8,6 +8,7 @@ import MobileNutritionBars from "@/components/ui/mobile-nutrition-bars";
 import NutritionBreakdown from "@/components/ui/nutrition-breakdown";
 import NutritionGoals from "@/components/ui/nutrition-goals";
 import TrackerHistory from "@/components/ui/tracker-history";
+import TrackerHistoryDialog from "@/components/ui/tracker-history-dialog";
 import { useSnackbarStore } from "@/context/useSnackbar";
 import { useUserStore } from "@/context/useUserStore";
 import { trpc } from "@/utils/trpc";
@@ -39,7 +40,8 @@ export default function MealTracker() {
     userId: userId ?? "",
   });
 
-  const [activeDayIndex, setActiveDayIndex] = useState<number | null>(null);
+  const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
+  const [historyDate, setHistoryDate] = useState<Date | null>(null);
 
   // Diet plan toggle
   const [dietPlanByMealId, setDietPlanByMealId] = useState<
@@ -65,12 +67,7 @@ export default function MealTracker() {
     return result.sort((a, b) => b.rawDate.getTime() - a.rawDate.getTime());
   }, [meals]);
 
-  useEffect(() => {
-    if (mealsGroupedByDay.length > 0 && activeDayIndex === null) {
-      setActiveDayIndex(0);
-    }
-  }, [mealsGroupedByDay, activeDayIndex]);
-
+  const activeDayIndex = mealsGroupedByDay.length > 0 ? 0 : null;
   const selectedDay =
     activeDayIndex !== null ? mealsGroupedByDay[activeDayIndex] : null;
 
@@ -151,11 +148,10 @@ export default function MealTracker() {
           <div className="flex md:hidden">
             {userId && (
               <TrackerHistory
-                onDateSelect={(date) => {
-                  const index = mealsGroupedByDay.findIndex(
-                    (day) => day.rawDate.toDateString() === date.toDateString(),
-                  );
-                  if (index !== -1) setActiveDayIndex(index);
+                onDateSelect={() => {}}
+                onDayClick={(date) => {
+                  setHistoryDate(date);
+                  setHistoryDialogOpen(true);
                 }}
               />
             )}
@@ -174,7 +170,10 @@ export default function MealTracker() {
                 const index = mealsGroupedByDay.findIndex(
                   (day) => day.rawDate.toDateString() === date.toDateString(),
                 );
-                if (index !== -1) setActiveDayIndex(index);
+              }}
+              onDayClick={(date) => {
+                setHistoryDate(date);
+                setHistoryDialogOpen(true);
               }}
             />
           )}
@@ -230,6 +229,26 @@ export default function MealTracker() {
             fatGoal={goals?.fatGoal ?? 50}
           />
         </div>
+
+        <TrackerHistoryDialog
+          open={historyDialogOpen}
+          onClose={() => setHistoryDialogOpen(false)}
+          selectedDate={historyDate}
+          allMeals={
+            meals?.map((m) => ({
+              ...m,
+              calories: toNum(m.calories),
+              protein: toNum(m.protein),
+              carbs: toNum(m.carbs),
+              fat: toNum(m.fat),
+            })) ?? []
+          }
+          calorieGoal={goals?.calorieGoal ?? 2000}
+          proteinGoal={goals?.proteinGoal ?? 100}
+          carbGoal={goals?.carbGoal ?? 250}
+          fatGoal={goals?.fatGoal ?? 50}
+          userId={userId ?? ""}
+        />
 
         {/* Counted Foods */}
         <div className="mt-6">

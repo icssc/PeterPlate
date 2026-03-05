@@ -261,7 +261,7 @@ export default function TrackedMealCard({
     setServingsDraft(meal.servings);
   }, [meal.servings]);
 
-  const updateServings = trpc.nutrition.updateLoggedMealServings.useMutation({
+  const updateServings = trpc.nutrition.updateLoggedMeal.useMutation({
     onSuccess: async () => {
       await utils.nutrition.invalidate();
     },
