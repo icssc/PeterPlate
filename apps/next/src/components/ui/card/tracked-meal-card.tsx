@@ -4,7 +4,6 @@ import {
   ArrowDropDown,
   ArrowDropUp,
   Delete,
-  LibraryBooksOutlined,
   Restaurant,
 } from "@mui/icons-material";
 import { Card, CardContent, Dialog, Drawer } from "@mui/material";
@@ -30,10 +29,6 @@ type LoggedMealJoinedWithNutrition = SelectLoggedMeal & {
 interface Props {
   meal: LoggedMealJoinedWithNutrition;
   isUnavailable?: boolean;
-
-  // diet plan toggle
-  dietPlanActive?: boolean;
-  onToggleDietPlan?: () => void;
 }
 
 interface TrackedMealCardContentProps
@@ -42,8 +37,6 @@ interface TrackedMealCardContentProps
   dishNameForIcon?: string;
   imageUrl?: string;
   isUnavailable?: boolean;
-  dietPlanActive?: boolean;
-  onToggleDietPlan?: () => void;
   onDelete?: () => void;
   deleteDisabled?: boolean;
   servingsDraft: number;
@@ -61,8 +54,6 @@ const TrackedMealCardContent = React.forwardRef<
       dishNameForIcon,
       imageUrl,
       isUnavailable = false,
-      dietPlanActive = false,
-      onToggleDietPlan,
       onDelete,
       deleteDisabled,
       servingsDraft,
@@ -178,24 +169,6 @@ const TrackedMealCardContent = React.forwardRef<
                 </div>
               </div>
               <div className="flex flex-col justify-between items-end">
-                {/* Diet Plan button */}
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onToggleDietPlan?.();
-                  }}
-                  className={cn(
-                    "shrink-0 rounded-lg border-2 p-1 transition mt-5",
-                    dietPlanActive
-                      ? "bg-green-700 border-green-700 text-white"
-                      : "bg-white border-green-700 text-green-700 hover:bg-green-700/20",
-                  )}
-                  aria-label="View nutrition details"
-                >
-                  <LibraryBooksOutlined fontSize="small" />
-                </button>
-
                 {/* Delete button */}
                 <button
                   type="button"
@@ -222,9 +195,6 @@ TrackedMealCardContent.displayName = "TrackedMealCardContent";
 export default function TrackedMealCard({
   meal,
   isUnavailable = false,
-
-  dietPlanActive,
-  onToggleDietPlan,
 }: Props) {
   /* Handle Display Food Card Info */
   const isDesktop = useMediaQuery("(min-width: 768px)");
@@ -276,17 +246,6 @@ export default function TrackedMealCard({
     updateServings.mutate({ id: meal.id, servings: next });
   };
 
-  /* Handle Diet Plan Toggle */
-  const [dietPlanLocal, setDietPlanLocal] = React.useState(false);
-
-  const dietPlanActiveFinal =
-    typeof dietPlanActive === "boolean" ? dietPlanActive : dietPlanLocal;
-
-  const toggleDietPlanFinal = () => {
-    if (onToggleDietPlan) onToggleDietPlan();
-    else setDietPlanLocal((v) => !v);
-  };
-
   /* Handle Delete Button */
   const deleteLoggedMeal = trpc.nutrition.deleteLoggedMeal.useMutation({
     onSuccess: async () => {
@@ -317,8 +276,6 @@ export default function TrackedMealCard({
           servingsDraft={servingsDraft}
           onChangeServings={handleChangeServings}
           servingsDisabled={updateServings.isPending}
-          dietPlanActive={dietPlanActiveFinal}
-          onToggleDietPlan={toggleDietPlanFinal}
           onDelete={handleDelete}
           deleteDisabled={deleteLoggedMeal.isPending}
           onClick={handleOpen}
@@ -365,8 +322,6 @@ export default function TrackedMealCard({
         servingsDraft={servingsDraft}
         onChangeServings={handleChangeServings}
         servingsDisabled={updateServings.isPending}
-        dietPlanActive={dietPlanActiveFinal}
-        onToggleDietPlan={toggleDietPlanFinal}
         onDelete={handleDelete}
         deleteDisabled={deleteLoggedMeal.isPending}
         onClick={handleOpen}
