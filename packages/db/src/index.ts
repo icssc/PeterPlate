@@ -6,6 +6,8 @@ const { Pool } = pg;
 
 import * as schema from "./schema";
 
+export * from "./schema/userGoalsByDay";
+
 export const pool = (config: PoolConfig): PoolType => new Pool(config);
 
 /**

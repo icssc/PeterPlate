@@ -16,6 +16,7 @@ export * from "./stations";
 export * from "./userAllergies";
 export * from "./userDietaryPreferences";
 export * from "./userGoals";
+export * from "./userGoalsByDay";
 export * from "./users";
 
 // import { drizzle } from 'drizzle-orm/node-postgres'; // or your DB driver
