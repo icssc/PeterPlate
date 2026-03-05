@@ -5,6 +5,7 @@ import { Card, CardContent, Dialog, Drawer, Typography } from "@mui/material";
 import type { DishInfo } from "@peterplate/api";
 import Image from "next/image";
 import React from "react";
+import { useSnackbarStore } from "@/context/useSnackbar";
 import { useUserStore } from "@/context/useUserStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { formatFoodName, getFoodIcon } from "@/utils/funcs";
@@ -68,6 +69,7 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
     ref,
   ) => {
     const userId = useUserStore((state) => state.userId);
+    const { showSnackbar } = useSnackbarStore();
     const IconComponent = getFoodIcon(dish.name) ?? Restaurant;
     const [imageError, setImageError] = React.useState(false);
     const showImage =
@@ -89,8 +91,7 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
     const utils = trpc.useUtils();
     const logMealMutation = trpc.nutrition.logMeal.useMutation({
       onSuccess: () => {
-        //TODO: Replace this with a shad/cn sonner or equivalent.
-        alert(`Added ${formatFoodName(dish.name)} to your log`);
+        showSnackbar(`Added ${formatFoodName(dish.name)} to your log.`);
         utils.nutrition.invalidate();
       },
       onError: (error) => {
@@ -186,7 +187,7 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
               <div className="flex items-center">
                 <Favorite
                   dishId={dish.id}
-                  {...{ isFavorited, favoriteDisabled }}
+                  {...{ isFavorited, favoriteDisabled, onToggleFavorite }}
                 />
               </div>
             </div>
@@ -217,6 +218,8 @@ interface FoodCardProps extends DishInfo {
   onToggleFavorite?: (dishId: string, currentlyFavorite: boolean) => void;
   /** Whether to render a compact version of the card. */
   isCompact?: boolean;
+  /** Optional class name for styling. */
+  className?: string;
 }
 
 export default function FoodCard({
@@ -224,16 +227,17 @@ export default function FoodCard({
   favoriteIsLoading = false,
   onToggleFavorite,
   isCompact = false,
+  className,
   ...dish
 }: FoodCardProps): React.JSX.Element {
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const [open, setOpen] = React.useState(false);
   const userId = useUserStore((s) => s.userId);
   const utils = trpc.useUtils();
+  const { showSnackbar } = useSnackbarStore();
   const logMealMutation = trpc.nutrition.logMeal.useMutation({
     onSuccess: () => {
-      // TODO: Replace with shadcn sonner or equivalent
-      alert(`Added ${formatFoodName(dish.name)} to your log`);
+      showSnackbar(`Added ${formatFoodName(dish.name)} to your log`, "success");
       utils.nutrition.invalidate();
     },
     onError: (error) => {
@@ -247,7 +251,7 @@ export default function FoodCard({
   const handleAddToMealTracker = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!userId) {
-      alert("Login to track meals!");
+      showSnackbar("Login to track meals!", "error");
       return;
     }
     logMealMutation.mutate({
@@ -269,6 +273,7 @@ export default function FoodCard({
           onAddToMealTracker={handleAddToMealTracker}
           isCompact={isCompact}
           onClick={handleOpen}
+          className={className}
         />
         <Dialog
           open={open}
@@ -309,6 +314,7 @@ export default function FoodCard({
           onAddToMealTracker={handleAddToMealTracker}
           isCompact={isCompact}
           onClick={handleOpen}
+          className={className}
         />
         <Drawer
           anchor="bottom"
