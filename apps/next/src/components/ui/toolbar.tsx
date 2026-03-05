@@ -188,7 +188,7 @@ function DesktopToolbar(): React.JSX.Element {
         className={`shadow-none ${
           isTransparent
             ? "bg-transparent hover:bg-gradient-to-b from-black/50 to-black/0"
-            : "!bg-white dark:!bg-zinc-900"
+            : "!bg-white dark:!bg-zinc-900 !border-b !border-zinc-200 dark:!border-zinc-700"
         }`}
       >
         <MuiToolbar className="justify-between px-4 py-1 group">
