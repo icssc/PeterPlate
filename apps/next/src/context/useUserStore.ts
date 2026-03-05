@@ -3,8 +3,10 @@ import { persist } from "zustand/middleware";
 
 interface UserState {
   userId: string | null;
+  hasOnboarded: boolean;
   isInitialized: boolean;
   setUserId: (id: string | null) => void;
+  setHasOnboarded: (val: boolean) => void;
   clearUser: () => void;
 }
 
@@ -12,12 +14,13 @@ export const useUserStore = create<UserState>()(
   persist(
     (set) => ({
       userId: null,
-      isInitialized: false,
-      setUserId: (id) => set({ userId: id, isInitialized: true }),
-      clearUser: () => set({ userId: null, isInitialized: true }),
+      hasOnboarded: false,
+      setUserId: (id) => set({ userId: id }),
+      setHasOnboarded: (val) => set({ hasOnboarded: val }),
+      clearUser: () => set({ userId: null, hasOnboarded: false }),
     }),
     {
-      name: "user-storage", // saves to localStorage
+      name: "user-storage",
     },
   ),
 );
