@@ -315,6 +315,7 @@ function DesktopToolbar(): React.JSX.Element {
 
 function MobileToolbar(): React.JSX.Element {
   const pathname = usePathname();
+  const isTransparent = TRANSPARENT_PAGES.includes(pathname);
   const [profileAnchor, setProfileAnchor] = useState<null | HTMLElement>(null);
   const profileOpen = Boolean(profileAnchor);
   const { data: session, isPending } = useSession();
@@ -348,8 +349,20 @@ function MobileToolbar(): React.JSX.Element {
   return (
     <>
       {/* Sticky top header bar */}
-      <div className="sticky top-0 z-50 w-full bg-white dark:bg-neutral-950 px-4 py-2.5 flex items-center justify-between">
-        <span className="text-[15px] font-semibold text-neutral-800 dark:text-neutral-100 truncate pr-2">
+      <div
+        className={`top-0 z-50 w-full px-4 py-2.5 flex items-center justify-between ${
+          isTransparent
+            ? "absolute bg-transparent"
+            : "sticky bg-white dark:bg-neutral-950"
+        }`}
+      >
+        <span
+          className={`text-[15px] font-semibold truncate pr-2 ${
+            isTransparent
+              ? "text-white"
+              : "text-neutral-800 dark:text-neutral-100"
+          }`}
+        >
           {greeting}
         </span>
         <div className="flex-shrink-0">
