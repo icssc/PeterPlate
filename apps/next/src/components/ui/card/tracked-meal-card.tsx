@@ -73,7 +73,7 @@ const TrackedMealCardContent = React.forwardRef<
       Restaurant;
 
     return (
-      <div ref={ref} {...divProps} className={cn("w-72", className)}>
+      <div ref={ref} {...divProps} className={cn("w-full md:w-72", className)}>
         <Card
           className={cn(
             "cursor-pointer transition w-full border",
