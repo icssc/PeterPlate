@@ -68,7 +68,6 @@ export function RootClient({ children }: { children: React.ReactNode }) {
         <QueryClientProvider client={queryClient}>
           <DateProvider>
             <Toolbar />
-            {children}
             <GlobalSnackbar />
             {/* Extra spacing for mobile view so toolbar doesn't overlap content */}
             <main className="pb-20 md:pb-0">{children}</main>
