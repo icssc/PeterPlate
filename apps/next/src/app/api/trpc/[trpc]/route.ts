@@ -3,6 +3,11 @@ import type { AnyRouter } from "@trpc/server";
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 
 const handler = (req: Request) => {
+  const connectionString = process.env.DATABASE_URL;
+  if (!connectionString) {
+    throw new Error("DATABASE_URL is not set");
+  }
+
   return fetchRequestHandler({
     endpoint: "/api/trpc",
     req,
@@ -10,7 +15,7 @@ const handler = (req: Request) => {
     createContext: () =>
       createTRPCContext({
         headers: req.headers,
-        connectionString: process.env.DATABASE_URL!,
+        connectionString,
       }),
   });
 };

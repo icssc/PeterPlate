@@ -1,11 +1,15 @@
 "use client";
+
+import { Alert, Snackbar } from "@mui/material";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink } from "@trpc/client";
 import { useEffect, useState } from "react";
 import superjson from "superjson";
+import { PWAManager } from "@/components/PWAManager";
 import { ThemeProvider } from "@/components/theme-provider";
 import Toolbar from "@/components/ui/toolbar";
 import { DateProvider } from "@/context/date-context";
+import { useSnackbarStore } from "@/context/useSnackbar";
 import { useUserStore } from "@/context/useUserStore";
 import { useSession } from "@/utils/auth-client";
 import { trpc } from "../utils/trpc";
@@ -16,7 +20,7 @@ export function RootClient({ children }: { children: React.ReactNode }) {
       new QueryClient({
         defaultOptions: {
           queries: {
-            // 5m defualt stale time
+            // 5m default stale time
             staleTime: 5 * 60 * 1000,
             refetchOnWindowFocus: false,
             refetchOnReconnect: false,
@@ -59,14 +63,29 @@ export function RootClient({ children }: { children: React.ReactNode }) {
 
   return (
     <ThemeProvider>
+      <PWAManager debug={process.env.NODE_ENV === "development"} />
       <trpc.Provider client={trpcClient} queryClient={queryClient}>
         <QueryClientProvider client={queryClient}>
           <DateProvider>
             <Toolbar />
-            {children}
+            <GlobalSnackbar />
+            {/* Extra spacing for mobile view so toolbar doesn't overlap content */}
+            <main className="pb-20 md:pb-0">{children}</main>
           </DateProvider>
         </QueryClientProvider>
       </trpc.Provider>
     </ThemeProvider>
+  );
+}
+
+function GlobalSnackbar() {
+  const { open, message, severity, closeSnackbar } = useSnackbarStore();
+
+  return (
+    <Snackbar open={open} autoHideDuration={4000} onClose={closeSnackbar}>
+      <Alert onClose={closeSnackbar} severity={severity} variant="filled">
+        {message}
+      </Alert>
+    </Snackbar>
   );
 }
