@@ -138,7 +138,9 @@ export default function MyFoodsPage() {
   const hasError = !!favoritesError || !!ratedError;
 
   return (
-    <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 pb-8 pt-20 sm:px-6 lg:px-8">
+    <div
+      className={`mx-auto flex max-w-7xl flex-col gap-4 px-4 pb-8 ${isDesktop ? "pt-20" : ""} sm:px-6 lg:px-8`}
+    >
       {/* Header */}
       <header className="space-y-1">
         <h1 className="text-4xl text-sky-700 font-bold mb-4">My Foods</h1>
