@@ -2,8 +2,8 @@
 
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
+import EditIcon from "@mui/icons-material/Edit";
 import {
-  Avatar,
   Button,
   CircularProgress,
   IconButton,
@@ -180,7 +180,6 @@ export default function EditPreferencesContent({
   const optionButtonUnselected =
     "!border-[#D1D5DC] !bg-white !text-black hover:!bg-gray-50 dark:!border-[1px] dark:!border-[#D4D4D8] dark:!bg-[rgba(63,63,71,0.40)] dark:!text-white dark:hover:!bg-[rgba(63,63,71,0.5)]";
 
-  const welcomeName = session?.user?.name?.split(" ")[0] ?? "Guest";
   const sectionHeading =
     "font-poppins text-[24px] font-bold leading-[36px] text-[#0069A8] dark:text-[#8EC5FF]";
   const sectionDescription =
@@ -189,17 +188,21 @@ export default function EditPreferencesContent({
   return (
     <div className="flex h-full min-h-0 w-full flex-1 flex-col bg-white dark:bg-[#313136] pb-[22px]">
       <div className="w-full shrink-0 rounded-t-[12px] flex flex-row items-center gap-3 pl-[18px] pr-4 pt-4 pb-4 md:flex-col md:items-center md:gap-0 md:pt-4 md:pb-0 md:pl-0 md:pr-0 md:h-[122px] bg-white dark:bg-[#313136] md:bg-[#0069A8] md:dark:border-b-[3px] md:dark:border-b-[#3F3F47]">
-        <Avatar
-          src={session?.user?.image ?? "/peterplate-icon.webp"}
-          className="!w-10 !h-10 !rounded-[100px] [&_img]:!object-cover flex-shrink-0"
-          imgProps={{ style: { objectFit: "cover" } }}
-        />
+        <div
+          className="flex !h-10 !w-10 flex-shrink-0 items-center justify-center rounded-full !p-2 bg-[rgba(0,105,168,0.12)] dark:bg-[rgba(142,197,255,0.12)] md:bg-white/20 md:dark:bg-white/10"
+          aria-hidden
+        >
+          <EditIcon
+            className="!h-6 !w-6 flex-shrink-0 text-[#0069A8] dark:text-[#8EC5FF] md:!text-white"
+            style={{ width: 24, height: 24 }}
+          />
+        </div>
         <div className="flex flex-col items-start justify-center gap-0 min-w-0 md:items-center">
           <p className="font-poppins text-[16px] font-bold leading-[42px] text-[#0069A8] dark:text-[#8EC5FF] md:text-white -mt-1">
-            Welcome, {welcomeName}!
+            Update dietary preferences
           </p>
           <p className="font-poppins text-[14px] font-normal leading-[21px] text-[#6A7282] dark:text-white md:text-white -mt-2">
-            Let&apos;s Personalize your dining experience
+            Make changes to your current needs
           </p>
         </div>
       </div>
