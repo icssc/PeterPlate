@@ -165,6 +165,7 @@ export function DesktopToolbar() {
   const [editPreferencesOpen, setEditPreferencesOpen] = useState(false);
   const [editPreferencesSnackbarOpen, setEditPreferencesSnackbarOpen] =
     useState(false);
+  const [editPreferencesExpanded, setEditPreferencesExpanded] = useState(false);
 
   const handleProfileOpen = (event: MouseEvent<HTMLElement>) => {
     setProfileAnchor(event.currentTarget);
@@ -178,6 +179,7 @@ export function DesktopToolbar() {
   };
   const handleEditPreferencesClose = () => {
     setEditPreferencesOpen(false);
+    setEditPreferencesExpanded(false);
   };
   const handleEditPreferencesSaved = () => {
     setEditPreferencesOpen(false);
@@ -307,10 +309,16 @@ export function DesktopToolbar() {
           maxWidth={false}
           PaperProps={{
             className:
-              "w-[460px] max-w-[90vw] max-h-[90vh] m-2 p-0 overflow-hidden flex flex-col rounded-2xl",
+              "w-[500px] max-w-[90vw] m-2 p-0 overflow-hidden flex flex-col rounded-[12px] bg-white shadow-[0_4px_20px_0_#6A7282] dark:bg-[#313136] dark:border-[3px] dark:border-[#3F3F47] dark:shadow-none",
+            style: {
+              height: editPreferencesExpanded ? 593 : 558,
+            },
           }}
         >
-          <EditPreferencesContent onSaved={handleEditPreferencesSaved} />
+          <EditPreferencesContent
+            onSaved={handleEditPreferencesSaved}
+            onExpandChange={setEditPreferencesExpanded}
+          />
         </Dialog>
       ) : (
         <Drawer
@@ -319,20 +327,8 @@ export function DesktopToolbar() {
           onClose={handleEditPreferencesClose}
           slotProps={{
             paper: {
-              sx: {
-                padding: 0,
-                overflow: "hidden",
-                borderRadius: "16px",
-              },
-            },
-          }}
-          sx={{
-            "& .MuiDrawer-paper": {
-              borderTopLeftRadius: "10px",
-              borderTopRightRadius: "10px",
-              marginTop: "96px",
-              height: "auto",
-              maxHeight: "85vh",
+              className:
+                "p-0 overflow-hidden rounded-t-[10px] mt-[96px] h-auto max-h-[85vh] bg-white dark:bg-[#313136] dark:border-[3px] dark:border-[#3F3F47] dark:border-b-0 dark:rounded-t-[12px]",
             },
           }}
         >
@@ -361,6 +357,11 @@ function MobileToolbar(): React.JSX.Element {
   const { data: session, isPending } = useSession();
   const user = session?.user;
   const [isMounted, setIsMounted] = useState(false);
+  const [editPreferencesOpen, setEditPreferencesOpen] = useState(false);
+  const [editPreferencesSnackbarOpen, setEditPreferencesSnackbarOpen] =
+    useState(false);
+  const [_editPreferencesExpanded, setEditPreferencesExpanded] =
+    useState(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -372,6 +373,21 @@ function MobileToolbar(): React.JSX.Element {
 
   const handleProfileClose = () => {
     setProfileAnchor(null);
+  };
+
+  const handleEditPreferencesOpen = () => {
+    setProfileAnchor(null);
+    setEditPreferencesOpen(true);
+  };
+
+  const handleEditPreferencesClose = () => {
+    setEditPreferencesOpen(false);
+    setEditPreferencesExpanded(false);
+  };
+
+  const handleEditPreferencesSaved = () => {
+    setEditPreferencesOpen(false);
+    setEditPreferencesSnackbarOpen(true);
   };
 
   const isActive = (href: string) => {
@@ -393,19 +409,21 @@ function MobileToolbar(): React.JSX.Element {
         <span className="text-[15px] font-semibold text-neutral-800 dark:text-neutral-100 truncate pr-2">
           {greeting}
         </span>
-        <div className="flex-shrink-0">
+        <div className="flex-shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center">
           {!isMounted || isPending ? (
             <IconButton
-              className="!p-0"
+              type="button"
+              className="!p-0 !min-w-[44px] !min-h-[44px]"
               aria-label="Open profile menu"
               disabled
             >
-              <AccountCircleIcon sx={{ fontSize: 36, color: "#bdbdbd" }} />
+              <AccountCircleIcon style={{ fontSize: 36, color: "#bdbdbd" }} />
             </IconButton>
           ) : user ? (
             <IconButton
+              type="button"
               onClick={handleProfileOpen}
-              className="!p-0"
+              className="!p-0 !min-w-[44px] !min-h-[44px]"
               aria-label="Open profile menu"
             >
               <Image
@@ -418,11 +436,12 @@ function MobileToolbar(): React.JSX.Element {
             </IconButton>
           ) : (
             <IconButton
+              type="button"
               onClick={handleProfileOpen}
-              className="!p-0"
+              className="!p-0 !min-w-[44px] !min-h-[44px]"
               aria-label="Open profile menu"
             >
-              <AccountCircleIcon sx={{ fontSize: 36, color: "#bdbdbd" }} />
+              <AccountCircleIcon style={{ fontSize: 36, color: "#bdbdbd" }} />
             </IconButton>
           )}
         </div>
@@ -492,25 +511,46 @@ function MobileToolbar(): React.JSX.Element {
           horizontal: "right",
         }}
         PaperProps={{
-          sx: {
-            backgroundColor: "transparent",
-            boxShadow: "none",
-            padding: 0,
-            width: 357,
-            maxHeight: 658,
-            mt: 1,
-          },
+          className:
+            "bg-transparent shadow-none p-0 w-[357px] max-h-[658px] mt-1",
         }}
         MenuListProps={{
-          sx: {
-            padding: 0,
+          className: "p-0",
+        }}
+      >
+        <SidebarContent
+          onClose={handleProfileClose}
+          onEditPreferencesClick={handleEditPreferencesOpen}
+        />
+      </Menu>
+
+      <Drawer
+        anchor="bottom"
+        open={editPreferencesOpen}
+        onClose={handleEditPreferencesClose}
+        slotProps={{
+          paper: {
+            className:
+              "p-0 overflow-hidden rounded-t-[10px] mt-[96px] h-auto max-h-[85vh] bg-white dark:bg-[#313136] dark:border-[3px] dark:border-[#3F3F47] dark:border-b-0 dark:rounded-t-[12px]",
           },
         }}
       >
-        {/* <SidebarContent
-          onClose={handleProfileClose}
-        /> */}
-      </Menu>
+        <EditPreferencesContent
+          onSaved={handleEditPreferencesSaved}
+          onExpandChange={setEditPreferencesExpanded}
+        />
+      </Drawer>
+
+      <Snackbar
+        open={editPreferencesSnackbarOpen}
+        autoHideDuration={4000}
+        onClose={(_, reason) => {
+          if (reason === "clickaway") return;
+          setEditPreferencesSnackbarOpen(false);
+        }}
+        message="Preferences updated successfully"
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      />
     </>
   );
 }
