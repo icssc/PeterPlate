@@ -199,7 +199,9 @@ export default function EditPreferencesContent({
         </div>
         <div className="flex flex-col items-start justify-center gap-0 min-w-0 md:items-center">
           <p className="font-poppins text-[16px] font-bold leading-[42px] text-[#0069A8] dark:text-[#8EC5FF] md:text-white -mt-1">
-            Update dietary preferences
+            {activeStep === 0
+              ? "Update food allergies"
+              : "Update dietary preferences"}
           </p>
           <p className="font-poppins text-[14px] font-normal leading-[21px] text-[#6A7282] dark:text-white md:text-white -mt-2">
             Make changes to your current needs
@@ -380,7 +382,7 @@ export default function EditPreferencesContent({
           onClick={activeStep === 1 ? handleSubmit : handleNext}
           className="font-poppins text-[14px] font-medium leading-[21px] !flex !items-center !justify-center !rounded-[8px] !h-[49px] !w-full !min-w-0 md:!w-[81.4px] !bg-[#0069A8] !text-white dark:!border-2 dark:!border-[#51A2FF] dark:!bg-[#8EC5FF] dark:!text-black dark:hover:!bg-[#7ab8f0] dark:hover:!border-[#51A2FF]"
         >
-          {activeStep === 1 ? (isSubmitting ? "Saving..." : "Finish") : "Next"}
+          {activeStep === 1 ? (isSubmitting ? "Saving..." : "Update") : "Next"}
         </Button>
       </footer>
     </div>
