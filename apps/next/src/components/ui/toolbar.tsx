@@ -328,7 +328,7 @@ export function DesktopToolbar() {
           slotProps={{
             paper: {
               className:
-                "p-0 overflow-hidden rounded-t-[10px] mt-[96px] h-auto max-h-[85vh] bg-white dark:bg-[#313136] dark:border-[3px] dark:border-[#3F3F47] dark:border-b-0 dark:rounded-t-[12px]",
+                "p-0 overflow-hidden rounded-t-[10px] mt-[96px] h-auto max-h-[85vh] flex flex-col min-h-0 bg-white dark:bg-[#313136] dark:border-[3px] dark:border-[#3F3F47] dark:border-b-0 dark:rounded-t-[12px]",
             },
           }}
         >
@@ -531,7 +531,7 @@ function MobileToolbar(): React.JSX.Element {
         slotProps={{
           paper: {
             className:
-              "p-0 overflow-hidden rounded-t-[10px] mt-[96px] h-auto max-h-[85vh] bg-white dark:bg-[#313136] dark:border-[3px] dark:border-[#3F3F47] dark:border-b-0 dark:rounded-t-[12px]",
+              "p-0 overflow-hidden rounded-t-[10px] mt-[96px] h-auto max-h-[85vh] flex flex-col min-h-0 bg-white dark:bg-[#313136] dark:border-[3px] dark:border-[#3F3F47] dark:border-b-0 dark:rounded-t-[12px]",
           },
         }}
       >

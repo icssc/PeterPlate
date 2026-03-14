@@ -187,18 +187,18 @@ export default function EditPreferencesContent({
     "font-poppins text-[14px] font-normal leading-[21px] text-[#6A7282] dark:text-white";
 
   return (
-    <div className="flex h-full w-full flex-col bg-white dark:bg-[#313136] pb-[22px]">
-      <div className="w-full h-[122px] shrink-0 rounded-t-[12px] bg-[#0069A8] flex flex-col items-center justify-start pt-4 dark:bg-[#313136] dark:border-b-[3px] dark:border-b-[#3F3F47]">
-        <div className="flex flex-col items-center gap-0">
-          <Avatar
-            src={session?.user?.image ?? "/peterplate-icon.webp"}
-            className="!w-10 !h-10 !rounded-[100px] [&_img]:!object-cover"
-            imgProps={{ style: { objectFit: "cover" } }}
-          />
-          <p className="font-poppins text-[16px] font-bold leading-[42px] text-white dark:text-[#8EC5FF] -mt-1">
+    <div className="flex h-full min-h-0 w-full flex-1 flex-col bg-white dark:bg-[#313136] pb-[22px]">
+      <div className="w-full shrink-0 rounded-t-[12px] flex flex-row items-center gap-3 pl-[18px] pr-4 pt-4 pb-4 md:flex-col md:items-center md:gap-0 md:pt-4 md:pb-0 md:pl-0 md:pr-0 md:h-[122px] bg-white dark:bg-[#313136] md:bg-[#0069A8] md:dark:border-b-[3px] md:dark:border-b-[#3F3F47]">
+        <Avatar
+          src={session?.user?.image ?? "/peterplate-icon.webp"}
+          className="!w-10 !h-10 !rounded-[100px] [&_img]:!object-cover flex-shrink-0"
+          imgProps={{ style: { objectFit: "cover" } }}
+        />
+        <div className="flex flex-col items-start justify-center gap-0 min-w-0 md:items-center">
+          <p className="font-poppins text-[16px] font-bold leading-[42px] text-[#0069A8] dark:text-[#8EC5FF] md:text-white -mt-1">
             Welcome, {welcomeName}!
           </p>
-          <p className="font-poppins text-[14px] font-normal leading-[21px] text-white -mt-2">
+          <p className="font-poppins text-[14px] font-normal leading-[21px] text-[#6A7282] dark:text-white md:text-white -mt-2">
             Let&apos;s Personalize your dining experience
           </p>
         </div>
@@ -348,14 +348,14 @@ export default function EditPreferencesContent({
         )}
       </div>
 
-      <footer className="shrink-0 mx-auto w-[464px] h-[49px] flex justify-between items-center bg-white dark:bg-[#313136] rounded-b-[12px]">
+      <footer className="shrink-0 w-full px-[18px] grid grid-cols-2 gap-[7px] h-[49px] md:mx-auto md:w-[464px] md:px-0 md:flex md:justify-between md:items-center md:gap-0 bg-white dark:bg-[#313136] rounded-b-[12px]">
         {activeStep === 0 ? (
           <Button
             variant="outlined"
             size="small"
             disabled={!!isSubmitting}
             onClick={handleNext}
-            className="font-poppins text-[14px] font-medium leading-[26px] tracking-[0.46px] !flex !items-center !justify-center !rounded-lg !w-[81.4px] !h-[49px] !min-w-0 !border-2 !border-[#D1D5DC] !bg-white !text-black hover:!bg-gray-50 dark:!border-2 dark:!border-[#8EC5FF] dark:!bg-transparent dark:!text-white dark:hover:!bg-[rgba(142,197,255,0.08)] dark:!shadow-[0_1px_8px_0_rgba(0,0,0,0.12),0_3px_4px_0_rgba(0,0,0,0.14),0_3px_3px_-2px_rgba(0,0,0,0.2)]"
+            className="font-poppins text-[14px] font-medium leading-[26px] tracking-[0.46px] !flex !items-center !justify-center !rounded-[8px] !h-[49px] !w-full !min-w-0 md:!w-[81.4px] !border-2 !border-[#D1D5DC] !bg-white !text-black hover:!bg-gray-50 dark:!border-2 dark:!border-[#8EC5FF] dark:!bg-transparent dark:!text-white dark:hover:!bg-[rgba(142,197,255,0.08)] dark:!shadow-[0_1px_8px_0_rgba(0,0,0,0.12),0_3px_4px_0_rgba(0,0,0,0.14),0_3px_3px_-2px_rgba(0,0,0,0.2)]"
           >
             Skip
           </Button>
@@ -365,7 +365,7 @@ export default function EditPreferencesContent({
             size="small"
             disabled={!!isSubmitting}
             onClick={handleBack}
-            className="font-poppins text-[14px] font-medium leading-[26px] tracking-[0.46px] !flex !items-center !justify-center !rounded-lg !w-[81.4px] !h-[49px] !min-w-0 !border-2 !border-[#D1D5DC] !bg-white !text-black hover:!bg-gray-50 dark:!border-2 dark:!border-[#8EC5FF] dark:!bg-transparent dark:!text-white dark:hover:!bg-[rgba(142,197,255,0.08)] dark:!shadow-[0_1px_8px_0_rgba(0,0,0,0.12),0_3px_4px_0_rgba(0,0,0,0.14),0_3px_3px_-2px_rgba(0,0,0,0.2)]"
+            className="font-poppins text-[14px] font-medium leading-[26px] tracking-[0.46px] !flex !items-center !justify-center !rounded-[8px] !h-[49px] !w-full !min-w-0 md:!w-[81.4px] !border-2 !border-[#D1D5DC] !bg-white !text-black hover:!bg-gray-50 dark:!border-2 dark:!border-[#8EC5FF] dark:!bg-transparent dark:!text-white dark:hover:!bg-[rgba(142,197,255,0.08)] dark:!shadow-[0_1px_8px_0_rgba(0,0,0,0.12),0_3px_4px_0_rgba(0,0,0,0.14),0_3px_3px_-2px_rgba(0,0,0,0.2)]"
           >
             Back
           </Button>
@@ -375,7 +375,7 @@ export default function EditPreferencesContent({
           size="small"
           disabled={isSubmitting || isGuest}
           onClick={activeStep === 1 ? handleSubmit : handleNext}
-          className="font-poppins text-[14px] font-medium leading-[21px] !flex !items-center !justify-center !rounded-lg !w-[81.4px] !h-[49px] !min-w-0 !bg-[#0069A8] !text-white dark:!border-2 dark:!border-[#51A2FF] dark:!bg-[#8EC5FF] dark:!text-black dark:hover:!bg-[#7ab8f0] dark:hover:!border-[#51A2FF]"
+          className="font-poppins text-[14px] font-medium leading-[21px] !flex !items-center !justify-center !rounded-[8px] !h-[49px] !w-full !min-w-0 md:!w-[81.4px] !bg-[#0069A8] !text-white dark:!border-2 dark:!border-[#51A2FF] dark:!bg-[#8EC5FF] dark:!text-black dark:hover:!bg-[#7ab8f0] dark:hover:!border-[#51A2FF]"
         >
           {activeStep === 1 ? (isSubmitting ? "Saving..." : "Finish") : "Next"}
         </Button>
