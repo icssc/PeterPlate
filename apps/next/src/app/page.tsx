@@ -9,21 +9,26 @@ import { useSession } from "@/utils/auth-client";
 import { HallEnum } from "@/utils/types";
 
 export default function Home() {
+  const [hasMounted, setHasMounted] = useState<boolean>(false);
   const { data: session, isPending } = useSession();
 
   const [activeHall, setActiveHall] = useState<HallEnum>(HallEnum.BRANDYWINE);
-  const isDesktop = useMediaQuery("(min-width: 768px)"); // Tailwind's `md` breakpoint
+  const isDesktop = useMediaQuery("(min-width: 768px)");
 
   const _hasOnboardedStore = useUserStore((state) => state.hasOnboarded);
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
   const hasOnboarded = _hasOnboardedStore || session?.user.hasOnboarded;
+  const showOnboardDialog = hasMounted && !isPending && !hasOnboarded;
 
   // Desktop layout: two Side components side-by-side
   if (isDesktop) {
     return (
       <div className="grid grid-cols-2 h-screen">
-        {((!isPending && !session) || (session?.user && !hasOnboarded)) && (
-          <OnboardingDialog />
-        )}
+        {showOnboardDialog && <OnboardingDialog />}
         <Side hall={HallEnum.BRANDYWINE} />
         <Side hall={HallEnum.ANTEATERY} />
       </div>
@@ -39,9 +44,7 @@ export default function Home() {
   return (
     <div className="flex flex-col h-screen">
       <div className="flex-grow overflow-y-auto">
-        {((!isPending && !session) || (session?.user && !hasOnboarded)) && (
-          <OnboardingDialog />
-        )}
+        {showOnboardDialog && <OnboardingDialog />}
         {activeHall === HallEnum.BRANDYWINE && (
           <Side hall={HallEnum.BRANDYWINE} toggleHall={toggleHall} />
         )}

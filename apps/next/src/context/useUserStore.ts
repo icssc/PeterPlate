@@ -15,9 +15,10 @@ export const useUserStore = create<UserState>()(
     (set) => ({
       userId: null,
       hasOnboarded: false,
+      isInitialized: false,
       setUserId: (id) => set({ userId: id }),
       setHasOnboarded: (val) => set({ hasOnboarded: val }),
-      clearUser: () => set({ userId: null, hasOnboarded: false }),
+      clearUser: () => set({ userId: null }),
     }),
     {
       name: "user-storage",

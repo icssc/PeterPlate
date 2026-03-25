@@ -390,12 +390,12 @@ export default function OnboardingDialog(): React.JSX.Element {
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const [open, setOpen] = useState(true);
 
+  const setHasOnboarded = useUserStore((state) => state.setHasOnboarded);
+
   const handleClose = () => {
     setHasOnboarded(true);
     setOpen(false);
   };
-
-  const setHasOnboarded = useUserStore((state) => state.setHasOnboarded);
 
   if (isDesktop)
     return (
