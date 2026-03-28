@@ -6,7 +6,13 @@
 "use client";
 
 import { Delete, Restaurant } from "@mui/icons-material";
-import { Card, CardContent, Dialog, IconButton } from "@mui/material";
+import {
+  Card,
+  CardContent,
+  Dialog,
+  IconButton,
+  Typography,
+} from "@mui/material";
 import type { DishInfo } from "@peterplate/api";
 import React from "react";
 import { useUserStore } from "@/context/useUserStore";
@@ -36,18 +42,20 @@ const RatingsCardContent = React.forwardRef<
   return (
     <div ref={ref} {...divProps} className={cn("w-full", className)}>
       <Card
-        className="cursor-pointer hover:shadow-lg transition w-full border"
-        sx={{ borderRadius: "16px" }}
+        className="cursor-pointer hover:shadow-lg transition w-full dark:bg-[#303035]"
+        sx={{ borderRadius: "16px", border: 1, borderColor: "divider" }}
       >
         <CardContent sx={{ padding: "0 !important" }}>
           <div className="flex justify-between items-center h-full p-6">
             <div className="flex items-center gap-6">
-              <IconComponent className="w-10 h-10 text-foreground" />
+              <IconComponent className="w-10 h-10" color="primary" />
               <div className="flex flex-col">
-                <strong>{formatFoodName(food.name)}</strong>
-                <span className="text-muted-foreground text-xs mt-1">
+                <strong className="text-sky-700 dark:text-blue-300">
+                  {formatFoodName(food.name)}
+                </strong>
+                <Typography variant="caption" color="text.secondary">
                   Rated {new Date(food.ratedAt).toLocaleDateString()}
-                </span>
+                </Typography>
               </div>
             </div>
             <div
