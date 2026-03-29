@@ -22,7 +22,10 @@ export function GoogleSignInButton() {
   };
 
   return (
-    <Button onClick={handleSignIn} className="w-full">
+    <Button
+      onClick={handleSignIn}
+      className="w-full bg-sky-700 text-white hover:bg-sky-800 dark:bg-blue-300 dark:text-gray-900 dark:hover:bg-blue-400"
+    >
       Sign In with Google
     </Button>
   );
