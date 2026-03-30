@@ -11,6 +11,7 @@ import { Card, CardContent, Dialog, Drawer } from "@mui/material";
 import type { DishInfo } from "@peterplate/api";
 import Image from "next/image";
 import React from "react";
+import { useSnackbarStore } from "@/context/useSnackbar";
 import { useUserStore } from "@/context/useUserStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import {
@@ -83,6 +84,7 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
     ref,
   ) => {
     const userId = useUserStore((state) => state.userId);
+    const { showSnackbar } = useSnackbarStore();
     const IconComponent = getFoodIcon(dish.name) ?? Restaurant;
     const [imageError, setImageError] = React.useState(false);
     const showImage =
@@ -101,48 +103,14 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
     const averageRating = ratingData?.averageRating ?? 0;
     const ratingCount = ratingData?.ratingCount ?? 0;
 
-    // const caloricInformationAvailable: boolean =
-    //   dish.nutritionInfo.calories != null &&
-    //   dish.nutritionInfo.calories.length > 0;
-
-    const utils = trpc.useUtils();
-    const logMealMutation = trpc.nutrition.logMeal.useMutation({
-      onSuccess: () => {
-        //TODO: Replace this with a shad/cn sonner or equivalent.
-        alert(`Added ${formatFoodName(dish.name)} to your log`);
-        utils.nutrition.invalidate();
-      },
-      onError: (error) => {
-        console.error(error.message);
-      },
-    });
-
-    const _handleLogMeal = (e: React.MouseEvent) => {
-      e.stopPropagation();
-
-      // TODO: use [MUI snackbar](https://mui.com/material-ui/react-snackbar/) to warn users.
-      if (!userId) {
-        alert("Login to track meals!");
-        return;
-      }
-
-      logMealMutation.mutate({
-        dishId: dish.id,
-        userId: userId,
-        dishName: dish.name,
-        servings: 1, // Default to 1 serving (TODO: add ability to manually input servings. Maybe a popup will ask to input a multiple of 0.5)
-      });
-    };
-
     const handleFavoriteClick = (
       event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     ) => {
       event.preventDefault();
       event.stopPropagation();
 
-      // TODO: use [MUI snackbar](https://mui.com/material-ui/react-snackbar/) to warn users of
       if (!userId) {
-        alert("Login to favorite meals!");
+        showSnackbar("Login to favorite meals!", "error");
         return;
       }
 
@@ -288,17 +256,6 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                     </p>
                   )}
                 </div>
-
-                {/*//TODO: Add user feedback on clicking button (e.g. changing Icon, making it green) */}
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onAddToMealTracker?.(e);
-                  }}
-                >
-                  <AddCircleOutline />
-                </button>
               </div>
               <div className="flex items-center">
                 <button
@@ -438,8 +395,7 @@ export default function FoodCard({
 
   const logMealMutation = trpc.nutrition.logMeal.useMutation({
     onSuccess: () => {
-      // TODO: Replace with shadcn sonner or equivalent
-      alert(`Added ${formatFoodName(dish.name)} to your log`);
+      showSnackbar(`Added ${formatFoodName(dish.name)} to your log`, "success");
       utils.nutrition.invalidate();
     },
     onError: (error) => {
@@ -453,7 +409,7 @@ export default function FoodCard({
   const handleAddToMealTracker = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!userId) {
-      alert("Login to track meals!");
+      showSnackbar("Login to track meals!", "error");
       return;
     }
     logMealMutation.mutate({

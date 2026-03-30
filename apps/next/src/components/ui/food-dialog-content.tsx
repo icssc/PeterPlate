@@ -97,7 +97,7 @@ export default function FoodDialogContent({
       ) : (
         <Image
           src={"/zm-card-header.webp"}
-          alt={"An image of peterplate logo."}
+          alt={"An image of PeterPlate's logo."}
           width={1200}
           height={700}
           className="w-full h-40 object-cover"
