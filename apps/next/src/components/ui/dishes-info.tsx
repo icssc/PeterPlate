@@ -1,6 +1,7 @@
 "use client";
 "use client";
 
+import { Typography } from "@mui/material";
 import type { DishInfo } from "@peterplate/api";
 import type React from "react";
 import { useUserStore } from "@/context/useUserStore";
@@ -85,9 +86,13 @@ export default function DishesInfo({
       {!isLoading &&
         !isError &&
         (dishes.length === 0 ? (
-          <p className="text-center text-gray-500 py-4">
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            className="text-center py-4"
+          >
             No dishes available for this selection.
-          </p>
+          </Typography>
         ) : isCompactView ? (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             {dishes.map((dish) => (

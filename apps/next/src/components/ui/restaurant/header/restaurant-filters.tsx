@@ -1,5 +1,11 @@
 import { ArrowDropDownRounded } from "@mui/icons-material";
-import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import {
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Typography,
+} from "@mui/material";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -44,7 +50,7 @@ export function RestaurantFilters({
         <FormControl fullWidth size="small" variant="outlined">
           <InputLabel
             id="meal-select-label"
-            className="!text-sky-700 [&.Mui-focused]:!text-sky-700"
+            className="!text-sky-700 dark:!text-blue-300 [&.Mui-focused]:!text-sky-700 dark:[&.Mui-focused]:!text-blue-300"
           >
             Meal
           </InputLabel>
@@ -54,7 +60,7 @@ export function RestaurantFilters({
             label="Meal"
             onChange={(e) => setSelectedPeriod(e.target.value)}
             IconComponent={ArrowDropDownRounded}
-            className="bg-white [&_fieldset]:!border-sky-700 [&:hover_fieldset]:!border-sky-700 [&_.Mui-focused_fieldset]:!border-sky-700 [&_.MuiSvgIcon-root]:!text-sky-700"
+            className="bg-white dark:bg-[#323235] [&_fieldset]:!border-sky-700 dark:[&_fieldset]:!border-blue-300 [&:hover_fieldset]:!border-sky-700 dark:[&:hover_fieldset]:!border-blue-300 [&_.Mui-focused_fieldset]:!border-sky-700 dark:[&_.Mui-focused_fieldset]:!border-blue-300 [&_.MuiSvgIcon-root]:!text-sky-700 dark:[&_.MuiSvgIcon-root]:!text-blue-300"
             MenuProps={{
               anchorOrigin: {
                 vertical: "bottom",
@@ -95,10 +101,15 @@ export function RestaurantFilters({
                   <MenuItem
                     key={time}
                     value={mealTimeKey}
-                    className="!flex !justify-between !items-center !gap-4"
+                    className="!flex !justify-between !items-center !gap-4 [&.Mui-selected]:!bg-sky-700 [&.Mui-selected]:!text-white [&:hover]:!bg-sky-50 dark:[&.Mui-selected]:!bg-blue-300 dark:[&.Mui-selected]:!text-gray-900 dark:[&:hover]:!bg-[#434e5d]"
                   >
                     <span>{toTitleCase(time)}</span>
-                    <span className="text-gray-500 text-sm">{timeString}</span>
+                    <Typography
+                      variant="caption"
+                      className="text-gray-500 [.Mui-selected_&]:!text-white dark:text-zinc-400 dark:[.Mui-selected_&]:!text-gray-900"
+                    >
+                      {timeString}
+                    </Typography>
                   </MenuItem>
                 );
               })
@@ -130,17 +141,17 @@ export function RestaurantFilters({
                   fullWidth: true,
                   onClick: () => setIsDatePickerOpen(true),
                   InputLabelProps: {
-                    className: "!text-sky-700",
+                    className: "!text-sky-700 dark:!text-blue-300",
                   },
                   inputProps: {
                     readOnly: true,
                     className: "!cursor-pointer",
                   },
                   className:
-                    "bg-white [&_fieldset]:!border-sky-700 [&:hover_fieldset]:!border-sky-700 [&_.Mui-focused_fieldset]:!border-sky-700 [&_.MuiSvgIcon-root]:!text-sky-700 !cursor-pointer",
+                    "bg-white dark:bg-[#323235] [&_fieldset]:!border-sky-700 dark:[&_fieldset]:!border-blue-300 [&:hover_fieldset]:!border-sky-700 dark:[&:hover_fieldset]:!border-blue-300 [&_.Mui-focused_fieldset]:!border-sky-700 dark:[&_.Mui-focused_fieldset]:!border-blue-300 [&_.MuiSvgIcon-root]:!text-sky-700 dark:[&_.MuiSvgIcon-root]:!text-blue-300 !cursor-pointer",
                 },
                 openPickerIcon: {
-                  className: "!text-sky-700",
+                  className: "!text-sky-700 dark:!text-blue-300",
                 },
                 dialog: {
                   disableScrollLock: true,

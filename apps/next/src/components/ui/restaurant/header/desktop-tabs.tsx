@@ -45,7 +45,7 @@ export function DesktopTabs({
               setSelectedStation(val);
             }
           }}
-          className="flex w-full overflow-x-auto no-scrollbar !bg-sky-700/40 !rounded-lg !p-2 [&_.MuiTabs-flexContainer]:justify-between [&_.MuiTabs-flexContainer]:gap-2 [&_.MuiTabs-indicator]:hidden"
+          className="flex w-full overflow-x-auto no-scrollbar !bg-sky-700/40 dark:!bg-[#46566a] !rounded-lg !p-2 [&_.MuiTabs-flexContainer]:justify-between [&_.MuiTabs-flexContainer]:gap-2 [&_.MuiTabs-indicator]:hidden"
           variant="scrollable"
           scrollButtons={false}
         >
@@ -54,7 +54,7 @@ export function DesktopTabs({
               key={station.name}
               value={station.name.toLowerCase()}
               label={toTitleCase(station.name)}
-              className="!rounded !border !border-transparent !bg-transparent !px-4 !py-1.5 !text-sm !font-medium !text-slate-700 !normal-case !min-h-0 aria-selected:!bg-white aria-selected:!text-slate-900 aria-selected:!border-slate-200 aria-selected:!shadow-sm"
+              className="!rounded !border !border-transparent !bg-transparent !px-4 !py-1.5 !text-sm !font-medium !text-slate-700 dark:!text-white !normal-case !min-h-0 aria-selected:!bg-white dark:aria-selected:!bg-white aria-selected:!text-slate-900 dark:aria-selected:!text-gray-900 aria-selected:!border-slate-200 dark:aria-selected:!border-slate-200 aria-selected:!shadow-sm"
             />
           ))}
         </Tabs>
@@ -67,7 +67,7 @@ export function DesktopTabs({
             size="small"
             type="button"
             onClick={() => setIsCompactView(false)}
-            className={`!border-sky-700 !normal-case ${!isCompactView ? "!bg-sky-700 !text-white hover:!bg-sky-700" : "!bg-white !text-sky-700 hover:!bg-sky-50"}`}
+            className={`!border-sky-700 dark:!border-blue-300 !normal-case ${!isCompactView ? "!bg-sky-700 !text-white hover:!bg-sky-700 dark:!bg-blue-300 dark:!text-gray-900" : "!bg-white !text-sky-700 hover:!bg-sky-50 dark:!bg-transparent dark:!text-white"}`}
             startIcon={<MenuIcon className="h-4 w-4" />}
           >
             Card View
@@ -77,7 +77,7 @@ export function DesktopTabs({
             size="small"
             type="button"
             onClick={() => setIsCompactView(true)}
-            className={`!border-sky-700 !normal-case ${isCompactView ? "!bg-sky-700 !text-white hover:!bg-sky-700" : "!bg-white !text-sky-700 hover:!bg-sky-50"}`}
+            className={`!border-sky-700 dark:!border-blue-300 !normal-case ${isCompactView ? "!bg-sky-700 !text-white hover:!bg-sky-700 dark:!bg-blue-300 dark:!text-gray-900" : "!bg-white !text-sky-700 hover:!bg-sky-50 dark:!bg-transparent dark:!text-white"}`}
             startIcon={<GridView className="h-4 w-4" />}
           >
             Compact View

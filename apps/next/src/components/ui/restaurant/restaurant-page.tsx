@@ -1,7 +1,7 @@
 "use client";
 
 import { LocationOn } from "@mui/icons-material";
-import { Container, Link, Typography } from "@mui/material";
+import { Box, Container, Link, Typography } from "@mui/material";
 import type { RestaurantInfo } from "@peterplate/api";
 import type { DateList } from "@peterplate/db";
 import Image from "next/image";
@@ -190,7 +190,7 @@ export function RestaurantPage({
   const displayDate = selectedDate ?? today;
 
   return (
-    <div>
+    <Box sx={{ bgcolor: "background.default", minHeight: "100vh" }}>
       {/* Hero image & mobile header */}
       <div className="relative w-full h-[200px] md:h-[250px]">
         <Image
@@ -312,7 +312,7 @@ export function RestaurantPage({
           )}
         </div>
       </Container>
-    </div>
+    </Box>
   );
 }
 
