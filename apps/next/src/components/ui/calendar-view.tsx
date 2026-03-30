@@ -17,6 +17,7 @@ import { enUS } from "date-fns/locale";
 import { Calendar, dateFnsLocalizer } from "react-big-calendar";
 import EventDialogContent from "./event-dialog-content";
 import EventDrawerContent from "./event-drawer-content";
+// @ts-ignore
 import "react-big-calendar/lib/css/react-big-calendar.css";
 
 const locales = {
@@ -66,10 +67,10 @@ const CalendarView = ({
     isSameMonth(currentDate, new Date());
 
   return (
-    <div className="border-2 border-sky-700 p-4 rounded-lg bg-white dark:bg-zinc-950 transition-colors events-calendar-wrapper">
+    <div className="border border-sky-700 dark:border-blue-300 p-4 rounded-lg bg-white dark:bg-[#27272A] transition-colors events-calendar-wrapper">
       {/* CUSTOM TOOLBAR */}
       <div className="flex items-center justify-center">
-        <div className="text-center flex items-center justify-center text-sky-700 font-medium">
+        <div className="text-center flex items-center justify-center text-sky-700 dark:text-blue-300 font-medium">
           <ArrowBackIosIcon
             className="mb-6 mr-4 cursor-pointer"
             onClick={onPreviousMonth}

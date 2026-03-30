@@ -99,3 +99,38 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* Calendar event colors */
+.dark .events-calendar-wrapper .rbc-event {
+  background-color: #93c5fd !important;
+  color: #111827 !important;
+}
+
+.dark .events-calendar-wrapper .rbc-off-range-bg {
+  background-color: #303035 !important;
+}
+
+/* Light mode calendar borders */
+.events-calendar-wrapper .rbc-month-view,
+.events-calendar-wrapper .rbc-day-bg + .rbc-day-bg,
+.events-calendar-wrapper .rbc-month-row + .rbc-month-row,
+.events-calendar-wrapper .rbc-header {
+  border-color: #0369a1 !important;
+}
+
+/* Dark mode calendar borders */
+.dark .events-calendar-wrapper .rbc-month-view,
+.dark .events-calendar-wrapper .rbc-day-bg + .rbc-day-bg,
+.dark .events-calendar-wrapper .rbc-month-row + .rbc-month-row,
+.dark .events-calendar-wrapper .rbc-header {
+  border-color: #93c5fd !important;
+}
+
+/* Today's date highlight */
+.events-calendar-wrapper .rbc-today {
+  background-color: #cce1ee !important;
+}
+
+.dark .events-calendar-wrapper .rbc-day-bg.rbc-today {
+  background-color: #434e5d !important;
+}

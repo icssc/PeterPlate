@@ -67,7 +67,7 @@ const EventCardContent = React.forwardRef<
     <div ref={ref} {...divProps}>
       <Card
         className="cursor-pointer hover:shadow-lg transition h-full min-w-[280px] sm:min-w-0 dark:bg-[#303035]"
-        sx={{ borderRadius: "16px" }}
+        sx={{ borderRadius: "16px", backgroundImage: "none" }}
       >
         <div className="p-7 pb-2 relative">
           <Image
@@ -81,7 +81,7 @@ const EventCardContent = React.forwardRef<
         </div>
         <CardContent className="flex flex-col gap-2 p-4">
           <div className="flex flex-row gap-2 items-center">
-            <Typography className="text-lg font-semibold text-sky-700 dark:text-blue-300">
+            <Typography className="text-lg font-semibold" color="primary">
               {props.name}
             </Typography>
             {props.isOngoing && <OngoingBadge />}

@@ -46,9 +46,8 @@ export default function EventDialogContent(
           {props.name}
         </Typography>
         <Box
-          className="flex flex-wrap gap-x-2 gap-y-1 items-center"
+          className="flex flex-wrap gap-x-2 gap-y-1 items-center text-zinc-500 dark:text-zinc-400"
           id="event-card-subheader"
-          sx={{ color: "text.secondary" }}
         >
           <div className="flex gap-1 items-center whitespace-nowrap">
             <AccessTimeOutlinedIcon fontSize="small" />
