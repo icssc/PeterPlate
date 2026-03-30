@@ -484,6 +484,7 @@ export default function FoodCard({
           isSimplified={isSimplified}
           onClick={handleOpen}
           className={className}
+          doesNotMeetPreferences={doesNotMeetPreferences}
         />
         <Drawer
           anchor="bottom"
