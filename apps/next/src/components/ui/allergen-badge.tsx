@@ -43,7 +43,9 @@ const badgeVariants = cva(
  */
 export interface BadgeProps
   extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof badgeVariants> {}
+    VariantProps<typeof badgeVariants> {
+  label?: string;
+}
 
 /**
  * Renders a styled badge to indicate an allergen or dietary preference (e.g., Vegetarian, Vegan, Gluten-Free).
@@ -58,11 +60,14 @@ export interface BadgeProps
 function AllergenBadge({
   className,
   variant,
+  label,
   ...props
 }: BadgeProps): JSX.Element {
+  const displayText =
+    label ?? toTitleCase(variant?.replace("_", "-") ?? "default");
   return (
     <div className={cn(badgeVariants({ variant }), className)} {...props}>
-      {toTitleCase(variant?.replace("_", "-") ?? "default")}
+      {displayText}
     </div>
   );
 }

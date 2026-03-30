@@ -381,24 +381,58 @@ export default function FoodCard({
     { enabled: !!userId },
   );
 
-  const doesNotMeetPreferences = React.useMemo(() => {
-    if (!preferences || !allergies) return false;
+  const dietaryConflict = React.useMemo(() => {
+    if (!preferences || !allergies) {
+      return { hasConflict: false, violations: [] as string[] };
+    }
 
     const flags = dish.dietRestriction;
+    const violations: string[] = [];
 
-    const violatesAllergy = allergies.some((allergy) => {
-      if (!(allergy in ALLERGY_MAP)) return false;
+    for (const allergy of allergies) {
+      if (!(allergy in ALLERGY_MAP)) continue;
       const key = ALLERGY_MAP[allergy as AllergyName];
-      return flags[key] === true;
-    });
+      if (flags[key]) {
+        const violated_allergy = key.slice(8);
+        const updated_allergy_str = "Contains " + violated_allergy;
+        violations.push(updated_allergy_str);
+      }
+    }
 
-    const violatesPreferences = preferences.some((pref) => {
-      if (!(pref in PREFERENCE_MAP)) return false;
-      const key = PREFERENCE_MAP[pref as PreferenceName];
-      return flags[key] === false;
-    });
+    for (const preference of preferences) {
+      if (!(preference in PREFERENCE_MAP)) continue;
+      const key = PREFERENCE_MAP[preference as PreferenceName];
+      if (!flags[key]) {
+        const violated_pref = key.slice(2);
+        const updated_pref_string = "Not " + violated_pref;
+        violations.push(updated_pref_string);
+      }
+    }
 
-    return violatesAllergy || violatesPreferences;
+    // const violatesAllergy = allergies.some((allergy) => {
+    //   if (!(allergy in ALLERGY_MAP)) return false;
+    //   const key = ALLERGY_MAP[allergy as AllergyName];
+    //   if (flags[key])
+    //   {
+    //     violations.push(key)
+    //   }
+    //   // return flags[key] === true;
+    // });
+
+    // const violatesPreferences = preferences.some((pref) => {
+    //   if (!(pref in PREFERENCE_MAP)) return false;
+    //   const key = PREFERENCE_MAP[pref as PreferenceName];
+    //   if (flags[key])
+    //   {
+    //     violations.push(key)
+    //   }
+    // return flags[key] === false;
+    // });
+
+    return {
+      hasConflict: violations.length > 0,
+      violations,
+    };
   }, [preferences, allergies, dish.dietRestriction]);
 
   const logMealMutation = trpc.nutrition.logMeal.useMutation({
@@ -441,7 +475,7 @@ export default function FoodCard({
           isSimplified={isSimplified}
           onClick={handleOpen}
           className={className}
-          doesNotMeetPreferences={doesNotMeetPreferences}
+          doesNotMeetPreferences={dietaryConflict.hasConflict}
         />
         <Dialog
           open={open}
@@ -467,7 +501,8 @@ export default function FoodCard({
             dish={dish}
             onAddToMealTracker={handleAddToMealTracker}
             isAddingToMealTracker={logMealMutation.isPending}
-            doesNotMeetPreferences={doesNotMeetPreferences}
+            doesNotMeetPreferences={dietaryConflict.hasConflict}
+            violations={dietaryConflict.violations}
           />
         </Dialog>
       </>
@@ -484,7 +519,7 @@ export default function FoodCard({
           isSimplified={isSimplified}
           onClick={handleOpen}
           className={className}
-          doesNotMeetPreferences={doesNotMeetPreferences}
+          doesNotMeetPreferences={dietaryConflict.hasConflict}
         />
         <Drawer
           anchor="bottom"
@@ -519,7 +554,8 @@ export default function FoodCard({
             dish={dish}
             onAddToMealTracker={handleAddToMealTracker}
             isAddingToMealTracker={logMealMutation.isPending}
-            doesNotMeetPreferences={doesNotMeetPreferences}
+            doesNotMeetPreferences={dietaryConflict.hasConflict}
+            violations={dietaryConflict.violations}
           />
         </Drawer>
       </>

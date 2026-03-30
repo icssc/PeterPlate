@@ -40,11 +40,13 @@ export default function FoodDialogContent({
   onAddToMealTracker,
   isAddingToMealTracker = false,
   doesNotMeetPreferences,
+  violations,
 }: {
   dish: DishInfo;
   onAddToMealTracker?: OnAddToMealTracker;
   isAddingToMealTracker?: boolean;
   doesNotMeetPreferences: boolean;
+  violations: string[];
 }) {
   const [showAllNutrients, setShowAllNutrients] = useState(false);
   const [imageError, setImageError] = useState(false);
@@ -154,9 +156,18 @@ export default function FoodDialogContent({
                   {dish.dietRestriction.isKosher && (
                     <AllergenBadge variant={"kosher"} />
                   )}
-                  {doesNotMeetPreferences && (
+                  {/* {doesNotMeetPreferences && (
                     <AllergenBadge variant={"conflict"} />
-                  )}
+                  )} */}
+                  {doesNotMeetPreferences &&
+                    violations.length > 0 &&
+                    violations.map((v) => (
+                      <AllergenBadge
+                        key={v}
+                        variant="conflict"
+                        label={`!${v}`}
+                      />
+                    ))}
                 </div>
               </div>
               <p className="text-black px-4 leading-relaxed">
