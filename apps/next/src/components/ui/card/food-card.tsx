@@ -6,6 +6,7 @@ import {
   Restaurant,
   StarBorder,
 } from "@mui/icons-material";
+import WarningIcon from "@mui/icons-material/Warning";
 import { Card, CardContent, Dialog, Drawer } from "@mui/material";
 import type { DishInfo } from "@peterplate/api";
 import Image from "next/image";
@@ -166,7 +167,7 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
             {doesNotMeetPreferences && (
               <div className="absolute top-2 right-2 z-10">
                 <span className="bg-red-500 text-white text-xs font-medium px-2 py-1 rounded-md shadow">
-                  ⚠ Conflict
+                  <WarningIcon />
                 </span>
               </div>
             )}
@@ -238,7 +239,7 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
           {doesNotMeetPreferences && (
             <div className="absolute top-2 right-2 z-10">
               <span className="bg-red-500 text-white text-xs font-medium px-2 py-1 rounded-md shadow">
-                ⚠ Conflict
+                <WarningIcon />
               </span>
             </div>
           )}
