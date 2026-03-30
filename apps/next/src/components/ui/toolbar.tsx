@@ -218,12 +218,16 @@ export function DesktopToolbar(): React.JSX.Element {
   return (
     <>
       <AppBar
-        position="absolute"
+        position={isTransparent ? "absolute" : "sticky"}
         className={`shadow-none ${
           isTransparent
             ? "bg-transparent bg-gradient-to-b from-black/50 to-black/0"
-            : "!bg-white dark:!bg-zinc-900 !border-b !border-zinc-200 dark:!border-zinc-700"
+            : "bg-white dark:bg-[#323235]"
         }`}
+        sx={{
+          backgroundImage: "none",
+          ...(!isTransparent && { borderBottom: 1, borderColor: "divider" }),
+        }}
       >
         <MuiToolbar className="justify-between px-4 py-1 group">
           <div className="flex-none flex items-center">
