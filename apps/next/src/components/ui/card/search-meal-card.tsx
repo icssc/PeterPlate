@@ -23,7 +23,7 @@ type LoggedMealJoinedWithNutrition = SelectLoggedMeal & {
 
 interface Props {
   meal: LoggedMealJoinedWithNutrition;
-  /** Called when the user clicks "+". Receives the meal and chosen serving count. */
+  /** Called when the user clicks "+". Receives the meal*/
   onAdd?: (meal: LoggedMealJoinedWithNutrition, servings: number) => void;
 }
 

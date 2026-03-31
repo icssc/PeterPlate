@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import SearchMealCard from "@/components/ui/card/search-meal-card";
 import TrackedMealCard from "@/components/ui/card/tracked-meal-card";
+import MealSearchDialog from "@/components/ui/meal-search";
 import MobileCalorieCard from "@/components/ui/mobile-calorie-card";
 import MobileNutritionBars from "@/components/ui/mobile-nutrition-bars";
 import NutritionBreakdown from "@/components/ui/nutrition-breakdown";
@@ -24,7 +25,6 @@ export default function MealTracker() {
 
   useEffect(() => {
     if (!isInitialized) return;
-
     if (!userId) {
       showSnackbar("Login to track meals!", "error");
       router.push("/");
@@ -101,7 +101,6 @@ export default function MealTracker() {
   const availableDishIds = useMemo(() => {
     const set = new Set<string>();
     const halls = [hallData?.anteatery, hallData?.brandywine].filter(Boolean);
-
     for (const hall of halls) {
       for (const menu of hall?.menus ?? []) {
         for (const station of menu.stations ?? []) {
@@ -116,6 +115,44 @@ export default function MealTracker() {
 
   const isUnavailable = (dishId: string) =>
     Boolean(hallData) && !availableDishIds.has(dishId);
+
+  // Flatten today's dishes for search
+  const availableDishes = useMemo(() => {
+    const dishes: {
+      id: string;
+      name: string;
+      calories: number;
+      protein: number;
+      carbs: number;
+      fat: number;
+      image_url?: string | null;
+    }[] = [];
+
+    const halls = [hallData?.anteatery, hallData?.brandywine].filter(Boolean);
+    const seen = new Set<string>();
+
+    for (const hall of halls) {
+      for (const menu of hall?.menus ?? []) {
+        for (const station of menu.stations ?? []) {
+          for (const dish of station.dishes ?? []) {
+            if (seen.has(dish.id)) continue;
+            seen.add(dish.id);
+            dishes.push({
+              id: dish.id,
+              name: dish.name,
+              calories: Number(dish.nutritionInfo?.calories ?? 0),
+              protein: Number(dish.nutritionInfo?.proteinG ?? 0),
+              carbs: Number(dish.nutritionInfo?.totalCarbsG ?? 0),
+              fat: Number(dish.nutritionInfo?.totalFatG ?? 0),
+              image_url: dish.image_url,
+            });
+          }
+        }
+      }
+    }
+
+    return dishes;
+  }, [hallData]);
 
   // suggested meals memo
   const suggestedMeals = useMemo(() => {
@@ -156,9 +193,7 @@ export default function MealTracker() {
     },
   });
 
-  // remove dish from tracker if unavailable
   const visibleMeals = selectedDay?.items ?? [];
-
   const countedMeals = visibleMeals.filter(
     (m) => (m.servings ?? 0) > 0 && !isUnavailable(m.dishId),
   );
@@ -273,6 +308,7 @@ export default function MealTracker() {
           />
         </div>
 
+        {/* History dialog/drawer */}
         {isMobile ? (
           <TrackerHistoryDrawer
             open={historyDialogOpen}
@@ -339,38 +375,53 @@ export default function MealTracker() {
               ))}
             </div>
           )}
+        </div>
 
-          {/* Suggested Foods */}
-          <div className="mt-6">
-            <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
-              Suggested Foods
-            </h2>
-            <div className="flex flex-wrap gap-4 mt-4">
-              {suggestedMeals.length === 0 ? (
-                <p className="mt-2 text-zinc-500 text-sm">
-                  Dishes from the past week logged 5+ times will appear here
-                </p>
-              ) : (
-                suggestedMeals.map((meal) => (
-                  <SearchMealCard
-                    key={meal.dishId}
-                    meal={meal}
-                    onAdd={(meal, servings) =>
-                      logMeal.mutate({
-                        userId: userId!,
-                        dishId: meal.dishId ?? "",
-                        dishName: meal.dishName ?? "",
-                        servings,
-                        eatenAt: new Date(),
-                      })
-                    }
-                  />
-                ))
-              )}
-            </div>
+        {/* Suggested Foods */}
+        <div className="mt-6">
+          <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
+            Suggested Foods
+          </h2>
+          <div className="flex flex-wrap gap-4 mt-4">
+            {suggestedMeals.length === 0 ? (
+              <p className="mt-2 text-zinc-500 text-sm">
+                Dishes from the past week logged 5+ times will appear here.
+              </p>
+            ) : (
+              suggestedMeals.map((meal) => (
+                <SearchMealCard
+                  key={meal.dishId}
+                  meal={meal}
+                  onAdd={(meal, servings) =>
+                    logMeal.mutate({
+                      userId: userId ?? "",
+                      dishId: meal.dishId ?? "",
+                      dishName: meal.dishName ?? "",
+                      servings,
+                      eatenAt: new Date(),
+                    })
+                  }
+                />
+              ))
+            )}
           </div>
         </div>
       </div>
+
+      {/* Floating search button + dialog/drawer */}
+      <MealSearchDialog
+        availableDishes={availableDishes}
+        suggestedMeals={suggestedMeals}
+        onAdd={(dishId, dishName, servings) =>
+          logMeal.mutate({
+            userId: userId ?? "",
+            dishId,
+            dishName,
+            servings,
+            eatenAt: new Date(),
+          })
+        }
+      />
     </div>
   );
 }
