@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import SearchMealCard from "@/components/ui/card/search-meal-card";
 import TrackedMealCard from "@/components/ui/card/tracked-meal-card";
 import MobileCalorieCard from "@/components/ui/mobile-calorie-card";
 import MobileNutritionBars from "@/components/ui/mobile-nutrition-bars";
@@ -16,6 +17,7 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { trpc } from "@/utils/trpc";
 
 export default function MealTracker() {
+  const utils = trpc.useUtils();
   const router = useRouter();
   const { userId, isInitialized } = useUserStore();
   const { showSnackbar } = useSnackbarStore();
@@ -114,6 +116,45 @@ export default function MealTracker() {
 
   const isUnavailable = (dishId: string) =>
     Boolean(hallData) && !availableDishIds.has(dishId);
+
+  // suggested meals memo
+  const suggestedMeals = useMemo(() => {
+    if (!meals) return [];
+    const servingCounts: Record<string, number> = {};
+    const latestByDish: Record<string, (typeof meals)[0]> = {};
+
+    for (const meal of meals) {
+      if (!meal.dishId) continue;
+      servingCounts[meal.dishId] =
+        (servingCounts[meal.dishId] ?? 0) + (meal.servings ?? 1);
+      if (!latestByDish[meal.dishId]) latestByDish[meal.dishId] = meal;
+    }
+
+    return Object.entries(servingCounts)
+      .filter(([, total]) => total >= 5)
+      .sort(([, a], [, b]) => b - a)
+      .map(([dishId]) => {
+        const meal = latestByDish[dishId]!;
+        return {
+          ...meal,
+          calories: Number(meal.calories ?? 0),
+          protein: Number(meal.protein ?? 0),
+          carbs: Number(meal.carbs ?? 0),
+          fat: Number(meal.fat ?? 0),
+          servings: 1,
+        };
+      });
+  }, [meals]);
+
+  // logmeal mutation
+  const logMeal = trpc.nutrition.logMeal.useMutation({
+    onSuccess: async () => {
+      await utils.nutrition.invalidate();
+    },
+    onError: (err) => {
+      console.error(err.message);
+    },
+  });
 
   // remove dish from tracker if unavailable
   const visibleMeals = selectedDay?.items ?? [];
@@ -298,6 +339,36 @@ export default function MealTracker() {
               ))}
             </div>
           )}
+
+          {/* Suggested Foods */}
+          <div className="mt-6">
+            <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
+              Suggested Foods
+            </h2>
+            <div className="flex flex-wrap gap-4 mt-4">
+              {suggestedMeals.length === 0 ? (
+                <p className="mt-2 text-zinc-500 text-sm">
+                  Dishes from the past week logged 5+ times will appear here
+                </p>
+              ) : (
+                suggestedMeals.map((meal) => (
+                  <SearchMealCard
+                    key={meal.dishId}
+                    meal={meal}
+                    onAdd={(meal, servings) =>
+                      logMeal.mutate({
+                        userId: userId!,
+                        dishId: meal.dishId ?? "",
+                        dishName: meal.dishName ?? "",
+                        servings,
+                        eatenAt: new Date(),
+                      })
+                    }
+                  />
+                ))
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>
