@@ -1,11 +1,13 @@
 "use client";
 
 import { AccessTime, PinDrop } from "@mui/icons-material";
+import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import { Card, CardContent, Dialog, Drawer } from "@mui/material";
 import Image from "next/image";
 import React from "react";
+import EventTypeBadge from "@/components/ui/event-type-badge";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-import { dateToString, toTitleCase } from "@/utils/funcs";
+import { dateToString, timeToString, toTitleCase } from "@/utils/funcs";
 import { HallEnum } from "@/utils/types";
 import EventDialogContent from "../event-dialog-content";
 import EventDrawerContent from "../event-drawer-content";
@@ -64,38 +66,51 @@ const EventCardContent = React.forwardRef<
   return (
     <div ref={ref} {...divProps}>
       <Card
-        className="cursor-pointer hover:shadow-lg transition"
-        sx={{ borderRadius: "16px" }}
+        className="cursor-pointer hover:shadow-lg transition h-full min-w-[280px] sm:min-w-0 dark:bg-zinc-900 dark:border-zinc-800"
+        sx={{ borderRadius: "6px" }}
       >
-        <CardContent className="flex items-center h-full w-full pt-6 gap-3 flex-wrap">
+        <div className="p-7 pb-2 relative">
           <Image
             src={props.imgSrc}
             alt={props.alt}
-            width={0}
-            height={0}
-            sizes="100vw"
-            className="w-full sm:w-[300px] md:w-[200px] h-auto rounded-sm"
+            width={400}
+            height={300}
+            className="w-full object-contain"
           />
-          <div className="flex flex-col gap-1 h-full" id="event-card-content">
-            <div className="flex flex-row gap-2">
-              <strong className="text-2xl">{props.name}</strong>
-              {props.isOngoing && <OngoingBadge />}
-            </div>
-            <div
-              className="text-zinc-400 flex flex-col sm:flex-row gap-x-4 gap-y-1"
-              id="event-card-subheader"
-            >
-              <div className="flex gap-1">
-                <AccessTime className="stroke-zinc-400" />
-                <p>{dateToString(props.startTime, props.endTime)}</p>
-              </div>
-              <div className="flex gap-1">
-                <PinDrop />
-                <p>{toTitleCase(HallEnum[props.location])}</p>
-              </div>
-            </div>
-            <p className="max-w-xl">{props.shortDesc}</p>
+          <EventTypeBadge title={props.name} />
+        </div>
+        <CardContent className="flex flex-col gap-2 p-4">
+          <div className="flex flex-row gap-2 items-center">
+            <h3 className="text-lg font-semibold text-sky-700 dark:text-sky-400">
+              {props.name}
+            </h3>
+            {props.isOngoing && <OngoingBadge />}
           </div>
+          <div className="flex flex-col gap-2 text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+            <div className="flex gap-3 items-center">
+              <CalendarTodayOutlinedIcon sx={{ fontSize: 16 }} />
+              <span>
+                {props.startTime.toLocaleDateString(undefined, {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </span>
+            </div>
+            <div className="flex gap-3 items-center">
+              <AccessTime sx={{ fontSize: 16 }} />
+              <span>
+                {timeToString(props.startTime)} – {timeToString(props.endTime)}
+              </span>
+            </div>
+            <div className="flex gap-3 items-center">
+              <PinDrop sx={{ fontSize: 16 }} />
+              <span>{toTitleCase(HallEnum[props.location])}</span>
+            </div>
+          </div>
+          <p className="text-sm text-zinc-900 dark:text-zinc-100 mt-2">
+            {props.longDesc}
+          </p>
         </CardContent>
       </Card>
     </div>
@@ -132,7 +147,8 @@ export default function EventCard(props: EventInfo): React.JSX.Element {
           slotProps={{
             paper: {
               sx: {
-                width: "460px",
+                bgcolor: "background.paper",
+                width: "570px",
                 maxWidth: "90vw",
                 margin: 2,
                 padding: 0,
@@ -157,19 +173,19 @@ export default function EventCard(props: EventInfo): React.JSX.Element {
           slotProps={{
             paper: {
               sx: {
-                width: "460px",
-                maxWidth: "90vw",
-                margin: 2,
+                bgcolor: "background.paper",
+                maxWidth: "100vw",
+                margin: 0,
                 overflow: "hidden",
-                borderRadius: "6px",
+                borderTopLeftRadius: "16px",
+                borderTopRightRadius: "16px",
               },
             },
           }}
           sx={{
             "& .MuiDrawer-paper": {
-              borderTopLeftRadius: "10px",
-              borderTopRightRadius: "10px",
-              marginTop: "96px",
+              bgcolor: "background.paper",
+              maxHeight: "90vh",
               height: "auto",
             },
           }}
