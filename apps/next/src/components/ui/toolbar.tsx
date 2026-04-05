@@ -57,19 +57,12 @@ const DESKTOP_TOOLBAR_ELEMENTS: ToolbarElement[] = [
       },
     ],
   },
+
   {
-    title: "Food Courts",
-    children: [
-      {
-        title: "Phoenix Food Court",
-        href: "/phoenix",
-      },
-      {
-        title: "East Food Court",
-        href: "/east-court",
-      },
-    ],
+    title: "Meal Tracker",
+    href: "/nutrition",
   },
+
   {
     title: "Events",
     href: "/events",
@@ -88,7 +81,7 @@ const MOBILE_TOOLBAR_ELEMENTS: ToolbarElement[] = [
   },
   {
     title: "Dining",
-    href: "/brandywine", // defaults to brandywine
+    href: "/brandywine", // defaults to brandywine for now, we'd need to add anteatery
     icon: <RestaurantRoundedIcon />,
   },
   {
