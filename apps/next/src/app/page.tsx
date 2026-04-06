@@ -314,7 +314,7 @@ function MobileHome(): React.JSX.Element {
 
         {/* Popular Today */}
         <section>
-          <h2 className="text-1xl sm:text-3xl font-bold text-sky-700 dark:text-neutral-100">
+          <h2 className="text-1xl sm:text-3xl font-bold text-sky-700 dark:text-neutral-100 mb-4">
             Popular Today
           </h2>
 
