@@ -6,7 +6,7 @@ import {
   Restaurant,
   StarBorder,
 } from "@mui/icons-material";
-import WarningIcon from "@mui/icons-material/Warning";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import { Card, CardContent, Dialog, Drawer } from "@mui/material";
 import type { DishInfo } from "@peterplate/api";
 import Image from "next/image";
@@ -132,19 +132,27 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
             )}
             sx={{ borderRadius: "12px" }}
           >
-            {doesNotMeetPreferences && (
+            {/* {doesNotMeetPreferences && (
               <div className="absolute top-2 right-2 z-10">
                 <span className="bg-red-500 text-white text-xs font-medium px-2 py-1 rounded-md shadow">
-                  <WarningIcon />
+                  <ErrorOutlineIcon />
                 </span>
               </div>
-            )}
+            )} */}
             <CardContent sx={{ padding: "0 !important" }}>
               <div className="flex justify-between items-center h-full p-4">
                 <div className="flex flex-col gap-1">
-                  <span className="font-bold text-base text-sky-700">
-                    {formatFoodName(dish.name)}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-base text-sky-700 inline">
+                      {formatFoodName(dish.name)}
+                      {doesNotMeetPreferences && (
+                        <ErrorOutlineIcon
+                          fontSize="inherit"
+                          className="ml-1 text-red-600 align-[-0.125em]"
+                        />
+                      )}
+                    </span>
+                  </div>
                   <div className="flex items-center gap-1">
                     <StarBorder
                       className="w-4 h-4 stroke-gray-500"
@@ -204,13 +212,13 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
           )}
           sx={{ borderRadius: "12px" }}
         >
-          {doesNotMeetPreferences && (
+          {/* {doesNotMeetPreferences && (
             <div className="absolute top-2 right-2 z-10">
               <span className="bg-red-500 text-white text-xs font-medium px-2 py-1 rounded-md shadow">
-                <WarningIcon />
+                <ErrorOutlineIcon />
               </span>
             </div>
-          )}
+          )} */}
           <CardContent sx={{ padding: "0 !important" }}>
             <div className="flex justify-between h-full p-4 gap-4">
               <div className="flex items-center gap-4 w-full">
@@ -229,9 +237,17 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                   )
                 )}
                 <div className="flex flex-col gap-1">
-                  <span className="font-bold text-base text-sky-700">
-                    {formatFoodName(dish.name)}
-                  </span>
+                  <div className="flex items-center gap-1">
+                    <span className="font-bold text-base text-sky-700 inline">
+                      {formatFoodName(dish.name)}
+                      {doesNotMeetPreferences && (
+                        <ErrorOutlineIcon
+                          fontSize="inherit"
+                          className="ml-1 text-red-600 align-[-0.125em]"
+                        />
+                      )}
+                    </span>
+                  </div>
                   <div className="flex gap-2 items-center text-slate-700 text-sm">
                     <div className="text-slate-900 font-normal">
                       <span>

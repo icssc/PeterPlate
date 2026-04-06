@@ -28,7 +28,7 @@ const badgeVariants = cva(
         gluten_free:
           "bg-orange-700 hover:bg-orange-700/80 text-primary-foreground",
         kosher: "bg-sky-700 hover:bg-sky-700/80 text-primary-foreground",
-        conflict: "bg-orange-700 hover:bg-red-700/80 text-primary-foreground",
+        conflict: "bg-red-600 hover:bg-red-600 text-white",
       },
     },
     defaultVariants: {
@@ -44,7 +44,7 @@ const badgeVariants = cva(
 export interface BadgeProps
   extends React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof badgeVariants> {
-  label?: string;
+  label?: React.ReactNode;
 }
 
 /**

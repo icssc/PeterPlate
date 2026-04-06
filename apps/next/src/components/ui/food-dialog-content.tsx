@@ -1,6 +1,7 @@
 "use client"; // Need state for toggling nutrient visibility
 
 import { Add, StarBorder } from "@mui/icons-material";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import { Button, DialogContent } from "@mui/material";
 import type { DishInfo } from "@peterplate/api";
 import Image from "next/image";
@@ -165,7 +166,12 @@ export default function FoodDialogContent({
                       <AllergenBadge
                         key={v}
                         variant="conflict"
-                        label={`!${v}`}
+                        label={
+                          <span className="inline-flex items-center gap-1">
+                            <ErrorOutlineIcon sx={{ fontSize: "0.75rem" }} />
+                            {`    ${v}`}
+                          </span>
+                        }
                       />
                     ))}
                 </div>
