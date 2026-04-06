@@ -175,7 +175,7 @@ export default function MealTracker() {
     }
 
     return Object.entries(servingCounts)
-      .filter(([, total]) => total >= 5)
+      .filter(([, total]) => total >= 1)
       .sort(([, a], [, b]) => b - a)
       .map(([dishId]) => {
         const meal = latestByDish[dishId]!;

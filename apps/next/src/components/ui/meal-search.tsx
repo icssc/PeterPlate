@@ -125,7 +125,7 @@ function MealList({
 
       {suggestedMeals.length === 0 ? (
         <p className="text-zinc-400 text-sm py-6 text-center">
-          Log a dish 5+ times for it to appear here.
+          Log a dish for it to appear here!
         </p>
       ) : (
         suggestedMeals.map((meal) => (
