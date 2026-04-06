@@ -86,13 +86,23 @@ export default function NutritionGoals({ userId, date }: Props) {
         Calorie Goal
         <input
           type="number"
-          value={calorieGoal}
+          value={calorieGoal === 0 ? "" : calorieGoal}
           min={100}
           max={10000}
           onChange={(e) => {
-            const val = Number(e.target.value);
+            const raw = e.target.value;
+            if (raw === "") {
+              setCalorieGoal(0);
+              return;
+            }
+            const val = Number(raw);
             setCalorieGoal(val);
             handleUpdate({ calorieGoal: val });
+          }}
+          onBlur={(e) => {
+            if (e.target.value === "") {
+              setCalorieGoal(calorieGoal);
+            }
           }}
           className="w-24 border-b border-sky-400 bg-sky-100 rounded px-2 py-1 text-sm"
         />
@@ -101,13 +111,23 @@ export default function NutritionGoals({ userId, date }: Props) {
         Protein Goal
         <input
           type="number"
-          value={proteinGoal}
+          value={proteinGoal === 0 ? "" : proteinGoal}
           min={1}
           max={500}
           onChange={(e) => {
-            const val = Number(e.target.value);
+            const raw = e.target.value;
+            if (raw === "") {
+              setProteinGoal(0);
+              return;
+            }
+            const val = Number(raw);
             setProteinGoal(val);
             handleUpdate({ proteinGoal: val });
+          }}
+          onBlur={(e) => {
+            if (e.target.value === "") {
+              setProteinGoal(proteinGoal);
+            }
           }}
           className="w-24 border-b border-sky-400 bg-sky-100 rounded px-2 py-1 text-sm"
         />
@@ -116,13 +136,23 @@ export default function NutritionGoals({ userId, date }: Props) {
         Carb Goal
         <input
           type="number"
-          value={carbGoal}
+          value={carbGoal === 0 ? "" : carbGoal}
           min={1}
           max={1000}
           onChange={(e) => {
-            const val = Number(e.target.value);
+            const raw = e.target.value;
+            if (raw === "") {
+              setCarbGoal(0);
+              return;
+            }
+            const val = Number(raw);
             setCarbGoal(val);
             handleUpdate({ carbGoal: val });
+          }}
+          onBlur={(e) => {
+            if (e.target.value === "") {
+              setCarbGoal(carbGoal);
+            }
           }}
           className="w-24 border-b border-sky-400 bg-sky-100 rounded px-2 py-1 text-sm"
         />
@@ -131,13 +161,23 @@ export default function NutritionGoals({ userId, date }: Props) {
         Fat Goal
         <input
           type="number"
-          value={fatGoal}
+          value={fatGoal === 0 ? "" : fatGoal}
           min={1}
           max={500}
           onChange={(e) => {
-            const val = Number(e.target.value);
+            const raw = e.target.value;
+            if (raw === "") {
+              setFatGoal(0);
+              return;
+            }
+            const val = Number(raw);
             setFatGoal(val);
             handleUpdate({ fatGoal: val });
+          }}
+          onBlur={(e) => {
+            if (e.target.value === "") {
+              setFatGoal(fatGoal);
+            }
           }}
           className="w-24 border-b border-sky-400 bg-sky-100 rounded px-2 py-1 text-sm"
         />
