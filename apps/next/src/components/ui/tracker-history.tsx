@@ -11,9 +11,14 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
 interface Props {
   onDateSelect: (date: Date) => void;
   onDayClick: (date: Date) => void;
+  loggedDates: Date[];
 }
 
-export default function TrackerHistory({ onDateSelect, onDayClick }: Props) {
+export default function TrackerHistory({
+  onDateSelect,
+  onDayClick,
+  loggedDates,
+}: Props) {
   const isMobile = useMediaQuery("(max-width: 768px)");
   const [open, setOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -51,6 +56,9 @@ export default function TrackerHistory({ onDateSelect, onDayClick }: Props) {
             onDayClick(date);
           }
         }}
+        shouldDisableDate={(date) =>
+          !loggedDates.some((d) => d.toDateString() === date.toDateString())
+        }
         displayStaticWrapperAs="desktop"
         slotProps={{ actionBar: { actions: [] } }}
         sx={{ "& .MuiDateCalendar-root": { height: "300px" } }}

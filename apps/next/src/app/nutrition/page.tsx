@@ -92,6 +92,13 @@ export default function MealTracker() {
     return Number.isFinite(n) ? n : 0;
   };
 
+  const loggedDates = useMemo(() => {
+    if (!meals) return [];
+    return [
+      ...new Set(meals.map((m) => new Date(m.eatenAt).toDateString())),
+    ].map((d) => new Date(d));
+  }, [meals]);
+
   // Checks dish availability
   const { data: hallData } = trpc.peterplate.useQuery(
     { date: selectedDay?.rawDate ?? new Date() },
@@ -229,6 +236,7 @@ export default function MealTracker() {
                   setHistoryDate(date);
                   setHistoryDialogOpen(true);
                 }}
+                loggedDates={loggedDates}
               />
             )}
           </div>
@@ -247,6 +255,7 @@ export default function MealTracker() {
                 setHistoryDate(date);
                 setHistoryDialogOpen(true);
               }}
+              loggedDates={loggedDates}
             />
           )}
         </div>
