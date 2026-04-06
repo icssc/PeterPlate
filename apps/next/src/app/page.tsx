@@ -232,7 +232,7 @@ function MobileHome(): React.JSX.Element {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-3">
         {/* ── Dining Halls ── */}
         <section>
-          <h2 className="text-1xl font-bold text-sky-600 mb-2">Dining Halls</h2>
+          <h2 className="text-1xl font-bold text-sky-700 mb-2">Dining Halls</h2>
           <div className="space-y-3">
             {/* Brandywine Card */}
             <Link href="/brandywine" className="group block">
@@ -248,7 +248,7 @@ function MobileHome(): React.JSX.Element {
                 </div>
                 <div className="relative flex items-center justify-between p-3">
                   <div className="space-y-1">
-                    <h3 className="text-sm font-semibold text-sky-600">
+                    <h3 className="text-sm font-semibold text-sky-700">
                       Brandywine
                     </h3>
                     <div className="flex items-center gap-1.5 text-xs text-neutral-500 dark:text-neutral-400">
@@ -265,7 +265,7 @@ function MobileHome(): React.JSX.Element {
                     </div>
                   </div>
                   <ChevronRight
-                    className="absolute top-3 right-3 text-sky-600"
+                    className="absolute top-3 right-3 text-sky-700"
                     style={{ fontSize: 16 }}
                   />
                 </div>
@@ -286,7 +286,7 @@ function MobileHome(): React.JSX.Element {
                 </div>
                 <div className="relative flex items-center justify-between p-3">
                   <div className="space-y-1">
-                    <h3 className="text-sm font-semibold text-sky-600">
+                    <h3 className="text-sm font-semibold text-sky-700">
                       Anteatery
                     </h3>
                     <div className="flex items-center gap-1.5 text-xs text-neutral-500 dark:text-neutral-400">
@@ -303,7 +303,7 @@ function MobileHome(): React.JSX.Element {
                     </div>
                   </div>
                   <ChevronRight
-                    className="absolute top-3 right-3 text-sky-600"
+                    className="absolute top-3 right-3 text-sky-700"
                     style={{ fontSize: 16 }}
                   />
                 </div>
@@ -314,7 +314,7 @@ function MobileHome(): React.JSX.Element {
 
         {/* Popular Today */}
         <section>
-          <h2 className="text-1xl sm:text-3xl font-bold text-neutral-900 dark:text-neutral-100">
+          <h2 className="text-1xl sm:text-3xl font-bold text-sky-700 dark:text-neutral-100">
             Popular Today
           </h2>
 
@@ -349,15 +349,15 @@ function MobileHome(): React.JSX.Element {
         {/* Upcoming Events */}
         <section>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-1xl sm:text-3xl font-bold text-neutral-900 dark:text-neutral-100">
+            <h2 className="text-1xl sm:text-3xl font-bold text-sky-700 dark:text-neutral-100">
               Upcoming Events
             </h2>
             <Link
               href="/events"
-              className="text-sm font-medium text-sky-600 hover:text-sky-700 flex items-center gap-1"
+              className="text-sm font-medium text-sky-700 hover:text-sky-700 flex items-center gap-1"
             >
               See More{" "}
-              <ChevronRight className="text-sky-600" style={{ fontSize: 16 }} />
+              <ChevronRight className="text-sky-700" style={{ fontSize: 16 }} />
             </Link>
           </div>
           {!events || events.length === 0 ? (
