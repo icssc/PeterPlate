@@ -63,7 +63,7 @@ export default function SearchMealCard({ meal, onAdd }: Props) {
         sx={{ borderRadius: "12px" }}
       >
         <CardContent sx={{ padding: "0 !important" }}>
-          <div className="h-40 p-4 flex justify-between gap-3 text-left">
+          <div className="h-auto p-3 md:h-40 md:p-4 flex justify-between gap-3 text-left">
             <div className="min-w-0 flex flex-col justify-between flex-1">
               <div className="flex items-center gap-3 min-w-0">
                 {showImage && imageUrl ? (

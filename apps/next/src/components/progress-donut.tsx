@@ -38,7 +38,7 @@ export function ProgressDonut({
   const strokeDashoffset = CIRCLE_CIRCUMFERENCE * (1 - percent);
 
   return (
-    <div className="flex flex-col items-center justify-center">
+    <div className="flex flex-col justify-center -ml-4 translate-y-2">
       <div className="relative w-36 h-36">
         <svg viewBox="0 0 100 100" className="w-full h-full">
           <title>Progress Donut</title>

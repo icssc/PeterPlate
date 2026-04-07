@@ -211,7 +211,7 @@ export default function MealTracker() {
   if (error) return <div>Error loading meals</div>;
 
   return (
-    <div className="min-h-screen p-8 mt-12">
+    <div className="min-h-screen p-2 md:p-8 mt-2 md:mt-12">
       <div className="px-2 md:px-8">
         <h1 className="text-2xl md:text-3xl font-bold text-sky-700 dark:text-sky-400 flex items-center justify-between">
           <span className="flex items-center gap-2 flex-nowrap whitespace-nowrap">

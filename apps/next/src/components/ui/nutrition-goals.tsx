@@ -190,7 +190,7 @@ export default function NutritionGoals({ userId, date }: Props) {
       <Button
         onClick={() => setOpen(!open)}
         variant="contained"
-        className="!bg-sky-700 !text-white hover:!bg-sky-800 !rounded-lg !min-w-0 !p-2"
+        className="!bg-sky-700 !text-white hover:!bg-sky-800 !rounded-lg !min-w-0 !p-1 md:!p-2"
       >
         <EditIcon />
       </Button>
