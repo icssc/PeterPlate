@@ -1,6 +1,7 @@
 "use client"; // Need state for toggling nutrient visibility
 
 import { Add, StarBorder } from "@mui/icons-material";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import { Button, DialogContent } from "@mui/material";
 import type { DishInfo } from "@peterplate/api";
 import Image from "next/image";
@@ -39,10 +40,14 @@ export default function FoodDialogContent({
   dish,
   onAddToMealTracker,
   isAddingToMealTracker = false,
+  doesNotMeetPreferences,
+  violations,
 }: {
   dish: DishInfo;
   onAddToMealTracker?: OnAddToMealTracker;
   isAddingToMealTracker?: boolean;
+  doesNotMeetPreferences: boolean;
+  violations: string[];
 }) {
   const [showAllNutrients, setShowAllNutrients] = useState(false);
   const [imageError, setImageError] = useState(false);
@@ -120,6 +125,11 @@ export default function FoodDialogContent({
                     {formatFoodName(dish.name)}
                   </h2>
                   {/* <Pin className="stroke-zinc-500"/> */}
+                  {/* {doesNotMeetPreferences && (
+                  <span className="bg-red-500 text-white text-xs font-medium px-2 py-1 rounded-md shadow-sm whitespace-nowrap">
+                    ⚠ Conflict
+                  </span>
+                )} */}
                 </div>
                 <InteractiveStarRating dishId={dish.id} />
               </div>
@@ -147,6 +157,23 @@ export default function FoodDialogContent({
                   {dish.dietRestriction.isKosher && (
                     <AllergenBadge variant={"kosher"} />
                   )}
+                  {/* {doesNotMeetPreferences && (
+                    <AllergenBadge variant={"conflict"} />
+                  )} */}
+                  {doesNotMeetPreferences &&
+                    violations.length > 0 &&
+                    violations.map((v) => (
+                      <AllergenBadge
+                        key={v}
+                        variant="conflict"
+                        label={
+                          <span className="inline-flex items-center gap-1">
+                            <ErrorOutlineIcon sx={{ fontSize: "0.75rem" }} />
+                            {`    ${v}`}
+                          </span>
+                        }
+                      />
+                    ))}
                 </div>
               </div>
               <p className="text-black px-4 leading-relaxed">

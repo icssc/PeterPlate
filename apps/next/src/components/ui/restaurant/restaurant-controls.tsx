@@ -34,6 +34,8 @@ interface RestaurantControlsProps {
   setIsCompactView: (isCompact: boolean) => void;
   selectedStation: string;
   setSelectedStation: (station: string) => void;
+  showPreferencesOnly: boolean;
+  setShowPreferencesOnly: (isSet: boolean) => void;
 }
 
 export function RestaurantControls({
@@ -63,6 +65,8 @@ export function RestaurantControls({
   setIsCompactView,
   selectedStation,
   setSelectedStation,
+  showPreferencesOnly,
+  setShowPreferencesOnly,
 }: RestaurantControlsProps) {
   return (
     <>
@@ -92,6 +96,8 @@ export function RestaurantControls({
             enabledDates={enabledDates}
             isDatePickerOpen={isDatePickerOpen}
             setIsDatePickerOpen={setIsDatePickerOpen}
+            showPreferencesOnly={showPreferencesOnly}
+            setShowPreferencesOnly={setShowPreferencesOnly}
           />
 
           {/* Mobile Actions */}

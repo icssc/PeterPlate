@@ -6,7 +6,6 @@ import type { RestaurantInfo } from "@peterplate/api";
 import type { DateList } from "@peterplate/db";
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
-import { DiningHallStatus } from "@/components/ui/status";
 import type { CalendarRange } from "@/components/ui/toolbar";
 import { useDate } from "@/context/date-context";
 import { useHallDerived, useHallStore } from "@/context/useHallStore";
@@ -35,6 +34,8 @@ export function RestaurantPage({
   const { selectedDate, setSelectedDate } = useDate();
   const today = useHallStore((s) => s.today);
   const setHallInputs = useHallStore((s) => s.setInputs);
+
+  const [showPreferencesOnly, setShowPreferencesOnly] = useState(false);
 
   const [enabledDates, setEnabledDates] = useState<DateList>(null);
   const [calendarRange, setCalendarRange] = useState<CalendarRange | null>(
@@ -274,6 +275,8 @@ export function RestaurantPage({
               setIsCompactView={setIsCompactView}
               selectedStation={selectedStation}
               setSelectedStation={setSelectedStation}
+              showPreferencesOnly={showPreferencesOnly}
+              setShowPreferencesOnly={setShowPreferencesOnly}
             />
 
             <div className="w-full">
@@ -285,6 +288,7 @@ export function RestaurantPage({
                 isError={isError}
                 error={error}
                 hallData={hallData}
+                showPreferencesOnly={showPreferencesOnly}
               />
             </div>
           </div>
