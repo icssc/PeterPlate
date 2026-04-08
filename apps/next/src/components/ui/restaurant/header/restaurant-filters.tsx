@@ -19,6 +19,8 @@ interface RestaurantFiltersProps {
   enabledDates: DateList;
   isDatePickerOpen: boolean;
   setIsDatePickerOpen: (isOpen: boolean) => void;
+  showPreferencesOnly: boolean;
+  setShowPreferencesOnly: (isSet: boolean) => void;
 }
 
 export function RestaurantFilters({
@@ -33,6 +35,8 @@ export function RestaurantFilters({
   enabledDates,
   isDatePickerOpen,
   setIsDatePickerOpen,
+  showPreferencesOnly,
+  setShowPreferencesOnly,
 }: RestaurantFiltersProps) {
   return (
     <div className={isDesktop ? "flex gap-2" : "grid grid-cols-2 gap-2 w-full"}>
@@ -172,6 +176,23 @@ export function RestaurantFilters({
           </LocalizationProvider>
         </div>
       )}
+
+      <div>
+        <button
+          type="button"
+          onClick={() => setShowPreferencesOnly(!showPreferencesOnly)}
+          className={`${isDesktop ? "w-[240px]" : "w-full"}
+            h-[40px] rounded-md border text-sm font-medium transition-all duration-200
+            ${
+              showPreferencesOnly
+                ? "bg-sky-700 text-white border-sky-700 shadow-md"
+                : "bg-white text-sky-700 border-sky-700 hover:bg-sky-50"
+            }
+          `}
+        >
+          Show Preferences Only
+        </button>
+      </div>
     </div>
   );
 }

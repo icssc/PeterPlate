@@ -33,6 +33,9 @@ interface DishesInfoProps {
    * Whether to display dishes in compact/simplified view.
    */
   isCompactView?: boolean;
+  /**
+   * Whether to only show dishes that match user preferences
+   */
 }
 
 /**
