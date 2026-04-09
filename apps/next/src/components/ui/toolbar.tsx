@@ -63,19 +63,12 @@ const DESKTOP_TOOLBAR_ELEMENTS: ToolbarElement[] = [
       },
     ],
   },
+
   {
-    title: "Food Courts",
-    children: [
-      {
-        title: "Phoenix Food Court",
-        href: "/phoenix",
-      },
-      {
-        title: "East Food Court",
-        href: "/east-court",
-      },
-    ],
+    title: "Meal Tracker",
+    href: "/nutrition",
   },
+
   {
     title: "Events",
     href: "/events",
@@ -94,7 +87,7 @@ const MOBILE_TOOLBAR_ELEMENTS: ToolbarElement[] = [
   },
   {
     title: "Dining",
-    href: "/brandywine", // defaults to brandywine
+    href: "/brandywine", // defaults to brandywine for now, we'd need to add anteatery
     icon: <RestaurantRoundedIcon />,
   },
   {
@@ -114,7 +107,15 @@ const MOBILE_TOOLBAR_ELEMENTS: ToolbarElement[] = [
   },
 ];
 
-function ToolbarDropdown({ element }: { element: ToolbarElement }) {
+const TRANSPARENT_PAGES = ["/about", "/brandywine", "/anteatery", "/events"];
+
+function ToolbarDropdown({
+  element,
+  isTransparent,
+}: {
+  element: ToolbarElement;
+  isTransparent: boolean;
+}) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -131,8 +132,11 @@ function ToolbarDropdown({ element }: { element: ToolbarElement }) {
       <Button
         onClick={handleClick}
         endIcon={<ArrowDropDownIcon fontSize="small" />}
-        className="capitalize text-[16px] font-medium
-        group-hover:text-white text-white/60 bg-transparent"
+        className={`capitalize text-[16px] !font-medium bg-transparent ${
+          isTransparent
+            ? "text-white/60 group-hover:text-white"
+            : "!text-black dark:!text-white"
+        }`}
       >
         {element.title}
       </Button>
@@ -158,8 +162,11 @@ function ToolbarDropdown({ element }: { element: ToolbarElement }) {
   );
 }
 
-export function DesktopToolbar() {
+export function DesktopToolbar(): React.JSX.Element {
+  const pathname = usePathname();
+  const isTransparent = TRANSPARENT_PAGES.includes(pathname);
   const isDesktop = useMediaQuery("(min-width: 768px)");
+    
   const [profileAnchor, setProfileAnchor] = useState<null | HTMLElement>(null);
   const profileOpen = Boolean(profileAnchor);
   const [editPreferencesOpen, setEditPreferencesOpen] = useState(false);
@@ -192,8 +199,11 @@ export function DesktopToolbar() {
     <>
       <AppBar
         position="absolute"
-        className="bg-transparent shadow-none 
-        hover:bg-gradient-to-b from-black/50 to-black/0"
+        className={`shadow-none ${
+          isTransparent
+            ? "bg-transparent hover:bg-gradient-to-b from-black/50 to-black/0"
+            : "!bg-white dark:!bg-zinc-900 !border-b !border-zinc-200 dark:!border-zinc-700"
+        }`}
       >
         <MuiToolbar className="justify-between px-4 py-1 group">
           <div className="flex-none flex items-center">
@@ -205,7 +215,11 @@ export function DesktopToolbar() {
                 width={40}
                 height={40}
               />
-              <span className="text-white font-poppins font-bold text-[28px] leading-[24px]">
+              <span
+                className={`font-poppins font-bold text-[28px] leading-[24px] ${
+                  isTransparent ? "text-white" : "text-sky-700 dark:text-white"
+                }`}
+              >
                 PeterPlate
               </span>
             </Link>
@@ -215,7 +229,11 @@ export function DesktopToolbar() {
             {DESKTOP_TOOLBAR_ELEMENTS.map((element) => {
               if (element.children) {
                 return (
-                  <ToolbarDropdown key={element.title} element={element} />
+                  <ToolbarDropdown
+                    key={element.title}
+                    element={element}
+                    isTransparent={isTransparent}
+                  />
                 );
               }
               return (
@@ -223,8 +241,11 @@ export function DesktopToolbar() {
                   key={element.title}
                   component={Link}
                   href={element.href || "#"}
-                  className="group-hover:text-white normal-case text-[16px] 
-                  !font-medium text-white/60"
+                  className={`normal-case text-[16px] !font-medium ${
+                    isTransparent
+                      ? "text-white/60 group-hover:text-white"
+                      : "!text-black dark:!text-white"
+                  }`}
                 >
                   {element.title}
                 </Button>
@@ -242,7 +263,9 @@ export function DesktopToolbar() {
                     aria-label="Open sidebar"
                     disabled
                   >
-                    <MenuIcon style={{ color: "white" }} />
+                    <MenuIcon
+                      style={{ color: isTransparent ? "white" : "black" }}
+                    />
                   </IconButton>
                 </>
               ) : user ? (
@@ -262,13 +285,6 @@ export function DesktopToolbar() {
               ) : (
                 <div className="flex items-center gap-2">
                   <GoogleSignInButton />
-                  <IconButton
-                    onClick={handleProfileOpen}
-                    className="!text-[#1f2937] hover:!bg-[rgba(0,0,0,0.04)]"
-                    aria-label="Open sidebar"
-                  >
-                    <MenuIcon style={{ color: "white" }} />
-                  </IconButton>
                 </div>
               )}
             </div>
@@ -352,6 +368,7 @@ export function DesktopToolbar() {
 
 function MobileToolbar(): React.JSX.Element {
   const pathname = usePathname();
+  const isTransparent = TRANSPARENT_PAGES.includes(pathname);
   const [profileAnchor, setProfileAnchor] = useState<null | HTMLElement>(null);
   const profileOpen = Boolean(profileAnchor);
   const { data: session, isPending } = useSession();
@@ -405,8 +422,20 @@ function MobileToolbar(): React.JSX.Element {
   return (
     <>
       {/* Sticky top header bar */}
-      <div className="sticky top-0 z-50 w-full bg-white dark:bg-neutral-950 px-4 py-2.5 flex items-center justify-between">
-        <span className="text-[15px] font-semibold text-neutral-800 dark:text-neutral-100 truncate pr-2">
+      <div
+        className={`top-0 z-50 w-full px-4 py-2.5 flex items-center justify-between ${
+          isTransparent
+            ? "absolute bg-transparent"
+            : "sticky bg-white dark:bg-neutral-950"
+        }`}
+      >
+        <span
+          className={`text-[15px] font-semibold truncate pr-2 ${
+            isTransparent
+              ? "text-white"
+              : "text-neutral-800 dark:text-neutral-100"
+          }`}
+        >
           {greeting}
         </span>
         <div className="flex-shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center">
