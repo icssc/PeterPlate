@@ -63,17 +63,17 @@ export default function UpcomingEventCard({
         className="w-full rounded-xl border border-neutral-200 dark:border-neutral-700 p-5 shadow-sm hover:shadow-md transition cursor-pointer text-left bg-transparent"
         onClick={() => setOpen(true)}
       >
-        <div className="flex min-w-[150px] items-start justify-between mb-3">
+        <div className="mb-3 flex items-start gap-2 min-w-0">
           <h3
-            className={`${titleSize} font-bold text-sky-700 leading-tight pr-2`}
+            className={`${titleSize} flex-1 font-bold leading-tight text-sky-700`}
           >
             {event.title}
           </h3>
-          <span
+          {/*           <span
             className={`flex-shrink-0 ${tagSize} font-semibold uppercase tracking-wider bg-sky-100 text-sky-700 dark:bg-sky-900 dark:text-sky-300 px-2 py-0.5 rounded-full`}
           >
             Celebration
-          </span>
+          </span> */}
         </div>
         <div className={spacing}>
           {startDate && (
