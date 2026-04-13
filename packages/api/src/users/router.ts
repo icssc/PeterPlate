@@ -4,6 +4,7 @@ import { UserSchema, users } from "@peterplate/db";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
+
 import { getUser, upsertUser } from "./services";
 
 const getUserProcedure = publicProcedure

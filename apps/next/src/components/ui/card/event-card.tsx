@@ -131,10 +131,10 @@ EventCardContent.displayName = "EventCardContent";
  */
 export default function EventCard(props: EventInfo): React.JSX.Element {
   const isDesktop = useMediaQuery("(min-width: 768px)");
-  const [open, setOpen] = React.useState(false);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+  const [open, setOpen] = React.useState(false);
 
   if (isDesktop)
     return (

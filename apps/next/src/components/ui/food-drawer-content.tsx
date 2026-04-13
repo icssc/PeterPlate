@@ -1,6 +1,7 @@
 "use client"; // Need state for toggling nutrient visibility
 
 import { Add } from "@mui/icons-material";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import { Box, Button } from "@mui/material";
 import type { DishInfo } from "@peterplate/api";
 import Image from "next/image";
@@ -52,6 +53,7 @@ export default function FoodDrawerContent({
     "totalFatG",
     "totalCarbsG",
     "proteinG",
+    "sugarsG",
     "sugarsG",
   ]; // Define which nutrients to show initially
   const recognizedNutrients = initialNutrients.concat([
@@ -114,7 +116,16 @@ export default function FoodDrawerContent({
               {doesNotMeetPreferences &&
                 violations.length > 0 &&
                 violations.map((v) => (
-                  <AllergenBadge key={v} variant="conflict" label={`!${v}`} />
+                  <AllergenBadge
+                    key={v}
+                    variant="conflict"
+                    label={
+                      <span className="inline-flex items-center gap-1">
+                        <ErrorOutlineIcon sx={{ fontSize: "0.75rem" }} />
+                        {`    ${v}`}
+                      </span>
+                    }
+                  />
                 ))}
             </div>
           </div>

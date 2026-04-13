@@ -12,6 +12,9 @@ describe("upsertUser", () => {
         expect(fetchedUser).toBeDefined();
         expect(fetchedUser?.id).toBe(testData.user.id);
         expect(fetchedUser?.name).toBe(testData.user.name);
+        expect(fetchedUser?.email).toBe(testData.user.email);
+        expect(fetchedUser?.emailVerified).toBe(testData.user.emailVerified);
+        expect(fetchedUser?.image).toBe(testData.user.image);
         trx.rollback();
       }),
     ).rejects.toThrowError("Rollback");
@@ -20,15 +23,20 @@ describe("upsertUser", () => {
   apiTest("updates existing user in db", async ({ db, expect, testData }) => {
     await expect(
       db.transaction(async (trx) => {
-        await upsertUser(trx, testData.user);
         await upsertUser(trx, {
           ...testData.user,
           name: "Beter",
+          email: "newemail@uci.edu",
+          emailVerified: true,
+          image: "https://example.com/pfp.png",
         });
         const fetchedUser = await getUser(trx, testData.user.id);
         expect(fetchedUser).toBeDefined();
         expect(fetchedUser?.id).toBe(testData.user.id);
         expect(fetchedUser?.name).toBe("Beter");
+        expect(fetchedUser?.email).toBe("newemail@uci.edu");
+        expect(fetchedUser?.emailVerified).toBe(true);
+        expect(fetchedUser?.image).toBe("https://example.com/pfp.png");
         trx.rollback();
       }),
     ).rejects.toThrowError("Rollback");
@@ -43,6 +51,10 @@ describe("getUser", () => {
         const fetchedUser = await getUser(trx, testData.user.id);
         expect(fetchedUser).toBeDefined();
         expect(fetchedUser?.id).toBe(testData.user.id);
+        expect(fetchedUser?.name).toBe(testData.user.name);
+        expect(fetchedUser?.email).toBe(testData.user.email);
+        expect(fetchedUser?.emailVerified).toBe(testData.user.emailVerified);
+        expect(fetchedUser?.image).toBe(testData.user.image);
         trx.rollback();
       }),
     ).rejects.toThrowError("Rollback");

@@ -271,6 +271,11 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                       {dish.description}
                     </p>
                   )}
+                  {dish.description && (
+                    <p className="text-slate-900 text-sm font-normal">
+                      {dish.description}
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="flex items-center">
@@ -344,6 +349,7 @@ export default function FoodCard({
   const [open, setOpen] = React.useState(false);
   const userId = useUserStore((s) => s.userId);
   const utils = trpc.useUtils();
+  const { showSnackbar } = useSnackbarStore();
 
   const { data: preferences } = trpc.preference.getDietaryPreferences.useQuery(
     { userId: userId ?? "" },

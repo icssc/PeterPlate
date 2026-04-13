@@ -75,6 +75,17 @@ export default function RatedFoods() {
                 You haven't rated any foods yet
               </p>
             ))}
+          {!isLoading &&
+            !error &&
+            (ratedFoods && ratedFoods.length > 0 ? (
+              ratedFoods.map((food: (typeof ratedFoods)[number]) => (
+                <RatingsCard key={`${food.id}|${food.ratedAt}`} food={food} />
+              ))
+            ) : (
+              <p className="text-center text-zinc-700 py-5">
+                You haven't rated any foods yet
+              </p>
+            ))}
         </div>
       </div>
     </div>

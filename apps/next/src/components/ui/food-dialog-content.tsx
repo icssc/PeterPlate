@@ -82,7 +82,6 @@ export default function FoodDialogContent({
     { staleTime: 5 * 60 * 1000 },
   );
   const averageRating = ratingData?.averageRating ?? 0;
-  // const ratingCount = ratingData?.ratingCount ?? 0;
 
   return (
     <div className="font-poppins flex flex-col max-h-[90vh]">
@@ -124,12 +123,6 @@ export default function FoodDialogContent({
                   <h2 className="text-3xl font-bold leading-tight tracking-normal text-sky-700">
                     {formatFoodName(dish.name)}
                   </h2>
-                  {/* <Pin className="stroke-zinc-500"/> */}
-                  {/* {doesNotMeetPreferences && (
-                  <span className="bg-red-500 text-white text-xs font-medium px-2 py-1 rounded-md shadow-sm whitespace-nowrap">
-                    ⚠ Conflict
-                  </span>
-                )} */}
                 </div>
                 <InteractiveStarRating dishId={dish.id} />
               </div>
@@ -157,9 +150,6 @@ export default function FoodDialogContent({
                   {dish.dietRestriction.isKosher && (
                     <AllergenBadge variant={"kosher"} />
                   )}
-                  {/* {doesNotMeetPreferences && (
-                    <AllergenBadge variant={"conflict"} />
-                  )} */}
                   {doesNotMeetPreferences &&
                     violations.length > 0 &&
                     violations.map((v) => (

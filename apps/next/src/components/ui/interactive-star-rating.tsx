@@ -26,8 +26,6 @@ export default function InteractiveStarRating({
 
   const { rateDish } = useRatings(userId ?? "");
 
-  console.log(userId);
-
   const { data: existingRating } = trpc.user.getUserRating.useQuery(
     { userId: userId ?? "", dishId },
     {

@@ -2,15 +2,17 @@
 /* tslint:disable */
 /* eslint-disable */
 /* deno-fmt-ignore-file */
+/* biome-ignore-all lint: auto-generated */
 
 declare module "sst" {
   export interface Resource {
-    "Api": {
-      "type": "sst.aws.ApiGatewayV2"
+    "ZotMealRedirect": {
+      "name": string
+      "type": "sst.aws.Function"
       "url": string
     }
-    "site": {
-      "type": "sst.aws.Nextjs"
+    "ZotMealRouter": {
+      "type": "sst.aws.Router"
       "url": string
     }
   }
