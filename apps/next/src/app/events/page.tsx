@@ -148,16 +148,16 @@ const Events = () => {
 
             {/* Filter Bar */}
             <div className="flex flex-wrap gap-8 w-full bg-sky-100 dark:bg-zinc-900/50 border dark:border-zinc-800 rounded-lg p-5 pb-8 mt-4">
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-3 w-full">
                 <span className="text-sm font-medium text-slate-900 dark:text-zinc-200">
                   Event Type
                 </span>
-                <div className="flex gap-3">
+                <div className="grid grid-cols-3 w-full gap-2 md:gap-3">
                   <Button
                     variant="outlined"
                     size="small"
                     onClick={() => setSelectedEventType("both")}
-                    className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
+                    className={`!w-full !min-w-0 !min-h-[3.25rem] !px-2 sm:!px-4 !py-1.5 flex items-center justify-center !normal-case !text-xs sm:!text-sm !leading-tight !whitespace-normal !font-thin ${
                       selectedEventType === "both"
                         ? "!bg-sky-700 dark:!bg-sky-400 !text-white !border-sky-700 dark:!border-sky-400 hover:!bg-sky-800 dark:hover:!bg-sky-500"
                         : "!bg-white dark:!bg-zinc-800 !border-sky-700 dark:!border-sky-400 !text-slate-900 dark:!text-zinc-100 hover:!bg-sky-50 dark:hover:!bg-zinc-700"
@@ -169,7 +169,7 @@ const Events = () => {
                     variant="outlined"
                     size="small"
                     onClick={() => setSelectedEventType("special")}
-                    className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
+                    className={`!w-full !min-w-0 !min-h-[3.25rem] !px-2 sm:!px-4 !py-1.5 flex items-center justify-center !normal-case !text-xs sm:!text-sm !leading-tight !whitespace-normal !font-thin ${
                       selectedEventType === "special"
                         ? "!bg-sky-700 dark:!bg-sky-400 !text-white !border-sky-700 dark:!border-sky-400 hover:!bg-sky-800 dark:hover:!bg-sky-500 hover:!text-white"
                         : "!bg-white dark:!bg-zinc-800 !border-sky-700 dark:!border-sky-400 !text-slate-900 dark:!text-zinc-100 hover:!bg-sky-50 dark:hover:!bg-zinc-700 hover:!text-slate-900"
@@ -181,7 +181,7 @@ const Events = () => {
                     variant="outlined"
                     size="small"
                     onClick={() => setSelectedEventType("celebration")}
-                    className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
+                    className={`!w-full !min-w-0 !min-h-[3.25rem] !px-2 sm:!px-4 !py-1.5 flex items-center justify-center !normal-case !text-xs sm:!text-sm !leading-tight !whitespace-normal !font-thin ${
                       selectedEventType === "celebration"
                         ? "!bg-sky-700 dark:!bg-sky-400 !text-white !border-sky-700 dark:!border-sky-400 hover:!bg-sky-800 dark:hover:!bg-sky-500 hover:!text-white"
                         : "!bg-white dark:!bg-zinc-800 !border-sky-700 dark:!border-sky-400 !text-slate-900 dark:!text-zinc-100 hover:!bg-sky-50 dark:hover:!bg-zinc-700 hover:!text-slate-900"
@@ -191,16 +191,16 @@ const Events = () => {
                   </Button>
                 </div>
               </div>
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-3 w-full">
                 <span className="text-sm font-medium text-slate-900">
                   Location
                 </span>
-                <div className="flex gap-3">
+                <div className="grid grid-cols-3 w-full gap-2 md:gap-3">
                   <Button
                     variant="outlined"
                     size="small"
                     onClick={() => setSelectedDiningHall("both")}
-                    className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
+                    className={`!w-full !min-w-0 !min-h-[3.25rem] !px-2 sm:!px-4 !py-1.5 flex items-center justify-center !normal-case !text-xs sm:!text-sm !leading-tight !whitespace-normal !font-thin ${
                       selectedDiningHall === "both"
                         ? "!bg-sky-700 dark:!bg-sky-400 !text-white !border-sky-700 dark:!border-sky-400 hover:!bg-sky-800 dark:hover:!bg-sky-500 hover:!text-white"
                         : "!bg-white dark:!bg-zinc-800 !border-sky-700 dark:!border-sky-400 !text-slate-900 dark:!text-zinc-100 hover:!bg-sky-50 dark:hover:!bg-zinc-700 hover:!text-slate-900"
@@ -212,7 +212,7 @@ const Events = () => {
                     variant="outlined"
                     size="small"
                     onClick={() => setSelectedDiningHall("brandywine")}
-                    className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
+                    className={`!w-full !min-w-0 !min-h-[3.25rem] !px-2 sm:!px-4 !py-1.5 flex items-center justify-center !normal-case !text-xs sm:!text-sm !leading-tight !whitespace-normal !font-thin ${
                       selectedDiningHall === "brandywine"
                         ? "!bg-sky-700 dark:!bg-sky-400 !text-white !border-sky-700 dark:!border-sky-400 hover:!bg-sky-800 dark:hover:!bg-sky-500 hover:!text-white"
                         : "!bg-white dark:!bg-zinc-800 !border-sky-700 dark:!border-sky-400 !text-slate-900 dark:!text-zinc-100 hover:!bg-sky-50 dark:hover:!bg-zinc-700 hover:!text-slate-900"
@@ -224,7 +224,7 @@ const Events = () => {
                     variant="outlined"
                     size="small"
                     onClick={() => setSelectedDiningHall("anteatery")}
-                    className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
+                    className={`!w-full !min-w-0 !min-h-[3.25rem] !px-2 sm:!px-4 !py-1.5 flex items-center justify-center !normal-case !text-xs sm:!text-sm !leading-tight !whitespace-normal !font-thin ${
                       selectedDiningHall === "anteatery"
                         ? "!bg-sky-700 dark:!bg-sky-400 !text-white !border-sky-700 dark:!border-sky-400 hover:!bg-sky-800 dark:hover:!bg-sky-500 hover:!text-white"
                         : "!bg-white dark:!bg-zinc-800 !border-sky-700 dark:!border-sky-400 !text-slate-900 dark:!text-zinc-100 hover:!bg-sky-50 dark:hover:!bg-zinc-700 hover:!text-slate-900"
