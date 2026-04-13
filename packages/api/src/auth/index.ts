@@ -1,8 +1,8 @@
+import { join } from "node:path";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { genericOAuth } from "better-auth/plugins";
 import { config } from "dotenv";
-import { join } from "path";
 import * as schema from "../../../db/src/index";
 import { db } from "../../../db/src/index";
 

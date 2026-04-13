@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  AddCircleOutline,
-  FavoriteBorder,
-  Restaurant,
-  StarBorder,
-} from "@mui/icons-material";
+import { FavoriteBorder, Restaurant, StarBorder } from "@mui/icons-material";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import { Card, CardContent, Dialog, Drawer } from "@mui/material";
 import type { DishInfo } from "@peterplate/api";
@@ -374,7 +369,7 @@ export default function FoodCard({
       const key = ALLERGY_MAP[allergy as AllergyName];
       if (flags[key]) {
         const violated_allergy = key.slice(8);
-        const updated_allergy_str = "Contains " + violated_allergy;
+        const updated_allergy_str = `Contains ${violated_allergy}`;
         violations.push(updated_allergy_str);
       }
     }
@@ -384,7 +379,7 @@ export default function FoodCard({
       const key = PREFERENCE_MAP[preference as PreferenceName];
       if (!flags[key]) {
         const violated_pref = key.slice(2);
-        const updated_pref_string = "Not " + violated_pref;
+        const updated_pref_string = `Not ${violated_pref}`;
         violations.push(updated_pref_string);
       }
     }
@@ -540,3 +535,80 @@ export default function FoodCard({
       </>
     );
 }
+
+// <div ref={ref} {...divProps} className={cn("w-full", className)}>
+//   <Card
+//     className="cursor-pointer hover:shadow-lg transition w-full border"
+//     sx={{ borderRadius: "16px" }}
+//   >
+//     <CardContent sx={{ padding: "0 !important" }}>
+//       <div className="flex justify-between h-full p-6">
+//         <div className="flex items-center gap-6 w-full">
+//           {IconComponent && (
+//             <IconComponent className="w-10 h-10 text-slate-700" />
+//           )}
+//           <div className="flex flex-col">
+//             <strong>{formatFoodName(dish.name)}</strong>
+//             <div className="flex gap-2 items-center">
+//               <span>
+//                 {dish.nutritionInfo.calories == null
+//                   ? "-"
+//                   : `${Math.round(parseFloat(dish.nutritionInfo.calories))} cal`}
+//               </span>
+//               {dish.restaurant && (
+//                 <>
+//                   <span className="text-zinc-400">•</span>
+//                   <span className="text-zinc-500">
+//                     {toTitleCase(dish.restaurant)}
+//                   </span>
+//                 </>
+//               )}
+//               {/* Average rating display - grey outline star */}
+//               <div className="flex gap-1 items-center">
+//                 <Star
+//                   className="w-4 h-4 stroke-zinc-200"
+//                   strokeWidth={1}
+//                 />
+//                 <span className="text-zinc-400 text-sm">
+//                   {averageRating.toFixed(1)} ({ratingCount})
+//                 </span>
+//               </div>
+//             </div>
+//           </div>
+//           {/*//TODO: Add user feedback on clicking button (e.g. changing Icon, making it green) */}
+//           <button onClick={handleLogMeal}>
+//             <CirclePlus />
+//           </button>
+//         </div>
+//         <div className="flex items-start">
+//           <button
+//             type="button"
+//             aria-label={
+//               isFavorited
+//                 ? "Remove meal from favorites"
+//                 : "Add meal to favorites"
+//             }
+//             aria-pressed={isFavorited}
+//             disabled={favoriteDisabled}
+//             onClick={handleFavoriteClick}
+//             className={cn(
+//               "rounded-full p-2 transition",
+//               favoriteDisabled
+//                 ? "opacity-60"
+//                 : "hover:bg-rose-50 hover:text-rose-600",
+//             )}
+//           >
+//             <Heart
+//               className={cn(
+//                 "w-5 h-5",
+//                 isFavorited
+//                   ? "fill-rose-500 stroke-rose-500"
+//                   : "stroke-zinc-500",
+//               )}
+//             />
+//           </button>
+//         </div>
+//       </div>
+//     </CardContent>
+//   </Card>
+// </div>

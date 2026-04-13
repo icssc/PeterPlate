@@ -54,7 +54,6 @@ export default function FoodDrawerContent({
     "totalCarbsG",
     "proteinG",
     "sugarsG",
-    "sugarsG",
   ]; // Define which nutrients to show initially
   const recognizedNutrients = initialNutrients.concat([
     "transFatG",
