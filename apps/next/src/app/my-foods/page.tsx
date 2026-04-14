@@ -240,7 +240,7 @@ export default function MyFoodsPage() {
                 type="button"
                 onClick={() => setLocationFilter(loc)}
                 className={cn(
-                  "rounded-lg px-2 py-1.5 h-8 text-sm font-medium transition whitespace-nowrap flex-1 min-w-0",
+                  "rounded-lg px-2 py-1.5 h-8 text-sm font-medium transition whitespace-nowrap flex-1 min-w-0 truncate",
                   locationFilter === loc
                     ? "bg-sky-700 text-white shadow-sm"
                     : "bg-white border border-sky-700 hover:bg-zinc-100",
