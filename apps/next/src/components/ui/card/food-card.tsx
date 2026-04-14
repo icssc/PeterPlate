@@ -68,8 +68,6 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
     },
     ref,
   ) => {
-    const userId = useUserStore((state) => state.userId);
-    const { showSnackbar } = useSnackbarStore();
     const IconComponent = getFoodIcon(dish.name) ?? Restaurant;
     const [imageError, setImageError] = React.useState(false);
     const showImage =
@@ -88,36 +86,6 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
     const averageRating = ratingData?.averageRating ?? 0;
     const ratingCount = ratingData?.ratingCount ?? 0;
 
-    const utils = trpc.useUtils();
-    const logMealMutation = trpc.nutrition.logMeal.useMutation({
-      onSuccess: () => {
-        showSnackbar(`Added ${formatFoodName(dish.name)} to your log.`);
-        utils.nutrition.invalidate();
-      },
-      onError: (error) => {
-        console.error(error.message);
-      },
-    });
-
-    const _handleLogMeal = (e: React.MouseEvent) => {
-      e.stopPropagation();
-
-      // TODO: use [MUI snackbar](https://mui.com/material-ui/react-snackbar/) to warn users.
-      if (!userId) {
-        alert("Login to track meals!");
-        return;
-      }
-
-      logMealMutation.mutate({
-        dishId: dish.id,
-        userId: userId,
-        dishName: dish.name,
-        // TODO: add ability to manually input servings. Maybe a popup to ask
-        //       for an input of a multiple of 0.5
-        servings: 1,
-      });
-    };
-
     return (
       <div
         ref={ref}
@@ -131,7 +99,7 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
           <CardContent
             sx={{ padding: 0, "&:last-child": { paddingBottom: 0 } }}
           >
-            <div className="flex justify-between h-full p-4 gap-4">
+            <div className="flex justify-between h-full w-full p-4 gap-4">
               <div className="flex items-center gap-4 w-full">
                 {!isCompact && showImage && dish.image_url && !imageError && (
                   <Image
@@ -147,14 +115,15 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                   <IconComponent className="w-12 h-12 text-zinc-700 dark:text-zinc-400 flex-shrink-0" />
                 )}
                 <div className="flex flex-col gap-1">
-                  <span
+                  <Typography
                     className={cn(
                       "font-semibold text-base text-sky-700 dark:text-sky-600",
                       isCompact && "font-bold",
                     )}
+                    noWrap
                   >
                     {formatFoodName(dish.name)}
-                  </span>
+                  </Typography>
                   <div className="flex gap-2 items-center text-zinc-700 text-sm">
                     <div className="text-zinc-900 dark:text-zinc-300 font-normal">
                       <span>
@@ -174,14 +143,17 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                       </p>
                     </div>
                   </div>
-                  {dish.description && (
-                    <Typography
-                      noWrap
-                      className="text-zinc-900 text-sm font-normal dark:text-zinc-300 md:w-72"
-                    >
-                      {dish.description}
-                    </Typography>
-                  )}
+                  <Typography
+                    noWrap
+                    className={cn(
+                      "text-zinc-900 text-sm font-normal dark:text-zinc-300 md:w-72",
+                      !dish.description && "italic text-zinc-700",
+                    )}
+                  >
+                    {dish.description
+                      ? dish.description
+                      : "No description available."}
+                  </Typography>
                 </div>
               </div>
               <div className="flex items-center">
