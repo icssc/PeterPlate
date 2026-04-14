@@ -277,7 +277,7 @@ export default function Side({
                 variant="outlined"
                 onClick={() => setIsCompactView(false)}
                 className={cn(
-                  "capitalize px-4 py-1 flex items-center justify-center text-black",
+                  "capitalize px-4 py-1 flex items-center justify-center text-black dark:text-zinc-300",
                   !isCompactView && "bg-sky-700 text-white",
                 )}
               >
@@ -288,7 +288,7 @@ export default function Side({
                 variant="outlined"
                 onClick={() => setIsCompactView(true)}
                 className={cn(
-                  "capitalize px-4 py-1 flex items-center justify-center text-black",
+                  "capitalize px-4 py-1 flex items-center justify-center text-black dark:text-zinc-300",
                   isCompactView && "bg-sky-700 text-white",
                 )}
               >

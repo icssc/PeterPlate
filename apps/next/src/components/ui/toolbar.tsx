@@ -166,7 +166,7 @@ export function DesktopToolbar(): React.JSX.Element {
   const pathname = usePathname();
   const isTransparent = TRANSPARENT_PAGES.includes(pathname);
   const isDesktop = useMediaQuery("(min-width: 768px)");
-    
+
   const [profileAnchor, setProfileAnchor] = useState<null | HTMLElement>(null);
   const profileOpen = Boolean(profileAnchor);
   const [editPreferencesOpen, setEditPreferencesOpen] = useState(false);
@@ -201,7 +201,7 @@ export function DesktopToolbar(): React.JSX.Element {
         position="absolute"
         className={`shadow-none ${
           isTransparent
-            ? "bg-transparent hover:bg-gradient-to-b from-black/50 to-black/0"
+            ? "bg-transparent bg-gradient-to-b from-black/50 to-black/0"
             : "!bg-white dark:!bg-zinc-900 !border-b !border-zinc-200 dark:!border-zinc-700"
         }`}
       >
