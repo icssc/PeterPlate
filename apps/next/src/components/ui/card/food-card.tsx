@@ -87,85 +87,88 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
     const ratingCount = ratingData?.ratingCount ?? 0;
 
     return (
-      <div
+      <Card
         ref={ref}
         {...divProps}
-        className={cn("w-xs flex-shrink-0", className)}
+        className="cursor-pointer hover:shadow-lg transition w-full border"
+        sx={{ borderRadius: "12px" }}
       >
-        <Card
-          className="cursor-pointer hover:shadow-lg transition w-full border"
-          sx={{ borderRadius: "12px" }}
-        >
-          <CardContent
-            sx={{ padding: 0, "&:last-child": { paddingBottom: 0 } }}
-          >
-            <div className="flex justify-between h-full w-full p-4 gap-4">
-              <div className="flex items-center gap-4 w-full">
-                {!isCompact && showImage && dish.image_url && !imageError && (
-                  <Image
-                    src={dish.image_url}
-                    alt=""
-                    width={64}
-                    height={64}
-                    className="w-16 h-16 object-cover rounded"
-                    onError={() => setImageError(true)}
-                  />
-                )}
-                {!isCompact && !showImage && IconComponent && (
-                  <IconComponent className="w-12 h-12 text-zinc-700 dark:text-zinc-400 flex-shrink-0" />
-                )}
-                <div className="flex flex-col gap-1">
-                  <Typography
-                    className={cn(
-                      "font-semibold text-base text-sky-700 dark:text-sky-600",
-                      isCompact && "font-bold",
-                    )}
-                    noWrap
-                  >
-                    {formatFoodName(dish.name)}
-                  </Typography>
-                  <div className="flex gap-2 items-center text-zinc-700 text-sm">
-                    <div className="text-zinc-900 dark:text-zinc-300 font-normal">
-                      <span>
-                        {dish.nutritionInfo.calories == null
-                          ? "-"
-                          : `${Math.round(parseFloat(dish.nutritionInfo.calories))} cal`}
-                      </span>
-                    </div>
-                    <div className="flex gap-1 items-center text-zinc-500">
-                      <StarBorder
-                        className="w-4 h-4 stroke-zinc-500"
-                        strokeWidth={0.15}
-                      />
-                      <p>
-                        {averageRating.toFixed(1)}&nbsp;
-                        {!isCompact && <span>({ratingCount})</span>}
-                      </p>
-                    </div>
-                  </div>
-                  <Typography
-                    noWrap
-                    className={cn(
-                      "text-zinc-900 text-sm font-normal dark:text-zinc-300 md:w-72",
-                      !dish.description && "italic text-zinc-700",
-                    )}
-                  >
-                    {dish.description
-                      ? dish.description
-                      : "No description available."}
-                  </Typography>
-                </div>
-              </div>
-              <div className="flex items-center">
-                <Favorite
-                  dishId={dish.id}
-                  {...{ isFavorited, favoriteDisabled, onToggleFavorite }}
+        <CardContent sx={{ padding: 0, "&:last-child": { paddingBottom: 0 } }}>
+          <div className="flex justify-between h-full w-full p-4 gap-4">
+            <div
+              className={cn(
+                "flex items-center gap-4 w-full",
+                isCompact && "justify-between",
+              )}
+            >
+              {!isCompact && showImage && dish.image_url && !imageError && (
+                <Image
+                  src={dish.image_url}
+                  alt=""
+                  width={64}
+                  height={64}
+                  className="w-16 h-16 object-cover rounded"
+                  onError={() => setImageError(true)}
                 />
+              )}
+              {!isCompact && !showImage && IconComponent && (
+                <IconComponent className="w-12 h-12 text-zinc-700 dark:text-zinc-400 flex-shrink-0" />
+              )}
+              <div
+                className={cn(
+                  "flex flex-col gap-1 w-full",
+                  isCompact && "w-3/4",
+                )}
+              >
+                <Typography
+                  className={cn(
+                    "font-semibold text-base text-sky-700 dark:text-sky-600",
+                    isCompact && "font-bold",
+                  )}
+                  noWrap
+                >
+                  {formatFoodName(dish.name)}
+                </Typography>
+                <div className="flex gap-2 items-center text-zinc-700 text-sm w-fit flex-shrink">
+                  <Typography
+                    noWrap
+                    className="text-zinc-900 dark:text-zinc-300 font-normal"
+                  >
+                    {dish.nutritionInfo.calories == null
+                      ? "-"
+                      : `${Math.round(parseFloat(dish.nutritionInfo.calories))} cal`}
+                  </Typography>
+                  <div className="flex gap-1 items-center text-zinc-500">
+                    <StarBorder
+                      className="w-4 h-4 stroke-zinc-500"
+                      strokeWidth={0.15}
+                    />
+                    <p>
+                      {averageRating.toFixed(1)}&nbsp;
+                      {!isCompact && <span>({ratingCount})</span>}
+                    </p>
+                  </div>
+                </div>
+                <Typography
+                  noWrap
+                  className={cn(
+                    "text-zinc-900 text-sm font-normal dark:text-zinc-300",
+                    !dish.description && "italic text-zinc-700",
+                  )}
+                >
+                  {dish.description
+                    ? dish.description
+                    : "No description available."}
+                </Typography>
               </div>
+              <Favorite
+                dishId={dish.id}
+                {...{ isFavorited, favoriteDisabled, onToggleFavorite }}
+              />
             </div>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </CardContent>
+      </Card>
     );
   },
 );
