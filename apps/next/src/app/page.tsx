@@ -9,24 +9,39 @@ import {
 } from "@mui/icons-material";
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 import PopularDishCard from "@/components/ui/card/popular-dish-card";
 import UpcomingEventCard from "@/components/ui/card/upcoming-event-card";
 import OnboardingDialog from "@/components/ui/onboarding";
-import Side from "@/components/ui/side";
 import { useDate } from "@/context/date-context";
+import { useUserStore } from "@/context/useUserStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { useSession } from "@/utils/auth-client";
 import { getHallDishData, getPopularDishes, sortedEvents } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
 
 export default function Home() {
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
-  if (isDesktop) {
-    return <DesktopHome />;
-  }
+  // Onboarding logic
+  const [hasMounted, setHasMounted] = useState<boolean>(false);
+  const { data: session, isPending } = useSession();
+  const _hasOnboardedStore = useUserStore((state) => state.hasOnboarded);
 
-  return <MobileHome />;
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
+  const hasOnboarded = _hasOnboardedStore || session?.user?.hasOnboarded;
+  const showOnboardDialog = hasMounted && !isPending && !hasOnboarded;
+
+  return (
+    <>
+      {showOnboardDialog && <OnboardingDialog />}
+      {isDesktop ? <DesktopHome /> : <MobileHome />}
+    </>
+  );
 }
 
 function DesktopHome(): React.JSX.Element {
