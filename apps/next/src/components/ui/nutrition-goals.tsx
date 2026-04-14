@@ -97,12 +97,12 @@ export default function NutritionGoals({ userId, date }: Props) {
             }
             const val = Number(raw);
             setCalorieGoal(val);
-            handleUpdate({ calorieGoal: val });
           }}
           onBlur={(e) => {
             if (e.target.value === "") {
               setCalorieGoal(calorieGoal);
             }
+            handleUpdate({ calorieGoal });
           }}
           className="w-24 border-b border-sky-400 bg-sky-100 rounded px-2 py-1 text-sm"
         />
@@ -122,12 +122,12 @@ export default function NutritionGoals({ userId, date }: Props) {
             }
             const val = Number(raw);
             setProteinGoal(val);
-            handleUpdate({ proteinGoal: val });
           }}
           onBlur={(e) => {
             if (e.target.value === "") {
               setProteinGoal(proteinGoal);
             }
+            handleUpdate({ proteinGoal });
           }}
           className="w-24 border-b border-sky-400 bg-sky-100 rounded px-2 py-1 text-sm"
         />
@@ -147,12 +147,12 @@ export default function NutritionGoals({ userId, date }: Props) {
             }
             const val = Number(raw);
             setCarbGoal(val);
-            handleUpdate({ carbGoal: val });
           }}
           onBlur={(e) => {
             if (e.target.value === "") {
               setCarbGoal(carbGoal);
             }
+            handleUpdate({ carbGoal });
           }}
           className="w-24 border-b border-sky-400 bg-sky-100 rounded px-2 py-1 text-sm"
         />
@@ -172,12 +172,12 @@ export default function NutritionGoals({ userId, date }: Props) {
             }
             const val = Number(raw);
             setFatGoal(val);
-            handleUpdate({ fatGoal: val });
           }}
           onBlur={(e) => {
             if (e.target.value === "") {
               setFatGoal(fatGoal);
             }
+            handleUpdate({ fatGoal });
           }}
           className="w-24 border-b border-sky-400 bg-sky-100 rounded px-2 py-1 text-sm"
         />
