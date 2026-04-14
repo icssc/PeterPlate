@@ -407,8 +407,17 @@ function MobileToolbar(): React.JSX.Element {
     setEditPreferencesSnackbarOpen(true);
   };
 
+  const diningHref =
+    pathname === "/brandywine"
+      ? "/anteatery"
+      : pathname === "/anteatery"
+        ? "/brandywine"
+        : "/brandywine";
+
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";
+    if (href === "/brandywine")
+      return pathname === "/brandywine" || pathname === "/anteatery";
     return pathname?.startsWith(href);
   };
 
@@ -489,12 +498,14 @@ function MobileToolbar(): React.JSX.Element {
             {MOBILE_TOOLBAR_ELEMENTS.map((element) => {
               if (!element.href) return null;
 
+              const isDining = element.title === "Dining";
+              const effectiveHref = isDining ? diningHref : element.href;
               const active = isActive(element.href);
 
               return (
                 <Link
                   key={element.title}
-                  href={element.href}
+                  href={effectiveHref}
                   className={`
                     flex flex-col items-center justify-center
                     w-[64px]
