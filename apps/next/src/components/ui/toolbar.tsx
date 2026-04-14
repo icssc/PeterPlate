@@ -201,7 +201,7 @@ export function DesktopToolbar(): React.JSX.Element {
         position="absolute"
         className={`shadow-none ${
           isTransparent
-            ? "bg-gradient-to-b from-black/50 to-black/0"
+            ? "bg-transparent bg-gradient-to-b from-black/50 to-black/0"
             : "!bg-white dark:!bg-zinc-900 !border-b !border-zinc-200 dark:!border-zinc-700"
         }`}
       >
