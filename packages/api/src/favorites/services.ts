@@ -42,6 +42,7 @@ export async function getFavorites(db: Drizzle, userId: string) {
       dish: {
         ...dishWithoutStation,
         restaurant: restaurantName,
+        stationName: station?.name ?? "",
       },
     };
   });

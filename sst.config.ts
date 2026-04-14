@@ -1,11 +1,17 @@
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="./.sst/platform/config.d.ts" />
 
+function isZotMeal(stage: string) {
+  return stage === "zotmeal";
+}
+
 function getDomain() {
   if ($app.stage === "production") {
     return "peterplate.com";
   } else if ($app.stage.match(/^staging-(\d+)$/)) {
     return `${$app.stage}.peterplate.com`;
+  } else if (isZotMeal($app.stage)) {
+    throw new Error("zotmeal stage should not call getDomain");
   }
 
   throw new Error("Invalid stage");
@@ -33,6 +39,27 @@ export default $config({
     };
   },
   async run() {
+    if (isZotMeal($app.stage)) {
+      const redirectFunction = new sst.aws.Function("ZotMealRedirect", {
+        runtime: "nodejs22.x",
+        memory: "128 MB",
+        handler: "infra/redirect-handler.handler",
+        url: true,
+      });
+
+      new sst.aws.Router("ZotMealRouter", {
+        domain: {
+          name: "zotmeal.com",
+          redirects: ["www.zotmeal.com"],
+        },
+        routes: {
+          "/*": redirectFunction.url,
+        },
+      });
+
+      return;
+    }
+
     const domain = getDomain();
     const clientId = getClientId();
 

@@ -1,6 +1,7 @@
 "use client"; // Need state for toggling nutrient visibility
 
 import { Add } from "@mui/icons-material";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import { Box, Button } from "@mui/material";
 import type { DishInfo } from "@peterplate/api";
 import Image from "next/image";
@@ -23,10 +24,14 @@ export default function FoodDrawerContent({
   dish,
   onAddToMealTracker,
   isAddingToMealTracker = false,
+  doesNotMeetPreferences,
+  violations,
 }: {
   dish: DishInfo;
   onAddToMealTracker?: OnAddToMealTracker;
   isAddingToMealTracker?: boolean;
+  doesNotMeetPreferences: boolean;
+  violations: string[];
 }) {
   const [imageError, setImageError] = useState(false);
   const showImage =
@@ -114,6 +119,20 @@ export default function FoodDrawerContent({
               {dish.dietRestriction.isKosher && (
                 <AllergenBadge variant={"kosher"} />
               )}
+              {doesNotMeetPreferences &&
+                violations.length > 0 &&
+                violations.map((v) => (
+                  <AllergenBadge
+                    key={v}
+                    variant="conflict"
+                    label={
+                      <span className="inline-flex items-center gap-1">
+                        <ErrorOutlineIcon sx={{ fontSize: "0.75rem" }} />
+                        {`    ${v}`}
+                      </span>
+                    }
+                  />
+                ))}
             </div>
           </div>
 

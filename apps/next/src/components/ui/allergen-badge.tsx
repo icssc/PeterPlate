@@ -14,6 +14,7 @@ import { cn } from "@/utils/tw";
  * @property {string} variants.variant.vegan - Style for vegan badges.
  * @property {string} variants.variant.gluten_free - Style for gluten-free badges.
  * @property {string} variants.variant.kosher - Style for kosher badges.
+ * @property {string} variants.variant.conflict - Style for conflict(doesn't meet dietary prefs) badges
  */
 const badgeVariants = cva(
   "inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent shadow",
@@ -27,6 +28,7 @@ const badgeVariants = cva(
         gluten_free:
           "bg-orange-700 hover:bg-orange-700/80 text-primary-foreground",
         kosher: "bg-sky-700 hover:bg-sky-700/80 text-primary-foreground",
+        conflict: "bg-red-600 hover:bg-red-600 text-white",
       },
     },
     defaultVariants: {
@@ -41,7 +43,9 @@ const badgeVariants = cva(
  */
 export interface BadgeProps
   extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof badgeVariants> {}
+    VariantProps<typeof badgeVariants> {
+  label?: React.ReactNode;
+}
 
 /**
  * Renders a styled badge to indicate an allergen or dietary preference (e.g., Vegetarian, Vegan, Gluten-Free).
@@ -49,18 +53,21 @@ export interface BadgeProps
  *
  * @param {BadgeProps} props - The properties for the AllergenBadge.
  * @param {string} [props.className] - Optional additional CSS classes to apply to the badge.
- * @param {("default" | "vegetarian" | "vegan" | "gluten_free" | "kosher")} [props.variant="default"] - The type of badge to render, determining its style and text content.
+ * @param {("default" | "vegetarian" | "vegan" | "gluten_free" | "kosher" | "conflict")} [props.variant="default"] - The type of badge to render, determining its style and text content.
  *        The text displayed is the title-cased version of the variant name (e.g., "vegetarian" becomes "Vegetarian").
  * @returns {JSX.Element} The rendered allergen badge component.
  */
 function AllergenBadge({
   className,
   variant,
+  label,
   ...props
 }: BadgeProps): JSX.Element {
+  const displayText =
+    label ?? toTitleCase(variant?.replace("_", "-") ?? "default");
   return (
     <div className={cn(badgeVariants({ variant }), className)} {...props}>
-      {toTitleCase(variant?.replace("_", "-") ?? "default")}
+      {displayText}
     </div>
   );
 }

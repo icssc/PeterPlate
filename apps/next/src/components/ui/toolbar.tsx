@@ -11,17 +11,23 @@ import RestaurantRoundedIcon from "@mui/icons-material/RestaurantRounded";
 import {
   AppBar,
   Button,
+  Dialog,
+  Drawer,
   IconButton,
   Menu,
   MenuItem,
   Toolbar as MuiToolbar,
+  Snackbar,
 } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import type { MouseEvent } from "react";
 import { useEffect, useState } from "react";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useSession } from "@/utils/auth-client";
+import EditPreferencesContent from "./edit-preferences-content";
 import SidebarContent from "./sidebar/sidebar-content";
 
 export type CalendarRange = {
@@ -57,19 +63,12 @@ const DESKTOP_TOOLBAR_ELEMENTS: ToolbarElement[] = [
       },
     ],
   },
+
   {
-    title: "Food Courts",
-    children: [
-      {
-        title: "Phoenix Food Court",
-        href: "/phoenix",
-      },
-      {
-        title: "East Food Court",
-        href: "/east-court",
-      },
-    ],
+    title: "Meal Tracker",
+    href: "/nutrition",
   },
+
   {
     title: "Events",
     href: "/events",
@@ -88,7 +87,7 @@ const MOBILE_TOOLBAR_ELEMENTS: ToolbarElement[] = [
   },
   {
     title: "Dining",
-    href: "/brandywine", // defaults to brandywine
+    href: "/brandywine", // defaults to brandywine for now, we'd need to add anteatery
     icon: <RestaurantRoundedIcon />,
   },
   {
@@ -108,11 +107,19 @@ const MOBILE_TOOLBAR_ELEMENTS: ToolbarElement[] = [
   },
 ];
 
-function ToolbarDropdown({ element }: { element: ToolbarElement }) {
+const TRANSPARENT_PAGES = ["/about", "/brandywine", "/anteatery", "/events"];
+
+function ToolbarDropdown({
+  element,
+  isTransparent,
+}: {
+  element: ToolbarElement;
+  isTransparent: boolean;
+}) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
 
@@ -125,8 +132,11 @@ function ToolbarDropdown({ element }: { element: ToolbarElement }) {
       <Button
         onClick={handleClick}
         endIcon={<ArrowDropDownIcon fontSize="small" />}
-        className="capitalize text-[16px] font-medium
-        group-hover:text-white text-white/60 bg-transparent"
+        className={`capitalize text-[16px] !font-medium bg-transparent ${
+          isTransparent
+            ? "text-white/60 group-hover:text-white"
+            : "!text-black dark:!text-white"
+        }`}
       >
         {element.title}
       </Button>
@@ -152,18 +162,36 @@ function ToolbarDropdown({ element }: { element: ToolbarElement }) {
   );
 }
 
-function DesktopToolbar(): React.JSX.Element {
+export function DesktopToolbar(): React.JSX.Element {
+  const pathname = usePathname();
+  const isTransparent = TRANSPARENT_PAGES.includes(pathname);
+  const isDesktop = useMediaQuery("(min-width: 768px)");
+
   const [profileAnchor, setProfileAnchor] = useState<null | HTMLElement>(null);
   const profileOpen = Boolean(profileAnchor);
+  const [editPreferencesOpen, setEditPreferencesOpen] = useState(false);
+  const [editPreferencesSnackbarOpen, setEditPreferencesSnackbarOpen] =
+    useState(false);
+  const [editPreferencesExpanded, setEditPreferencesExpanded] = useState(false);
 
-  const handleProfileOpen = (event: React.MouseEvent<HTMLElement>) => {
+  const handleProfileOpen = (event: MouseEvent<HTMLElement>) => {
     setProfileAnchor(event.currentTarget);
   };
 
   const handleProfileClose = () => {
     setProfileAnchor(null);
   };
-
+  const handleEditPreferencesOpen = () => {
+    setEditPreferencesOpen(true);
+  };
+  const handleEditPreferencesClose = () => {
+    setEditPreferencesOpen(false);
+    setEditPreferencesExpanded(false);
+  };
+  const handleEditPreferencesSaved = () => {
+    setEditPreferencesOpen(false);
+    setEditPreferencesSnackbarOpen(true);
+  };
   const { data: session, isPending } = useSession();
   const user = session?.user;
 
@@ -171,8 +199,11 @@ function DesktopToolbar(): React.JSX.Element {
     <>
       <AppBar
         position="absolute"
-        className="bg-transparent shadow-none bg-none
-        hover:bg-gradient-to-b from-black/50 to-black/0"
+        className={`shadow-none ${
+          isTransparent
+            ? "bg-gradient-to-b from-black/50 to-black/0"
+            : "!bg-white dark:!bg-zinc-900 !border-b !border-zinc-200 dark:!border-zinc-700"
+        }`}
       >
         <MuiToolbar className="justify-between px-4 py-1 group">
           <div className="flex-none flex items-center">
@@ -184,7 +215,11 @@ function DesktopToolbar(): React.JSX.Element {
                 width={40}
                 height={40}
               />
-              <span className="text-white font-poppins font-bold text-[28px] leading-[24px]">
+              <span
+                className={`font-poppins font-bold text-[28px] leading-[24px] ${
+                  isTransparent ? "text-white" : "text-sky-700 dark:text-white"
+                }`}
+              >
                 PeterPlate
               </span>
             </Link>
@@ -194,7 +229,11 @@ function DesktopToolbar(): React.JSX.Element {
             {DESKTOP_TOOLBAR_ELEMENTS.map((element) => {
               if (element.children) {
                 return (
-                  <ToolbarDropdown key={element.title} element={element} />
+                  <ToolbarDropdown
+                    key={element.title}
+                    element={element}
+                    isTransparent={isTransparent}
+                  />
                 );
               }
               return (
@@ -202,8 +241,11 @@ function DesktopToolbar(): React.JSX.Element {
                   key={element.title}
                   component={Link}
                   href={element.href || "#"}
-                  className="group-hover:text-white normal-case text-[16px] 
-                  !font-medium text-white/60"
+                  className={`normal-case text-[16px] !font-medium ${
+                    isTransparent
+                      ? "text-white/60 group-hover:text-white"
+                      : "!text-black dark:!text-white"
+                  }`}
                 >
                   {element.title}
                 </Button>
@@ -221,7 +263,9 @@ function DesktopToolbar(): React.JSX.Element {
                     aria-label="Open sidebar"
                     disabled
                   >
-                    <MenuIcon style={{ color: "white" }} />
+                    <MenuIcon
+                      style={{ color: isTransparent ? "white" : "black" }}
+                    />
                   </IconButton>
                 </>
               ) : user ? (
@@ -241,13 +285,6 @@ function DesktopToolbar(): React.JSX.Element {
               ) : (
                 <div className="flex items-center gap-2">
                   <GoogleSignInButton />
-                  <IconButton
-                    onClick={handleProfileOpen}
-                    className="!text-[#1f2937] hover:!bg-[rgba(0,0,0,0.04)]"
-                    aria-label="Open sidebar"
-                  >
-                    <MenuIcon style={{ color: "white" }} />
-                  </IconButton>
                 </div>
               )}
             </div>
@@ -268,35 +305,80 @@ function DesktopToolbar(): React.JSX.Element {
           horizontal: "right",
         }}
         PaperProps={{
-          sx: {
-            backgroundColor: "transparent",
-            boxShadow: "none",
-            padding: 0,
-            width: 357,
-            maxHeight: 658,
-            // borderRadius: 3,
-            mt: 1,
-          },
+          className:
+            "bg-transparent shadow-none p-0 w-[357px] max-h-[658px] mt-1",
         }}
         MenuListProps={{
-          sx: {
-            padding: 0,
-          },
+          className: "p-0",
         }}
       >
-        <SidebarContent onClose={handleProfileClose} />
+        <SidebarContent
+          onClose={handleProfileClose}
+          onEditPreferencesClick={handleEditPreferencesOpen}
+        />
       </Menu>
+
+      {isDesktop ? (
+        <Dialog
+          open={editPreferencesOpen}
+          onClose={handleEditPreferencesClose}
+          maxWidth={false}
+          PaperProps={{
+            className:
+              "w-[500px] max-w-[90vw] m-2 p-0 overflow-hidden flex flex-col rounded-[12px] bg-white shadow-[0_4px_20px_0_#6A7282] dark:bg-[#313136] dark:border-[3px] dark:border-[#3F3F47] dark:shadow-none",
+            style: {
+              height: editPreferencesExpanded ? 593 : 558,
+            },
+          }}
+        >
+          <EditPreferencesContent
+            onSaved={handleEditPreferencesSaved}
+            onExpandChange={setEditPreferencesExpanded}
+          />
+        </Dialog>
+      ) : (
+        <Drawer
+          anchor="bottom"
+          open={editPreferencesOpen}
+          onClose={handleEditPreferencesClose}
+          slotProps={{
+            paper: {
+              className:
+                "p-0 overflow-hidden rounded-t-[10px] mt-[96px] h-auto max-h-[85vh] flex flex-col min-h-0 bg-white dark:bg-[#313136] dark:border-[3px] dark:border-[#3F3F47] dark:border-b-0 dark:rounded-t-[12px]",
+            },
+          }}
+        >
+          <EditPreferencesContent onSaved={handleEditPreferencesSaved} />
+        </Drawer>
+      )}
+
+      <Snackbar
+        open={editPreferencesSnackbarOpen}
+        autoHideDuration={4000}
+        onClose={(_, reason) => {
+          if (reason === "clickaway") return;
+          setEditPreferencesSnackbarOpen(false);
+        }}
+        message="Preferences updated successfully"
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      />
     </>
   );
 }
 
 function MobileToolbar(): React.JSX.Element {
   const pathname = usePathname();
+  const isTransparent = TRANSPARENT_PAGES.includes(pathname);
   const [profileAnchor, setProfileAnchor] = useState<null | HTMLElement>(null);
   const profileOpen = Boolean(profileAnchor);
   const { data: session, isPending } = useSession();
   const user = session?.user;
   const [isMounted, setIsMounted] = useState(false);
+  const [editPreferencesOpen, setEditPreferencesOpen] = useState(false);
+  const [editPreferencesSnackbarOpen, setEditPreferencesSnackbarOpen] =
+    useState(false);
+  const [_editPreferencesExpanded, setEditPreferencesExpanded] =
+    useState(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -308,6 +390,21 @@ function MobileToolbar(): React.JSX.Element {
 
   const handleProfileClose = () => {
     setProfileAnchor(null);
+  };
+
+  const handleEditPreferencesOpen = () => {
+    setProfileAnchor(null);
+    setEditPreferencesOpen(true);
+  };
+
+  const handleEditPreferencesClose = () => {
+    setEditPreferencesOpen(false);
+    setEditPreferencesExpanded(false);
+  };
+
+  const handleEditPreferencesSaved = () => {
+    setEditPreferencesOpen(false);
+    setEditPreferencesSnackbarOpen(true);
   };
 
   const isActive = (href: string) => {
@@ -325,23 +422,37 @@ function MobileToolbar(): React.JSX.Element {
   return (
     <>
       {/* Sticky top header bar */}
-      <div className="sticky top-0 z-50 w-full bg-white dark:bg-neutral-950 px-4 py-2.5 flex items-center justify-between">
-        <span className="text-[15px] font-semibold text-neutral-800 dark:text-neutral-100 truncate pr-2">
+      <div
+        className={`top-0 z-50 w-full px-4 py-2.5 flex items-center justify-between ${
+          isTransparent
+            ? "absolute bg-transparent"
+            : "sticky bg-white dark:bg-neutral-950"
+        }`}
+      >
+        <span
+          className={`text-[15px] font-semibold truncate pr-2 ${
+            isTransparent
+              ? "text-white"
+              : "text-neutral-800 dark:text-neutral-100"
+          }`}
+        >
           {greeting}
         </span>
-        <div className="flex-shrink-0">
+        <div className="flex-shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center">
           {!isMounted || isPending ? (
             <IconButton
-              className="!p-0"
+              type="button"
+              className="!p-0 !min-w-[44px] !min-h-[44px]"
               aria-label="Open profile menu"
               disabled
             >
-              <AccountCircleIcon sx={{ fontSize: 36, color: "#bdbdbd" }} />
+              <AccountCircleIcon style={{ fontSize: 36, color: "#bdbdbd" }} />
             </IconButton>
           ) : user ? (
             <IconButton
+              type="button"
               onClick={handleProfileOpen}
-              className="!p-0"
+              className="!p-0 !min-w-[44px] !min-h-[44px]"
               aria-label="Open profile menu"
             >
               <Image
@@ -354,11 +465,12 @@ function MobileToolbar(): React.JSX.Element {
             </IconButton>
           ) : (
             <IconButton
+              type="button"
               onClick={handleProfileOpen}
-              className="!p-0"
+              className="!p-0 !min-w-[44px] !min-h-[44px]"
               aria-label="Open profile menu"
             >
-              <AccountCircleIcon sx={{ fontSize: 36, color: "#bdbdbd" }} />
+              <AccountCircleIcon style={{ fontSize: 36, color: "#bdbdbd" }} />
             </IconButton>
           )}
         </div>
@@ -428,39 +540,58 @@ function MobileToolbar(): React.JSX.Element {
           horizontal: "right",
         }}
         PaperProps={{
-          sx: {
-            backgroundColor: "transparent",
-            boxShadow: "none",
-            padding: 0,
-            width: 357,
-            maxHeight: 658,
-            mt: 1,
-          },
+          className:
+            "bg-transparent shadow-none p-0 w-[357px] max-h-[658px] mt-1",
         }}
         MenuListProps={{
-          sx: {
-            padding: 0,
+          className: "p-0",
+        }}
+      >
+        <SidebarContent
+          onClose={handleProfileClose}
+          onEditPreferencesClick={handleEditPreferencesOpen}
+        />
+      </Menu>
+
+      <Drawer
+        anchor="bottom"
+        open={editPreferencesOpen}
+        onClose={handleEditPreferencesClose}
+        slotProps={{
+          paper: {
+            className:
+              "p-0 overflow-hidden rounded-t-[10px] mt-[96px] h-auto max-h-[85vh] flex flex-col min-h-0 bg-white dark:bg-[#313136] dark:border-[3px] dark:border-[#3F3F47] dark:border-b-0 dark:rounded-t-[12px]",
           },
         }}
       >
-        <SidebarContent onClose={handleProfileClose} />
-      </Menu>
+        <EditPreferencesContent
+          onSaved={handleEditPreferencesSaved}
+          onExpandChange={setEditPreferencesExpanded}
+        />
+      </Drawer>
+
+      <Snackbar
+        open={editPreferencesSnackbarOpen}
+        autoHideDuration={4000}
+        onClose={(_, reason) => {
+          if (reason === "clickaway") return;
+          setEditPreferencesSnackbarOpen(false);
+        }}
+        message="Preferences updated successfully"
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      />
     </>
   );
 }
 
-export default function Toolbar() {
-  return (
-    <>
-      {/* Desktop toolbar */}
-      <div className="hidden md:block">
-        <DesktopToolbar />
-      </div>
+export default function AdaptiveToolbar() {
+  const isDesktop = useMediaQuery("(min-width: 768px)");
+  const [mounted, setMounted] = useState(false);
 
-      {/* Mobile toolbar */}
-      <div className="block md:hidden">
-        <MobileToolbar />
-      </div>
-    </>
-  );
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+  return isDesktop ? <DesktopToolbar /> : <MobileToolbar />;
 }
