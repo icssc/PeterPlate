@@ -3,7 +3,7 @@
 /** biome-ignore-all lint/a11y/useFocusableInteractive: Will fix when using MUI. */
 "use client";
 
-import { DarkMode, LightMode } from "@mui/icons-material";
+import { DarkMode, DesktopWindows, LightMode } from "@mui/icons-material";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { Switch } from "@/components/ui/switch";
@@ -15,8 +15,16 @@ export function ThemeToggle() {
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;
 
-  const isDark = (theme === "system" ? resolvedTheme : theme) === "dark";
-  const toggleTheme = () => setTheme(isDark ? "light" : "dark");
+  const isSystem = theme === "system";
+  const isDark = !isSystem && theme === "dark";
+
+  const toggleTheme = () => {
+    if (isSystem) {
+      setTheme(resolvedTheme === "dark" ? "light" : "dark");
+    } else {
+      setTheme(isDark ? "light" : "dark");
+    }
+  };
 
   return (
     <div
@@ -25,13 +33,15 @@ export function ThemeToggle() {
       className="flex w-full items-center justify-between px-3 py-2 rounded-md transition-colors cursor-pointer select-none hover:bg-accent hover:text-accent-foreground group"
     >
       <div className="flex gap-3 items-center">
-        {isDark ? (
+        {isSystem ? (
+          <DesktopWindows className="stroke-1 size-5" />
+        ) : isDark ? (
           <LightMode className="stroke-1 size-5" />
         ) : (
           <DarkMode className="stroke-1 size-5" />
         )}
         <span className="text-md font-medium">
-          {isDark ? "Light mode" : "Dark mode"}
+          {isSystem ? "Device" : isDark ? "Light mode" : "Dark mode"}
         </span>
       </div>
 
