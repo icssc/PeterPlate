@@ -401,6 +401,7 @@ export default function MealTracker() {
                 <SearchMealCard
                   key={meal.dishId}
                   meal={meal}
+                  isUnavailable={isUnavailable(meal.dishId)}
                   onAdd={(meal, servings) =>
                     logMeal.mutate({
                       userId: userId ?? "",

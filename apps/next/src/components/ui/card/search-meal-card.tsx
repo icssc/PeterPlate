@@ -23,11 +23,12 @@ type LoggedMealJoinedWithNutrition = SelectLoggedMeal & {
 
 interface Props {
   meal: LoggedMealJoinedWithNutrition;
+  isUnavailable?: boolean;
   /** Called when the user clicks "+". Receives the meal*/
   onAdd?: (meal: LoggedMealJoinedWithNutrition, servings: number) => void;
 }
 
-export default function SearchMealCard({ meal, onAdd }: Props) {
+export default function SearchMealCard({ meal, isUnavailable, onAdd }: Props) {
   const [servingsDraft, setServingsDraft] = React.useState(meal.servings ?? 1);
   const [imageError, setImageError] = React.useState(false);
 
@@ -59,7 +60,10 @@ export default function SearchMealCard({ meal, onAdd }: Props) {
   return (
     <div className={cn("w-full md:w-72")}>
       <Card
-        className="bg-white hover:shadow-lg transition w-full border"
+        className={cn(
+          "cursor-pointer transition w-full border",
+          isUnavailable ? "bg-zinc-200/90" : "bg-white hover:shadow-lg",
+        )}
         sx={{ borderRadius: "12px" }}
       >
         <CardContent sx={{ padding: "0 !important" }}>
@@ -84,7 +88,14 @@ export default function SearchMealCard({ meal, onAdd }: Props) {
                     {meal.dishName}
                   </h3>
                   <div className="flex items-center gap-2 text-xs text-zinc-500">
-                    <div className="inline-flex items-stretch rounded-md bg-sky-100 ring-1 ring-sky-200">
+                    <div
+                      className={cn(
+                        "inline-flex items-stretch rounded-md ring-1",
+                        isUnavailable
+                          ? "bg-sky-200/70 ring-sky-300/70"
+                          : "bg-sky-100 ring-sky-200",
+                      )}
+                    >
                       <div className="w-8 px-2 py-1 text-slate-900 tabular-nums leading-none flex items-center justify-center">
                         {servingsDraft}
                       </div>
@@ -92,7 +103,12 @@ export default function SearchMealCard({ meal, onAdd }: Props) {
                       <div className="flex flex-col border-l border-sky-200 w-6 min-w-6 shrink-0">
                         <button
                           type="button"
-                          className="h-4 w-6 flex items-center justify-center hover:bg-sky-200/60 transition p-0"
+                          className={cn(
+                            "h-4 w-6 flex items-center justify-center transition p-0",
+                            isUnavailable
+                              ? "hover:bg-sky-300/60"
+                              : "hover:bg-sky-200/60",
+                          )}
                           onClick={(e) => {
                             e.stopPropagation();
                             setServingsDraft(
@@ -109,7 +125,12 @@ export default function SearchMealCard({ meal, onAdd }: Props) {
 
                         <button
                           type="button"
-                          className="h-4 w-6 flex items-center justify-center hover:bg-sky-200/60 transition p-0"
+                          className={cn(
+                            "h-4 w-6 flex items-center justify-center transition p-0",
+                            isUnavailable
+                              ? "hover:bg-sky-300/60"
+                              : "hover:bg-sky-200/60",
+                          )}
                           onClick={(e) => {
                             e.stopPropagation();
                             setServingsDraft(
@@ -152,7 +173,9 @@ export default function SearchMealCard({ meal, onAdd }: Props) {
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation();
-                  onAdd?.(meal, servingsDraft);
+                  if (!isUnavailable) {
+                    onAdd?.(meal, servingsDraft);
+                  }
                 }}
                 className="shrink-0 p-2 text-zinc-500 hover:text-sky-600 transition"
                 aria-label={`Add ${meal.dishName} to tracker`}
