@@ -22,5 +22,4 @@ ALTER TABLE "dishes" DROP COLUMN "name";--> statement-breakpoint
 ALTER TABLE "dishes" DROP COLUMN "description";--> statement-breakpoint
 ALTER TABLE "dishes" DROP COLUMN "ingredients";--> statement-breakpoint
 ALTER TABLE "dishes" DROP COLUMN "category";--> statement-breakpoint
-ALTER TABLE "dishes" DROP COLUMN "image_url";--> statement-breakpoint
-ALTER TABLE "dishes" DROP COLUMN "num_ratings";
+ALTER TABLE "dishes" DROP COLUMN "image_url";
