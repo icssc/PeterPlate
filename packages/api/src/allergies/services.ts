@@ -12,7 +12,7 @@ export async function getAllergies(db: Drizzle, userId: string) {
   const allergies = await db.query.userAllergies.findMany({
     where: (ua, { eq }) => eq(ua.userId, userId),
   });
-  //Return each allergy string
+  // Return each allergy string
   return allergies.map((a) => a.allergy);
 }
 
@@ -36,7 +36,7 @@ export async function addAllergies(
 
     const results = await Promise.all(upsertPromises);
     console.log(`Successfully synced ${results.length} preferences.`);
-  } catch (error) {
+  } catch (_) {
     console.error("Failed to save dietary preferences.");
   }
 }

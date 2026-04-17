@@ -6,23 +6,60 @@ import {
 } from "@api/ratings/services";
 import { createTRPCRouter, publicProcedure } from "@api/trpc";
 import { RatingSchema } from "@peterplate/db";
+import {
+  type DishWithRating,
+  retrieveDishesByIdResponseSchema,
+} from "@peterplate/validators";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+import { AAPI_DINING_ROUTE } from "..";
 
-const getDishProcedure = publicProcedure
-  .input(z.object({ id: z.string() }))
+// Queries the AAPI 'Retrieve Dishes By Id' endpoint for a batch of dishes' info.
+// Also adds the ratings from our database to the dish information.
+// If not found, omits it from the returned information.
+export const getDishProcedure = publicProcedure
+  .input(z.object({ ids: z.array(z.string()) }))
   .query(async ({ ctx: { db }, input }) => {
-    const dish = await db.query.dishes.findFirst({
-      where: (dishes, { eq }) => eq(dishes.id, input.id),
-    });
+    const response = await fetch(
+      `${AAPI_DINING_ROUTE}/dishes/batch?ids=${input.ids.join()}`,
+    );
 
-    if (!dish)
+    // Retrieve and parse data from AAPI Endpoint
+    if (!response.ok) {
       throw new TRPCError({
-        code: "NOT_FOUND",
-        message: "dish not found",
+        code: "SERVICE_UNAVAILABLE",
+        message: "Could not reach AAPI endpoint.",
       });
+    }
 
-    return dish;
+    const result = await response.json();
+    const parsedResult = retrieveDishesByIdResponseSchema.safeParse(result);
+
+    if (!parsedResult.success) {
+      throw new TRPCError({
+        code: "PARSE_ERROR",
+        message: `Could not parse the response from retrieving dish data: ${parsedResult.error.message}`,
+      });
+    }
+
+    const data = parsedResult.data.data;
+    const dishIds = data.flatMap((dish) => dish.id);
+
+    // Retrieve ratings from PeterPlate database
+    const dishesWithRatings = await db.query.dishes.findMany({
+      where: (dishes, { inArray }) => inArray(dishes.id, dishIds),
+    });
+    const ratingMap = new Map(
+      dishesWithRatings.map((dish) => [dish.id, dish.totalRating]),
+    );
+
+    // Merge the ratings with dish information
+    const dishInfo = data.map((apiDish) => ({
+      ...apiDish,
+      totalRating: ratingMap.get(apiDish.id ?? null) ?? 0,
+    }));
+
+    return dishInfo as DishWithRating[];
   });
 
 const rateDishProcedure = publicProcedure
@@ -35,7 +72,7 @@ const rateDishProcedure = publicProcedure
     if (!dish)
       throw new TRPCError({
         code: "NOT_FOUND",
-        message: "dish not found",
+        message: "Dish could not be found.",
       });
 
     await upsertRating(db, input);
@@ -43,12 +80,14 @@ const rateDishProcedure = publicProcedure
     return await getAverageRating(db, input.dishId);
   });
 
+// Gets the average rating of the dish specified.
 const getAverageRatingProcedure = publicProcedure
   .input(z.object({ dishId: z.string() }))
   .query(async ({ ctx: { db }, input }) => {
     return await getAverageRating(db, input.dishId);
   });
 
+// Gets all of the dishes rated by the user.
 const getUserRatedDishesProcedure = publicProcedure
   .input(z.object({ userId: z.string() }))
   .query(async ({ ctx: { db }, input }) => {

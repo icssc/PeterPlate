@@ -33,6 +33,8 @@ export { createTRPCContext, appRouter, createCaller };
 export type { AppRouter, RouterInputs, RouterOutputs };
 export * from "./server";
 
+export const AAPI_DINING_ROUTE = "https://anteaterapi.com/v2/rest/dining";
+
 // Next.js Exports
 export type { RestaurantInfo };
 export type DishInfo =
