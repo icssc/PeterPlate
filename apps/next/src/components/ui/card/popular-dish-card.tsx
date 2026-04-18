@@ -10,7 +10,6 @@ import { formatFoodName, getFoodIcon, toTitleCase } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
 import FoodDialogContent from "../food-dialog-content";
 import FoodDrawerContent from "../food-drawer-content";
-import FoodCard from "./food-card";
 
 interface PopularDishCardContentProps
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -197,7 +196,7 @@ export default function PopularDishCard({
             },
           }}
         >
-          <FoodDialogContent
+          <FoodDrawerContent
             dish={dish}
             onAddToMealTracker={handleAddToMealTracker}
             isAddingToMealTracker={logMealMutation.isPending}
