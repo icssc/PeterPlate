@@ -3,6 +3,8 @@ import { Star } from "@mui/icons-material";
 import { Card, Dialog } from "@mui/material";
 import Image from "next/image";
 import { useState } from "react";
+import { useSnackbarStore } from "@/context/useSnackbar";
+import { useUserStore } from "@/context/useUserStore";
 import { formatFoodName, getFoodIcon, toTitleCase } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
 import FoodDialogContent from "../food-dialog-content";
@@ -31,6 +33,36 @@ export default function PopularDishCard({
 
   const iconSize = compact ? 16 : 24;
   const descSize = compact ? "text-[8px]" : "text-[10px]";
+
+  const userId = useUserStore((s) => s.userId);
+  const { showSnackbar } = useSnackbarStore();
+  const utils = trpc.useUtils();
+
+  const logMealMutation = trpc.nutrition.logMeal.useMutation({
+    onSuccess: () => {
+      showSnackbar(`Added ${formatFoodName(dish.name)} to your log`, "success");
+      utils.nutrition.invalidate();
+    },
+    onError: (error) => {
+      console.error(error.message);
+    },
+  });
+
+  const handleAddToMealTracker = (e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    if (!userId) {
+      showSnackbar("Login to track meals!", "error");
+      return;
+    }
+
+    logMealMutation.mutate({
+      dishId: dish.id,
+      userId,
+      dishName: dish.name,
+      servings: 1,
+    });
+  };
 
   return (
     <>
@@ -89,7 +121,11 @@ export default function PopularDishCard({
           },
         }}
       >
-        <FoodDialogContent dish={dish} />
+        <FoodDialogContent
+          dish={dish}
+          onAddToMealTracker={handleAddToMealTracker}
+          isAddingToMealTracker={logMealMutation.isPending}
+        />
       </Dialog>
     </>
   );
