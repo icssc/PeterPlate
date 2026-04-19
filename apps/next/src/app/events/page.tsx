@@ -6,6 +6,7 @@ import Button from "@mui/material/Button";
 import { useState } from "react";
 import { trpc } from "@/utils/trpc";
 import "react-big-calendar/lib/css/react-big-calendar.css";
+import { FormControl, MenuItem, Select } from "@mui/material";
 import { addMonths, endOfMonth, startOfMonth, subMonths } from "date-fns";
 import CalendarView from "@/components/ui/calendar-view";
 import EventCard, { type EventInfo } from "@/components/ui/card/event-card";
@@ -27,6 +28,10 @@ const Events = () => {
   );
   const [currentDate, setCurrentDate] = useState(new Date());
   const now = new Date();
+  const locationFormControlClasses =
+    "mt-1.5 w-40 sm:w-[180px] [&_.MuiOutlinedInput-root]:min-h-[38px] [&_.MuiOutlinedInput-root]:rounded-lg [&_.MuiOutlinedInput-root]:bg-white [&_.MuiOutlinedInput-root]:text-[0.9rem] [&_.MuiOutlinedInput-root]:text-slate-900 [&_.MuiOutlinedInput-notchedOutline]:border-sky-700 [&_.MuiOutlinedInput-root:hover_.MuiOutlinedInput-notchedOutline]:border-sky-800 [&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-2 [&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-sky-700";
+  const locationSelectClasses =
+    "[&_.MuiSelect-select]:!py-2 [&_.MuiSelect-select]:!pl-3 [&_.MuiSelect-select]:!pr-[30px] [&_.MuiSelect-icon]:right-2 [&_.MuiSelect-icon]:text-sky-700";
 
   const {
     data: events,
@@ -67,6 +72,10 @@ const Events = () => {
   }));
 
   const isDesktop = useMediaQuery("(min-width: 768px)");
+
+  const handleLocationChange = (event: any) => {
+    setSelectedDiningHall(event.target.value);
+  };
 
   const handleSelectEvent = (calendarEvent: any) => {
     const resource = calendarEvent.resource;
@@ -112,6 +121,19 @@ const Events = () => {
               Join us for special events and celebrations hosted at your local
               dining halls!
             </p>
+            <FormControl fullWidth className={locationFormControlClasses}>
+              <Select
+                id="location-select"
+                size="small"
+                className={locationSelectClasses}
+                value={selectedDiningHall}
+                onChange={handleLocationChange}
+              >
+                <MenuItem value="both">All Locations</MenuItem>
+                <MenuItem value={HallEnum.BRANDYWINE}>Brandywine</MenuItem>
+                <MenuItem value={HallEnum.ANTEATERY}>The Anteatery</MenuItem>
+              </Select>
+            </FormControl>
             <div className="flex gap-2 mt-3 items-center">
               <span className="text-sm font-medium text-slate-900">View:</span>
 
