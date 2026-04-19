@@ -120,7 +120,6 @@ const Events = () => {
             <FormControl fullWidth className={locationFormControlClasses}>
               <Select
                 id="location-select"
-                size="small"
                 className={locationSelectClasses}
                 value={selectedDiningHall}
                 onChange={handleLocationChange}
