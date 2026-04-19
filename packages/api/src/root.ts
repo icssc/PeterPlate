@@ -1,5 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+import { allergiesRouter } from "./allergies/router";
 import { getContributors } from "./contributors/services";
 import { dishRouter } from "./dishes/router";
 import { eventRouter } from "./events/router";
@@ -7,6 +8,7 @@ import { favoriteRouter } from "./favorites/router";
 import { getPickableDates } from "./menus/services";
 import { notificationRouter } from "./notifications/router";
 import { nutritionRouter } from "./nutrition/router";
+import { preferencesRouter } from "./preferences/router";
 import { getRestaurantsByDate } from "./restaurants/services";
 import { createTRPCRouter, publicProcedure } from "./trpc";
 import { userRouter } from "./users/router";
@@ -17,8 +19,9 @@ export const appRouter = createTRPCRouter({
   favorite: favoriteRouter,
   notification: notificationRouter,
   user: userRouter,
+  preference: preferencesRouter,
+  allergy: allergiesRouter,
   nutrition: nutritionRouter,
-  /** Returns "Hello, world!" */
   hello: publicProcedure.query(() => "Hello, world!"),
   /** Get all information about restaurants on a given date. */
   peterplate: publicProcedure.input(z.object({ date: z.date() })).query(

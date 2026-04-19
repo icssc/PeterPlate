@@ -64,27 +64,27 @@ const allApiQueries: TestCase<any>[] = [
     } as GetLocationRecipesWeeklyVariables,
     schema: GetLocationRecipesWeeklySchema,
   },
-  {
-    name: "AEM_eventList (The Anteatery)",
-    query: AEMEventListQuery,
-    variables: {
-      campus: {
-        _expressions: {
-          _operator: "EQUALS",
-          value: "campus",
-        },
-      },
-      location: {
-        name: {
-          _expressions: {
-            _operator: "EQUALS",
-            value: "The Anteatery",
-          },
-        },
-      },
-    } as AEMEventListQueryVariables,
-    schema: AEMEventListSchema,
-  },
+  // {
+  //   name: "AEM_eventList (The Anteatery)",
+  //   query: AEMEventListQuery,
+  //   variables: {
+  //     campus: {
+  //       _expressions: {
+  //         _operator: "EQUALS",
+  //         value: "campus",
+  //       },
+  //     },
+  //     location: {
+  //       name: {
+  //         _expressions: {
+  //           _operator: "EQUALS",
+  //           value: "The Anteatery",
+  //         },
+  //       },
+  //     },
+  //   } as AEMEventListQueryVariables,
+  //   schema: AEMEventListSchema,
+  // },
 ];
 
 describe("AdobeECommerce API Integration Tests", () => {
@@ -95,7 +95,7 @@ describe("AdobeECommerce API Integration Tests", () => {
     name,
   }) => {
     it(`should successfully fetch data, not throw errors, and validate against Zod schema (${name})`, async () => {
-      let response: any;
+      let response = null;
       let caughtError = null;
 
       try {

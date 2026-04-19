@@ -33,6 +33,7 @@ export function ProgressDonut({
     <div className="flex flex-col items-center justify-center p-4 pt-0">
       <div className="relative w-40 h-40">
         <svg viewBox="0 0 100 100" className="w-full h-full">
+          <title>Progress Donut</title>
           <circle
             cx="50"
             cy="50"

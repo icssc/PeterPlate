@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import FoodCard from "@/components/ui/card/food-card";
 import FoodCardSkeleton from "@/components/ui/skeleton/food-card-skeleton";
+import { useSnackbarStore } from "@/context/useSnackbar";
 import { useUserStore } from "@/context/useUserStore";
 import { useFavorites } from "@/hooks/useFavorites";
 
@@ -11,15 +12,17 @@ type FavoriteEntry = ReturnType<typeof useFavorites>["favorites"][number];
 
 export default function MyFavoritesPage() {
   const router = useRouter();
-  const userId = useUserStore((s) => s.userId);
+  const { userId, isInitialized } = useUserStore();
+  const { showSnackbar } = useSnackbarStore();
 
   useEffect(() => {
-    // TODO: use [MUI snackbar](https://mui.com/material-ui/react-snackbar/) to warn users.
+    if (!isInitialized) return;
+
     if (!userId) {
-      alert("Login to favorite meals!");
+      showSnackbar("Login to favorite meals!", "error");
       router.push("/");
     }
-  }, [userId, router.push]);
+  }, [userId, isInitialized, router, showSnackbar]);
 
   const {
     favorites,
@@ -27,7 +30,7 @@ export default function MyFavoritesPage() {
     favoritesError,
     toggleFavorite,
     isFavoritePending,
-  } = useFavorites(userId!);
+  } = useFavorites(userId ?? "");
 
   const hasFavorites = favorites.length > 0;
 
@@ -40,21 +43,18 @@ export default function MyFavoritesPage() {
           any card to add or remove items.
         </p>
       </header>
-
       {favoritesError && (
         <div className="rounded-md border border-red-200 bg-red-50/70 px-4 py-3 text-red-700">
           We couldn&apos;t load your favorites. Please try again in a moment.
         </div>
       )}
-
       {isLoadingFavorites && (
         <div className="space-y-4">
-          {Array.from({ length: 3 }).map((_, index) => (
+          {["s1", "s2", "s3"].map((index) => (
             <FoodCardSkeleton key={`favorite-skeleton-${index}`} />
           ))}
         </div>
       )}
-
       {!isLoadingFavorites &&
         !favoritesError &&
         (hasFavorites ? (
@@ -62,6 +62,7 @@ export default function MyFavoritesPage() {
             {favorites.map((favorite: FavoriteEntry) => (
               <FoodCard
                 key={favorite.dishId}
+                menuId="favorite-menu"
                 {...favorite.dish}
                 isFavorited
                 favoriteIsLoading={isFavoritePending?.(favorite.dishId)}
@@ -79,7 +80,7 @@ export default function MyFavoritesPage() {
               favorites list.
             </p>
           </div>
-        ))}
+        ))}{" "}
     </div>
   );
 }

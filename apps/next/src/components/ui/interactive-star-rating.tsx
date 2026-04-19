@@ -7,6 +7,7 @@
 
 import { StarBorder } from "@mui/icons-material";
 import { useEffect, useState } from "react";
+import { useSnackbarStore } from "@/context/useSnackbar";
 import { useUserStore } from "@/context/useUserStore";
 import { useRatings } from "@/hooks/useRatings";
 import { trpc } from "@/utils/trpc";
@@ -19,12 +20,11 @@ export default function InteractiveStarRating({
   dishId,
 }: InteractiveStarRatingProps) {
   const userId = useUserStore((s) => s.userId);
+  const { showSnackbar } = useSnackbarStore();
   const [userRating, setUserRating] = useState<number | undefined>(0);
   const [hoverRating, setHoverRating] = useState<number | null>(null);
 
   const { rateDish } = useRatings(userId ?? "");
-
-  console.log(userId);
 
   const { data: existingRating } = trpc.user.getUserRating.useQuery(
     { userId: userId ?? "", dishId },
@@ -41,9 +41,8 @@ export default function InteractiveStarRating({
   }, [existingRating]);
 
   const handleStarClick = (stars: number) => {
-    // TODO: use [MUI snackbar](https://mui.com/material-ui/react-snackbar/) to warn users.
     if (!userId) {
-      alert("Login to rate meals!");
+      showSnackbar("Login to rate meals!", "error");
       return;
     }
 

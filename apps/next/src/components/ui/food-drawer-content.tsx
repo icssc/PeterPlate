@@ -1,5 +1,7 @@
 "use client"; // Need state for toggling nutrient visibility
 
+import { Add } from "@mui/icons-material";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import { Box, Button } from "@mui/material";
 import type { DishInfo } from "@peterplate/api";
 import Image from "next/image";
@@ -13,17 +15,33 @@ import {
 } from "@/utils/funcs";
 import { cn } from "@/utils/tw";
 import { nutrientToUnit } from "@/utils/types";
+import IngredientsDialog from "../ingredients-dialog";
 import { AllergenBadge } from "./allergen-badge";
-import InteractiveStarRating from "./interactive-star-rating";
+import type { OnAddToMealTracker } from "./card/food-card";
+import InteractiveStarRating from "./rating";
 
-export default function FoodDrawerContent({ dish }: { dish: DishInfo }) {
+export default function FoodDrawerContent({
+  dish,
+  onAddToMealTracker,
+  isAddingToMealTracker = false,
+  doesNotMeetPreferences,
+  violations,
+}: {
+  dish: DishInfo;
+  onAddToMealTracker?: OnAddToMealTracker;
+  isAddingToMealTracker?: boolean;
+  doesNotMeetPreferences: boolean;
+  violations: string[];
+}) {
   const [imageError, setImageError] = useState(false);
   const showImage =
     typeof dish.image_url === "string" &&
     dish.image_url.trim() !== "" &&
     !imageError;
-  // const ingredientsAvailable: boolean =
-  //   dish.ingredients != null && dish.ingredients.length > 0;
+
+  const ingredientsAvailable: boolean =
+    dish.ingredients != null && dish.ingredients.length > 0;
+
   const caloricInformationAvailable: boolean =
     dish.nutritionInfo.calories != null &&
     dish.nutritionInfo.calories.length > 0;
@@ -47,8 +65,8 @@ export default function FoodDrawerContent({ dish }: { dish: DishInfo }) {
   ]);
 
   return (
-    <Box className="max-h-[95vh] flex flex-col">
-      <Box className="pb-4">
+    <Box className="h-full max-h-[85vh] flex flex-col font-poppins min-h-0">
+      <Box className="pb-4 shrink-0">
         {showImage ? (
           <Image
             src={dish.image_url as string}
@@ -61,7 +79,7 @@ export default function FoodDrawerContent({ dish }: { dish: DishInfo }) {
         ) : (
           <Image
             src={"/zm-card-header.webp"}
-            alt={"An image of peterplate logo."}
+            alt={"An image of PeterPlate's logo."}
             width={1200}
             height={700}
             className="w-full h-32 object-cover"
@@ -69,7 +87,14 @@ export default function FoodDrawerContent({ dish }: { dish: DishInfo }) {
         )}
         <Box className="px-4 pt-4 flex flex-col gap-2">
           <div className="flex items-center justify-between">
-            <h2 className="text-3xl font-bold leading-tight tracking-normal text-sky-700">
+            <h2
+              className={cn(
+                "text-3xl font-bold leading-tight tracking-normal",
+                "text-sky-700 dark:text-sky-600",
+                dish.name.length > 10 && "text-2xl",
+                dish.name.length > 30 && "text-md",
+              )}
+            >
               {formatFoodName(dish.name)}
             </h2>
           </div>
@@ -94,6 +119,20 @@ export default function FoodDrawerContent({ dish }: { dish: DishInfo }) {
               {dish.dietRestriction.isKosher && (
                 <AllergenBadge variant={"kosher"} />
               )}
+              {doesNotMeetPreferences &&
+                violations.length > 0 &&
+                violations.map((v) => (
+                  <AllergenBadge
+                    key={v}
+                    variant="conflict"
+                    label={
+                      <span className="inline-flex items-center gap-1">
+                        <ErrorOutlineIcon sx={{ fontSize: "0.75rem" }} />
+                        {`    ${v}`}
+                      </span>
+                    }
+                  />
+                ))}
             </div>
           </div>
 
@@ -108,10 +147,10 @@ export default function FoodDrawerContent({ dish }: { dish: DishInfo }) {
         </Box>
       </Box>
 
-      <Box className="px-4 flex-1 min-h-0 flex flex-col">
+      <Box className="flex-1 min-h-0 overflow-y-auto flex flex-col px-4">
         <h1 className="text-2xl text-left font-bold mb-2">Nutrients</h1>
         <div
-          className="flex-1 grid grid-cols-2 gap-x-4 w-full px-2 text-black mb-4 overflow-y-auto auto-rows-max"
+          className="grid grid-cols-2 gap-x-4 w-full px-2 text-black mb-4 auto-rows-max"
           id="nutrient-content"
         >
           {caloricInformationAvailable &&
@@ -159,33 +198,63 @@ export default function FoodDrawerContent({ dish }: { dish: DishInfo }) {
                 );
               })}
         </div>
-      </Box>
-      {!caloricInformationAvailable && (
-        <h2 className="text-center w-full text-sm text-zinc-600">
-          Nutritional information not available.
-        </h2>
-      )}
-
-      <Box className="px-4 pb-6">
-        {caloricInformationAvailable && (
-          <Button
-            variant="outlined"
-            size="small"
-            className="w-full whitespace-nowrap border-input hover:bg-accent hover:text-accent-foreground text-sm font-medium h-8 rounded-md normal-case"
-            sx={{
-              borderColor: "hsl(var(--input))",
-              color: "inherit",
-              "&:hover": {
-                borderColor: "hsl(var(--input))",
-                backgroundColor: "hsl(var(--accent))",
-              },
-            }}
-            onClick={() => setShowAllNutrients(!showAllNutrients)}
-          >
-            {showAllNutrients ? "Show Less" : "Show More Nutrients"}
-          </Button>
+        {!caloricInformationAvailable && (
+          <h2 className="text-center w-full text-sm text-zinc-600">
+            Nutritional information not available.
+          </h2>
         )}
+
+        <Box className="mb-4 flex flex-col gap-2">
+          {caloricInformationAvailable && (
+            <Button
+              variant="outlined"
+              size="small"
+              className="w-full whitespace-nowrap border-input hover:bg-accent hover:text-accent-foreground text-sm font-medium h-8 rounded-md normal-case"
+              sx={{
+                borderColor: "hsl(var(--input))",
+                color: "inherit",
+                "&:hover": {
+                  borderColor: "hsl(var(--input))",
+                  backgroundColor: "hsl(var(--accent))",
+                },
+              }}
+              onClick={() => setShowAllNutrients(!showAllNutrients)}
+            >
+              {showAllNutrients ? "Show Less" : "Show More Nutrients"}
+            </Button>
+          )}
+          {ingredientsAvailable && (
+            <IngredientsDialog
+              name={dish.name}
+              ingredients={dish.ingredients ?? ""}
+            />
+          )}
+          {!ingredientsAvailable && (
+            <Button
+              variant="outlined"
+              disabled
+              className="w-full whitespace-nowrap"
+            >
+              Ingredients Not Available
+            </Button>
+          )}
+        </Box>
       </Box>
+
+      {onAddToMealTracker && (
+        <Box className="px-4 pt-2 pb-8 shrink-0">
+          <button
+            type="button"
+            onClick={onAddToMealTracker}
+            disabled={isAddingToMealTracker}
+            className="w-full inline-flex h-[30px] justify-center items-center gap-0.5 rounded-md border border-gray-300 bg-white text-[12px] font-normal leading-[18px] text-zinc-500 hover:bg-zinc-50 disabled:opacity-60"
+            style={{ fontFamily: "Poppins, sans-serif" }}
+          >
+            <Add sx={{ fontSize: 18, width: 18, height: 18 }} />
+            Add to Meal Tracker
+          </button>
+        </Box>
+      )}
     </Box>
   );
 }
