@@ -1,6 +1,5 @@
 "use client";
 
-import { useTheme } from "next-themes";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import FavoriteBorder from "@mui/icons-material/FavoriteBorder";
@@ -24,6 +23,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTheme } from "next-themes";
 import type { MouseEvent } from "react";
 import { useEffect, useState } from "react";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in";
@@ -135,9 +135,7 @@ function ToolbarDropdown({
         onClick={handleClick}
         endIcon={<ArrowDropDownIcon fontSize="small" />}
         className={`capitalize text-[16px] !font-medium bg-transparent ${
-          isTransparent
-            ? "text-white"
-            : "!text-black dark:!text-white"
+          isTransparent ? "text-white" : "!text-black dark:!text-white"
         }`}
       >
         {element.title}
@@ -166,11 +164,13 @@ function ToolbarDropdown({
             component={Link}
             href={child.href}
             onClick={handleClose}
-           sx={{ 
+            sx={{
               color: pathname === child.href ? "primary.main" : "text.primary",
               "&.Mui-selected": { backgroundColor: "transparent" },
-              borderLeft: pathname === child.href ? "3px solid" : "3px solid transparent",
-              borderColor: pathname === child.href ? "primary.main" : "transparent",
+              borderLeft:
+                pathname === child.href ? "3px solid" : "3px solid transparent",
+              borderColor:
+                pathname === child.href ? "primary.main" : "transparent",
             }}
           >
             {child.title}
@@ -242,7 +242,12 @@ export function DesktopToolbar(): React.JSX.Element {
               <Typography
                 className="font-poppins text-[28px] leading-[24px]"
                 fontWeight={700}
-                sx={{ color: isTransparent && resolvedTheme === "light" ? "white" : "primary.main" }}
+                sx={{
+                  color:
+                    isTransparent && resolvedTheme === "light"
+                      ? "white"
+                      : "primary.main",
+                }}
               >
                 PeterPlate
               </Typography>
@@ -269,7 +274,9 @@ export function DesktopToolbar(): React.JSX.Element {
                   className={`normal-case text-[16px] !font-medium ${
                     isTransparent
                       ? "text-white"
-                      : "!text-black dark:!text-white"
+                      : pathname === element.href
+                        ? "!text-sky-700 dark:!text-blue-300"
+                        : "!text-black dark:!text-white"
                   }`}
                 >
                   {element.title}
@@ -288,7 +295,9 @@ export function DesktopToolbar(): React.JSX.Element {
                     aria-label="Open sidebar"
                     disabled
                   >
-                    <MenuIcon sx={{ color: isTransparent ? "white" : "text.primary" }} />
+                    <MenuIcon
+                      sx={{ color: isTransparent ? "white" : "text.primary" }}
+                    />
                   </IconButton>
                 </>
               ) : user ? (
@@ -313,7 +322,9 @@ export function DesktopToolbar(): React.JSX.Element {
                     className="hover:!bg-gray-100 dark:hover:!bg-gray-700"
                     aria-label="Open sidebar"
                   >
-                    <MenuIcon sx={{ color: isTransparent ? "white" : "text.primary" }} />
+                    <MenuIcon
+                      sx={{ color: isTransparent ? "white" : "text.primary" }}
+                    />
                   </IconButton>
                 </div>
               )}
