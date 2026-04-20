@@ -61,8 +61,8 @@ const MobileEventsView = ({
               onChange={handleLocationChange}
             >
               <MenuItem value="both">All Locations</MenuItem>
-              <MenuItem value={HallEnum.BRANDYWINE}>Brandywine</MenuItem>
-              <MenuItem value={HallEnum.ANTEATERY}>The Anteatery</MenuItem>
+              <MenuItem value="brandywine">Brandywine</MenuItem>
+              <MenuItem value="anteatery">Anteatery</MenuItem>
             </Select>
           </FormControl>
 
