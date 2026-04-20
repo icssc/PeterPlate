@@ -103,7 +103,7 @@ const MobileListView = ({
                           <span className="font-medium text-black dark:text-zinc-200">
                             {event.title}
                           </span>
-                          <span className="text-xs text-slate-500 flex items-center mt-0.5">
+                          <span className="text-gray-500 flex items-center mt-0.5">
                             <LocationOnOutlinedIcon
                               sx={{ fontSize: 14 }}
                               className="mr-0.5"
