@@ -149,7 +149,7 @@ const MobileCalendarView = ({
                 <div className="absolute -bottom-3 flex space-x-0.5">
                   {eventsOnDay.slice(0, 3).map((event) => (
                     <div
-                      key={event.title}
+                      key={`${event.title}-${String(event.start)}-${event.restaurantId || event.location}`}
                       className="w-1.5 h-1.5 rounded-full bg-sky-700 dark:bg-sky-400"
                     />
                   ))}
