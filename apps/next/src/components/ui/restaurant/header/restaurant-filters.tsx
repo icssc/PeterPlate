@@ -196,8 +196,8 @@ export function RestaurantFilters({
             h-[40px] rounded-md border text-sm font-medium transition-all duration-200
             ${
               showPreferencesOnly
-                ? "bg-sky-700 text-white border-sky-700 shadow-md"
-                : "bg-white text-sky-700 border-sky-700 hover:bg-sky-50"
+                ? "bg-sky-700 text-white border-sky-700 shadow-md dark:bg-blue-300 dark:text-gray-900 dark:border-blue-300"
+                : "bg-white text-sky-700 border-sky-700 hover:bg-sky-50 dark:bg-[#323235] dark:text-blue-300 dark:border-blue-300 dark:hover:bg-zinc-700"
             }
           `}
         >

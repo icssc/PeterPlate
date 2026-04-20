@@ -13,9 +13,9 @@ import {
 import { Box, Tooltip, Typography } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
-import type { ReactNode } from "react";
 import { useTheme } from "next-themes";
 import type React from "react";
+import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in";
 import { signOut, useSession } from "@/utils/auth-client";
@@ -188,8 +188,16 @@ export default function SidebarContent({
                 }}
                 className="w-full flex items-center gap-3 rounded-lg px-4 py-2 text-sm text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:dark:hover:bg-transparent"
               >
-                <Box sx={{ color: "primary.main" }}><EditIcon fontSize="small" /></Box>
-                <Typography variant="body2" fontWeight={500} color="text.primary">Edit Preferences</Typography>
+                <Box sx={{ color: "primary.main" }}>
+                  <EditIcon fontSize="small" />
+                </Box>
+                <Typography
+                  variant="body2"
+                  fontWeight={500}
+                  color="text.primary"
+                >
+                  Edit Preferences
+                </Typography>
               </button>
             </span>
           </Tooltip>
@@ -252,7 +260,7 @@ function ThemeButton({
       className={`flex-1 flex items-center justify-center gap-1 py-2 text-xs font-medium transition-colors ${
         active
           ? "bg-sky-700 text-white dark:bg-blue-300 dark:text-gray-900"
-          : "text-gray-700 hover:bg-blue-50 dark:text-white"
+          : "text-gray-700 hover:bg-sky-100 dark:text-white dark:hover:bg-zinc-700"
       }`}
     >
       {icon}
