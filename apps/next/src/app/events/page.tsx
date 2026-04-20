@@ -117,9 +117,7 @@ const Events = () => {
     <DesktopEventsView
       isDesktop={isDesktop}
       currentDate={currentDate}
-      setCurrentDate={setCurrentDate}
       selectedDiningHall={selectedDiningHall}
-      setSelectedDiningHall={setSelectedDiningHall}
       selectedEventType={selectedEventType}
       setSelectedEventType={setSelectedEventType}
       viewMode={viewMode}
@@ -141,17 +139,13 @@ const Events = () => {
       currentDate={currentDate}
       setCurrentDate={setCurrentDate}
       selectedDiningHall={selectedDiningHall}
-      setSelectedDiningHall={setSelectedDiningHall}
       filteredEvents={filteredEvents}
       selectedEventData={selectedEventData}
       isLoading={isLoading}
       error={error}
       handleLocationChange={handleLocationChange}
-      viewMode={viewMode}
-      setViewMode={setViewMode}
       handleSelectEvent={handleSelectEvent}
       handleClose={handleClose}
-      now={now}
     />
   );
 };

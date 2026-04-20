@@ -2,7 +2,12 @@
 
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import MenuIcon from "@mui/icons-material/Menu";
-import { FormControl, MenuItem, Select } from "@mui/material";
+import {
+  FormControl,
+  MenuItem,
+  Select,
+  type SelectChangeEvent,
+} from "@mui/material";
 import Drawer from "@mui/material/Drawer";
 import { useState } from "react";
 import { HallEnum } from "@/utils/types";
@@ -14,14 +19,18 @@ import MonthPickerDrawer from "./month-picker-drawer";
 
 interface MobileEventsViewProps {
   selectedDiningHall: "both" | "anteatery" | "brandywine";
-  handleLocationChange: (event: unknown) => void;
+  handleLocationChange: (
+    event: SelectChangeEvent<"both" | "anteatery" | "brandywine">,
+  ) => void;
   isLoading: boolean;
   error: Error | null;
   filteredEvents: EventInfo[];
   currentDate: Date;
   setCurrentDate: (date: Date) => void;
   selectedEventData: EventInfo | null;
-  handleSelectEvent: (calendarEvent: { resource: EventInfo }) => void;
+  handleSelectEvent: (calendarEvent: {
+    resource: Record<string, unknown>;
+  }) => void;
   handleClose: () => void;
 }
 

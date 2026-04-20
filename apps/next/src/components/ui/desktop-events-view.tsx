@@ -31,7 +31,9 @@ interface DesktopEventsViewProps {
   }[];
   currentDate: Date;
   selectedEventData: EventInfo | null;
-  handleSelectEvent: (calendarEvent: { resource: EventInfo }) => void;
+  handleSelectEvent: (calendarEvent: {
+    resource: Record<string, unknown>;
+  }) => void;
   handleClose: () => void;
   viewPreviousMonthsEvents: () => void;
   viewNextMonthsEvents: () => void;
