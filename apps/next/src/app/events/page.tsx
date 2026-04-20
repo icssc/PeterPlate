@@ -115,8 +115,12 @@ const Events = () => {
         >
           <div>
             <h1 className="text-4xl font-bold text-sky-700 dark:text-sky-400">
-              Events
+              Dining Hall Events
             </h1>
+            <p className="text-zinc-600 dark:text-zinc-400 mt-1 font-medium">
+              Join us for special events and celebrations hosted at your local
+              dining halls!
+            </p>
             <FormControl fullWidth className={locationFormControlClasses}>
               <Select
                 id="location-select"
