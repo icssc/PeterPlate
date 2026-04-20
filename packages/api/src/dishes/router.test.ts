@@ -21,6 +21,19 @@ describe("dish.get", () => {
     });
   });
 
+  apiTest("adds rating metadata fields", async ({ api, expect, testData }) => {
+    const result = await api.dish.get({
+      ids: [testData.dishIds.at(0) ?? ""],
+    });
+
+    expect(result[0]).toEqual(
+      expect.objectContaining({
+        totalRating: expect.any(Number),
+        numRatings: expect.any(Number),
+      }),
+    );
+  });
+
   apiTest("fails on invalid params", async ({ api, expect }) => {
     const result = await api.dish.get({
       ids: ["1"],

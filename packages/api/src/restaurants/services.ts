@@ -1,19 +1,73 @@
-import { upsert } from "@api/utils";
 import type {
-  Drizzle,
-  InsertRestaurant,
-  SelectDietRestriction,
-  SelectDish,
-  SelectEvent,
-  SelectMenu,
-  SelectNutritionInfo,
-  SelectPeriod,
-  SelectRestaurant,
-  SelectStation,
-} from "@peterplate/db";
+  DiningEventPayload,
+  DiningMenuPayload,
+  DiningRestaurantPayload,
+  DiningStationPayload,
+  PeterPlateDiningPayload,
+} from "@api/dining/types";
+import { getDishesById } from "@api/dishes/services";
+import { upsert } from "@api/utils";
+import type { Drizzle, InsertRestaurant } from "@peterplate/db";
 import { restaurants } from "@peterplate/db";
 import { TRPCError } from "@trpc/server";
 import { formatInTimeZone } from "date-fns-tz";
+import { z } from "zod";
+import { AAPI_DINING_ROUTE } from "..";
+
+const diningHallIdSchema = z.enum(["anteatery", "brandywine"]);
+
+const restaurantsResponseSchema = z.object({
+  ok: z.boolean(),
+  message: z.string().optional(),
+  data: z.array(
+    z.object({
+      id: diningHallIdSchema,
+      updatedAt: z.string(),
+      stations: z.array(
+        z.object({
+          id: z.string(),
+          name: z.string(),
+          updatedAt: z.string(),
+        }),
+      ),
+    }),
+  ),
+});
+
+const restaurantTodayResponseSchema = z.object({
+  ok: z.boolean(),
+  message: z.string().optional(),
+  data: z.object({
+    id: diningHallIdSchema,
+    updatedAt: z.string(),
+    periods: z.record(
+      z.string(),
+      z.object({
+        name: z.string(),
+        startTime: z.string().nullable(),
+        endTime: z.string().nullable(),
+        stationToDishes: z.record(z.string(), z.array(z.string())),
+        updatedAt: z.string(),
+      }),
+    ),
+  }),
+});
+
+const eventsResponseSchema = z.object({
+  ok: z.boolean(),
+  message: z.string().optional(),
+  data: z.array(
+    z.object({
+      title: z.string(),
+      image: z.string().nullable(),
+      restaurantId: diningHallIdSchema,
+      description: z.string().nullable(),
+      start: z.coerce.date(),
+      end: z.coerce.date().nullable(),
+      updatedAt: z.coerce.date(),
+    }),
+  ),
+});
 
 export const upsertRestaurant = async (
   db: Drizzle,
@@ -24,113 +78,232 @@ export const upsertRestaurant = async (
     set: restaurant,
   });
 
-/** Restaurant information for a given date. */
-export interface RestaurantInfo extends SelectRestaurant {
-  /** Events that are happening today or later. */
-  events: SelectEvent[];
-  /** List of menus for each period. */
-  menus: (SelectMenu & {
-    period: SelectPeriod;
-    stations: (SelectStation & {
-      dishes: (SelectDish & {
-        menuId: SelectMenu["id"]; // derived from menu context (dishes_to_menus), not dishes.menu_id
-        restaurant: SelectRestaurant["name"];
-        dietRestriction: SelectDietRestriction;
-        nutritionInfo: SelectNutritionInfo;
-      })[];
-    })[];
-  })[];
-}
+export type RestaurantInfo = DiningRestaurantPayload;
 
-/** Data object to be given to the client. */
-interface PeterPlateData {
-  anteatery: RestaurantInfo;
-  brandywine: RestaurantInfo;
-}
-
-/**
- * Get menus and events for each restaurant. Fetches menus that correspond to the
- * given date and events that are happening today or later.
- */
 export async function getRestaurantsByDate(
   db: Drizzle,
   date: Date,
-): Promise<PeterPlateData> {
-  const restaurants = await db.query.restaurants.findMany({
-    with: {
-      /** Get menus that correspond to the given date. */
-      menus: {
-        where: (menus, { eq }) =>
-          eq(
-            menus.date,
-            formatInTimeZone(date, "America/Los_Angeles", "yyyy-MM-dd"),
-          ),
-        with: {
-          period: true,
-          dishesToMenus: {
-            with: {
-              dish: {
-                with: {
-                  dietRestriction: true,
-                  nutritionInfo: true,
-                },
-              },
-            },
-          },
-        },
-      },
-      /** Get events that are happening today or later. */
-      events: {
-        where: (events, { gte }) => gte(events.end, new Date()),
-      },
-      stations: true,
-    },
-  });
+): Promise<PeterPlateDiningPayload> {
+  const dateString = formatInTimeZone(
+    date,
+    "America/Los_Angeles",
+    "yyyy-MM-dd",
+  );
+  const [anteateryTodayResult, brandywineTodayResult] = await Promise.all([
+    fetchRestaurantToday("anteatery", dateString),
+    fetchRestaurantToday("brandywine", dateString),
+  ]);
 
-  // Transform data to the expected format
-  const [firstRestaurant, secondRestaurant] = restaurants.map(
-    ({ menus, events, stations, ...restaurant }) => ({
-      ...restaurant,
-      menus: menus
-        .map(({ period, dishesToMenus, ...menu }) => ({
-          ...menu,
-          /** Only include stations that have dishes */
-          stations: stations
-            .map((station) => ({
-              ...station,
-              dishes: dishesToMenus
-                .map((dishToMenu) => ({
-                  ...dishToMenu.dish,
-                  image_url: dishToMenu.dish.image_url ?? null,
-                  menuId: menu.id, // derived from menu we’re iterating, not from dish row
-                  restaurant: restaurant.name,
-                }))
-                .filter((dish) => dish.stationId === station.id),
-            }))
-            .filter((station) => station.dishes.length),
-          // ? include this if we want a flat list of dishes
-          // dishes: dishesToMenus.map((dishToMenu) => dishToMenu.dish),
-          period,
-        }))
-        .sort((a, b) => a.period.startTime.localeCompare(b.period.startTime)),
-      events,
-      stations,
-    }),
+  const [restaurantsResponse, eventsResponse] = await Promise.all([
+    fetch(`${AAPI_DINING_ROUTE}/restaurants`),
+    fetch(`${AAPI_DINING_ROUTE}/events`),
+  ]);
+
+  if (!restaurantsResponse.ok || !eventsResponse.ok) {
+    throw new TRPCError({
+      code: "SERVICE_UNAVAILABLE",
+      message: "Could not reach AnteaterAPI dining endpoints.",
+    });
+  }
+
+  const [restaurantsResult, eventsResult] = await Promise.all([
+    restaurantsResponse.json(),
+    eventsResponse.json(),
+  ]);
+
+  const parsedRestaurants =
+    restaurantsResponseSchema.safeParse(restaurantsResult);
+  const parsedEvents = eventsResponseSchema.safeParse(eventsResult);
+
+  if (!parsedRestaurants.success) {
+    throw new TRPCError({
+      code: "PARSE_ERROR",
+      message: `Could not parse AnteaterAPI restaurants response: ${parsedRestaurants.error.message}`,
+    });
+  }
+
+  if (!parsedEvents.success) {
+    throw new TRPCError({
+      code: "PARSE_ERROR",
+      message: `Could not parse AnteaterAPI events response: ${parsedEvents.error.message}`,
+    });
+  }
+
+  const restaurantsById = new Map(
+    parsedRestaurants.data.data.map((restaurant) => [
+      restaurant.id,
+      restaurant,
+    ]),
   );
 
-  if (!firstRestaurant || !secondRestaurant)
+  return {
+    anteatery: await buildRestaurantPayload({
+      db,
+      dateString,
+      restaurant: restaurantsById.get("anteatery"),
+      restaurantToday: anteateryTodayResult,
+      events: parsedEvents.data.data.filter(
+        (event) => event.restaurantId === "anteatery",
+      ),
+    }),
+    brandywine: await buildRestaurantPayload({
+      db,
+      dateString,
+      restaurant: restaurantsById.get("brandywine"),
+      restaurantToday: brandywineTodayResult,
+      events: parsedEvents.data.data.filter(
+        (event) => event.restaurantId === "brandywine",
+      ),
+    }),
+  };
+}
+
+async function buildRestaurantPayload({
+  db,
+  dateString,
+  restaurant,
+  restaurantToday,
+  events,
+}: {
+  db: Drizzle;
+  dateString: string;
+  restaurant:
+    | z.infer<typeof restaurantsResponseSchema>["data"][number]
+    | undefined;
+  restaurantToday: z.infer<typeof restaurantTodayResponseSchema>["data"] | null;
+  events: z.infer<typeof eventsResponseSchema>["data"];
+}): Promise<RestaurantInfo> {
+  if (!restaurant) {
     throw new TRPCError({
       code: "INTERNAL_SERVER_ERROR",
-      message: "Restaurants not found, there should always be two restaurants",
+      message: "Restaurant metadata not found in AnteaterAPI response.",
     });
+  }
 
-  return firstRestaurant.name === "anteatery"
-    ? {
-        anteatery: firstRestaurant,
-        brandywine: secondRestaurant,
+  const eventsPayload: DiningEventPayload[] = events.map((event) => ({
+    title: event.title,
+    image: event.image,
+    restaurantId: event.restaurantId,
+    shortDescription: event.description,
+    longDescription: event.description,
+    start: event.start,
+    end: event.end,
+  }));
+
+  if (!restaurantToday) {
+    return {
+      id: restaurant.id,
+      name: restaurant.id,
+      events: eventsPayload,
+      menus: [],
+    };
+  }
+
+  const stationNames = new Map(
+    restaurant.stations.map((station) => [station.id, station.name]),
+  );
+  const allDishIds = [
+    ...new Set(
+      Object.values(restaurantToday.periods)
+        .flatMap((period) => Object.values(period.stationToDishes))
+        .flat(),
+    ),
+  ];
+  const dishes = await getDishesById(db, allDishIds);
+  const dishesById = new Map(dishes.map((dish) => [dish.id, dish]));
+
+  const menus = Object.entries(restaurantToday.periods)
+    .map(([periodId, period]): DiningMenuPayload | null => {
+      if (!period.startTime || !period.endTime) {
+        return null;
       }
-    : {
-        anteatery: secondRestaurant,
-        brandywine: firstRestaurant,
+
+      const stations = Object.entries(period.stationToDishes)
+        .map(([stationId, dishIds]): DiningStationPayload | null => {
+          const stationDishes = dishIds
+            .map((dishId) => dishesById.get(dishId))
+            .filter((dish) => dish !== undefined)
+            .map((dish) => ({
+              ...dish,
+              menuId: periodId,
+              restaurant: restaurant.id,
+              image_url: dish.imageUrl ?? null,
+            }));
+
+          if (stationDishes.length === 0) {
+            return null;
+          }
+
+          return {
+            id: stationId,
+            name: stationNames.get(stationId) ?? stationId,
+            dishes: stationDishes,
+          };
+        })
+        .filter(isNonNull);
+
+      if (stations.length === 0) {
+        return null;
+      }
+
+      return {
+        id: periodId,
+        date: dateString,
+        period: {
+          name: period.name,
+          startTime: period.startTime,
+          endTime: period.endTime,
+        },
+        stations,
+        price: null,
       };
+    })
+    .filter(isNonNull)
+    .sort((firstMenu, secondMenu) =>
+      firstMenu.period.startTime.localeCompare(secondMenu.period.startTime),
+    );
+
+  return {
+    id: restaurant.id,
+    name: restaurant.id,
+    events: eventsPayload,
+    menus,
+  };
+}
+
+function isNonNull<T>(value: T | null): value is T {
+  return value !== null;
+}
+
+async function fetchRestaurantToday(
+  restaurantId: z.infer<typeof diningHallIdSchema>,
+  dateString: string,
+): Promise<z.infer<typeof restaurantTodayResponseSchema>["data"] | null> {
+  const response = await fetch(
+    `${AAPI_DINING_ROUTE}/restaurantToday?id=${restaurantId}&date=${dateString}`,
+  );
+
+  if (response.status === 404) {
+    return null;
+  }
+
+  if (!response.ok) {
+    throw new TRPCError({
+      code: "SERVICE_UNAVAILABLE",
+      message: `Could not reach AnteaterAPI restaurantToday endpoint for ${restaurantId}.`,
+    });
+  }
+
+  const parsedResult = restaurantTodayResponseSchema.safeParse(
+    await response.json(),
+  );
+
+  if (!parsedResult.success) {
+    throw new TRPCError({
+      code: "PARSE_ERROR",
+      message: `Could not parse AnteaterAPI restaurantToday response for ${restaurantId}: ${parsedResult.error.message}`,
+    });
+  }
+
+  return parsedResult.data.data;
 }

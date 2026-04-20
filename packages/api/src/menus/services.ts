@@ -9,8 +9,8 @@ const retrieveDatesResponseSchema = z.object({
   ok: z.boolean(),
   message: z.string().optional(),
   data: z.object({
-    minDate: z.string().date(),
-    maxDate: z.string().date(),
+    earliest: z.string().date().nullable(),
+    latest: z.string().date().nullable(),
   }),
 });
 
@@ -35,7 +35,7 @@ export async function upsertMenuBatch(_db: Drizzle, _menuBatch: unknown[]) {
 export async function getPickableDates(
   _db: Drizzle,
 ): Promise<PickableDatesPayload> {
-  const response = await fetch(`${AAPI_DINING_ROUTE}/dates`);
+  const response = await fetch(`${AAPI_DINING_ROUTE}/dateRange`);
 
   if (!response.ok) {
     throw new TRPCError({
@@ -54,15 +54,19 @@ export async function getPickableDates(
     });
   }
 
-  const { minDate, maxDate } = parsedResult.data.data;
-  const earliest = toLocalDate(minDate);
-  const latest = toLocalDate(maxDate);
+  const { earliest, latest } = parsedResult.data.data;
+  const firstDate = toLocalDate(earliest);
+  const lastDate = toLocalDate(latest);
 
-  if (!earliest || !latest) return null;
+  if (!firstDate || !lastDate) return null;
 
   const dates: Date[] = [];
 
-  for (let current = earliest; current <= latest; current = addDays(current, 1))
+  for (
+    let current = firstDate;
+    current <= lastDate;
+    current = addDays(current, 1)
+  )
     dates.push(new Date(current));
 
   return dates;
