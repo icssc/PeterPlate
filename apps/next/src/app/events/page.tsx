@@ -115,6 +115,7 @@ const Events = () => {
 
   return isDesktop ? (
     <DesktopEventsView
+      isDesktop={isDesktop}
       currentDate={currentDate}
       setCurrentDate={setCurrentDate}
       selectedDiningHall={selectedDiningHall}
