@@ -1,6 +1,7 @@
 "use client";
 
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import CloseIcon from "@mui/icons-material/Close";
 import MenuIcon from "@mui/icons-material/Menu";
 import {
   FormControl,
@@ -10,6 +11,7 @@ import {
 } from "@mui/material";
 import Drawer from "@mui/material/Drawer";
 import { useState } from "react";
+import { getEventType } from "@/utils/funcs";
 import { HallEnum } from "@/utils/types";
 import type { EventInfo } from "./card/event-card";
 import EventDrawerContent from "./event-drawer-content";
@@ -48,6 +50,7 @@ const MobileEventsView = ({
 }: MobileEventsViewProps) => {
   const [mobileView, setMobileView] = useState<"calendar" | "list">("calendar");
   const [monthPickerOpen, setMonthPickerOpen] = useState(false);
+  const [selectedDayEvents, setSelectedDayEvents] = useState<EventInfo[]>([]);
 
   const locationFormControlClasses =
     "w-36 [&_.MuiOutlinedInput-root]:h-[38px] [&_.MuiOutlinedInput-root]:rounded-lg [&_.MuiOutlinedInput-root]:bg-white [&_.MuiOutlinedInput-root]:text-[0.9rem] [&_.MuiOutlinedInput-root]:text-slate-900 [&_.MuiOutlinedInput-notchedOutline]:border-sky-700 [&_.MuiOutlinedInput-root:hover_.MuiOutlinedInput-notchedOutline]:border-sky-800 [&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-2 [&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-sky-700";
@@ -124,13 +127,29 @@ const MobileEventsView = ({
             onDateChange={setCurrentDate}
             filteredEvents={filteredEvents}
             onSelectEventDay={(_date, eventsForDay) => {
-              // Expand day behavior could either show list or directly a drawer if 1 item.
-              // Assuming it jumps to list view mapped to that day, or opens a modal.
-              // For now we pass the first event to the standard details drawer logic.
               if (eventsForDay.length > 0) {
-                // Re-wrap to expected resource structure
-                const evt = { resource: eventsForDay[0] };
-                handleSelectEvent(evt);
+                const now = new Date();
+                const mappedEvents = (eventsForDay as any[]).map(
+                  (resource) =>
+                    ({
+                      name: (resource.title as string) || "",
+                      shortDesc: (resource.shortDescription as string) || "",
+                      longDesc: (resource.longDescription as string) || "",
+                      imgSrc: (resource.image as string) || "",
+                      alt: `${(resource.title as string) || ""} promotion image`,
+                      startTime: new Date(resource.start),
+                      endTime: new Date(resource.end),
+                      location:
+                        (resource.restaurantId as string) === "anteatery"
+                          ? HallEnum.ANTEATERY
+                          : HallEnum.BRANDYWINE,
+                      isOngoing:
+                        new Date(resource.start) <= now &&
+                        new Date(resource.end) >= now,
+                      type: getEventType((resource.title as string) || ""),
+                    }) as EventInfo,
+                );
+                setSelectedDayEvents(mappedEvents);
               }
             }}
             onOpenMonthPicker={() => setMonthPickerOpen(true)}
@@ -161,17 +180,58 @@ const MobileEventsView = ({
       {/* Event Details Drawer */}
       <Drawer
         anchor="bottom"
-        open={Boolean(selectedEventData)}
-        onClose={handleClose}
+        open={Boolean(selectedEventData) || selectedDayEvents.length > 0}
+        onClose={() => {
+          handleClose();
+          setSelectedDayEvents([]);
+        }}
         sx={{
           "& .MuiDrawer-paper": {
             borderTopLeftRadius: "10px",
             borderTopRightRadius: "10px",
             height: "auto",
+            maxHeight: "90vh",
+            backgroundColor:
+              selectedDayEvents.length === 1 ? "white" : "#f8fafc",
           },
         }}
+        className="dark:[&_.MuiDrawer-paper]:!bg-zinc-950"
       >
-        {selectedEventData && <EventDrawerContent {...selectedEventData} />}
+        <div className="relative w-full h-full flex flex-col overflow-y-auto">
+          {(Boolean(selectedEventData) || selectedDayEvents.length > 0) && (
+            <button
+              type="button"
+              className="absolute top-3 right-4 z-50 bg-white/80 dark:bg-zinc-900/80 backdrop-blur rounded-full p-1 shadow hover:bg-white dark:hover:bg-zinc-800 transition-colors"
+              onClick={() => {
+                handleClose();
+                setSelectedDayEvents([]);
+              }}
+            >
+              <CloseIcon
+                className="text-zinc-600 dark:text-zinc-300"
+                fontSize="small"
+              />
+            </button>
+          )}
+
+          {selectedEventData ? (
+            <EventDrawerContent {...selectedEventData} />
+          ) : selectedDayEvents.length === 1 ? (
+            <EventDrawerContent {...selectedDayEvents[0]} />
+          ) : (
+            <div className="flex flex-col gap-4 p-4 pt-12 pb-10">
+              {selectedDayEvents.map((event, idx) => (
+                <div
+                  // biome-ignore lint/suspicious/noArrayIndexKey: list events lack unique IDs and are statically ordered
+                  key={`event-drawer-${event.name}-${idx}`}
+                  className="bg-white dark:bg-zinc-900 rounded-xl overflow-hidden shadow-sm border border-slate-200 dark:border-zinc-800"
+                >
+                  <EventDrawerContent {...event} />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </Drawer>
     </div>
   );
