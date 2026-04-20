@@ -90,35 +90,43 @@ const MobileCalendarView = ({
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      <div className="flex items-center justify-between mb-6 px-2 w-full max-w-sm mx-auto">
-        <ArrowBackIosIcon
-          className="cursor-pointer text-slate-800 dark:text-zinc-200"
-          fontSize="small"
-          onClick={() => onDateChange(subMonths(currentDate, 1))}
-        />
-        <button
-          type="button"
-          className="text-2xl font-bold text-sky-700 dark:text-sky-400 focus:outline-none"
-          onClick={onOpenMonthPicker}
-        >
-          {format(currentDate, "MMMM yyyy")} <span className="text-sm">▼</span>
-        </button>
-        <ArrowForwardIosIcon
-          className="cursor-pointer text-slate-800 dark:text-zinc-200"
-          fontSize="small"
-          onClick={() => onDateChange(addMonths(currentDate, 1))}
-        />
+      <div className="bg-[#0069A833] dark:bg-sky-950 rounded-2xl px-4 py-4 w-full max-w-sm mx-auto mb-4">
+        <div className="flex items-center justify-between mb-4">
+          <button
+            type="button"
+            className="text-xl sm:text-2xl font-bold text-sky-700 dark:text-sky-400 focus:outline-none flex items-center gap-2"
+            onClick={onOpenMonthPicker}
+          >
+            {format(currentDate, "MMMM yyyy")}{" "}
+            <span className="text-xs sm:text-sm">▼</span>
+          </button>
+          <div className="flex items-center gap-5">
+            <ArrowBackIosIcon
+              className="cursor-pointer text-slate-500 dark:text-zinc-400"
+              fontSize="small"
+              onClick={() => onDateChange(subMonths(currentDate, 1))}
+            />
+            <ArrowForwardIosIcon
+              className="cursor-pointer text-slate-500 dark:text-zinc-400"
+              fontSize="small"
+              onClick={() => onDateChange(addMonths(currentDate, 1))}
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-7 gap-x-2 text-center">
+          {weekDays.map((day) => (
+            <div
+              key={`header-${day}`}
+              className="text-xs font-semibold text-slate-800 dark:text-zinc-300"
+            >
+              {day.slice(0, 1)}
+            </div>
+          ))}
+        </div>
       </div>
 
       <div className="grid grid-cols-7 gap-y-6 gap-x-2 text-center w-full max-w-sm mx-auto pb-10">
-        {weekDays.map((day) => (
-          <div
-            key={`header-${day}`}
-            className="text-xs font-semibold text-slate-500 dark:text-zinc-400 mb-2"
-          >
-            {day.slice(0, 1)}
-          </div>
-        ))}
         {daysList.map((date, _idx) => {
           const eventsOnDay = getEventsForDay(date);
           const isCurrentMonth = isSameMonth(date, currentDate);
