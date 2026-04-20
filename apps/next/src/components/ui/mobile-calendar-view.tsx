@@ -8,6 +8,7 @@ import {
   format,
   isSameDay,
   isSameMonth,
+  isToday,
   startOfMonth,
   startOfWeek,
   subMonths,
@@ -122,6 +123,7 @@ const MobileCalendarView = ({
           const eventsOnDay = getEventsForDay(date);
           const isCurrentMonth = isSameMonth(date, currentDate);
           const hasEvents = eventsOnDay.length > 0;
+          const isCurrentDate = isToday(date);
 
           return (
             <button
@@ -140,7 +142,7 @@ const MobileCalendarView = ({
             >
               <div
                 className={`flex items-center justify-center w-8 h-8 rounded-full ${
-                  hasEvents ? "bg-sky-100 dark:bg-sky-900" : ""
+                  isCurrentDate ? "bg-sky-100 dark:bg-sky-900 font-bold" : ""
                 }`}
               >
                 {format(date, "d")}
