@@ -72,7 +72,7 @@ const MobileListView = ({
               >
                 {/* Date Header */}
                 <div className="flex items-center justify-between">
-                  <h3 className="font-bold text-slate-900 dark:text-zinc-100">
+                  <h3 className="font-semibold text-black dark:text-zinc-100">
                     {format(group.date, "EEEE - MMMM d, yyyy")}
                   </h3>
                   {isToday && (
@@ -100,7 +100,7 @@ const MobileListView = ({
                         onClick={() => onSelectEvent(event)}
                       >
                         <div className="flex flex-col">
-                          <span className="font-medium text-slate-800 dark:text-zinc-200">
+                          <span className="font-medium text-black dark:text-zinc-200">
                             {event.title}
                           </span>
                           <span className="text-xs text-slate-500 flex items-center mt-0.5">
@@ -111,7 +111,7 @@ const MobileListView = ({
                             {locationLabel}
                           </span>
                         </div>
-                        <div className="flex flex-col items-end text-sm text-slate-600 dark:text-zinc-400 font-medium">
+                        <div className="flex flex-col items-end text-sm text-black dark:text-zinc-400">
                           <span>{startStr}</span>
                           <span>{endStr}</span>
                         </div>
