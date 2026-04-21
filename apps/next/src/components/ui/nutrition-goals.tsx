@@ -56,8 +56,8 @@ export default function NutritionGoals({ userId, date }: Props) {
         setOpen(false);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
   }, [open, isMobile]);
 
   const handleUpdate = (updates: {
@@ -102,7 +102,10 @@ export default function NutritionGoals({ userId, date }: Props) {
             if (e.target.value === "") {
               setCalorieGoal(calorieGoal);
             }
-            handleUpdate({ calorieGoal });
+            handleUpdate({ calorieGoal: Number(e.target.value) });
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") e.currentTarget.blur();
           }}
           className="w-24 border-b border-sky-400 bg-sky-100 rounded px-2 py-1 text-sm"
         />
@@ -127,7 +130,10 @@ export default function NutritionGoals({ userId, date }: Props) {
             if (e.target.value === "") {
               setProteinGoal(proteinGoal);
             }
-            handleUpdate({ proteinGoal });
+            handleUpdate({ proteinGoal: Number(e.target.value) });
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") e.currentTarget.blur();
           }}
           className="w-24 border-b border-sky-400 bg-sky-100 rounded px-2 py-1 text-sm"
         />
@@ -152,7 +158,10 @@ export default function NutritionGoals({ userId, date }: Props) {
             if (e.target.value === "") {
               setCarbGoal(carbGoal);
             }
-            handleUpdate({ carbGoal });
+            handleUpdate({ carbGoal: Number(e.target.value) });
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") e.currentTarget.blur();
           }}
           className="w-24 border-b border-sky-400 bg-sky-100 rounded px-2 py-1 text-sm"
         />
@@ -177,7 +186,10 @@ export default function NutritionGoals({ userId, date }: Props) {
             if (e.target.value === "") {
               setFatGoal(fatGoal);
             }
-            handleUpdate({ fatGoal });
+            handleUpdate({ fatGoal: Number(e.target.value) });
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") e.currentTarget.blur();
           }}
           className="w-24 border-b border-sky-400 bg-sky-100 rounded px-2 py-1 text-sm"
         />
