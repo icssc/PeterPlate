@@ -63,12 +63,6 @@ const DESKTOP_TOOLBAR_ELEMENTS: ToolbarElement[] = [
       },
     ],
   },
-
-  {
-    title: "Meal Tracker",
-    href: "/nutrition",
-  },
-
   {
     title: "Events",
     href: "/events",
