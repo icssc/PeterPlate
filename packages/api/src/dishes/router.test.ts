@@ -2,24 +2,40 @@ import { apiTest } from "@api/apiTest";
 import { describe } from "vitest";
 
 describe("dish.get", () => {
-  apiTest("gets a dish", async ({ api, expect, testData }) => {
-    const result = await api.dish.get({
-      ids: [testData.dishIds.at(0) ?? ""],
-    });
+  apiTest(
+    "gets a dish, upserts if missing",
+    async ({ api, db, expect, testData }) => {
+      const result = await api.dish.get({
+        ids: [testData.dishIds.at(0) ?? ""],
+      });
 
-    expect(result.at(0)).not.toBe(undefined);
-  });
+      const dbResult = await db.query.dishes.findFirst({
+        where: (dishes, { eq }) => eq(dishes.id, testData.dishIds.at(0) ?? ""),
+      });
 
-  apiTest("gets multiple dishes", async ({ api, expect, testData }) => {
-    const result = await api.dish.get({
-      ids: testData.dishIds,
-    });
+      expect(result.at(0)).not.toBe(undefined);
+      expect(dbResult).not.toBe(undefined);
+    },
+  );
 
-    expect(result.length).toBeGreaterThan(1);
-    result.forEach((dish) => {
-      expect(dish).not.toBe(undefined);
-    });
-  });
+  apiTest(
+    "gets multiple dishes, upserts if missing",
+    async ({ api, db, expect, testData }) => {
+      const result = await api.dish.get({
+        ids: testData.dishIds,
+      });
+
+      const dbResult = await db.query.dishes.findMany({
+        where: (dishes, { inArray }) => inArray(dishes.id, testData.dishIds),
+      });
+
+      expect(result.length).toBeGreaterThan(1);
+      expect(result.length).eq(dbResult.length);
+      result.forEach((dish) => {
+        expect(dish).not.toBe(undefined);
+      });
+    },
+  );
 
   apiTest("fails on invalid params", async ({ api, expect }) => {
     const result = await api.dish.get({

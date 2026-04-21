@@ -1,22 +1,19 @@
-import { upsert } from "@api/utils";
-
 import type { Drizzle, InsertDish } from "@peterplate/db";
 import { dishes } from "@peterplate/db";
 
-export async function upsertDish(
+export async function upsertDishesIfMissing(
   db: Drizzle,
-  dishData: InsertDish,
-): Promise<InsertDish> {
+  dishData: InsertDish[],
+): Promise<InsertDish[]> {
+  if (dishData.length === 0) return [];
+
   try {
-    const result = await db.transaction<Omit<InsertDish, "stationId">>(
-      async (tx) => {
-        const upsertedDish = await upsert(tx, dishes, dishData, {
-          target: [dishes.id],
-        });
-        return upsertedDish;
-      },
-    );
-    return result;
+    const results = db
+      .insert(dishes)
+      .values(dishData)
+      .onConflictDoNothing()
+      .returning();
+    return results;
   } catch (e) {
     console.error(e);
     throw e;
