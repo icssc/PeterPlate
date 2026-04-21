@@ -16,7 +16,7 @@ import { AAPI_DINING_ROUTE } from "..";
 
 // Queries the AAPI 'Retrieve Dishes By Id' endpoint for a batch of dishes' info.
 // Also adds the ratings from our database to the dish information.
-// If not found, omits it from the returned information.
+// If not found by ID, omits it from the returned information.
 export const getDishProcedure = publicProcedure
   .input(z.object({ ids: z.array(z.string()) }))
   .query(async ({ ctx: { db }, input }) => {
