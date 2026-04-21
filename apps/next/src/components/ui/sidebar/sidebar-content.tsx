@@ -47,8 +47,6 @@ export default function SidebarContent({
     { enabled: !!userId },
   );
 
-  if (!mounted) return null;
-
   const handleSignOut = async () => {
     await signOut();
     window.location.href = "/";
@@ -139,19 +137,19 @@ export default function SidebarContent({
 
           <div className="flex rounded-lg border border-blue-500 overflow-hidden">
             <ThemeButton
-              active={theme === "light"}
+              active={mounted && theme === "light"}
               onClick={() => setTheme("light")}
               icon={<LightModeIcon fontSize="small" />}
               label="Light"
             />
             <ThemeButton
-              active={theme === "system"}
+              active={mounted && theme === "system"}
               onClick={() => setTheme("system")}
               icon={<DesktopWindowsIcon fontSize="small" />}
               label="Device"
             />
             <ThemeButton
-              active={theme === "dark"}
+              active={mounted && theme === "dark"}
               onClick={() => setTheme("dark")}
               icon={<DarkModeIcon fontSize="small" />}
               label="Dark"
