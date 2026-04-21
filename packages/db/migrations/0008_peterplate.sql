@@ -1,0 +1,1 @@
+ALTER TABLE "dishes" ADD COLUMN IF NOT EXISTS "num_ratings" integer DEFAULT 0 NOT NULL;

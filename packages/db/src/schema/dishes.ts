@@ -4,7 +4,7 @@ import { metadataColumns } from "./utils";
 
 export const dishes = pgTable("dishes", {
   id: text("id").primaryKey(),
-  numRatings: integer("total_rating").default(0).notNull(),
+  numRatings: integer("num_ratings").default(0).notNull(),
   totalRating: integer("total_rating").default(0).notNull(),
   ...metadataColumns,
 });
