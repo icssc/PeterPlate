@@ -79,7 +79,14 @@ export function RestaurantPage({
   const { data: upcomingEvents = [] } = trpc.event.upcoming.useQuery();
   const restaurantId = hall === HallEnum.ANTEATERY ? "anteatery" : "brandywine";
   const hallEvents = useMemo(
-    () => [...upcomingEvents].filter((e) => e.restaurantId === restaurantId),
+    () =>
+      [...upcomingEvents]
+        .filter((e) => e.restaurantId === restaurantId)
+        .sort(
+          (a, b) =>
+            (a.start ? new Date(a.start).getTime() : 0) -
+            (b.start ? new Date(b.start).getTime() : 0),
+        ),
     [upcomingEvents, restaurantId],
   );
 
