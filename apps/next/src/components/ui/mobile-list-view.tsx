@@ -1,8 +1,10 @@
 "use client";
 
+import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
-import { format, isSameDay, startOfDay } from "date-fns";
-import { useMemo } from "react";
+import { addMonths, format, isSameDay, startOfDay, subMonths } from "date-fns";
+import { useMemo, useState } from "react";
 import type { EventInfo } from "./card/event-card";
 
 interface MobileListViewProps {
@@ -15,11 +17,40 @@ interface MobileListViewProps {
 
 const MobileListView = ({
   currentDate,
-  onDateChange: _onDateChange,
+  onDateChange,
   filteredEvents,
   onOpenMonthPicker,
   onSelectEvent,
 }: MobileListViewProps) => {
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  // Minimum swipe distance (in px)
+  const minSwipeDistance = 50;
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      onDateChange(addMonths(currentDate, 1));
+    }
+    if (isRightSwipe) {
+      onDateChange(subMonths(currentDate, 1));
+    }
+  };
+
   const groupedEvents = useMemo(() => {
     // Sort events just in case
     const sorted = [...filteredEvents].sort(
@@ -44,16 +75,37 @@ const MobileListView = ({
   const monthLabel = format(currentDate, "MMMM yyyy");
 
   return (
-    <div className="flex flex-col flex-1 px-4 mt-2 mb-20 overflow-y-auto">
+    <div
+      className="flex flex-col flex-1 px-4 mt-2 mb-20 overflow-y-auto"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
       {/* Scrollable Month Header */}
       <div className="sticky top-0 z-10 bg-white/95 dark:bg-zinc-950/95 backdrop-blur py-2">
-        <button
-          type="button"
-          onClick={onOpenMonthPicker}
-          className="flex items-center gap-2 px-4 py-2 bg-sky-100/50 dark:bg-sky-900/30 rounded-full text-sky-800 dark:text-sky-300 font-semibold"
-        >
-          {monthLabel} <span className="text-xs">▼</span>
-        </button>
+        <div className="bg-[#CCE1EE] dark:bg-sky-950 rounded-2xl px-4 py-4 w-full mx-auto">
+          <div className="flex items-center justify-between">
+            <button
+              type="button"
+              className="text-xl sm:text-2xl font-bold text-sky-700 dark:text-sky-400 focus:outline-none flex items-center gap-2"
+              onClick={onOpenMonthPicker}
+            >
+              {monthLabel} <span className="text-xs sm:text-sm">▼</span>
+            </button>
+            <div className="flex items-center gap-5">
+              <ArrowBackIosIcon
+                className="cursor-pointer text-slate-500 dark:text-zinc-400 focus:outline-none"
+                fontSize="small"
+                onClick={() => onDateChange(subMonths(currentDate, 1))}
+              />
+              <ArrowForwardIosIcon
+                className="cursor-pointer text-slate-500 dark:text-zinc-400 focus:outline-none"
+                fontSize="small"
+                onClick={() => onDateChange(addMonths(currentDate, 1))}
+              />
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="flex flex-col gap-6 mt-4">
