@@ -14,6 +14,15 @@ export const auth = betterAuth({
   debug: true,
   secret: process.env.NEXT_PUBLIC_BETTER_AUTH_SECRET,
   baseURL: process.env.NEXT_PUBLIC_BASE_URL,
+  user: {
+    additionalFields: {
+      hasOnboarded: {
+        type: "boolean",
+        required: false,
+        defaultValue: false,
+      },
+    },
+  },
   plugins: [
     genericOAuth({
       config: [
@@ -35,12 +44,6 @@ export const auth = betterAuth({
       ],
     }),
   ],
-  // socialProviders: {
-  //   google: {
-  //     clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
-  //     clientSecret: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET!,
-  //   },
-  // },
   database: drizzleAdapter(db, {
     provider: "pg",
     schema: {

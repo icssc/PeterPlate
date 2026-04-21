@@ -2,7 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body {
+html,
+body {
   height: 100%;
   margin: 0;
 }
@@ -16,9 +17,8 @@ body {
   text-transform: none !important;
 }
 
-.MuiButton-root {
-  font-family: inherit !important;
-  text-transform: none !important;
+.MuiTypography-root {
+  font-family: Poppins, Arial, Helvetica, sans-serif !important;
 }
 
 
@@ -51,6 +51,7 @@ body {
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
   }
+
   .dark {
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
@@ -83,6 +84,7 @@ body {
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -92,6 +94,7 @@ body {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }

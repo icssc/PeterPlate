@@ -1,3 +1,7 @@
+"use client";
+
+import type React from "react";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { trpc } from "@/utils/trpc";
 import type { SelectLoggedMeal } from "../../../../../packages/db/src/schema";
 import { ProgressDonut } from "../progress-donut";
@@ -19,12 +23,7 @@ type LoggedMealJoinedWithNutrition = SelectLoggedMeal & {
 function compileMealData(
   meals: LoggedMealJoinedWithNutrition[],
 ): NutritionData {
-  const data = {
-    calories: 0,
-    protein_g: 0,
-    carbs_g: 0,
-    fat_g: 0,
-  };
+  const data = { calories: 0, protein_g: 0, carbs_g: 0, fat_g: 0 };
 
   for (const meal of meals) {
     const servings = meal.servings;
@@ -43,103 +42,101 @@ function compileMealData(
 }
 
 interface Props {
-  dateString: string;
   mealsEaten: LoggedMealJoinedWithNutrition[];
+  calorieGoal: number;
+  proteinGoal: number;
+  carbGoal: number;
+  fatGoal: number;
 }
 
-const NutritionBreakdown = ({ dateString, mealsEaten }: Props) => {
-  const nutrition: NutritionData = compileMealData(mealsEaten);
+const NutritionBreakdown = ({
+  mealsEaten,
+  calorieGoal,
+  proteinGoal,
+  carbGoal,
+  fatGoal,
+}: Props) => {
+  const nutrition = compileMealData(mealsEaten);
+
+  const isLg = useMediaQuery("(min-width: 1024px)");
+  const isXl = useMediaQuery("(min-width: 1280px)");
 
   const utils = trpc.useUtils();
   const deleteLoggedMealMutation = trpc.nutrition.deleteLoggedMeal.useMutation({
     onSuccess: () => {
-      //TODO: Replace this with a shad/cn sonner or equivalent.
       alert(`Removed dish from your log`);
       utils.nutrition.invalidate();
     },
-    onError: (error: Error) => {
+    onError: (error) => {
       console.error(error.message);
     },
   });
 
-  const removeBtnOnClick = (
-    e: React.MouseEvent,
-    userId: string | null,
-    dishId: string | null,
-  ) => {
-    e.preventDefault();
-    if (!userId || !dishId) return;
+  const cols = isXl ? 4 : isLg ? 2 : 1;
 
-    deleteLoggedMealMutation.mutate({ userId, dishId });
+  const gridStyle: React.CSSProperties = {
+    display: "grid",
+    gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+    gap: "24px",
+    width: "100%",
   };
 
+  const cardBase =
+    "bg-sky-100 rounded-xl px-4 flex flex-row items-center justify-between h-36 min-w-0";
+
+  const labelBase = "text-3xl text-sky-700 font-medium pl-3 truncate min-w-0";
+
   return (
-    <div>
-      <center className="text-[2rem] font-bold">{dateString}</center>
-      <div className="flex align-items mt-4">
-        <div className="flex flex-col">
-          <center className="text-[2rem] font-bold">Calories</center>
+    <div style={gridStyle} className="mt-6">
+      <div className={cardBase}>
+        <span className={labelBase}>Calories</span>
+        <div className="shrink-0">
           <ProgressDonut
             progress_value={nutrition.calories}
-            max_value={2000}
+            max_value={calorieGoal}
             display_unit=""
+            trackColor="#0084D1"
+            progressColor="#00BCFF"
           />
         </div>
-        <div className="flex flex-col">
-          <center className="text-[2rem] font-bold">Protein</center>
+      </div>
+
+      <div className={cardBase}>
+        <span className={labelBase}>Protein</span>
+        <div className="shrink-0">
           <ProgressDonut
             progress_value={nutrition.protein_g}
-            max_value={75}
-            display_unit="g"
-          />
-        </div>
-        <div className="flex flex-col">
-          <center className="text-[2rem] font-bold">Carbs</center>
-          <ProgressDonut
-            progress_value={nutrition.carbs_g}
-            max_value={250}
-            display_unit="g"
-          />
-        </div>
-        <div className="flex flex-col">
-          <center className="text-[2rem] font-bold">Fat</center>
-          <ProgressDonut
-            progress_value={nutrition.fat_g}
-            max_value={50}
+            max_value={proteinGoal}
             display_unit="g"
           />
         </div>
       </div>
-      <div className="meal-history">
-        {mealsEaten?.map((meal) => (
-          <div
-            key={meal.id}
-            className="flex items-center justify-between gap-4 rounded-lg border p-4 mb-3"
-          >
-            <div className="flex flex-col">
-              <h3 className="font-medium">
-                {meal.servings} serving{meal.servings > 1 ? "s" : ""} of{" "}
-                {meal.dishName}
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                {Math.round(meal.calories * meal.servings)} calories |&nbsp;
-                {Math.round(meal.protein * meal.servings)}g protein |&nbsp;
-                {Math.round(meal.carbs * meal.servings)}g carbs |&nbsp;
-                {Math.round(meal.fat * meal.servings)}g fat
-              </p>
-            </div>
 
-            <button
-              className="h-8 rounded-md border px-3 text-sm transition-colors hover:bg-accent hover:text-accent-foreground"
-              onClick={(e) => removeBtnOnClick(e, meal.userId, meal.dishId)}
-            >
-              Remove
-            </button>
-          </div>
-        ))}
+      <div className={cardBase}>
+        <span className={labelBase}>Carbs</span>
+        <div className="shrink-0">
+          <ProgressDonut
+            progress_value={nutrition.carbs_g}
+            max_value={carbGoal}
+            display_unit="g"
+          />
+        </div>
+      </div>
+
+      <div className={cardBase}>
+        <span className={labelBase}>Fat</span>
+        <div className="shrink-0">
+          <ProgressDonut
+            progress_value={nutrition.fat_g}
+            max_value={fatGoal}
+            display_unit="g"
+          />
+        </div>
       </div>
     </div>
   );
 };
 
 export default NutritionBreakdown;
+export type { NutritionData, LoggedMealJoinedWithNutrition };
+export { compileMealData };

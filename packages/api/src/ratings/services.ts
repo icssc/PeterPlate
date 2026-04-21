@@ -1,7 +1,7 @@
 import { upsert } from "@api/utils";
 import type { Drizzle, InsertRating } from "@peterplate/db";
 import { dishes, ratings } from "@peterplate/db";
-import { and, avg, count, desc, eq, sum } from "drizzle-orm";
+import { and, avg, count, eq, sum } from "drizzle-orm";
 
 const updateDishStats = async (db: Drizzle, dishId: string) => {
   const result = await db
@@ -117,6 +117,7 @@ export const getUserRatedDishes = async (db: Drizzle, userId: string) => {
         return {
           ...dish,
           restaurant: dish.station?.restaurant?.name || "Unknown Restaurant",
+          stationName: dish.station?.name ?? "",
           rating: rating.rating,
           ratedAt: rating.updatedAt,
         };

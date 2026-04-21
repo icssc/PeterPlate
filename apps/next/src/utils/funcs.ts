@@ -271,7 +271,7 @@ function militaryToStandard(militaryTime: string): Date {
 }
 
 /**
- * Formats a time range from two Date objects into a string like "10:00a-2:30p".
+ * Formats a time range from two Date objects into a string like "10:00am-2:30pm".
  * @param openTime The start time.
  * @param closeTime The end time.
  * @returns A formatted string representing the time range.
@@ -289,7 +289,7 @@ function formatOpenCloseTime(openTime: Date, closeTime: Date): string {
   const openTimeMinutes: string = padMinutes(openTime.getMinutes());
   const closeTimeMinutes: string = padMinutes(closeTime.getMinutes());
 
-  return `${openTimeHours}:${openTimeMinutes}${openTimeIsAfternoon ? "p" : "a"}-${closeTimeHours}:${closeTimeMinutes}${closeTimeIsAfternoon ? "p" : "a"}`;
+  return `${openTimeHours}:${openTimeMinutes}${openTimeIsAfternoon ? "pm" : "am"}-${closeTimeHours}:${closeTimeMinutes}${closeTimeIsAfternoon ? "pm" : "am"}`;
 }
 
 /**
@@ -435,6 +435,134 @@ function isSameDay(a: Date, b: Date): boolean {
   );
 }
 
+// Handles getting hall data for easier access to dishes and status
+type HallInput =
+  | {
+      menus?: {
+        period: { startTime: string; endTime: string };
+        stations: {
+          name: string;
+          dishes: Array<Record<string, any>>;
+        }[];
+      }[];
+    }
+  | undefined;
+
+function getHallDishData<TDish extends Record<string, any>>(
+  hallData:
+    | (Omit<NonNullable<HallInput>, "menus"> & {
+        menus?: {
+          period: { startTime: string; endTime: string };
+          stations: { name: string; dishes: TDish[] }[];
+        }[];
+      })
+    | undefined,
+  hallName: string,
+) {
+  const status = getHallStatus(hallData);
+  const menus = hallData?.menus ?? [];
+
+  const dishes = menus.flatMap((menu) =>
+    menu.stations.flatMap((station) =>
+      station.dishes.map((dish) => ({
+        ...dish,
+        hallName,
+        stationName: station.name,
+      })),
+    ),
+  );
+
+  return { status, dishes };
+}
+
+// Handles Popular Today: gets top unique dishes sorted by average rating (descending)
+type DishRatings = {
+  name: string;
+  numRatings: number;
+  totalRating: number;
+};
+
+function getPopularDishes<T extends DishRatings>(
+  allDishes: T[] | null | undefined,
+  numCards: number,
+): T[] {
+  const seenNames = new Set<string>();
+
+  return (allDishes ?? [])
+    .filter((dish) => {
+      const key = dish.name.toLowerCase();
+      if (seenNames.has(key)) return false;
+      seenNames.add(key);
+      return true;
+    })
+    .sort((a, b) => {
+      const avgA = a.numRatings > 0 ? a.totalRating / a.numRatings : 0;
+      const avgB = b.numRatings > 0 ? b.totalRating / b.numRatings : 0;
+      return avgB - avgA;
+    })
+    .slice(0, numCards);
+}
+
+// Handles Upcoming Events: gets top upcoming events sorted by start time (ascending)
+type EventItem = {
+  start?: string | Date | null;
+};
+
+export function sortedEvents<T extends EventItem>(
+  events: T[] | null | undefined,
+  numCards: number,
+): T[] {
+  return [...(events ?? [])]
+    .sort((event, nextEvent) => {
+      const eventStartTime = event.start ? new Date(event.start).getTime() : 0;
+      const nextEventStartTime = nextEvent.start
+        ? new Date(nextEvent.start).getTime()
+        : 0;
+
+      return eventStartTime - nextEventStartTime;
+    })
+    .slice(0, numCards);
+}
+
+// Get open/close status for each hall
+type HallData =
+  | {
+      menus?: {
+        period: {
+          startTime: string;
+          endTime: string;
+        };
+      }[];
+    }
+  | undefined;
+
+function getHallStatus(hallData: HallData) {
+  if (!hallData?.menus?.length) return { isOpen: false, statusText: "" };
+  let earliestOpen: Date | undefined;
+  let latestClose: Date | undefined;
+  for (const menu of hallData.menus) {
+    try {
+      const open = militaryToStandard(menu.period.startTime);
+      const close = militaryToStandard(menu.period.endTime);
+      if (!earliestOpen || open < earliestOpen) earliestOpen = open;
+      if (!latestClose || close > latestClose) latestClose = close;
+    } catch {
+      /* skip */
+    }
+  }
+  if (earliestOpen && latestClose) {
+    const now = new Date();
+    const isOpen = now >= earliestOpen && now <= latestClose;
+    return {
+      isOpen,
+      statusText: isOpen
+        ? `Open until ${latestClose.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })}`
+        : `Closed`,
+    };
+  }
+  return { isOpen: false, statusText: "" };
+}
+
 export {
   toTitleCase,
   dateToString,
@@ -450,4 +578,21 @@ export {
   sortCategoryKeys,
   getFoodIcon,
   isSameDay,
+  getHallDishData,
+  getHallStatus,
+  getPopularDishes,
 };
+
+/**
+ * Hardcoded function for celebration vs special meals
+ */
+
+export function getEventType(title: string): string {
+  const celebrations = ["mardi gras", "senior", "men's vb"];
+  const specialMeals = ["desserts", "banh mi", "takeover", "appetizer trio"];
+
+  const lower = title.toLowerCase();
+  if (celebrations.some((c) => lower.includes(c))) return "celebration";
+  if (specialMeals.some((s) => lower.includes(s))) return "special";
+  return "all";
+}

@@ -23,7 +23,6 @@ describe("upsertUser", () => {
   apiTest("updates existing user in db", async ({ db, expect, testData }) => {
     await expect(
       db.transaction(async (trx) => {
-        await upsertUser(trx, testData.user);
         await upsertUser(trx, {
           ...testData.user,
           name: "Beter",
