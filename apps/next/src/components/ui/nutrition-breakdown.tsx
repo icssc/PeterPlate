@@ -1,12 +1,7 @@
-import {
-  DeleteOutline,
-  KeyboardArrowDown,
-  KeyboardArrowUp,
-} from "@mui/icons-material";
-import { IconButton, Stack } from "@mui/material";
+"use client";
+
 import type React from "react";
-import { useSnackbarStore } from "@/context/useSnackbar";
-import { formatFoodName } from "@/utils/funcs";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { trpc } from "@/utils/trpc";
 import type { SelectLoggedMeal } from "../../../../../packages/db/src/schema";
 import { ProgressDonut } from "../progress-donut";
@@ -28,12 +23,7 @@ type LoggedMealJoinedWithNutrition = SelectLoggedMeal & {
 function compileMealData(
   meals: LoggedMealJoinedWithNutrition[],
 ): NutritionData {
-  const data = {
-    calories: 0,
-    protein_g: 0,
-    carbs_g: 0,
-    fat_g: 0,
-  };
+  const data = { calories: 0, protein_g: 0, carbs_g: 0, fat_g: 0 };
 
   for (const meal of meals) {
     const servings = meal.servings;
@@ -52,191 +42,101 @@ function compileMealData(
 }
 
 interface Props {
-  dateString: string;
   mealsEaten: LoggedMealJoinedWithNutrition[];
-  userId: string;
+  calorieGoal: number;
+  proteinGoal: number;
+  carbGoal: number;
+  fatGoal: number;
 }
 
-const NutritionBreakdown = ({ dateString, mealsEaten }: Props) => {
-  const { showSnackbar } = useSnackbarStore();
-  const nutrition: NutritionData = compileMealData(mealsEaten);
+const NutritionBreakdown = ({
+  mealsEaten,
+  calorieGoal,
+  proteinGoal,
+  carbGoal,
+  fatGoal,
+}: Props) => {
+  const nutrition = compileMealData(mealsEaten);
+
+  const isLg = useMediaQuery("(min-width: 1024px)");
+  const isXl = useMediaQuery("(min-width: 1280px)");
 
   const utils = trpc.useUtils();
-
-  const updateMealMutation = trpc.nutrition.updateLoggedMeal.useMutation({
-    onSuccess: (data) => {
-      showSnackbar(
-        `Updated ${formatFoodName(data.dishName)} quantity`,
-        "success",
-      );
+  const deleteLoggedMealMutation = trpc.nutrition.deleteLoggedMeal.useMutation({
+    onSuccess: () => {
+      alert(`Removed dish from your log`);
       utils.nutrition.invalidate();
     },
     onError: (error) => {
-      console.error(error);
-      showSnackbar("Failed to update quantity", "error");
+      console.error(error.message);
     },
   });
 
-  const deleteMealMutation = trpc.nutrition.deleteLoggedMeal.useMutation({
-    onSuccess: (data) => {
-      showSnackbar(
-        `Removed ${formatFoodName(data.dishName)} from your log`,
-        "success",
-      );
-      utils.nutrition.invalidate();
-    },
-    onError: (error) => {
-      console.error(error);
-      showSnackbar("Failed to remove meal from your log", "error");
-    },
-  });
+  const cols = isXl ? 4 : isLg ? 2 : 1;
 
-  const handleAdjustQuantity = (
-    meal: LoggedMealJoinedWithNutrition,
-    newServings: number,
-  ) => {
-    if (newServings < 0.5) {
-      showSnackbar("Minimum serving size is 0.5", "error");
-      return;
-    }
-
-    updateMealMutation.mutate({
-      id: meal.id,
-      servings: newServings,
-    });
+  const gridStyle: React.CSSProperties = {
+    display: "grid",
+    gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+    gap: "24px",
+    width: "100%",
   };
 
-  const handleIncreaseQuantity = (
-    e: React.MouseEvent,
-    meal: LoggedMealJoinedWithNutrition,
-  ) => {
-    e.stopPropagation();
-    const newServings = meal.servings + 0.5;
-    handleAdjustQuantity(meal, newServings);
-  };
+  const cardBase =
+    "bg-sky-100 rounded-xl px-4 flex flex-row items-center justify-between h-36 min-w-0";
 
-  const handleDecreaseQuantity = (
-    e: React.MouseEvent,
-    meal: LoggedMealJoinedWithNutrition,
-  ) => {
-    e.stopPropagation();
-    const newServings = Math.max(0.5, meal.servings - 0.5);
-    handleAdjustQuantity(meal, newServings);
-  };
-
-  const removeBtnOnClick = (e: React.MouseEvent, id: string | null) => {
-    e.preventDefault();
-    if (!id) return;
-
-    deleteMealMutation.mutate({ id });
-  };
+  const labelBase = "text-3xl text-sky-700 font-medium pl-3 truncate min-w-0";
 
   return (
-    <div>
-      <center className="text-[2rem] font-bold">{dateString}</center>
-      <div className="flex align-items mt-4">
-        <div className="flex flex-col">
-          <center className="text-[2rem] font-bold">Calories</center>
+    <div style={gridStyle} className="mt-6">
+      <div className={cardBase}>
+        <span className={labelBase}>Calories</span>
+        <div className="shrink-0">
           <ProgressDonut
             progress_value={nutrition.calories}
-            max_value={2000}
+            max_value={calorieGoal}
             display_unit=""
+            trackColor="#0084D1"
+            progressColor="#00BCFF"
           />
         </div>
-        <div className="flex flex-col">
-          <center className="text-[2rem] font-bold">Protein</center>
+      </div>
+
+      <div className={cardBase}>
+        <span className={labelBase}>Protein</span>
+        <div className="shrink-0">
           <ProgressDonut
             progress_value={nutrition.protein_g}
-            max_value={75}
-            display_unit="g"
-          />
-        </div>
-        <div className="flex flex-col">
-          <center className="text-[2rem] font-bold">Carbs</center>
-          <ProgressDonut
-            progress_value={nutrition.carbs_g}
-            max_value={250}
-            display_unit="g"
-          />
-        </div>
-        <div className="flex flex-col">
-          <center className="text-[2rem] font-bold">Fat</center>
-          <ProgressDonut
-            progress_value={nutrition.fat_g}
-            max_value={50}
+            max_value={proteinGoal}
             display_unit="g"
           />
         </div>
       </div>
-      <div className="meal-history">
-        {mealsEaten?.map((meal) => (
-          <div
-            key={meal.id}
-            className="flex items-center justify-between gap-4 rounded-lg border p-4 mb-3"
-          >
-            <div className="flex flex-col flex-1">
-              <h3 className="font-medium">
-                {meal.servings} serving{meal.servings > 1 ? "s" : ""} of{" "}
-                {meal.dishName}
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                {Math.round(meal.calories * meal.servings)} calories |&nbsp;
-                {Math.round(meal.protein * meal.servings)}g protein |&nbsp;
-                {Math.round(meal.carbs * meal.servings)}g carbs |&nbsp;
-                {Math.round(meal.fat * meal.servings)}g fat
-              </p>
-            </div>
 
-            <Stack direction="column" spacing={0.5}>
-              <IconButton
-                size="small"
-                onClick={(e) => handleIncreaseQuantity(e, meal)}
-                sx={{
-                  border: "1px solid",
-                  borderColor: "divider",
-                  borderRadius: "4px",
-                  padding: "2px",
-                }}
-              >
-                <KeyboardArrowUp fontSize="small" />
-              </IconButton>
-              <IconButton
-                size="small"
-                onClick={(e) => handleDecreaseQuantity(e, meal)}
-                disabled={meal.servings <= 0.5}
-                sx={{
-                  border: "1px solid",
-                  borderColor: "divider",
-                  borderRadius: "4px",
-                  padding: "2px",
-                }}
-              >
-                <KeyboardArrowDown fontSize="small" />
-              </IconButton>
-            </Stack>
+      <div className={cardBase}>
+        <span className={labelBase}>Carbs</span>
+        <div className="shrink-0">
+          <ProgressDonut
+            progress_value={nutrition.carbs_g}
+            max_value={carbGoal}
+            display_unit="g"
+          />
+        </div>
+      </div>
 
-            <IconButton
-              aria-label="delete"
-              size="small"
-              color="error"
-              onClick={(e) => removeBtnOnClick(e, meal.id)}
-              sx={{
-                border: "1px solid",
-                borderColor: "error.main",
-                borderRadius: "6px",
-                "&:hover": {
-                  backgroundColor: "error.main",
-                  color: "white",
-                },
-              }}
-            >
-              <DeleteOutline fontSize="small" />
-            </IconButton>
-          </div>
-        ))}
+      <div className={cardBase}>
+        <span className={labelBase}>Fat</span>
+        <div className="shrink-0">
+          <ProgressDonut
+            progress_value={nutrition.fat_g}
+            max_value={fatGoal}
+            display_unit="g"
+          />
+        </div>
       </div>
     </div>
   );
 };
 
 export default NutritionBreakdown;
+export type { NutritionData, LoggedMealJoinedWithNutrition };
+export { compileMealData };

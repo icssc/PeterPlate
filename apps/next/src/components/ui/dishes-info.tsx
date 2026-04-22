@@ -1,5 +1,4 @@
 "use client";
-"use client";
 
 import type { DishInfo } from "@peterplate/api";
 import type React from "react";
@@ -89,7 +88,7 @@ export default function DishesInfo({
             No dishes available for this selection.
           </p>
         ) : isCompactView ? (
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 md:gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             {dishes.map((dish) => (
               <FoodCard
                 key={dish.id}
@@ -100,7 +99,7 @@ export default function DishesInfo({
                   !!isFavoritesLoading || !!isFavoritePending?.(dish.id)
                 }
                 onToggleFavorite={onToggleFavorite}
-                isSimplified={isCompactView}
+                isCompact={isCompactView}
               />
             ))}
           </div>
@@ -115,7 +114,7 @@ export default function DishesInfo({
                   !!isFavoritesLoading || !!isFavoritePending?.(dish.id)
                 }
                 onToggleFavorite={onToggleFavorite}
-                isSimplified={isCompactView}
+                isCompact={isCompactView}
               />
             ))}
           </div>

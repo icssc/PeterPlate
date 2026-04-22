@@ -65,17 +65,16 @@ const DESKTOP_TOOLBAR_ELEMENTS: ToolbarElement[] = [
   },
 
   {
-    title: "Meal Tracker",
-    href: "/nutrition",
-  },
-
-  {
     title: "Events",
     href: "/events",
   },
   {
     title: "My Foods",
     href: "/my-foods",
+  },
+  {
+    title: "Tracker",
+    href: "/nutrition",
   },
 ];
 
@@ -102,7 +101,7 @@ const MOBILE_TOOLBAR_ELEMENTS: ToolbarElement[] = [
   },
   {
     title: "Tracker",
-    href: "/nutrition",
+    href: "/tracker",
     icon: <ListAltRoundedIcon />,
   },
 ];
@@ -201,7 +200,7 @@ export function DesktopToolbar(): React.JSX.Element {
         position="absolute"
         className={`shadow-none ${
           isTransparent
-            ? "bg-transparent hover:bg-gradient-to-b from-black/50 to-black/0"
+            ? "bg-transparent bg-gradient-to-b from-black/50 to-black/0"
             : "!bg-white dark:!bg-zinc-900 !border-b !border-zinc-200 dark:!border-zinc-700"
         }`}
       >
@@ -407,8 +406,17 @@ function MobileToolbar(): React.JSX.Element {
     setEditPreferencesSnackbarOpen(true);
   };
 
+  const diningHref =
+    pathname === "/brandywine"
+      ? "/anteatery"
+      : pathname === "/anteatery"
+        ? "/brandywine"
+        : "/brandywine";
+
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";
+    if (href === "/brandywine")
+      return pathname === "/brandywine" || pathname === "/anteatery";
     return pathname?.startsWith(href);
   };
 
@@ -489,12 +497,14 @@ function MobileToolbar(): React.JSX.Element {
             {MOBILE_TOOLBAR_ELEMENTS.map((element) => {
               if (!element.href) return null;
 
+              const isDining = element.title === "Dining";
+              const effectiveHref = isDining ? diningHref : element.href;
               const active = isActive(element.href);
 
               return (
                 <Link
                   key={element.title}
-                  href={element.href}
+                  href={effectiveHref}
                   className={`
                     flex flex-col items-center justify-center
                     w-[64px]
