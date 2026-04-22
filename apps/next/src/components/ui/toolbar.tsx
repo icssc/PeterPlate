@@ -106,7 +106,7 @@ const MOBILE_TOOLBAR_ELEMENTS: ToolbarElement[] = [
   },
 ];
 
-const TRANSPARENT_PAGES = ["/about", "/brandywine", "/anteatery", "/events"];
+const TRANSPARENT_PAGES = ["/about", "/brandywine", "/anteatery"];
 
 function ToolbarDropdown({
   element,
