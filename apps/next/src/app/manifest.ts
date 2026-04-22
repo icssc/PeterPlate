@@ -8,6 +8,7 @@ export default function manifest(): MetadataRoute.Manifest {
       "A dynamic web app to discover what UCI's dining halls have to offer. Find anything from daily menus and special events to dining hall features and updates.",
     start_url: "/",
     display: "standalone",
+    orientation: "portrait",
     background_color: "#ffffff",
     theme_color: "#0064a4",
     icons: [
