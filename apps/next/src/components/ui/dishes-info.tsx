@@ -1,5 +1,4 @@
 "use client";
-"use client";
 
 import type { DishInfo } from "@peterplate/api";
 import type React from "react";
