@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
-import withPWA from "next-pwa";
+import path from "node:path";
 
 const nextConfig: NextConfig = {
+  // ! TODO: Fix these errors
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -63,7 +64,5 @@ const nextConfig: NextConfig = {
   }, */
 };
 
-export default withPWA({
-  dest: "public",
-  disable: process.env.NODE_ENV === "development",
-})(nextConfig);
+export default nextConfig;
+
