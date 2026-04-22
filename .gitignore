@@ -56,3 +56,5 @@ apps/expo-rewrite/expo-env.d.ts
 
 ## Next.js
 .next
+apps/next/public/sw.js
+apps/next/public/workbox-*.js

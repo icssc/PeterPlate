@@ -63,6 +63,7 @@ const DESKTOP_TOOLBAR_ELEMENTS: ToolbarElement[] = [
       },
     ],
   },
+
   {
     title: "Events",
     href: "/events",
@@ -100,12 +101,12 @@ const MOBILE_TOOLBAR_ELEMENTS: ToolbarElement[] = [
   },
   {
     title: "Tracker",
-    href: "/tracker",
+    href: "/nutrition",
     icon: <ListAltRoundedIcon />,
   },
 ];
 
-const TRANSPARENT_PAGES = ["/about", "/brandywine", "/anteatery", "/events"];
+const TRANSPARENT_PAGES = ["/about", "/brandywine", "/anteatery"];
 
 function ToolbarDropdown({
   element,
