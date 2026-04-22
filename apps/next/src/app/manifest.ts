@@ -12,6 +12,29 @@ export default function manifest(): MetadataRoute.Manifest {
     orientation: "portrait",
     background_color: "#ffffff",
     theme_color: "#0064a4",
+    screenshots: [
+      {
+        src: "/screenshots/home-mobile.jpg",
+        sizes: "1206x2034",
+        type: "image/jpeg",
+        form_factor: "narrow",
+        label: "Home screen on mobile",
+      },
+      {
+        src: "/screenshots/restaurant-mobile.jpg",
+        sizes: "1206x2034",
+        type: "image/jpeg",
+        form_factor: "narrow",
+        label: "Restaurant screen on mobile",
+      },
+      {
+        src: "/screenshots/home-desktop.png",
+        sizes: "2992x1494",
+        type: "image/png",
+        form_factor: "wide",
+        label: "Home screen on desktop",
+      },
+    ],
     icons: [
       {
         src: "/icons/icon-192x192.png",
