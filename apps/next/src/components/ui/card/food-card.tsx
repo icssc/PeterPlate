@@ -254,7 +254,8 @@ export default function FoodCard({
     for (const allergy of allergies) {
       if (!(allergy in ALLERGY_MAP)) continue;
       const key = ALLERGY_MAP[allergy as AllergyName];
-      if (flags[key]) {
+      if (flags[key] === true) {
+        console.log(`Violated allergy: ${key.slice(8)}`);
         const violated_allergy = key.slice(8);
         const updated_allergy_str = `Contains ${violated_allergy}`;
         violations.push(updated_allergy_str);
@@ -264,7 +265,7 @@ export default function FoodCard({
     for (const preference of preferences) {
       if (!(preference in PREFERENCE_MAP)) continue;
       const key = PREFERENCE_MAP[preference as PreferenceName];
-      if (!flags[key]) {
+      if (flags[key] === false) {
         const violated_pref = key.slice(2);
         const updated_pref_string = `Not ${violated_pref}`;
         violations.push(updated_pref_string);
