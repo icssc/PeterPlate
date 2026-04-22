@@ -102,7 +102,7 @@ const MOBILE_TOOLBAR_ELEMENTS: ToolbarElement[] = [
   },
   {
     title: "Tracker",
-    href: "/tracker",
+    href: "/nutrition",
     icon: <ListAltRoundedIcon />,
   },
 ];
@@ -166,7 +166,7 @@ export function DesktopToolbar(): React.JSX.Element {
   const pathname = usePathname();
   const isTransparent = TRANSPARENT_PAGES.includes(pathname);
   const isDesktop = useMediaQuery("(min-width: 768px)");
-    
+
   const [profileAnchor, setProfileAnchor] = useState<null | HTMLElement>(null);
   const profileOpen = Boolean(profileAnchor);
   const [editPreferencesOpen, setEditPreferencesOpen] = useState(false);
