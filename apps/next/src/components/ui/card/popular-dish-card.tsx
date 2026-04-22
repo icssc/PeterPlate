@@ -1,42 +1,47 @@
 import type { DishInfo } from "@api/index";
 import { Star } from "@mui/icons-material";
-import { Card, Dialog } from "@mui/material";
+import { Card, Dialog, Drawer } from "@mui/material";
 import Image from "next/image";
-import { useState } from "react";
+import React, { useState } from "react";
+import { useSnackbarStore } from "@/context/useSnackbar";
+import { useUserStore } from "@/context/useUserStore";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { formatFoodName, getFoodIcon, toTitleCase } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
 import FoodDialogContent from "../food-dialog-content";
+import FoodDrawerContent from "../food-drawer-content";
 
-export default function PopularDishCard({
-  dish,
-  hallName,
-  stationName,
-  compact = false,
-}: {
+interface PopularDishCardContentProps
+  extends React.HTMLAttributes<HTMLDivElement> {
+  // The dish information to display.
   dish: DishInfo;
+  // The dining hall where the dish is served.
   hallName: string;
+  // The station where the dish is served.
   stationName: string;
-  compact?: boolean;
-}) {
-  const [open, setOpen] = useState(false);
+  // Whether to render a compact version of the card.
+  isCompact?: boolean;
+}
+
+const PopularDishCardContent = React.forwardRef<
+  HTMLDivElement,
+  PopularDishCardContentProps
+>(({ dish, hallName, stationName, isCompact = false, onClick }, ref) => {
+  const IconComponent = getFoodIcon(dish.name);
+  const iconSize = isCompact ? 16 : 24;
+  const descSize = isCompact ? "text-[8px]" : "text-[10px]";
 
   const { data: ratingData } = trpc.dish.getAverageRating.useQuery(
     { dishId: dish.id },
     { staleTime: 5 * 60 * 1000 },
   );
-
-  const IconComponent = getFoodIcon(dish.name);
-
   const averageRating = ratingData?.averageRating ?? 0;
-
-  const iconSize = compact ? 16 : 24;
-  const descSize = compact ? "text-[8px]" : "text-[10px]";
 
   return (
     <>
       <Card
         className="w-full h-full min-h-[210px] flex flex-col rounded-xl border border-neutral-200 dark:border-neutral-700 overflow-hidden shadow-sm hover:shadow-md transition cursor-pointer text-left bg-transparent p-0"
-        onClick={() => setOpen(true)}
+        onClick={onClick}
       >
         {/* Dish image */}
         <div className="relative w-full aspect-[16/9] flex-shrink-0 bg-amber-50 dark:bg-neutral-800">
@@ -72,25 +77,132 @@ export default function PopularDishCard({
           </div>
         </div>
       </Card>
-      <Dialog
-        open={open}
-        onClose={() => setOpen(false)}
-        maxWidth={false}
-        slotProps={{
-          paper: {
-            sx: {
-              width: "460px",
-              maxWidth: "90vw",
-              margin: 2,
-              padding: 0,
-              overflow: "hidden",
-              borderRadius: "16px",
-            },
-          },
-        }}
-      >
-        <FoodDialogContent dish={dish} />
-      </Dialog>
     </>
   );
+});
+
+export default function PopularDishCard({
+  dish,
+  hallName,
+  stationName,
+  isCompact = false,
+  onClick,
+}: PopularDishCardContentProps): React.JSX.Element {
+  const isDesktop = useMediaQuery("(min-width: 768px)");
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+  const userId = useUserStore((s) => s.userId);
+  const utils = trpc.useUtils();
+  const { showSnackbar } = useSnackbarStore();
+
+  const logMealMutation = trpc.nutrition.logMeal.useMutation({
+    onSuccess: () => {
+      showSnackbar(`Added ${formatFoodName(dish.name)} to your log`, "success");
+      utils.nutrition.invalidate();
+    },
+    onError: (error) => {
+      console.error(error.message);
+    },
+  });
+
+  const handleAddToMealTracker = (e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    if (!userId) {
+      showSnackbar("Login to track meals!", "error");
+      return;
+    }
+
+    logMealMutation.mutate({
+      dishId: dish.id,
+      userId,
+      dishName: dish.name,
+      servings: 1,
+    });
+  };
+
+  if (isDesktop) {
+    return (
+      <>
+        <PopularDishCardContent
+          dish={dish}
+          hallName={hallName}
+          stationName={stationName}
+          isCompact={isCompact}
+          onClick={handleOpen}
+        />
+        <Dialog
+          open={open}
+          onClose={handleClose}
+          maxWidth={false}
+          slotProps={{
+            paper: {
+              sx: {
+                width: "460px",
+                maxWidth: "90vw",
+                margin: 2,
+                padding: 0,
+                overflow: "hidden",
+                borderRadius: "16px",
+              },
+            },
+          }}
+        >
+          <FoodDialogContent
+            dish={dish}
+            onAddToMealTracker={handleAddToMealTracker}
+            isAddingToMealTracker={logMealMutation.isPending}
+          />
+        </Dialog>
+      </>
+    );
+  } else {
+    return (
+      <>
+        <PopularDishCardContent
+          dish={dish}
+          hallName={hallName}
+          stationName={stationName}
+          isCompact={isCompact}
+          onClick={handleOpen}
+        />
+        <Drawer
+          anchor="bottom"
+          open={open}
+          onClose={handleClose}
+          slotProps={{
+            paper: {
+              sx: {
+                width: "460px",
+                maxWidth: "90vw",
+                maxHeight: "85vh",
+                margin: 2,
+                padding: 0,
+                overflow: "hidden",
+                display: "flex",
+                flexDirection: "column",
+                borderRadius: "16px",
+              },
+            },
+          }}
+          sx={{
+            "& .MuiDrawer-paper": {
+              borderTopLeftRadius: "10px",
+              borderTopRightRadius: "10px",
+              marginTop: "96px",
+              height: "auto",
+              maxHeight: "85vh",
+            },
+          }}
+        >
+          <FoodDrawerContent
+            dish={dish}
+            onAddToMealTracker={handleAddToMealTracker}
+            isAddingToMealTracker={logMealMutation.isPending}
+          />
+        </Drawer>
+      </>
+    );
+  }
 }
