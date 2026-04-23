@@ -1,5 +1,7 @@
 import { apiTest } from "@api/apiTest";
+import { upsertUser } from "@api/users/services";
 import { describe } from "vitest";
+import { upsertDishesIfMissing } from "./services";
 
 describe("dish.get", () => {
   apiTest(
@@ -46,70 +48,70 @@ describe("dish.get", () => {
   });
 });
 
-// describe("dish.rate", () => {
-//   const dishId = `${testData.dish.id}2` as const; // TODO: temporary workaround since db is dirtied between tests. should clear db after procedure tests
-//   apiTest("rates a dish", async ({ api, expect, testData, db }) => {
-//     // await upsertRestaurant(db, testData.brandywine);
-//     // await upsertStation(db, testData.station);
-//     await upsertPeriod(db, testData.period);
-//     await upsertMenu(db, testData.menu);
-//     await upsertDish(db, {
-//       ...testData.dish,
-//       id: dishId,
-//     });
-//     await upsertUser(db, testData.user);
-//     const result = await api.dish.rate({
-//       ...testData.rating,
-//       dishId: testData.dish.id,
-//     });
-//     const fetchedDish = await api.dish.get({
-//       id: testData.dish.id,
-//     });
-//     expect(result.averageRating).toEqual(fetchedDish.totalRating);
-//     expect(fetchedDish.numRatings).toEqual(1);
-//   });
+describe("dish.rate", () => {
+  apiTest("rates a dish", async ({ api, expect, testData, db }) => {
+    await upsertDishesIfMissing(db, [
+      {
+        id: testData.dish.id,
+        numRatings: 0,
+        totalRating: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ]);
+    await upsertUser(db, testData.user);
+    const result = await api.dish.rate({
+      ...testData.rating,
+      dishId: testData.dish.id,
+    });
+    const fetchedDishes = await api.dish.get({
+      ids: [testData.dish.id],
+    });
+    expect(result.averageRating).toEqual(fetchedDishes[0]?.totalRating);
+    expect(fetchedDishes[0]?.numRatings).toEqual(1);
+  });
 
-//   apiTest("updates existing rating", async ({ api, expect, testData, db }) => {
-//     await upsertPeriod(db, testData.period);
-//     await upsertMenu(db, testData.menu);
-//     await upsertDish(db, {
-//       ...testData.dish,
-//       id: dishId,
-//     });
-//     await upsertUser(db, testData.user);
-//     await api.dish.rate({
-//       ...testData.rating,
-//       dishId,
-//     });
-//     await api.dish.rate({
-//       ...testData.rating,
-//       dishId,
-//       rating: testData.rating.rating + 2,
-//     });
-//     const fetchedDish = await api.dish.get({
-//       id: dishId,
-//     });
-//     expect(fetchedDish.numRatings).toEqual(1);
-//     expect(fetchedDish.totalRating).toEqual(testData.rating.rating + 2);
+  apiTest("updates existing rating", async ({ api, expect, testData, db }) => {
+    await upsertDishesIfMissing(db, [
+      {
+        id: testData.dish.id,
+        numRatings: 0,
+        totalRating: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ]);
+    await upsertUser(db, testData.user);
+    await api.dish.rate({
+      ...testData.rating,
+    });
+    await api.dish.rate({
+      ...testData.rating,
+      rating: testData.rating.rating + 2,
+    });
+    const fetchedDish = await api.dish.get({
+      ids: [testData.dish.id],
+    });
+    expect(fetchedDish.at(0)?.numRatings).toEqual(1);
+    expect(fetchedDish.at(0)?.totalRating).toEqual(testData.rating.rating + 2);
 
-//     await api.dish.rate({
-//       ...testData.rating,
-//       dishId,
-//     });
+    await api.dish.rate({
+      ...testData.rating,
+    });
 
-//     const fetchedDish2 = await api.dish.get({
-//       id: dishId,
-//     });
-//     expect(fetchedDish2.numRatings).toEqual(1);
-//     expect(fetchedDish2.totalRating).toEqual(fetchedDish.totalRating - 2);
-//   });
+    const fetchedDish2 = await api.dish.get({
+      ids: [testData.dish.id],
+    });
+    expect(fetchedDish2.at(0)?.numRatings).toEqual(1);
+    expect(fetchedDish2.at(0)?.totalRating).toEqual(testData.rating.rating);
+  });
 
-//   apiTest("fails on invalid params", async ({ api, expect, testData }) => {
-//     await expect(
-//       api.dish.rate({
-//         ...testData.rating,
-//         dishId: 1 as unknown as "1",
-//       }),
-//     ).rejects.toThrow();
-//   });
-// });
+  apiTest("fails on invalid params", async ({ api, expect, testData }) => {
+    await expect(
+      api.dish.rate({
+        ...testData.rating,
+        dishId: 1 as unknown as "1",
+      }),
+    ).rejects.toThrow();
+  });
+});

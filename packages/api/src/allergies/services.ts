@@ -1,7 +1,6 @@
 import { upsert } from "@api/utils";
-import type { Drizzle, InsertAllergy, SelectAllergy } from "@peterplate/db";
-import { userAllergies, users } from "@peterplate/db";
-import { TRPCError } from "@trpc/server";
+import type { Drizzle } from "@peterplate/db";
+import { userAllergies } from "@peterplate/db";
 import { and, eq } from "drizzle-orm";
 
 /**

@@ -71,14 +71,22 @@ export async function getDishes(ids: string[], db: Drizzle) {
   });
 
   const ratingMap = new Map(
-    dishesWithRatings.map((dish) => [dish.id, dish.totalRating]),
+    dishesWithRatings.map((dish) => [
+      dish.id,
+      [dish.totalRating, dish.numRatings],
+    ]),
   );
 
   // Merge the ratings with dish information
-  const dishInfo = data.map((apiDish) => ({
-    ...apiDish,
-    totalRating: ratingMap.get(apiDish.id ?? null) ?? 0,
-  }));
+  const dishInfo = data.map((apiDish) => {
+    const ratingInfo = ratingMap.get(apiDish.id ?? null);
+
+    return {
+      ...apiDish,
+      totalRating: ratingInfo?.at(0) ?? 0,
+      numRatings: ratingInfo?.at(1) ?? 0,
+    };
+  });
 
   return dishInfo as DishWithRating[];
 }

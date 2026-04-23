@@ -13,7 +13,7 @@ const dish = {
   ingredients: "Chicken Breast, Canola Oil, Turmeric, Cinnamon, Cumin",
   category: "Grilled",
   imageUrl: null,
-  updatedAt: null,
+  updatedAt: new Date("2026-04-23"),
   dietRestriction: {
     containsEggs: true,
     containsFish: true,
@@ -33,8 +33,8 @@ const dish = {
     isVegetarian: true,
   },
   nutritionInfo: {
-    servingSize: null,
-    servingUnit: null,
+    servingSize: "1",
+    servingUnit: "serving",
     calories: null,
     totalFatG: null,
     transFatG: null,
