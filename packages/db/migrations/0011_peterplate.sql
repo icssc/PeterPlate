@@ -1,0 +1,1 @@
+ALTER TABLE "logged_meals" DROP COLUMN "dish_name";
