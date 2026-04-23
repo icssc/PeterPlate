@@ -54,5 +54,22 @@ export const retrieveDishesByIdResponseSchema = z.object({
   ),
 });
 
+export const getDiningEventsResponseSchema = z.object({
+  ok: z.boolean(),
+  data: z.array(
+    z.object({
+      title: z.string(),
+      image: z.string(),
+      restaurantId: z.enum(["brandywine", "anteatery"]),
+      description: z.string(),
+      start: z.coerce.date(),
+      end: z.coerce.date(),
+      updatedAt: z.coerce.date(),
+    }),
+  ),
+});
+
 export type Dish = z.infer<typeof retrieveDishesByIdResponseSchema>["data"][0];
 export type DishWithRating = Dish & { totalRating: number };
+
+export type Event = z.infer<typeof getDiningEventsResponseSchema>["data"][0];

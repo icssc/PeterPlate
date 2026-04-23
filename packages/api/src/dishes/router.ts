@@ -28,7 +28,7 @@ export const getDishProcedure = publicProcedure
     if (!response.ok) {
       throw new TRPCError({
         code: "SERVICE_UNAVAILABLE",
-        message: "Could not reach AAPI endpoint.",
+        message: "Could not reach AAPI dishes endpoint.",
       });
     }
 
