@@ -5,11 +5,13 @@ import { getContributors } from "./contributors/services";
 import { dishRouter } from "./dishes/router";
 import { eventRouter } from "./events/router";
 import { favoriteRouter } from "./favorites/router";
-import { getPickableDates } from "./menus/services";
 import { notificationRouter } from "./notifications/router";
 import { nutritionRouter } from "./nutrition/router";
 import { preferencesRouter } from "./preferences/router";
-import { getRestaurantsByDate } from "./restaurants/services";
+import {
+  getAvailableDateRange,
+  getRestaurantByDate,
+} from "./restaurants/services";
 import { createTRPCRouter, publicProcedure } from "./trpc";
 import { userRouter } from "./users/router";
 
@@ -22,29 +24,21 @@ export const appRouter = createTRPCRouter({
   preference: preferencesRouter,
   allergy: allergiesRouter,
   nutrition: nutritionRouter,
-  hello: publicProcedure.query(() => "Hello, world!"),
-  /** Get all information about restaurants on a given date. */
-  peterplate: publicProcedure.input(z.object({ date: z.date() })).query(
-    async ({ ctx: { db }, input: { date } }) =>
-      await getRestaurantsByDate(db, date).catch((error) => {
-        if (error instanceof TRPCError) throw error;
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "An error occurred while fetching restaurants",
-        });
-      }),
-  ),
+  /** Get information for anteatery. */
+  anteatery: publicProcedure
+    .input(z.object({ date: z.date() }))
+    .query(async ({ input, ctx: { db } }) =>
+      getRestaurantByDate("anteatery", db, input.date),
+    ),
+  /** Get information for brandywine. */
+  brandywine: publicProcedure
+    .input(z.object({ date: z.date() }))
+    .query(async ({ input, ctx: { db } }) =>
+      getRestaurantByDate("brandywine", db, input.date),
+    ),
   /** Get earliest and latest days we currently have meal info for. */
   pickableDates: publicProcedure.query(
-    async ({ ctx: { db } }) =>
-      await getPickableDates(db).catch((error) => {
-        if (error instanceof TRPCError) throw error;
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message:
-            "An error occurred while fetching dates with meal information.",
-        });
-      }),
+    async () => await getAvailableDateRange(),
   ),
   /** Get all current contributors to PeterPlate's GitHub repo. */
   peterplate_contributors: publicProcedure.query(
