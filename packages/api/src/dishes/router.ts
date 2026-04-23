@@ -5,75 +5,17 @@ import {
   upsertRating,
 } from "@api/ratings/services";
 import { createTRPCRouter, publicProcedure } from "@api/trpc";
-import { type InsertDish, RatingSchema } from "@peterplate/db";
-import {
-  type DishWithRating,
-  retrieveDishesByIdResponseSchema,
-} from "@peterplate/validators";
+import { RatingSchema } from "@peterplate/db";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { AAPI_DINING_ROUTE } from "..";
-import { upsertDishesIfMissing } from "./services";
+import { getDishes } from "./services";
 
 // Queries the AAPI 'Retrieve Dishes By Id' endpoint for a batch of dishes' info.
 // Also adds the ratings from our database to the dish information.
 export const getDishProcedure = publicProcedure
   .input(z.object({ ids: z.array(z.string()) }))
   .query(async ({ ctx: { db }, input }) => {
-    const response = await fetch(
-      `${AAPI_DINING_ROUTE}/dishes/batch?ids=${input.ids.join()}`,
-    );
-
-    // Retrieve and parse data from AAPI Endpoint
-    if (!response.ok) {
-      throw new TRPCError({
-        code: "SERVICE_UNAVAILABLE",
-        message: "Could not reach AAPI dishes endpoint.",
-      });
-    }
-
-    const result = await response.json();
-    const parsedResult = retrieveDishesByIdResponseSchema.safeParse(result);
-
-    if (!parsedResult.success) {
-      throw new TRPCError({
-        code: "PARSE_ERROR",
-        message: `Could not parse the response from retrieving dish data: ${parsedResult.error.message}`,
-      });
-    }
-
-    const data = parsedResult.data.data;
-    const dishIds = data.flatMap((dish) => dish.id);
-
-    // Upsert all of the dishIds found from API, doing nothing if exists
-    const upsertData = data.map(
-      (dish) =>
-        ({
-          id: dish.id,
-          numRatings: 0,
-          totalRating: 0,
-          createdAt: new Date(),
-          updatedAt: dish.updatedAt,
-        }) satisfies InsertDish,
-    );
-    await upsertDishesIfMissing(db, upsertData);
-
-    // Retrieve ratings from PeterPlate database
-    const dishesWithRatings = await db.query.dishes.findMany({
-      where: (dishes, { inArray }) => inArray(dishes.id, dishIds),
-    });
-
-    const ratingMap = new Map(
-      dishesWithRatings.map((dish) => [dish.id, dish.totalRating]),
-    );
-
-    // Merge the ratings with dish information
-    const dishInfo = data.map((apiDish) => ({
-      ...apiDish,
-      totalRating: ratingMap.get(apiDish.id ?? null) ?? 0,
-    }));
-
-    return dishInfo as DishWithRating[];
+    return await getDishes(input.ids, db);
   });
 
 const rateDishProcedure = publicProcedure
