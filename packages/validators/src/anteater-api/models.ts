@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { updatedAt } from "../../../db/src/schema/utils";
 
 // Represents the schema of the response from bulk dish retrieval.
 export const retrieveDishesByIdResponseSchema = z.object({
@@ -35,20 +36,20 @@ export const retrieveDishesByIdResponseSchema = z.object({
       nutritionInfo: z.object({
         servingSize: z.string(),
         servingUnit: z.string(),
-        calories: z.number(),
-        totalFatG: z.number(),
-        transFatG: z.number(),
-        saturatedFatG: z.number(),
-        cholesterolMg: z.number(),
-        sodiumMg: z.number(),
-        totalCarbsG: z.number(),
-        dietaryFiberG: z.number(),
-        sugarsG: z.number(),
-        proteinG: z.number(),
-        calciumMg: z.number(),
-        ironMg: z.number(),
-        vitaminAIU: z.number(),
-        vitaminCIU: z.number(),
+        calories: z.number().nullable(),
+        totalFatG: z.number().nullable(),
+        transFatG: z.number().nullable(),
+        saturatedFatG: z.number().nullable(),
+        cholesterolMg: z.number().nullable(),
+        sodiumMg: z.number().nullable(),
+        totalCarbsG: z.number().nullable(),
+        dietaryFiberG: z.number().nullable(),
+        sugarsG: z.number().nullable(),
+        proteinG: z.number().nullable(),
+        calciumMg: z.number().nullable(),
+        ironMg: z.number().nullable(),
+        vitaminAIU: z.number().nullable(),
+        vitaminCIU: z.number().nullable(),
       }),
     }),
   ),
@@ -69,7 +70,53 @@ export const getDiningEventsResponseSchema = z.object({
   ),
 });
 
+export const getDateRangeOfAvailableDiningDataResponseSchema = z.object({
+  ok: z.boolean(),
+  data: z.object({
+    earliest: z.coerce.date(),
+    latest: z.coerce.date(),
+  }),
+});
+
+export const getRestaurantsResponseSchema = z.object({
+  ok: z.boolean(),
+  data: z.array(
+    z.object({
+      id: z.enum(["brandywine", "anteatery"]),
+      updatedAt: z.coerce.date(),
+      stations: z.array(
+        z.object({
+          id: z.coerce.number(),
+          name: z.string(),
+          updatedAt: z.coerce.date(),
+        }),
+      ),
+    }),
+  ),
+});
+
+export const getStateForRestaurantOnDayResponseSchema = z.object({
+  ok: z.boolean(),
+  data: z.object({
+    id: z.enum(["brandywine", "anteatery"]),
+    updatedAt: z.coerce.date(),
+    periods: z.record(
+      z.string().uuid(),
+      z.object({
+        name: z.string(),
+        startTime: z.string().time().nullable(),
+        endTime: z.string().time().nullable(),
+        stationToDishes: z.record(z.coerce.number(), z.array(z.string())),
+      }),
+    ),
+  }),
+});
+
 export type Dish = z.infer<typeof retrieveDishesByIdResponseSchema>["data"][0];
 export type DishWithRating = Dish & { totalRating: number };
 
 export type Event = z.infer<typeof getDiningEventsResponseSchema>["data"][0];
+export type RestaurantInfo = z.infer<
+  typeof getStateForRestaurantOnDayResponseSchema
+>["data"];
+export type Period = RestaurantInfo["periods"][""];

@@ -2,7 +2,6 @@ import { createTRPCRouter, publicProcedure } from "@api/trpc";
 import type { Event } from "@peterplate/validators";
 import { getDiningEventsResponseSchema } from "@peterplate/validators";
 import { TRPCError } from "@trpc/server";
-import { z } from "zod";
 import { AAPI_DINING_ROUTE } from "..";
 
 export const eventRouter = createTRPCRouter({

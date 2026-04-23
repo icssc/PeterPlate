@@ -1,6 +1,6 @@
 import { apiTest } from "@api/apiTest";
 import { describe } from "vitest";
-import { getRestaurantByDate } from "./services";
+import { getAvailableDateRange, getRestaurantByDate } from "./services";
 
 describe("getRestaurants", () => {
   apiTest(
@@ -24,4 +24,11 @@ describe("getRestaurants", () => {
     },
     10000,
   );
+
+  apiTest("gets available date range", async ({ expect }) => {
+    const results = await getAvailableDateRange();
+
+    expect(results.earliest).lt(new Date());
+    expect(results.latest).gte(new Date());
+  });
 });
