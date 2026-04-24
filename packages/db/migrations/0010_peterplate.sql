@@ -17,7 +17,8 @@ DROP INDEX "dishes_name_idx";--> statement-breakpoint
 DROP INDEX "dishes_category_idx";--> statement-breakpoint
 ALTER TABLE "favorites" DROP CONSTRAINT "pins_pk";--> statement-breakpoint
 ALTER TABLE "favorites" ADD CONSTRAINT "favorites_pk" PRIMARY KEY("user_id","dish_id");--> statement-breakpoint
-ALTER TABLE "favorites" ADD COLUMN "restaurant" "restaurant_id_enum" NOT NULL;--> statement-breakpoint
+ALTER TABLE "favorites" ADD COLUMN "restaurant" "restaurant_id_enum" DEFAULT 'anteatery' NOT NULL;--> statement-breakpoint
+ALTER TABLE "favorites" ALTER COLUMN "restaurant" DROP DEFAULT;--> statement-breakpoint
 ALTER TABLE "dishes" DROP COLUMN "station_id";--> statement-breakpoint
 ALTER TABLE "dishes" DROP COLUMN "name";--> statement-breakpoint
 ALTER TABLE "dishes" DROP COLUMN "description";--> statement-breakpoint
