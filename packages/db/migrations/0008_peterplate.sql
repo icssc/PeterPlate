@@ -1,1 +1,1 @@
-ALTER TABLE "dishes" ADD COLUMN IF NOT EXISTS "num_ratings" integer DEFAULT 0 NOT NULL;
+ALTER TABLE "user_goals" ALTER COLUMN "protein_goal" SET DEFAULT 100;

@@ -1,24 +1,9 @@
-ALTER TABLE "events" DISABLE ROW LEVEL SECURITY;--> statement-breakpoint
-ALTER TABLE "dishes_to_menus" DISABLE ROW LEVEL SECURITY;--> statement-breakpoint
-ALTER TABLE "menus" DISABLE ROW LEVEL SECURITY;--> statement-breakpoint
-ALTER TABLE "nutrition_infos" DISABLE ROW LEVEL SECURITY;--> statement-breakpoint
-ALTER TABLE "periods" DISABLE ROW LEVEL SECURITY;--> statement-breakpoint
-ALTER TABLE "restaurants" DISABLE ROW LEVEL SECURITY;--> statement-breakpoint
-ALTER TABLE "stations" DISABLE ROW LEVEL SECURITY;--> statement-breakpoint
-DROP TABLE "events" CASCADE;--> statement-breakpoint
-DROP TABLE "dishes_to_menus" CASCADE;--> statement-breakpoint
-DROP TABLE "menus" CASCADE;--> statement-breakpoint
-DROP TABLE "nutrition_infos" CASCADE;--> statement-breakpoint
-DROP TABLE "periods" CASCADE;--> statement-breakpoint
-DROP TABLE "restaurants" CASCADE;--> statement-breakpoint
-DROP TABLE "stations" CASCADE;--> statement-breakpoint
+CREATE TABLE "user_goals" (
+	"user_id" text PRIMARY KEY NOT NULL,
+	"calorie_goal" integer DEFAULT 2000 NOT NULL,
+	"protein_goal" integer DEFAULT 75 NOT NULL,
+	"carb_goal" integer DEFAULT 250 NOT NULL,
+	"fat_goal" integer DEFAULT 50 NOT NULL
+);
 --> statement-breakpoint
-DROP INDEX "dishes_station_id_idx";--> statement-breakpoint
-DROP INDEX "dishes_name_idx";--> statement-breakpoint
-DROP INDEX "dishes_category_idx";--> statement-breakpoint
-ALTER TABLE "dishes" DROP COLUMN "station_id";--> statement-breakpoint
-ALTER TABLE "dishes" DROP COLUMN "name";--> statement-breakpoint
-ALTER TABLE "dishes" DROP COLUMN "description";--> statement-breakpoint
-ALTER TABLE "dishes" DROP COLUMN "ingredients";--> statement-breakpoint
-ALTER TABLE "dishes" DROP COLUMN "category";--> statement-breakpoint
-ALTER TABLE "dishes" DROP COLUMN "image_url";
+ALTER TABLE "user_goals" ADD CONSTRAINT "user_goals_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;
