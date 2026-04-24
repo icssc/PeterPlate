@@ -14,9 +14,7 @@ import { getDishes } from "./services";
 // Also adds the ratings from our database to the dish information.
 export const getDishProcedure = publicProcedure
   .input(z.object({ ids: z.array(z.string()) }))
-  .query(async ({ ctx: { db }, input }) => {
-    return await getDishes(input.ids, db);
-  });
+  .query(async ({ ctx: { db }, input }) => await getDishes(input.ids, db));
 
 const rateDishProcedure = publicProcedure
   .input(RatingSchema)
