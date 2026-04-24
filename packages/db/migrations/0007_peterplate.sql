@@ -12,7 +12,6 @@ DROP TABLE "nutrition_infos" CASCADE;--> statement-breakpoint
 DROP TABLE "periods" CASCADE;--> statement-breakpoint
 DROP TABLE "restaurants" CASCADE;--> statement-breakpoint
 DROP TABLE "stations" CASCADE;--> statement-breakpoint
-ALTER TABLE "dishes" DROP CONSTRAINT "dishes_station_id_stations_id_fk";
 --> statement-breakpoint
 DROP INDEX "dishes_station_id_idx";--> statement-breakpoint
 DROP INDEX "dishes_name_idx";--> statement-breakpoint

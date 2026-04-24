@@ -24,17 +24,16 @@ export const appRouter = createTRPCRouter({
   preference: preferencesRouter,
   allergy: allergiesRouter,
   nutrition: nutritionRouter,
-  /** Get information for anteatery. */
-  anteatery: publicProcedure
-    .input(z.object({ date: z.date() }))
+  /** Get information for a given restaurant. */
+  restaurant: publicProcedure
+    .input(
+      z.object({
+        date: z.date(),
+        restaurant: z.enum(["anteatery", "brandywine"]),
+      }),
+    )
     .query(async ({ input, ctx: { db } }) =>
       getRestaurantByDate("anteatery", db, input.date),
-    ),
-  /** Get information for brandywine. */
-  brandywine: publicProcedure
-    .input(z.object({ date: z.date() }))
-    .query(async ({ input, ctx: { db } }) =>
-      getRestaurantByDate("brandywine", db, input.date),
     ),
   /** Get earliest and latest days we currently have meal info for. */
   pickableDates: publicProcedure.query(

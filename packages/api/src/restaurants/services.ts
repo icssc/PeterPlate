@@ -1,12 +1,13 @@
 import { getDishes } from "@api/dishes/services";
 import type { Drizzle, RestaurantId } from "@peterplate/db";
+import type { DishWithRating } from "@peterplate/validators";
 import {
-  type DishWithRating,
   getDateRangeOfAvailableDiningDataResponseSchema,
   getRestaurantsResponseSchema,
   getStateForRestaurantOnDayResponseSchema,
 } from "@peterplate/validators";
 import { TRPCError } from "@trpc/server";
+import type { FormattedRestaurantInfo } from "..";
 import { AAPI_DINING_ROUTE } from "..";
 
 export async function getAvailableDateRange() {
@@ -30,19 +31,6 @@ export async function getAvailableDateRange() {
 
   return parsedData.data.data;
 }
-
-export type FormattedRestaurantInfo = {
-  name: string;
-  periods: {
-    name: string;
-    startTime: string;
-    endTime: string;
-    stations: {
-      name: string;
-      dishes: DishWithRating[];
-    }[];
-  }[];
-};
 
 export async function getRestaurantByDate(
   restaurant: RestaurantId,
@@ -94,25 +82,34 @@ export async function getRestaurantByDate(
   );
 
   const periods = await Promise.all(
-    validPeriods.map(
-      async (period) =>
-        ({
-          name: period.name,
-          startTime: period.startTime ?? "",
-          endTime: period.endTime ?? "",
-          stations: await Promise.all(
-            Object.entries(period.stationToDishes).map(
-              async ([stationId, dishIds]) =>
-                ({
-                  name:
-                    stationIdToName.get(Number.parseInt(stationId, 10)) ??
-                    "UNKNOWN",
-                  dishes: await getDishes(dishIds, db),
-                }) satisfies FormattedRestaurantInfo["periods"][0]["stations"][0],
-            ),
-          ),
-        }) satisfies FormattedRestaurantInfo["periods"][0],
-    ),
+    validPeriods.map(async (period) => {
+      // 1. Collect all unique IDs for the entire period first
+      const allDishIdsInPeriod = [
+        ...new Set(Object.values(period.stationToDishes).flat()),
+      ];
+
+      // 2. Single batch fetch for the whole period
+      const allDishesInPeriod = await getDishes(allDishIdsInPeriod, db);
+
+      // 3. Map them back to their stations
+      const dishesLookup = new Map(allDishesInPeriod.map((d) => [d.id, d]));
+
+      const stations = Object.entries(period.stationToDishes).map(
+        ([sId, dIds]) => ({
+          name: stationIdToName.get(Number.parseInt(sId, 10)) ?? "UNKNOWN",
+          dishes: dIds
+            .map((id) => dishesLookup.get(id))
+            .filter(Boolean) as DishWithRating[],
+        }),
+      );
+
+      return {
+        name: period.name,
+        startTime: period.startTime ?? "",
+        endTime: period.endTime ?? "",
+        stations,
+      };
+    }),
   );
 
   return {

@@ -26,7 +26,7 @@ export const eventRouter = createTRPCRouter({
         message: "Could not reach AAPI events endpoint.",
       });
 
-    return availableData.flatMap(async (eventResponse) => {
+    const eventPromises = availableData.map(async (eventResponse) => {
       const parsedData = getDiningEventsResponseSchema.safeParse(
         await eventResponse.json(),
       );
@@ -39,6 +39,9 @@ export const eventRouter = createTRPCRouter({
 
       return parsedData.data.data satisfies Event[];
     });
+
+    const nestedEvents = await Promise.all(eventPromises);
+    return nestedEvents.flat();
   }),
 
   /** Get all events that are happening in between two dates **/

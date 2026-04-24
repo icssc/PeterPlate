@@ -1,4 +1,5 @@
-import type { RestaurantInfo } from "@peterplate/api";
+import type { AppRouter, FormattedRestaurantInfo, Station } from "@api/index";
+import type { TRPCClientErrorLike } from "@trpc/client";
 import { useMemo } from "react";
 import DishesInfo from "@/components/ui/dishes-info";
 import { useUserStore } from "@/context/useUserStore";
@@ -10,15 +11,17 @@ import {
 } from "@/utils/dietary";
 import { toTitleCase } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
+import type { DishWithRating } from "../../../../../../packages/validators/src/anteater-api";
 
+export type DishWithPreference = DishWithRating & { meetsPreferences: boolean };
 interface DishesViewProps {
   isCompactView: boolean;
-  stations: any[]; // Ideally typed better, but keeping consistent with usage
-  activeStation: any | undefined;
+  stations: Station[];
+  activeStation: Station;
   isLoading: boolean;
   isError: boolean;
-  error: any;
-  hallData: RestaurantInfo | undefined;
+  error: TRPCClientErrorLike<AppRouter> | null;
+  hallData: FormattedRestaurantInfo | undefined;
   showPreferencesOnly: boolean;
 }
 
@@ -56,14 +59,19 @@ export function DishesView({
     { enabled: !!userId },
   );
 
-  const enrichedStations = useMemo(() => {
+  type EnrichedStation = {
+    name: string;
+    dishes: DishWithPreference[];
+  };
+
+  const enrichedStations: EnrichedStation[] = useMemo(() => {
     if (!stations) return [];
 
     return stations.map((station) => ({
       ...station,
-      dishes: station.dishes.map((dish: any) => {
+      dishes: station.dishes.map((dish) => {
         if (!preferences || !allergies) {
-          return { ...dish, doesNotMeetPreferences: false };
+          return { ...dish, meetsPreferences: true };
         }
 
         const flags = dish.dietRestriction;
@@ -82,24 +90,18 @@ export function DishesView({
 
         return {
           ...dish,
-          doesNotMeetPreferences: violatesAllergy || violatesPreferences,
+          meetsPreferences: !violatesAllergy && !violatesPreferences,
         };
       }),
     }));
   }, [stations, preferences, allergies]);
 
-  const getFilteredDishes = (dishes: any[]) => {
-    // console.log("running filtered dishes function")
+  const getFilteredDishes = (dishes: DishWithPreference[]) => {
     if (!showPreferencesOnly) return dishes;
-    console.log("showprefs only is true");
-    console.log(
-      "Preferences: ",
-      dishes.map((d) => d.doesNotMeetPreferences),
-    );
-    console.log(dishes.filter((d) => !d.doesNotMeetPreferences));
-    return dishes.filter((d) => !d.doesNotMeetPreferences);
+    return dishes.filter((d) => !d.meetsPreferences);
   };
-  const enrichedActiveStation = enrichedStations.find(
+
+  const activeEnrichedStation = enrichedStations.find(
     (s) => s.name === activeStation?.name,
   );
 
@@ -136,7 +138,7 @@ export function DishesView({
                 </h1>
               </div>
               <DishesInfo
-                dishes={getFilteredDishes(enrichedActiveStation?.dishes ?? [])}
+                dishes={getFilteredDishes(activeEnrichedStation?.dishes ?? [])}
                 isLoading={isLoading}
                 isError={isError || (!isLoading && !hallData)}
                 errorMessage={errorMessage}

@@ -1,11 +1,11 @@
 "use client";
 "use client";
 
-import type { DishInfo } from "@peterplate/api";
 import type React from "react";
 import { useUserStore } from "@/context/useUserStore";
 import { useFavorites } from "@/hooks/useFavorites";
 import FoodCard from "./card/food-card";
+import type { DishWithPreference } from "./restaurant/dishes-view";
 import FoodCardSkeleton from "./skeleton/food-card-skeleton";
 
 /**
@@ -13,9 +13,9 @@ import FoodCardSkeleton from "./skeleton/food-card-skeleton";
  */
 interface DishesInfoProps {
   /**
-   * An array of `DishInfo` objects to be displayed.
+   * An array of `DishWithPreference` objects to be displayed.
    */
-  dishes: DishInfo[];
+  dishes: DishWithPreference[];
   /**
    * A boolean indicating whether the data is currently being loaded.
    * If true, skeleton loaders will be displayed.

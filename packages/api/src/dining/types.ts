@@ -1,4 +1,4 @@
-import type { Dish } from "@peterplate/validators";
+import type { DishWithRating } from "@peterplate/validators";
 
 export type DiningHallId = "anteatery" | "brandywine";
 
@@ -38,44 +38,61 @@ export interface DiningNutrientsPayload {
 }
 
 /** Dish data plus PeterPlate-specific fields. */
-export interface DiningDishPayload extends Dish {
-  menuId?: string;
-  restaurant?: string;
-  totalRating: number;
-  numRatings?: number;
-  image_url?: string | null;
-  category?: string | null;
-  ingredients?: string | null;
-  dietRestriction?: Record<string, unknown> | null;
-  nutritionInfo?: Record<string, unknown> | null;
-}
+// export interface DiningDishPayload extends Dish {
+//   menuId?: string;
+//   restaurant?: string;
+//   totalRating: number;
+//   numRatings?: number;
+//   image_url?: string | null;
+//   category?: string | null;
+//   ingredients?: string | null;
+//   dietRestriction?: Record<string, unknown> | null;
+//   nutritionInfo?: Record<string, unknown> | null;
+// }
 
 /** Station grouping used by the dining hall page. */
-export interface DiningStationPayload {
-  id?: string;
-  name: string;
-  dishes: DiningDishPayload[];
-}
+// export interface DiningStationPayload {
+//   id?: string;
+//   name: string;
+//   dishes: DiningDishPayload[];
+// }
 
 /** Menu-like wrapper kept for frontend compatibility. */
-export interface DiningMenuPayload {
-  id?: string;
-  date?: string;
-  period: DiningPeriodPayload;
-  stations: DiningStationPayload[];
-  price?: string | null;
-}
+// export interface DiningMenuPayload {
+//   id?: string;
+//   date?: string;
+//   period: DiningPeriodPayload;
+//   stations: DiningStationPayload[];
+//   price?: string | null;
+// }
 
 /** Dining hall payload used by the frontend. */
-export interface DiningRestaurantPayload {
-  id: DiningHallId | string;
-  name: string;
-  events: DiningEventPayload[];
-  menus: DiningMenuPayload[];
-}
+// export interface DiningRestaurantPayload {
+//   id: DiningHallId | string;
+//   name: string;
+//   events: DiningEventPayload[];
+//   menus: DiningMenuPayload[];
+// }
 
 /** Top-level dining response. */
-export interface PeterPlateDiningPayload {
-  anteatery: DiningRestaurantPayload;
-  brandywine: DiningRestaurantPayload;
-}
+// export interface PeterPlateDiningPayload {
+//   anteatery: DiningRestaurantPayload;
+//   brandywine: DiningRestaurantPayload;
+// }
+
+/** Dish Information crucial for the PeterPlate Frontend. */
+export type FormattedRestaurantInfo = {
+  name: string;
+  periods: {
+    name: string;
+    startTime: string;
+    endTime: string;
+    stations: Station[];
+  }[];
+};
+
+/** Station information, with name and dishes currently available at this station for this period. */
+export type Station = {
+  name: string;
+  dishes: DishWithRating[];
+};

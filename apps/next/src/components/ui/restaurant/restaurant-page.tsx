@@ -2,8 +2,7 @@
 
 import { LocationOn } from "@mui/icons-material";
 import { Container, Link, Typography } from "@mui/material";
-import type { RestaurantInfo } from "@peterplate/api";
-import type { DateList } from "@peterplate/db";
+import type { FormattedRestaurantInfo } from "@peterplate/api";
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import type { CalendarRange } from "@/components/ui/toolbar";
@@ -37,7 +36,6 @@ export function RestaurantPage({
 
   const [showPreferencesOnly, setShowPreferencesOnly] = useState(false);
 
-  const [enabledDates, setEnabledDates] = useState<DateList>(null);
   const [calendarRange, setCalendarRange] = useState<CalendarRange | null>(
     null,
   );
@@ -45,12 +43,8 @@ export function RestaurantPage({
   const { data: dateRes } = trpc.pickableDates.useQuery();
 
   useEffect(() => {
-    if (dateRes && dateRes.length > 0) {
-      setEnabledDates(dateRes);
-      setCalendarRange({
-        earliest: dateRes[0],
-        latest: dateRes[dateRes.length - 1],
-      });
+    if (dateRes) {
+      setCalendarRange(dateRes);
     }
   }, [dateRes]);
 
@@ -71,22 +65,24 @@ export function RestaurantPage({
     }
   };
 
-  const { data, isLoading, isError, error } = trpc.peterplate.useQuery(
-    { date: selectedDate ?? today },
+  const restaurantId = hall === HallEnum.ANTEATERY ? "anteatery" : "brandywine";
+  const { data, isLoading, isError, error } = trpc.restaurant.useQuery(
+    { date: selectedDate ?? today, restaurant: restaurantId },
     { staleTime: 2 * 60 * 60 * 1000 },
   );
 
   const { data: upcomingEvents = [] } = trpc.event.upcoming.useQuery();
-  const restaurantId = hall === HallEnum.ANTEATERY ? "anteatery" : "brandywine";
   const hallEvents = useMemo(
     () => [...upcomingEvents].filter((e) => e.restaurantId === restaurantId),
     [upcomingEvents, restaurantId],
   );
 
-  const hallData: RestaurantInfo | undefined = useMemo(() => {
+  const hallData: FormattedRestaurantInfo | undefined = useMemo(() => {
     if (isLoading || isError || !data) return undefined;
-    return hall === HallEnum.ANTEATERY ? data.anteatery : data.brandywine;
-  }, [data, hall, isError, isLoading]);
+    return data;
+  }, [data, isError, isLoading]);
+
+  console.log("Received information:", hallData);
 
   useEffect(() => {
     if (hallData && selectedDate) {
@@ -143,9 +139,9 @@ export function RestaurantPage({
 
   const currentMenu = useMemo(
     () =>
-      (hallData?.menus ?? []).find(
-        (m) => m.period.name.toLowerCase() === selectedPeriod.toLowerCase(),
-      ),
+      hallData?.periods.find(
+        (period) => period.name.toLowerCase() === selectedPeriod.toLowerCase(),
+      ) ?? null,
     [hallData, selectedPeriod],
   );
 
@@ -159,19 +155,17 @@ export function RestaurantPage({
       return;
     }
 
-    const first = stations[0].name.toLowerCase();
+    const firstStation = stations[0].name.toLowerCase();
     const isValid = stations.some(
       (s) => s.name.toLowerCase() === selectedStation,
     );
 
-    if (!isValid) {
-      setSelectedStation(first);
-    }
+    if (!isValid) setSelectedStation(firstStation);
   }, [selectedStation, stations]);
 
-  const activeStation = stations.find(
-    (s) => s.name.toLowerCase() === selectedStation,
-  );
+  const activeStation =
+    stations.find((s) => s.name.toLowerCase() === selectedStation) ??
+    stations[0];
 
   const dishes = activeStation?.dishes ?? [];
 
@@ -259,7 +253,6 @@ export function RestaurantPage({
               selectedDate={selectedDate}
               handleDateSelect={handleDateSelect}
               calendarRange={calendarRange}
-              enabledDates={enabledDates}
               isDatePickerOpen={isDatePickerOpen}
               setIsDatePickerOpen={setIsDatePickerOpen}
               isLoading={isLoading}
