@@ -1,6 +1,6 @@
 {
-  "id": "1c309333-e50f-4296-b333-5b46d194e0bd",
-  "prevId": "c5ad9947-ecb6-4c43-8604-7402a5f2b813",
+  "id": "eb782e34-fd2f-4ac1-b022-17bccae6f48e",
+  "prevId": "da3f5b93-99a7-499f-a340-a750256b1c58",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -348,12 +348,6 @@
         },
         "dish_id": {
           "name": "dish_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "dish_name": {
-          "name": "dish_name",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -912,6 +906,142 @@
           "columns": [
             "userId",
             "preference"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.user_goals": {
+      "name": "user_goals",
+      "schema": "",
+      "columns": {
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "calorie_goal": {
+          "name": "calorie_goal",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 2000
+        },
+        "protein_goal": {
+          "name": "protein_goal",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 100
+        },
+        "carb_goal": {
+          "name": "carb_goal",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 250
+        },
+        "fat_goal": {
+          "name": "fat_goal",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 50
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "user_goals_user_id_users_id_fk": {
+          "name": "user_goals_user_id_users_id_fk",
+          "tableFrom": "user_goals",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.user_goals_by_day": {
+      "name": "user_goals_by_day",
+      "schema": "",
+      "columns": {
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "date": {
+          "name": "date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "calorie_goal": {
+          "name": "calorie_goal",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 2000
+        },
+        "protein_goal": {
+          "name": "protein_goal",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 100
+        },
+        "carb_goal": {
+          "name": "carb_goal",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 250
+        },
+        "fat_goal": {
+          "name": "fat_goal",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 50
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "user_goals_by_day_user_id_users_id_fk": {
+          "name": "user_goals_by_day_user_id_users_id_fk",
+          "tableFrom": "user_goals_by_day",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "user_goals_by_day_user_id_date_pk": {
+          "name": "user_goals_by_day_user_id_date_pk",
+          "columns": [
+            "user_id",
+            "date"
           ]
         }
       },
