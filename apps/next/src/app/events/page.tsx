@@ -28,24 +28,21 @@ const Events = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const now = new Date();
 
-  const {
-    data: events,
-    isLoading,
-    error,
-  } = trpc.event.inBetween.useQuery({
-    after: startOfMonth(currentDate),
-    before: endOfMonth(currentDate),
-  });
+  const { data: events, isLoading, error } = trpc.event.upcoming.useQuery();
+  // TODO: Add inBetween here when route is complete
+  // } = trpc.event.inBetween.useQuery({
+  //   after: startOfMonth(currentDate),
+  //   before: endOfMonth(currentDate),
+  // });
 
   const sortedEvents =
-    events?.length > 0
-      ? [...events].sort(
-          (a: any, b: any) =>
-            new Date(a.start).getTime() - new Date(b.start).getTime(),
+    (events?.length ?? -1 > 0)
+      ? events?.sort(
+          (a, b) => new Date(a.start).getTime() - new Date(b.start).getTime(),
         )
       : [];
 
-  const filteredEvents = sortedEvents.filter((event: any) => {
+  const filteredEvents = sortedEvents?.filter((event) => {
     const matchesDiningHall =
       selectedDiningHall === "both" ||
       (selectedDiningHall === "anteatery" &&
@@ -55,10 +52,11 @@ const Events = () => {
     const matchesEventType =
       selectedEventType === "both" ||
       getEventType(event.title) === selectedEventType;
-    return matchesDiningHall && matchesEventType;
+    const notInPast = new Date(event.start) >= new Date();
+    return matchesDiningHall && matchesEventType && notInPast;
   });
 
-  const calendarEvents = filteredEvents.map((event: any) => ({
+  const calendarEvents = filteredEvents?.map((event) => ({
     title: event.title,
     start: new Date(event.start),
     end: new Date(event.end),
@@ -72,10 +70,9 @@ const Events = () => {
     const resource = calendarEvent.resource;
     setSelectedEventData({
       name: resource.title,
-      shortDesc: resource.shortDescription,
-      longDesc: resource.longDescription,
+      desc: resource.longDescription,
       imgSrc: resource.image,
-      alt: resource.title + " promotion image",
+      alt: resource.title + " promotional image",
       startTime: resource.start,
       endTime: resource.end,
       location:
@@ -254,12 +251,12 @@ const Events = () => {
           {!isLoading && !error && viewMode === "grid" && (
             <>
               <p className="text-sm text-zinc-700 dark:text-zinc-400">
-                Showing {filteredEvents.length} event
-                {filteredEvents.length !== 1 ? "s" : ""}
+                Showing {filteredEvents?.length} event
+                {filteredEvents?.length !== 1 ? "s" : ""}
               </p>
 
               <div className="flex sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12 overflow-x-auto sm:overflow-visible pb-2 sm:pb-0">
-                {filteredEvents.map((event: any): any => (
+                {filteredEvents?.map((event) => (
                   <EventCard
                     key={`${event.title}-${event.start}-${event.restaurantId}`}
                     name={event.title}
@@ -272,13 +269,12 @@ const Events = () => {
                         ? HallEnum.ANTEATERY
                         : HallEnum.BRANDYWINE
                     }
-                    shortDesc={event.shortDescription}
-                    longDesc={event.longDescription}
+                    desc={event.description}
                     isOngoing={event.start <= now && event.end >= now}
                   />
                 ))}
               </div>
-              {filteredEvents.length === 0 && (
+              {filteredEvents?.length === 0 && (
                 <p className="text-center text-zinc-700 py-5">
                   No events found :(
                 </p>
@@ -294,7 +290,7 @@ const Events = () => {
               isLoading={isLoading}
               error={error}
               currentDate={currentDate}
-              calendarEvents={calendarEvents}
+              calendarEvents={calendarEvents ?? []}
               selectedEventData={selectedEventData}
               onPreviousMonth={viewPreviousMonthsEvents}
               onNextMonth={viewNextMonthsEvents}

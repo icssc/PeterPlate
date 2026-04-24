@@ -1,7 +1,7 @@
 import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import PinDropOutlinedIcon from "@mui/icons-material/PinDropOutlined";
-import { Button, DialogContent } from "@mui/material";
+import { DialogContent } from "@mui/material";
 import Image from "next/image";
 import type React from "react";
 import EventTypeBadge from "@/components/ui/event-type-badge";
@@ -62,7 +62,7 @@ export default function EventDialogContent(
             <span>{toTitleCase(HallEnum[props.location])}</span>
           </div>
         </div>
-        <p className="text-sm leading-relaxed mt-2">{props.longDesc}</p>
+        <p className="text-sm leading-relaxed mt-2">{props.desc}</p>
       </DialogContent>
     </>
   );

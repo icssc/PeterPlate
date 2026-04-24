@@ -19,10 +19,8 @@ import OngoingBadge from "../ongoing-badge";
 export interface EventInfo {
   /** The name or title of the event. */
   name: string;
-  /** A brief, one-sentence description of the event, displayed on the card. */
-  shortDesc: string;
   /** A detailed description of the event, displayed in the full dialog. */
-  longDesc: string;
+  desc: string;
   /** The URL or path to the event's image, used on the card. */
   imgSrc: string;
   /** The alt text for the event's image, for accessibility. */
@@ -109,7 +107,7 @@ const EventCardContent = React.forwardRef<
             </div>
           </div>
           <p className="text-sm text-zinc-900 dark:text-zinc-100 mt-2">
-            {props.longDesc}
+            {props.desc}
           </p>
         </CardContent>
       </Card>

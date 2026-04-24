@@ -82,8 +82,6 @@ export function RestaurantPage({
     return data;
   }, [data, isError, isLoading]);
 
-  console.log("Received information:", hallData);
-
   useEffect(() => {
     if (hallData && selectedDate) {
       setHallInputs({ hallData, selectedDate });
