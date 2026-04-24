@@ -448,33 +448,6 @@ type HallInput =
     }
   | undefined;
 
-function getHallDishData<TDish extends Record<string, any>>(
-  hallData:
-    | (Omit<NonNullable<HallInput>, "menus"> & {
-        menus?: {
-          period: { startTime: string; endTime: string };
-          stations: { name: string; dishes: TDish[] }[];
-        }[];
-      })
-    | undefined,
-  hallName: string,
-) {
-  const status = getHallStatus(hallData);
-  const menus = hallData?.menus ?? [];
-
-  const dishes = menus.flatMap((menu) =>
-    menu.stations.flatMap((station) =>
-      station.dishes.map((dish) => ({
-        ...dish,
-        hallName,
-        stationName: station.name,
-      })),
-    ),
-  );
-
-  return { status, dishes };
-}
-
 // Handles Popular Today: gets top unique dishes sorted by average rating (descending)
 type DishRatings = {
   name: string;
@@ -524,32 +497,23 @@ export function sortedEvents<T extends EventItem>(
     .slice(0, numCards);
 }
 
-// Get open/close status for each hall
-type HallData =
-  | {
-      menus?: {
-        period: {
-          startTime: string;
-          endTime: string;
-        };
-      }[];
-    }
-  | undefined;
-
-function getHallStatus(hallData: HallData) {
-  if (!hallData?.menus?.length) return { isOpen: false, statusText: "" };
+function getHallStatus(
+  periods?: { startTime?: string | null; endTime?: string | null }[] | null,
+) {
+  if (!periods || periods.length === 0)
+    return { isOpen: false, statusText: "" };
   let earliestOpen: Date | undefined;
   let latestClose: Date | undefined;
-  for (const menu of hallData.menus) {
+  periods.forEach((period) => {
     try {
-      const open = militaryToStandard(menu.period.startTime);
-      const close = militaryToStandard(menu.period.endTime);
+      const open = militaryToStandard(period.startTime ?? "");
+      const close = militaryToStandard(period.endTime ?? "");
       if (!earliestOpen || open < earliestOpen) earliestOpen = open;
       if (!latestClose || close > latestClose) latestClose = close;
     } catch {
       /* skip */
     }
-  }
+  });
   if (earliestOpen && latestClose) {
     const now = new Date();
     const isOpen = now >= earliestOpen && now <= latestClose;
@@ -578,7 +542,6 @@ export {
   sortCategoryKeys,
   getFoodIcon,
   isSameDay,
-  getHallDishData,
   getHallStatus,
   getPopularDishes,
 };
