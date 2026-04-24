@@ -3,7 +3,6 @@
 import { Restaurant, StarBorder } from "@mui/icons-material";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import { Card, CardContent, Dialog, Drawer, Typography } from "@mui/material";
-import type { DishInfo } from "@peterplate/api";
 import Image from "next/image";
 import React from "react";
 import { useSnackbarStore } from "@/context/useSnackbar";
@@ -21,6 +20,7 @@ import { cn } from "@/utils/tw";
 import Favorite from "../favorite";
 import FoodDialogContent from "../food-dialog-content";
 import FoodDrawerContent from "../food-drawer-content";
+import type { DishWithPreference } from "../restaurant/dishes-view";
 
 /** Handler for "Add to meal tracker" used by card, dialog, and drawer. */
 export type OnAddToMealTracker = (e: React.MouseEvent) => void;
@@ -32,7 +32,7 @@ interface FoodCardContentProps extends React.HTMLAttributes<HTMLDivElement> {
   /**
    * The dish information to display.
    */
-  dish: DishInfo;
+  dish: DishWithPreference;
   /**
    * Whether the dish is currently marked as favorite.
    */
@@ -82,8 +82,8 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
     const IconComponent = getFoodIcon(dish.name) ?? Restaurant;
     const [imageError, setImageError] = React.useState(false);
     const showImage =
-      typeof dish.image_url === "string" &&
-      dish.image_url.trim() !== "" &&
+      typeof dish.imageUrl === "string" &&
+      dish.imageUrl.trim() !== "" &&
       !imageError;
 
     /**
@@ -115,9 +115,9 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                 isCompact && "justify-between",
               )}
             >
-              {!isCompact && showImage && dish.image_url && !imageError && (
+              {!isCompact && showImage && dish.imageUrl && !imageError && (
                 <Image
-                  src={dish.image_url}
+                  src={dish.imageUrl}
                   alt=""
                   width={64}
                   height={64}
@@ -157,7 +157,7 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                   >
                     {dish.nutritionInfo.calories == null
                       ? "-"
-                      : `${Math.round(parseFloat(dish.nutritionInfo.calories))} cal`}
+                      : `${Math.round(dish.nutritionInfo.calories)} cal`}
                   </Typography>
                   <div className="flex gap-1 items-center text-zinc-500">
                     <StarBorder
@@ -205,7 +205,7 @@ FoodCardContent.displayName = "FoodCardContent";
  * @param {DishInfo} dish - The dish information to display and pass to the dialog.
  * @returns {JSX.Element} A React component representing a food card.
  */
-interface FoodCardProps extends DishInfo {
+interface FoodCardProps extends DishWithPreference {
   /** Whether this dish is currently favorited. */
   isFavorited?: boolean;
   /** Loading state for favorite toggles. */
@@ -215,7 +215,6 @@ interface FoodCardProps extends DishInfo {
   /** Whether to render a compact version of the card. */
   isCompact?: boolean;
   /** Optional class name for styling. */
-  doesNotMeetPreferences?: boolean;
   className?: string;
 }
 
