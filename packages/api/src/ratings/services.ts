@@ -97,15 +97,6 @@ export const getUserRatedDishes = async (db: Drizzle, userId: string) => {
       allRatings.map(async (rating) => {
         const dish = await db.query.dishes.findFirst({
           where: (dishes, { eq }) => eq(dishes.id, rating.dishId),
-          with: {
-            nutritionInfo: true,
-            dietRestriction: true,
-            station: {
-              with: {
-                restaurant: true, // Fetch the restaurant from station
-              },
-            },
-          },
         });
 
         if (!dish) {
@@ -113,14 +104,7 @@ export const getUserRatedDishes = async (db: Drizzle, userId: string) => {
           return null;
         }
 
-        // Add the restaurant field to match DishInfo type
-        return {
-          ...dish,
-          restaurant: dish.station?.restaurant?.name || "Unknown Restaurant",
-          stationName: dish.station?.name ?? "",
-          rating: rating.rating,
-          ratedAt: rating.updatedAt,
-        };
+        return { ...dish, restaurant: rating.restaurant };
       }),
     );
 

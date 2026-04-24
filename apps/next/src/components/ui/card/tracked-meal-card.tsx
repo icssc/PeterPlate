@@ -13,7 +13,7 @@ import React from "react";
 import FoodDialogContent from "@/components/ui/food-dialog-content";
 import FoodDrawerContent from "@/components/ui/food-drawer-content";
 import { useDate } from "@/context/date-context";
-import { useHallStore } from "@/context/useHallStore";
+import { useRestaurantStore } from "@/context/useRestaurantStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { getFoodIcon } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
@@ -203,7 +203,7 @@ export default function TrackedMealCard({
   const handleClose = () => setOpen(false);
 
   const { selectedDate } = useDate();
-  const today = useHallStore((s) => s.today);
+  const today = useRestaurantStore((s) => s.today);
 
   const { data, isLoading } = trpc.peterplate.useQuery(
     { date: selectedDate ?? today },

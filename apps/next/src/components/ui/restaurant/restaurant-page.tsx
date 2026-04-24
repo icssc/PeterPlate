@@ -7,7 +7,10 @@ import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import type { CalendarRange } from "@/components/ui/toolbar";
 import { useDate } from "@/context/date-context";
-import { useHallDerived, useHallStore } from "@/context/useHallStore";
+import {
+  useHallDerived,
+  useRestaurantStore,
+} from "@/context/useRestaurantStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { isSameDay } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
@@ -31,8 +34,8 @@ export function RestaurantPage({
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   const { selectedDate, setSelectedDate } = useDate();
-  const today = useHallStore((s) => s.today);
-  const setHallInputs = useHallStore((s) => s.setInputs);
+  const today = useRestaurantStore((s) => s.today);
+  const setHallInputs = useRestaurantStore((s) => s.setInputs);
 
   const [showPreferencesOnly, setShowPreferencesOnly] = useState(false);
 
@@ -84,9 +87,9 @@ export function RestaurantPage({
 
   useEffect(() => {
     if (hallData && selectedDate) {
-      setHallInputs({ hallData, selectedDate });
+      setHallInputs({ hallData, selectedDate, restaurant: restaurantId });
     }
-  }, [hallData, selectedDate, setHallInputs]);
+  }, [hallData, selectedDate, setHallInputs, restaurantId]);
 
   const { availablePeriodTimes, derivedHallStatus, openTime, closeTime } =
     useHallDerived();

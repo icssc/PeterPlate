@@ -5,6 +5,7 @@ import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import { Card, CardContent, Dialog, Drawer, Typography } from "@mui/material";
 import Image from "next/image";
 import React from "react";
+import { useRestaurantStore } from "@/context/useRestaurantStore";
 import { useSnackbarStore } from "@/context/useSnackbar";
 import { useUserStore } from "@/context/useUserStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
@@ -33,6 +34,7 @@ interface FoodCardContentProps extends React.HTMLAttributes<HTMLDivElement> {
    * The dish information to display.
    */
   dish: DishWithPreference;
+  restaurant: "brandywine" | "anteatery";
   /**
    * Whether the dish is currently marked as favorite.
    */
@@ -48,7 +50,11 @@ interface FoodCardContentProps extends React.HTMLAttributes<HTMLDivElement> {
   /**
    * Handler invoked when a user toggles the favorite button.
    */
-  onToggleFavorite?: (dishId: string, currentlyFavorite: boolean) => void;
+  onToggleFavorite?: (
+    dishId: string,
+    currentlyFavorite: boolean,
+    restaurant: "anteatery" | "brandywine",
+  ) => void;
   /**
    * Handler invoked when a user clicks "Add to meal tracker" (card, dialog, or drawer).
    */
@@ -68,6 +74,7 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
   (
     {
       dish,
+      restaurant,
       isFavorited,
       favoriteDisabled,
       onToggleFavorite,
@@ -184,7 +191,12 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
               </div>
               <Favorite
                 dishId={dish.id}
-                {...{ isFavorited, favoriteDisabled, onToggleFavorite }}
+                {...{
+                  isFavorited,
+                  favoriteDisabled,
+                  onToggleFavorite,
+                  restaurant,
+                }}
               />
             </div>
           </div>
@@ -211,17 +223,24 @@ interface FoodCardProps extends DishWithPreference {
   /** Loading state for favorite toggles. */
   favoriteIsLoading?: boolean;
   /** Handler to toggle the favorite state. */
-  onToggleFavorite?: (dishId: string, currentlyFavorite: boolean) => void;
+  onToggleFavorite?: (
+    dishId: string,
+    currentlyFavorite: boolean,
+    restaurant: "anteatery" | "brandywine",
+  ) => void;
   /** Whether to render a compact version of the card. */
   isCompact?: boolean;
   /** Optional class name for styling. */
   className?: string;
+  /** Restaurant */
+  restaurant?: "anteatery" | "brandywine";
 }
 
 export default function FoodCard({
   isFavorited = false,
   favoriteIsLoading = false,
   onToggleFavorite,
+  restaurant,
   isCompact = false,
   className,
   ...dish
@@ -229,6 +248,9 @@ export default function FoodCard({
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const [open, setOpen] = React.useState(false);
   const userId = useUserStore((s) => s.userId);
+  const hallStoreRestaurant = useRestaurantStore((s) => s.restaurant);
+  const finalRestaurant = restaurant ?? hallStoreRestaurant;
+
   const utils = trpc.useUtils();
   const { showSnackbar } = useSnackbarStore();
 
@@ -327,14 +349,11 @@ export default function FoodCard({
     return (
       <>
         <FoodCardContent
-          dish={dish}
-          isFavorited={isFavorited}
+          {...{ dish, isFavorited, onToggleFavorite, isCompact, className }}
+          restaurant={finalRestaurant as "anteatery" | "brandywine"}
           favoriteDisabled={favoriteIsLoading}
-          onToggleFavorite={onToggleFavorite}
           onAddToMealTracker={handleAddToMealTracker}
-          isCompact={isCompact}
           onClick={handleOpen}
-          className={className}
           doesNotMeetPreferences={dietaryConflict.hasConflict}
         />
         <Dialog
@@ -371,14 +390,11 @@ export default function FoodCard({
     return (
       <>
         <FoodCardContent
-          dish={dish}
-          isFavorited={isFavorited}
+          {...{ dish, isFavorited, onToggleFavorite, isCompact, className }}
+          restaurant={finalRestaurant as "anteatery" | "brandywine"}
           favoriteDisabled={favoriteIsLoading}
-          onToggleFavorite={onToggleFavorite}
           onAddToMealTracker={handleAddToMealTracker}
-          isCompact={isCompact}
           onClick={handleOpen}
-          className={className}
           doesNotMeetPreferences={dietaryConflict.hasConflict}
         />
         <Drawer

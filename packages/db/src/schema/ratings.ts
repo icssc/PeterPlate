@@ -3,6 +3,7 @@ import { pgTable, primaryKey, real, text } from "drizzle-orm/pg-core"; // switch
 import { createInsertSchema } from "drizzle-zod";
 
 import { dishes } from "./dishes";
+import { restaurantIdEnum } from "./enums";
 import { users } from "./users";
 import { metadataColumns } from "./utils";
 
@@ -22,6 +23,7 @@ export const ratings = pgTable(
         onUpdate: "cascade",
       }),
     rating: real("rating").notNull(),
+    restaurant: restaurantIdEnum().notNull(),
     ...metadataColumns,
   },
   (table) => {

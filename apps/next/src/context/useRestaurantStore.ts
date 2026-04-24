@@ -6,22 +6,26 @@ import { HallStatusEnum } from "@/utils/types";
 interface HallStore {
   hallData?: FormattedRestaurantInfo;
   selectedDate?: Date;
+  restaurant?: "anteatery" | "brandywine";
   today: Date;
   setInputs: (input: {
     hallData: FormattedRestaurantInfo;
     selectedDate: Date;
+    restaurant: "anteatery" | "brandywine";
   }) => void;
 }
 
-export const useHallStore = create<HallStore>((set) => ({
+export const useRestaurantStore = create<HallStore>((set) => ({
   hallData: undefined,
   selectedDate: undefined,
+  restaurant: undefined,
   today: new Date(),
-  setInputs: ({ hallData, selectedDate }) => set({ hallData, selectedDate }),
+  setInputs: ({ hallData, selectedDate, restaurant }) =>
+    set({ hallData, selectedDate, restaurant }),
 }));
 
 export const useHallDerived = () =>
-  useHallStore((state) => {
+  useRestaurantStore((state) => {
     const { hallData, selectedDate, today } = state;
 
     const availablePeriodTimes: Record<string, [Date, Date]> = {};

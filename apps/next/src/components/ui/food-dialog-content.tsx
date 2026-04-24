@@ -3,7 +3,6 @@
 import { Add, StarBorder } from "@mui/icons-material";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import { Button, DialogContent, Tooltip } from "@mui/material";
-import type { DishInfo } from "@peterplate/api";
 import Image from "next/image";
 import { useState } from "react";
 import { useUserStore } from "@/context/useUserStore";
@@ -17,6 +16,7 @@ import {
 import { trpc } from "@/utils/trpc";
 import { cn } from "@/utils/tw";
 import { nutrientToUnit } from "@/utils/types";
+import type { DishWithRating } from "../../../../../packages/validators/src/anteater-api";
 import IngredientsDialog from "../ingredients-dialog";
 import { AllergenBadge } from "./allergen-badge";
 import type { OnAddToMealTracker } from "./card/food-card";
@@ -44,7 +44,7 @@ export default function FoodDialogContent({
   doesNotMeetPreferences,
   violations,
 }: {
-  dish: DishInfo;
+  dish: DishWithRating;
   onAddToMealTracker?: OnAddToMealTracker;
   isAddingToMealTracker?: boolean;
   doesNotMeetPreferences: boolean;
@@ -53,8 +53,8 @@ export default function FoodDialogContent({
   const [showAllNutrients, setShowAllNutrients] = useState(false);
   const [imageError, setImageError] = useState(false);
   const showImage =
-    typeof dish.image_url === "string" &&
-    dish.image_url.trim() !== "" &&
+    typeof dish.imageUrl === "string" &&
+    dish.imageUrl.trim() !== "" &&
     !imageError;
   const initialNutrients = [
     "calories",
@@ -75,8 +75,7 @@ export default function FoodDialogContent({
   const ingredientsAvailable: boolean =
     dish.ingredients != null && dish.ingredients.length > 0;
   const caloricInformationAvailable: boolean =
-    dish.nutritionInfo.calories != null &&
-    dish.nutritionInfo.calories.length > 0;
+    dish.nutritionInfo.calories != null;
 
   const { data: ratingData } = trpc.dish.getAverageRating.useQuery(
     { dishId: dish.id },
@@ -89,7 +88,7 @@ export default function FoodDialogContent({
     <div className="font-poppins flex flex-col max-h-[90vh]">
       {showImage ? (
         <Image
-          src={dish.image_url as string}
+          src={dish.imageUrl as string}
           alt={formatFoodName(dish.name)}
           width={800}
           height={160}
@@ -144,7 +143,7 @@ export default function FoodDialogContent({
                   {averageRating.toFixed(1)} • {toTitleCase(dish.restaurant)} •{" "}
                   {!caloricInformationAvailable
                     ? "-"
-                    : `${Math.round(parseFloat(dish.nutritionInfo.calories ?? "0"))} cal`}
+                    : `${Math.round(dish.nutritionInfo.calories ?? 0)} cal`}
                 </span>
                 <div className="flex items-center gap-2 flex-wrap">
                   {dish.dietRestriction.isVegetarian && (
@@ -194,7 +193,7 @@ export default function FoodDialogContent({
                         const value = dish.nutritionInfo[nutrientKey]; // Now correctly typed
                         const formattedValue = formatNutrientValue(
                           nutrientKey,
-                          value,
+                          value?.toString(),
                         );
                         const isInitial =
                           initialNutrients.includes(nutrientKey); // Use nutrientKey here too for consistency

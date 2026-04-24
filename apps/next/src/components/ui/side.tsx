@@ -6,7 +6,10 @@ import type { RestaurantInfo } from "@peterplate/api"; // Import types
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useDate } from "@/context/date-context";
-import { useHallDerived, useHallStore } from "@/context/useHallStore";
+import {
+  useHallDerived,
+  useRestaurantStore,
+} from "@/context/useRestaurantStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { formatOpenCloseTime, isSameDay, toTitleCase } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc"; // Import tRPC hook
@@ -50,8 +53,8 @@ export default function Side({
   const { selectedDate } = useDate();
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
-  const today = useHallStore((s) => s.today);
-  const setHallInputs = useHallStore((s) => s.setInputs);
+  const today = useRestaurantStore((s) => s.today);
+  const setHallInputs = useRestaurantStore((s) => s.setInputs);
 
   /** Fetch data */
   const { data, isLoading, isError, error } = trpc.peterplate.useQuery(

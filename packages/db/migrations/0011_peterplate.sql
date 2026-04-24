@@ -1,0 +1,1 @@
+ALTER TABLE "ratings" ADD COLUMN "restaurant" "restaurant_id_enum" NOT NULL;
