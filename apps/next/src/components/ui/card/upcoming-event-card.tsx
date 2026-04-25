@@ -4,6 +4,7 @@ import { useState } from "react";
 import { timeToString, toTitleCase } from "@/utils/funcs";
 import { HallEnum, numToMonth } from "@/utils/types";
 import EventDialogContent from "../event-dialog-content";
+import EventTypeBadge from "../event-type-badge";
 import type { EventInfo } from "./event-card";
 
 /** A compact card for an upcoming event in the horizontal scroll row */
@@ -69,11 +70,7 @@ export default function UpcomingEventCard({
           >
             {event.title}
           </h3>
-          {/*           <span
-            className={`flex-shrink-0 ${tagSize} font-semibold uppercase tracking-wider bg-sky-100 text-sky-700 dark:bg-sky-900 dark:text-sky-300 px-2 py-0.5 rounded-full`}
-          >
-            Celebration
-          </span> */}
+          {<EventTypeBadge title={event.longDescription ?? event.title} />}
         </div>
         <div className={spacing}>
           {startDate && (
