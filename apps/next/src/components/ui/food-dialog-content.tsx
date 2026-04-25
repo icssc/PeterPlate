@@ -137,10 +137,7 @@ export default function FoodDialogContent({
                 </div>
                 <Rating dishId={dish.id} />
               </div>
-              <Box
-                className="px-4 flex flex-wrap items-center gap-2"
-                sx={{ color: "text.secondary" }}
-              >
+              <Box className="px-4 flex flex-wrap items-center gap-2 text-zinc-500 dark:text-zinc-400">
                 <span className="whitespace-nowrap flex items-center gap-1">
                   <StarBorder
                     className="w-4 h-4 stroke-zinc-400"
@@ -227,7 +224,7 @@ export default function FoodDialogContent({
                                 "col-span-1",
                                 (nutrientKey === "transFatG" ||
                                   nutrientKey === "saturatedFatG") &&
-                                  "text-gray-500 dark:text-blue-300 pl-4",
+                                  "text-gray-500 dark:text-zinc-400 pl-4",
                               )}
                             >
                               {formatNutrientLabel(nutrientKey)}
@@ -237,7 +234,7 @@ export default function FoodDialogContent({
                                 "col-span-1 text-right",
                                 (nutrientKey === "transFatG" ||
                                   nutrientKey === "saturatedFatG") &&
-                                  "text-gray-500 dark:text-blue-300",
+                                  "text-gray-500 dark:text-zinc-400",
                               )}
                             >
                               {value == null
@@ -312,7 +309,7 @@ export default function FoodDialogContent({
                 <button
                   type="button"
                   disabled={true}
-                  className="w-full inline-flex h-[30px] justify-center items-center gap-0.5 rounded-md border border-gray-300 bg-white text-[12px] font-normal leading-[18px] text-zinc-500 hover:bg-zinc-50 disabled:opacity-60"
+                  className="w-full inline-flex h-[30px] justify-center items-center gap-0.5 rounded-md border border-gray-300 dark:border-zinc-600 bg-white dark:bg-transparent text-[12px] font-normal leading-[18px] text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-700 disabled:opacity-60"
                 >
                   <Add sx={{ fontSize: 18, width: 18, height: 18 }} />
                   Add to Meal Tracker
@@ -326,7 +323,7 @@ export default function FoodDialogContent({
                 type="button"
                 onClick={onAddToMealTracker}
                 disabled={isAddingToMealTracker}
-                className="w-full inline-flex h-[30px] justify-center items-center gap-0.5 rounded-md border border-gray-300 bg-white text-[12px] font-normal leading-[18px] text-zinc-500 hover:bg-zinc-50 disabled:opacity-60"
+                className="w-full inline-flex h-[30px] justify-center items-center gap-0.5 rounded-md border border-gray-500 dark:border-zinc-300 bg-white dark:bg-transparent text-[12px] font-normal leading-[18px] text-zinc-500 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700 disabled:opacity-60"
                 style={{ fontFamily: "Poppins, sans-serif" }}
               >
                 <Add sx={{ fontSize: 18, width: 18, height: 18 }} />
