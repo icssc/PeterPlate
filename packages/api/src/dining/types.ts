@@ -82,7 +82,10 @@ export interface DiningNutrientsPayload {
 
 /** Dish Information crucial for the PeterPlate Frontend. */
 export type FormattedRestaurantInfo = {
-  name: string;
+  /**
+   * Name of the restaurant
+   */
+  name: "brandywine" | "anteatery";
   periods: {
     name: string;
     startTime: string;

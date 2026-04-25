@@ -100,6 +100,7 @@ export default function MealTracker() {
   }, [meals]);
 
   // Checks dish availability
+  // TODO: Update
   const { data: hallData } = trpc.peterplate.useQuery(
     { date: selectedDay?.rawDate ?? new Date() },
     { enabled: Boolean(selectedDay) },

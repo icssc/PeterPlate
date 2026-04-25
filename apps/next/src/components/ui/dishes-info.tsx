@@ -1,11 +1,11 @@
 "use client";
 "use client";
 
+import type { DishWithRating } from "@peterplate/validators";
 import type React from "react";
 import { useUserStore } from "@/context/useUserStore";
 import { useFavorites } from "@/hooks/useFavorites";
 import FoodCard from "./card/food-card";
-import type { DishWithPreference } from "./restaurant/dishes-view";
 import FoodCardSkeleton from "./skeleton/food-card-skeleton";
 
 /**
@@ -15,7 +15,7 @@ interface DishesInfoProps {
   /**
    * An array of `DishWithPreference` objects to be displayed.
    */
-  dishes: DishWithPreference[];
+  dishes: DishWithRating[];
   /**
    * A boolean indicating whether the data is currently being loaded.
    * If true, skeleton loaders will be displayed.
@@ -34,9 +34,7 @@ interface DishesInfoProps {
    * Whether to display dishes in compact/simplified view.
    */
   isCompactView?: boolean;
-  /**
-   * Whether to only show dishes that match user preferences
-   */
+  restaurant: "brandywine" | "anteatery";
 }
 
 /**
@@ -50,6 +48,7 @@ export default function DishesInfo({
   dishes,
   isLoading,
   isError,
+  restaurant,
   errorMessage,
   isCompactView = false,
 }: DishesInfoProps): React.JSX.Element {
@@ -101,6 +100,7 @@ export default function DishesInfo({
                 }
                 onToggleFavorite={onToggleFavorite}
                 isCompact={isCompactView}
+                restaurant={restaurant}
               />
             ))}
           </div>
@@ -116,6 +116,7 @@ export default function DishesInfo({
                 }
                 onToggleFavorite={onToggleFavorite}
                 isCompact={isCompactView}
+                restaurant={restaurant}
               />
             ))}
           </div>

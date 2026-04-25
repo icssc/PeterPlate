@@ -113,6 +113,7 @@ export const getStateForRestaurantOnDayResponseSchema = z.object({
 
 export type Dish = z.infer<typeof retrieveDishesByIdResponseSchema>["data"][0];
 export type DishWithRating = Dish & { totalRating: number; numRatings: number };
+export type DietaryRestrictions = Dish["dietRestriction"];
 
 export type Event = z.infer<typeof getDiningEventsResponseSchema>["data"][0];
 export type RestaurantInfo = z.infer<

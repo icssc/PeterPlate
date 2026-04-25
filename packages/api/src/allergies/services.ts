@@ -1,5 +1,5 @@
 import { upsert } from "@api/utils";
-import type { Drizzle } from "@peterplate/db";
+import type { Drizzle, UserAllergy } from "@peterplate/db";
 import { userAllergies } from "@peterplate/db";
 import { and, eq } from "drizzle-orm";
 
@@ -18,7 +18,7 @@ export async function getAllergies(db: Drizzle, userId: string) {
 export async function addAllergies(
   db: Drizzle,
   userId: string,
-  allergies: Array<string>,
+  allergies: Array<UserAllergy>,
 ): Promise<void> {
   try {
     const upsertPromises = allergies.map((a) =>
@@ -43,7 +43,7 @@ export async function addAllergies(
 export async function deleteAllergy(
   db: Drizzle,
   userId: string,
-  allergy: string,
+  allergy: UserAllergy,
 ): Promise<void> {
   await db
     .delete(userAllergies)

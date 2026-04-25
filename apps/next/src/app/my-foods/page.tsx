@@ -1,6 +1,7 @@
 "use client";
 
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import type { DishWithRating } from "@peterplate/validators";
 import { useMemo, useState } from "react";
 import MyFoodsCard from "@/components/ui/card/my-foods-card";
 import FoodCardSkeleton from "@/components/ui/skeleton/food-card-skeleton";
@@ -9,7 +10,6 @@ import { useFavorites } from "@/hooks/useFavorites";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { trpc } from "@/utils/trpc";
 import { cn } from "@/utils/tw";
-import type { DishWithRating } from "../../../../../packages/validators/src/anteater-api";
 
 type LocationFilter = "all" | "brandywine" | "anteatery";
 type SortOption = "recent" | "oldest" | "highest" | "lowest" | "az" | "za";

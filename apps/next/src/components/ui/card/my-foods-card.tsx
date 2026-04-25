@@ -8,6 +8,7 @@ import {
   StarBorder,
 } from "@mui/icons-material";
 import { Card, CardContent, Dialog, Drawer } from "@mui/material";
+import type { DishWithRating } from "@peterplate/validators";
 import Image from "next/image";
 import React from "react";
 import { useUserStore } from "@/context/useUserStore";
@@ -15,7 +16,6 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { formatFoodName, getFoodIcon, toTitleCase } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
 import { cn } from "@/utils/tw";
-import type { DishWithRating } from "../../../../../../packages/validators/src/anteater-api";
 import FoodDialogContent from "../food-dialog-content";
 import FoodDrawerContent from "../food-drawer-content";
 import type { OnAddToMealTracker } from "./food-card";

@@ -3,9 +3,11 @@
 import { Add, StarBorder } from "@mui/icons-material";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import { Button, DialogContent, Tooltip } from "@mui/material";
+import type { DishWithRating } from "@peterplate/validators";
 import Image from "next/image";
 import { useState } from "react";
 import { useUserStore } from "@/context/useUserStore";
+import { useDietaryConflicts } from "@/hooks/useDietaryConflicts";
 import {
   enhanceDescription,
   formatFoodName,
@@ -16,7 +18,6 @@ import {
 import { trpc } from "@/utils/trpc";
 import { cn } from "@/utils/tw";
 import { nutrientToUnit } from "@/utils/types";
-import type { DishWithRating } from "../../../../../packages/validators/src/anteater-api";
 import IngredientsDialog from "../ingredients-dialog";
 import { AllergenBadge } from "./allergen-badge";
 import type { OnAddToMealTracker } from "./card/food-card";
@@ -39,17 +40,16 @@ import Rating from "./rating";
  */
 export default function FoodDialogContent({
   dish,
+  restaurant,
   onAddToMealTracker,
   isAddingToMealTracker = false,
-  doesNotMeetPreferences,
-  violations,
 }: {
   dish: DishWithRating;
+  restaurant: "brandywine" | "anteatery";
   onAddToMealTracker?: OnAddToMealTracker;
   isAddingToMealTracker?: boolean;
-  doesNotMeetPreferences: boolean;
-  violations: string[];
 }) {
+  const violations = useDietaryConflicts(dish.dietRestriction);
   const [showAllNutrients, setShowAllNutrients] = useState(false);
   const [imageError, setImageError] = useState(false);
   const showImage =
@@ -140,7 +140,7 @@ export default function FoodDialogContent({
                     className="w-4 h-4 stroke-zinc-400"
                     strokeWidth={1.5}
                   />
-                  {averageRating.toFixed(1)} • {toTitleCase(dish.restaurant)} •{" "}
+                  {averageRating.toFixed(1)} • {toTitleCase(restaurant)} •{" "}
                   {!caloricInformationAvailable
                     ? "-"
                     : `${Math.round(dish.nutritionInfo.calories ?? 0)} cal`}
@@ -158,7 +158,7 @@ export default function FoodDialogContent({
                   {dish.dietRestriction.isKosher && (
                     <AllergenBadge variant={"kosher"} />
                   )}
-                  {doesNotMeetPreferences &&
+                  {violations &&
                     violations.length > 0 &&
                     violations.map((v) => (
                       <AllergenBadge
@@ -193,7 +193,7 @@ export default function FoodDialogContent({
                         const value = dish.nutritionInfo[nutrientKey]; // Now correctly typed
                         const formattedValue = formatNutrientValue(
                           nutrientKey,
-                          value?.toString(),
+                          value?.toString() ?? "0",
                         );
                         const isInitial =
                           initialNutrients.includes(nutrientKey); // Use nutrientKey here too for consistency

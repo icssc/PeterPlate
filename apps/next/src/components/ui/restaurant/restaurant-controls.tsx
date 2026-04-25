@@ -1,7 +1,7 @@
+import type { DishWithRating } from "@peterplate/validators";
 import { DiningHallStatus } from "@/components/ui/status";
 import type { CalendarRange } from "@/components/ui/toolbar";
 import type { HallEnum, HallStatusEnum } from "@/utils/types";
-import type { DishWithRating } from "../../../../../../packages/validators/src/anteater-api";
 import { DesktopTabs } from "./header/desktop-tabs";
 import { MobileActions } from "./header/mobile-actions";
 import { RestaurantFilters } from "./header/restaurant-filters";
