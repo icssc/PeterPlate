@@ -105,7 +105,12 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
           "relative cursor-pointer hover:shadow-lg transition w-full dark:bg-[#303035]",
           doesNotMeetPreferences && "opacity-70",
         )}
-        sx={{ borderRadius: "12px", border: 1, borderColor: "divider" }}
+        sx={{
+          borderRadius: "12px",
+          border: 1,
+          borderColor: "divider",
+          backgroundImage: "none",
+        }}
       >
         <CardContent sx={{ padding: 0, "&:last-child": { paddingBottom: 0 } }}>
           <div className="flex justify-between h-full w-full p-4 gap-4">
@@ -126,7 +131,10 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                 />
               )}
               {!isCompact && !showImage && IconComponent && (
-                <IconComponent className="w-12 h-12 flex-shrink-0" color="primary"/>
+                <IconComponent
+                  className="w-12 h-12 flex-shrink-0"
+                  color="primary"
+                />
               )}
               <div
                 className={cn(
@@ -154,7 +162,8 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                 <div className="flex gap-2 items-center text-zinc-700 text-sm w-fit flex-shrink">
                   <Typography
                     noWrap
-                    color="text.primary" className="font-normal"
+                    color="text.primary"
+                    className="font-normal"
                   >
                     {dish.nutritionInfo.calories == null
                       ? "-"

@@ -54,7 +54,7 @@ export function DesktopTabs({
               key={station.name}
               value={station.name.toLowerCase()}
               label={toTitleCase(station.name)}
-              className="!rounded !border !border-transparent !bg-transparent !px-4 !py-1.5 !text-sm !font-medium !text-slate-700 dark:!text-white !normal-case !min-h-0 aria-selected:!bg-white dark:aria-selected:!bg-white aria-selected:!text-slate-900 dark:aria-selected:!text-gray-900 aria-selected:!border-slate-200 dark:aria-selected:!border-slate-200 aria-selected:!shadow-sm"
+              className="!rounded !border !border-transparent !bg-transparent !px-4 !py-1.5 !text-sm !font-medium !text-black dark:!text-white !normal-case !min-h-0 aria-selected:!bg-white dark:aria-selected:!bg-white aria-selected:!text-slate-900 dark:aria-selected:!text-gray-900 aria-selected:!border-slate-200 dark:aria-selected:!border-slate-200 aria-selected:!shadow-sm"
             />
           ))}
         </Tabs>

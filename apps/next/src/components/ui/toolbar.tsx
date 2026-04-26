@@ -476,7 +476,7 @@ function MobileToolbar(): React.JSX.Element {
         className={`top-0 z-50 w-full px-4 py-2.5 flex items-center justify-between ${
           isTransparent
             ? "absolute bg-transparent"
-            : "sticky bg-white dark:bg-neutral-950"
+            : "sticky bg-white dark:bg-[#27272A]"
         }`}
       >
         <span
@@ -532,7 +532,7 @@ function MobileToolbar(): React.JSX.Element {
             rounded-[28px]
             px-4 py-3
             shadow-lg
-            bg-gradient-to-b from-sky-700 to-sky-900
+            bg-gradient-to-b from-sky-700 to-sky-900 dark:from-[#8EC5FF] dark:to-[#4281CA]
           "
         >
           <div className="flex items-center justify-between">
@@ -561,13 +561,14 @@ function MobileToolbar(): React.JSX.Element {
                       color: "white",
                       opacity: active ? 1 : 0.9,
                     }}
+                    className={active ? "dark:!text-[#162456]" : ""}
                   >
                     {element.icon}
                   </div>
                   <span
                     className={`
                       text-[12px] leading-none text-white
-                      ${active ? "font-semibold" : "font-medium"}
+                      ${active ? "font-semibold dark:!text-[#162456]" : "font-medium"}
                     `}
                   >
                     {element.title}

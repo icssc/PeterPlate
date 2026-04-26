@@ -10,6 +10,7 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import type { DateList } from "@peterplate/db";
+import { useTheme } from "next-themes";
 import type { CalendarRange } from "@/components/ui/toolbar";
 import { formatOpenCloseTime, isSameDay, toTitleCase } from "@/utils/funcs";
 
@@ -44,6 +45,7 @@ export function RestaurantFilters({
   showPreferencesOnly,
   setShowPreferencesOnly,
 }: RestaurantFiltersProps) {
+  const { resolvedTheme } = useTheme();
   return (
     <div className={isDesktop ? "flex gap-2" : "grid grid-cols-2 gap-2 w-full"}>
       <div className={isDesktop ? "w-52" : "w-full"}>
@@ -60,7 +62,7 @@ export function RestaurantFilters({
             label="Meal"
             onChange={(e) => setSelectedPeriod(e.target.value)}
             IconComponent={ArrowDropDownRounded}
-            className="bg-white dark:bg-[#323235] [&_fieldset]:!border-sky-700 dark:[&_fieldset]:!border-blue-300 [&:hover_fieldset]:!border-sky-700 dark:[&:hover_fieldset]:!border-blue-300 [&_.Mui-focused_fieldset]:!border-sky-700 dark:[&_.Mui-focused_fieldset]:!border-blue-300 [&_.MuiSvgIcon-root]:!text-sky-700 dark:[&_.MuiSvgIcon-root]:!text-blue-300"
+            className="bg-white dark:bg-[#27272A] [&_fieldset]:!border-sky-700 dark:[&_fieldset]:!border-blue-300 [&:hover_fieldset]:!border-sky-700 dark:[&:hover_fieldset]:!border-blue-300 [&_.Mui-focused_fieldset]:!border-sky-700 dark:[&_.Mui-focused_fieldset]:!border-blue-300 [&_.MuiSvgIcon-root]:!text-sky-700 dark:[&_.MuiSvgIcon-root]:!text-blue-300"
             MenuProps={{
               anchorOrigin: {
                 vertical: "bottom",
@@ -74,6 +76,11 @@ export function RestaurantFilters({
               PaperProps: {
                 style: {
                   minWidth: "280px",
+                  backgroundImage: "none",
+                  backgroundColor:
+                    resolvedTheme === "dark" ? "#323235" : undefined,
+                  border: "1px solid",
+                  borderColor: resolvedTheme === "dark" ? "#93C5FD" : "#0369a1",
                 },
               },
             }}
@@ -148,7 +155,7 @@ export function RestaurantFilters({
                     className: "!cursor-pointer",
                   },
                   className:
-                    "bg-white dark:bg-[#323235] [&_fieldset]:!border-sky-700 dark:[&_fieldset]:!border-blue-300 [&:hover_fieldset]:!border-sky-700 dark:[&:hover_fieldset]:!border-blue-300 [&_.Mui-focused_fieldset]:!border-sky-700 dark:[&_.Mui-focused_fieldset]:!border-blue-300 [&_.MuiSvgIcon-root]:!text-sky-700 dark:[&_.MuiSvgIcon-root]:!text-blue-300 !cursor-pointer",
+                    "bg-white dark:bg-[#27272A] [&_fieldset]:!border-sky-700 dark:[&_fieldset]:!border-blue-300 [&:hover_fieldset]:!border-sky-700 dark:[&:hover_fieldset]:!border-blue-300 [&_.Mui-focused_fieldset]:!border-sky-700 dark:[&_.Mui-focused_fieldset]:!border-blue-300 [&_.MuiSvgIcon-root]:!text-sky-700 dark:[&_.MuiSvgIcon-root]:!text-blue-300 !cursor-pointer",
                 },
                 openPickerIcon: {
                   className: "!text-sky-700 dark:!text-blue-300",
@@ -158,7 +165,8 @@ export function RestaurantFilters({
                 },
                 popper: {
                   placement: "bottom-end",
-                  className: "[&_.MuiPaper-root]:mt-1",
+                  className:
+                    "[&_.MuiPaper-root]:mt-1 [&_.MuiPaper-root]:!border [&_.MuiPaper-root]:!border-sky-700 dark:[&_.MuiPaper-root]:!bg-[#323235] dark:[&_.MuiPaper-root]:!border-blue-300 dark:[&_.MuiPaper-root]:![background-image:none]",
                   modifiers: [
                     {
                       name: "flip",
@@ -197,7 +205,7 @@ export function RestaurantFilters({
             ${
               showPreferencesOnly
                 ? "bg-sky-700 text-white border-sky-700 shadow-md dark:bg-blue-300 dark:text-gray-900 dark:border-blue-300"
-                : "bg-white text-sky-700 border-sky-700 hover:bg-sky-50 dark:bg-[#323235] dark:text-blue-300 dark:border-blue-300 dark:hover:bg-zinc-700"
+                : "bg-white text-sky-700 border-sky-700 hover:bg-sky-50 dark:bg-[#27272A] dark:text-blue-300 dark:border-blue-300 dark:hover:bg-zinc-700"
             }
           `}
         >
