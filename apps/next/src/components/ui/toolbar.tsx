@@ -102,7 +102,7 @@ const MOBILE_TOOLBAR_ELEMENTS: ToolbarElement[] = [
   },
   {
     title: "Tracker",
-    href: "/tracker",
+    href: "/nutrition",
     icon: <ListAltRoundedIcon />,
   },
 ];
