@@ -1,7 +1,7 @@
 import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import PinDropOutlinedIcon from "@mui/icons-material/PinDropOutlined";
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import Image from "next/image";
 import EventTypeBadge from "@/components/ui/event-type-badge";
 import { timeToString, toTitleCase } from "@/utils/funcs";
@@ -21,7 +21,7 @@ export default function EventDrawerContent(
   props: EventInfo,
 ): React.JSX.Element {
   return (
-    <Box>
+    <Box className="dark:bg-[#303035]">
       <div className="relative">
         <Image
           src={props.imgSrc}
@@ -33,10 +33,15 @@ export default function EventDrawerContent(
         <EventTypeBadge title={props.name} />
       </div>
       <Box sx={{ padding: "20px 24px 24px" }} className="flex flex-col gap-2">
-        <h2 className="text-2xl font-semibold text-sky-700 leading-tight">
+        <Typography
+          fontWeight={600}
+          color="primary"
+          sx={{ fontSize: "1.5rem" }}
+          className="leading-tight"
+        >
           {props.name}
-        </h2>
-        <div className="flex flex-col gap-2 text-sm text-zinc-500 mt-1">
+        </Typography>
+        <div className="flex flex-col gap-2 text-sm text-zinc-500 dark:text-zinc-400 mt-1">
           <div className="flex gap-2 items-center">
             <CalendarTodayOutlinedIcon sx={{ fontSize: 16 }} />
             <span>
@@ -58,9 +63,13 @@ export default function EventDrawerContent(
             <span>{toTitleCase(HallEnum[props.location])}</span>
           </div>
         </div>
-        <p className="text-sm leading-relaxed mt-2">
+        <Typography
+          variant="body2"
+          color="text.primary"
+          className="leading-relaxed mt-2"
+        >
           {props.longDesc?.replace(/\u00A0+/g, " ")}
-        </p>
+        </Typography>
       </Box>
     </Box>
   );

@@ -185,9 +185,7 @@ export default function MyFoodsPage() {
                     color:
                       locationFilter === loc
                         ? undefined
-                        : resolvedTheme === "dark"
-                          ? "white"
-                          : "black",
+                        : "var(--mui-palette-text-primary)",
                   }}
                   className={cn(
                     "rounded-lg px-4 py-1.5 h-8 text-sm font-medium transition whitespace-nowrap",

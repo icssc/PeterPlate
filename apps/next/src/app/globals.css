@@ -134,3 +134,47 @@ body {
 .dark .events-calendar-wrapper .rbc-day-bg.rbc-today {
   background-color: #434e5d !important;
 }
+
+/* Date picker light mode */
+.MuiPickersDay-root {
+  color: #111827 !important;
+}
+.MuiPickersDay-root.Mui-selected {
+  background-color: #0369a1 !important;
+  color: white !important;
+}
+.MuiDayCalendar-weekDayLabel {
+  color: #111827 !important;
+}
+.MuiPickersCalendarHeader-label {
+  color: #111827 !important;
+}
+.MuiPickersArrowSwitcher-button {
+  color: #111827 !important;
+}
+
+/* Date picker dark mode */
+.dark .MuiPickersDay-root {
+  color: white !important;
+}
+.dark .MuiPickersDay-root.Mui-selected {
+  background-color: #93C5FD !important;
+  color: #111827 !important;
+}
+.dark .MuiPickersDay-today {
+  border-color: #93C5FD !important;
+}
+.dark .MuiDayCalendar-weekDayLabel {
+  color: white !important;
+}
+.dark .MuiPickersCalendarHeader-label {
+  color: white !important;
+}
+.dark .MuiPickersArrowSwitcher-button {
+  color: white !important;
+}
+/* Date picker dialog dark mode (mobile) */
+.dark .MuiDialog-paper {
+  background-color: #323235 !important;
+  background-image: none !important;
+}
