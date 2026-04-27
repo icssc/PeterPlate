@@ -6,7 +6,7 @@ import {
   Delete,
   Restaurant,
 } from "@mui/icons-material";
-import { Card, CardContent, Dialog, Drawer } from "@mui/material";
+import { Card, CardContent, Dialog, Drawer, Typography } from "@mui/material";
 import type { SelectLoggedMeal } from "@peterplate/db";
 import Image from "next/image";
 import React from "react";
@@ -77,9 +77,11 @@ const TrackedMealCardContent = React.forwardRef<
         <Card
           className={cn(
             "cursor-pointer transition w-full border",
-            isUnavailable ? "bg-zinc-200/90" : "bg-white hover:shadow-lg",
+            isUnavailable
+              ? "bg-zinc-200/90 dark:bg-zinc-700"
+              : "bg-white dark:bg-[#303035] hover:shadow-lg",
           )}
-          sx={{ borderRadius: "12px" }}
+          sx={{ borderRadius: "12px", backgroundImage: "none" }}
         >
           <CardContent sx={{ padding: "0 !important" }}>
             <div className="h-auto p-3 md:h-40 md:p-4 flex justify-between gap-3 text-left">
@@ -95,16 +97,20 @@ const TrackedMealCardContent = React.forwardRef<
                       onError={() => setImageError(true)}
                     />
                   ) : (
-                    <IconComponent className="w-12 h-12 text-slate-700 flex-shrink-0" />
+                    <IconComponent className="w-12 h-12 text-slate-700 dark:text-blue-300 flex-shrink-0" />
                   )}
 
                   <div className="min-w-0">
-                    <h3 className="text-sky-700 font-semibold text-lg truncate">
+                    <Typography
+                      color="primary"
+                      fontWeight={600}
+                      className="text-lg truncate"
+                    >
                       {meal.dishName}
-                    </h3>
+                    </Typography>
 
                     {/* Edit Servings/Bowls */}
-                    <div className="flex items-center gap-2 text-xs text-zinc-500">
+                    <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-white">
                       <div className="inline-flex items-stretch rounded-md bg-sky-100 ring-1 ring-sky-200">
                         <div className="w-8 px-2 py-1 text-slate-900 tabular-nums leading-none flex items-center justify-center">
                           {servingsDraft}
@@ -159,7 +165,7 @@ const TrackedMealCardContent = React.forwardRef<
                   </div>
                 </div>
 
-                <div className="flex gap-4 text-sm text-zinc-600">
+                <div className="flex gap-4 text-sm text-zinc-600 dark:text-zinc-400">
                   <span>{Math.round(meal.calories * servingsDraft)} cal</span>
                   <span>
                     {Math.round(meal.protein * servingsDraft)}g protein

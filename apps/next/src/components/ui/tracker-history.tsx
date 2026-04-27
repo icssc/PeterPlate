@@ -60,7 +60,16 @@ export default function TrackerHistory({
           !loggedDates.some((d) => d.toDateString() === date.toDateString())
         }
         displayStaticWrapperAs="desktop"
-        slotProps={{ actionBar: { actions: [] } }}
+        slotProps={{
+          actionBar: { actions: [] },
+          layout: {
+            sx: {
+              backgroundColor: "var(--mui-palette-background-paper)",
+              backgroundImage: "none",
+              ".dark &": { backgroundColor: "#323235" },
+            },
+          },
+        }}
         sx={{ "& .MuiDateCalendar-root": { height: "300px" } }}
       />
     </LocalizationProvider>
@@ -71,19 +80,29 @@ export default function TrackerHistory({
       <Button
         onClick={() => setOpen(!open)}
         variant="contained"
-        className="!bg-sky-700 !text-white !text-sm !font-semibold hover:!bg-sky-800 !rounded-lg !px-3 !py-1 !normal-case"
+        className="!bg-sky-700 !text-white !text-sm !font-semibold hover:!bg-sky-800 !rounded-lg !px-3 !py-1 !normal-case dark:!bg-blue-300 dark:!text-gray-900 dark:hover:!bg-blue-400"
         endIcon={<RestoreIcon fontSize="small" />}
       >
         History
       </Button>
 
       {isMobile ? (
-        <Drawer anchor="bottom" open={open} onClose={() => setOpen(false)}>
+        <Drawer
+          anchor="bottom"
+          open={open}
+          onClose={() => setOpen(false)}
+          sx={{
+            ".dark & .MuiDrawer-paper": {
+              backgroundImage: "none",
+              backgroundColor: "#323235",
+            },
+          }}
+        >
           <div className="p-4">{calendar}</div>
         </Drawer>
       ) : (
         open && (
-          <div className="absolute top-full mt-2 right-0 z-50 bg-white rounded-xl border border-sky-700/30 p-4 shadow-md">
+          <div className="absolute top-full mt-2 right-0 z-50 bg-white dark:bg-[#323235] rounded-xl border border-sky-700 dark:border-blue-300 p-4 shadow-md">
             {calendar}
           </div>
         )
