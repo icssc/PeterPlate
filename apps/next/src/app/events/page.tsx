@@ -16,7 +16,6 @@ import {
   EVENT_CATEGORIES,
   type EventCategory,
 } from "@/utils/classifyEvent";
-//import { getEventType } from "@/utils/funcs";
 import { HallEnum } from "@/utils/types";
 
 const Events = () => {
@@ -50,7 +49,8 @@ const Events = () => {
   const eventsWithType = sortedEvents.map((event: any) => ({
     ...event,
     eventType: classifyEvent(
-      `${event.title} ${event.shortDescription ?? ""} ${event.longDescription ?? ""}`,
+      event.title,
+      `${event.shortDescription ?? ""} ${event.longDescription ?? ""}`,
     ),
   }));
 
