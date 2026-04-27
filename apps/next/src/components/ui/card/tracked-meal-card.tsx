@@ -7,13 +7,12 @@ import {
   Restaurant,
 } from "@mui/icons-material";
 import { Card, CardContent, Dialog, Drawer } from "@mui/material";
+import type { DishInfo } from "@peterplate/api";
 import type { SelectLoggedMeal } from "@peterplate/db";
 import Image from "next/image";
 import React from "react";
 import FoodDialogContent from "@/components/ui/food-dialog-content";
 import FoodDrawerContent from "@/components/ui/food-drawer-content";
-import { useDate } from "@/context/date-context";
-import { useRestaurantStore } from "@/context/useRestaurantStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { getFoodIcon } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
@@ -29,6 +28,11 @@ type LoggedMealJoinedWithNutrition = SelectLoggedMeal & {
 
 interface Props {
   meal: LoggedMealJoinedWithNutrition;
+  dish?: {
+    id: string;
+    name: string;
+    imageUrl?: string | null;
+  };
   isUnavailable?: boolean;
 }
 
@@ -195,6 +199,7 @@ TrackedMealCardContent.displayName = "TrackedMealCardContent";
 
 export default function TrackedMealCard({
   meal,
+  dish: previewDish,
   isUnavailable = false,
 }: Props) {
   /* Handle Display Food Card Info */
@@ -203,27 +208,12 @@ export default function TrackedMealCard({
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const { selectedDate } = useDate();
-  const today = useRestaurantStore((s) => s.today);
-
-  // This still reads from the temporary compatibility route until tracker UI is fully normalized and ready to go.
-  const { data, isLoading } = trpc.peterplate.useQuery(
-    { date: selectedDate ?? today },
+  const { data: dishResults, isLoading } = trpc.dish.get.useQuery(
+    { ids: [meal.dishId] },
     { enabled: open },
   );
-
-  const dish = React.useMemo(() => {
-    const halls = [data?.anteatery, data?.brandywine].filter(Boolean);
-    for (const hall of halls) {
-      for (const menu of hall?.menus ?? []) {
-        for (const station of menu.stations ?? []) {
-          const found = station.dishes?.find((d) => d.id === meal.dishId);
-          if (found) return found;
-        }
-      }
-    }
-    return undefined;
-  }, [data, meal.dishId]);
+  const fullDish = dishResults?.[0];
+  const displayDish = fullDish ?? previewDish;
 
   const utils = trpc.useUtils();
 
@@ -264,8 +254,8 @@ export default function TrackedMealCard({
     });
   };
 
-  const imageUrl = dish?.imageUrl;
-  const dishNameForIcon = dish?.name ?? meal.dishName;
+  const imageUrl = displayDish?.imageUrl;
+  const dishNameForIcon = displayDish?.name ?? meal.dishName;
 
   if (isDesktop)
     return (
@@ -303,8 +293,8 @@ export default function TrackedMealCard({
             },
           }}
         >
-          {dish ? (
-            <FoodDialogContent dish={dish} />
+          {fullDish ? (
+            <FoodDialogContent dish={fullDish} />
           ) : (
             <div className="p-4">
               {isLoading ? "Loading..." : "Dish not found"}
@@ -358,8 +348,8 @@ export default function TrackedMealCard({
           },
         }}
       >
-        {dish ? (
-          <FoodDrawerContent dish={dish} />
+        {fullDish ? (
+          <FoodDrawerContent dish={fullDish} />
         ) : (
           <div className="p-4">
             {isLoading ? "Loading..." : "Dish not found"}

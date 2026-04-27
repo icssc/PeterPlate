@@ -2,8 +2,8 @@ import { getDishes } from "@api/dishes/services";
 import { upsert } from "@api/utils";
 import type { Drizzle, RestaurantId, SelectFavorite } from "@peterplate/db";
 import { favorites } from "@peterplate/db";
-import { TRPCError } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
+import { ensureDishMetadataRow } from "../dishes/local-metadata";
 
 /**
  * Get all favorites for a given user ID.
@@ -45,17 +45,7 @@ export async function addFavorite(
   dishId: string,
   restaurant: RestaurantId,
 ): Promise<SelectFavorite> {
-  // Check if dish exists
-  const dish = await db.query.dishes.findFirst({
-    where: (dishes, { eq }) => eq(dishes.id, dishId),
-  });
-
-  if (!dish) {
-    throw new TRPCError({
-      code: "NOT_FOUND",
-      message: "dish not found",
-    });
-  }
+  await ensureDishMetadataRow(db, dishId);
 
   // Upsert the favorite (idempotent - if exists, no change)
   const favorite = await upsert(

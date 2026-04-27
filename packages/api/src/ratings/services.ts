@@ -3,6 +3,7 @@ import { upsert } from "@api/utils";
 import type { Drizzle, InsertRating } from "@peterplate/db";
 import { dishes, ratings } from "@peterplate/db";
 import { and, avg, count, eq, sum } from "drizzle-orm";
+import { ensureDishMetadataRow } from "../dishes/local-metadata";
 
 const updateDishStats = async (db: Drizzle, dishId: string) => {
   const result = await db
@@ -24,6 +25,7 @@ const updateDishStats = async (db: Drizzle, dishId: string) => {
 };
 
 export const upsertRating = async (db: Drizzle, rating: InsertRating) => {
+  await ensureDishMetadataRow(db, rating.dishId);
   const result = await upsert(db, ratings, rating, {
     target: [ratings.userId, ratings.dishId],
     set: rating,

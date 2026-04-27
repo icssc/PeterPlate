@@ -19,16 +19,6 @@ export const getDishProcedure = publicProcedure
 const rateDishProcedure = publicProcedure
   .input(RatingSchema)
   .mutation(async ({ ctx: { db }, input }) => {
-    const dish = await db.query.dishes.findFirst({
-      where: (dishes, { eq }) => eq(dishes.id, input.dishId),
-    });
-
-    if (!dish)
-      throw new TRPCError({
-        code: "NOT_FOUND",
-        message: "Dish could not be found.",
-      });
-
     await upsertRating(db, input);
 
     return await getAverageRating(db, input.dishId);
