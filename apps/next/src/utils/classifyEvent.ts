@@ -70,13 +70,14 @@ const DESSERT_MAIN_KEYWORDS = [
   "fudgy",
   "creamy milk tea",
   "caramelized brown sugar",
+  "cupcakes",
 ];
 
 // These indicate dessert is incidental, not the main event
 const DESSERT_INCIDENTAL_PATTERNS = [
   /feast.*with/i,
   /menu.*includes/i,
-  /and more/i,
+  // /and more/i,
   /topped with/i,
   /finish with/i,
   /sweet ending/i,
@@ -111,9 +112,9 @@ function isDessertMain(text: string): boolean {
   return true;
 }
 
-export function classifyEvent(longDesc: string): EventCategory {
+export function classifyEvent(title: string, longDesc: string): EventCategory {
   console.log(`Description: ${longDesc}`);
-  const text = normalize(longDesc);
+  const text = normalize(`${title} ${longDesc}`);
 
   if (matchesAny(text, CULTURAL_KEYWORDS)) return "Cultural & Heritage";
   if (matchesAny(text, CAMPUS_KEYWORDS)) return "Campus Life";

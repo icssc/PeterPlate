@@ -77,7 +77,7 @@ const EventCardContent = React.forwardRef<
             height={300}
             className="w-full object-contain"
           />
-          <EventTypeBadge title={props.name} />
+          <EventTypeBadge title={props.name} desc={props.longDesc} />
         </div>
         <CardContent className="flex flex-col gap-2 p-4">
           <div className="flex flex-row gap-2 items-center">

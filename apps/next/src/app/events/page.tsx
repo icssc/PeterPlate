@@ -11,6 +11,7 @@ import CalendarView from "@/components/ui/calendar-view";
 import EventCard, { type EventInfo } from "@/components/ui/card/event-card";
 import EventCardSkeleton from "@/components/ui/skeleton/event-card-skeleton";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { classifyEvent } from "@/utils/classifyEvent";
 import { getEventType } from "@/utils/funcs";
 import { HallEnum } from "@/utils/types";
 
