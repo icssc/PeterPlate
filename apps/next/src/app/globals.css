@@ -50,6 +50,13 @@ body {
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
+    --donut-inner: white;
+    --donut-outer: white;
+    --donut-track: #ffffff;
+    --donut-progress: #0084D1;
+    --donut-calories-value: #0369a1;
+    --donut-calories-track: #0084D1;
+    --donut-calories-progress: #00BCFF;
   }
 
   .dark {
@@ -77,6 +84,13 @@ body {
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+    --donut-inner: #27272A;
+    --donut-outer: #31373F;
+    --donut-track: #27272A;
+    --donut-progress: var(--mui-palette-primary-main);
+    --donut-calories-value: #7CB9FF;
+    --donut-calories-track: #74D4FF;
+    --donut-calories-progress: #20336C;
   }
 }
 
@@ -178,3 +192,4 @@ body {
   background-color: #323235 !important;
   background-image: none !important;
 }
+

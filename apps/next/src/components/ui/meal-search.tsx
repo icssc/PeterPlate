@@ -80,14 +80,14 @@ function MealList({
     return (
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold uppercase tracking-wide text-sky-700">
+          <span className="text-xs font-semibold uppercase tracking-wide text-sky-700 dark:text-blue-300">
             Search Results...
           </span>
-          <div className="flex-1 h-px bg-sky-100" />
+          <div className="flex-1 h-px bg-sky-100 dark:bg-blue-300/30" />
         </div>
 
         {searchResults.length === 0 ? (
-          <p className="text-zinc-400 text-sm py-6 text-center">
+          <p className="text-zinc-400 dark:text-white text-sm py-6 text-center">
             No dishes found matching &quot;{query}&quot;.
           </p>
         ) : (
@@ -120,11 +120,11 @@ function MealList({
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center gap-2">
-        <div className="flex-1 h-px bg-sky-100" />
+        <div className="flex-1 h-px bg-sky-100 dark:bg-blue-300/30" />
       </div>
 
       {suggestedMeals.length === 0 ? (
-        <p className="text-zinc-400 text-sm py-6 text-center">
+        <p className="text-zinc-400 dark:text-white text-sm py-6 text-center">
           Log a dish for it to appear here!
         </p>
       ) : (
@@ -162,15 +162,19 @@ function SearchBar({
       InputProps={{
         startAdornment: (
           <InputAdornment position="start">
-            <Search sx={{ color: colors.slate500 }} />
+            <Search sx={{ color: "var(--mui-palette-text-secondary)" }} />
           </InputAdornment>
         ),
         sx: {
-          backgroundColor: "white",
+          backgroundColor: "var(--mui-palette-background-paper)",
           borderRadius: "12px",
-          "& fieldset": { borderColor: colors.sky200 },
-          "&:hover fieldset": { borderColor: colors.sky500 },
-          "&.Mui-focused fieldset": { borderColor: colors.sky600 },
+          "& fieldset": { borderColor: "var(--mui-palette-primary-main)" },
+          "&:hover fieldset": {
+            borderColor: "var(--mui-palette-primary-main)",
+          },
+          "&.Mui-focused fieldset": {
+            borderColor: "var(--mui-palette-primary-main)",
+          },
         },
       }}
     />
@@ -218,6 +222,7 @@ function DesktopMealSearchDialog({
           backgroundColor: colors.sky100,
           padding: "12px",
           flexShrink: 0,
+          ".dark &": { backgroundColor: "#8EC5FF33" },
         }}
       >
         <div className="flex items-center gap-2">
@@ -228,7 +233,7 @@ function DesktopMealSearchDialog({
             onClick={onClose}
             size="small"
             aria-label="Close search"
-            sx={{ color: colors.sky700, flexShrink: 0 }}
+            sx={{ color: "var(--mui-palette-primary-main)", flexShrink: 0 }}
           >
             <Close fontSize="small" />
           </IconButton>
@@ -275,9 +280,13 @@ function MobileMealSearchDrawer({
           flexDirection: "column",
           overflow: "hidden",
         },
+        ".dark & .MuiDrawer-paper": {
+          backgroundImage: "none",
+          backgroundColor: "#303035",
+        },
       }}
     >
-      <div className="bg-sky-100 px-4 pt-3 pb-4 flex-shrink-0">
+      <div className="bg-sky-100 dark:bg-[#8EC5FF33] px-4 pt-3 pb-4 flex-shrink-0">
         <div className="flex items-center gap-2">
           <div className="flex-1">
             <SearchBar query={query} onChange={setQuery} />
@@ -286,7 +295,7 @@ function MobileMealSearchDrawer({
             onClick={onClose}
             size="small"
             aria-label="Close search"
-            sx={{ color: colors.sky700, flexShrink: 0 }}
+            sx={{ color: "var(--mui-palette-primary-main)", flexShrink: 0 }}
           >
             <Close fontSize="small" />
           </IconButton>
@@ -307,7 +316,7 @@ function MobileMealSearchDrawer({
         <button
           type="button"
           onClick={onClose}
-          className="bg-sky-700 text-white text-sm font-medium px-5 py-2 rounded-full hover:bg-sky-800 transition-colors"
+          className="bg-sky-700 dark:bg-blue-300 text-white dark:text-gray-900 text-sm font-medium px-5 py-2 rounded-full hover:bg-sky-800 dark:hover:bg-blue-400 transition-colors"
         >
           Close
         </button>
@@ -336,6 +345,8 @@ export default function MealSearchDialog(props: MealSearchDialogProps) {
           "&:hover": { backgroundColor: colors.sky800 },
           color: "white",
           zIndex: 50,
+          ".dark &": { backgroundColor: "#93C5FD", color: "#111827" },
+          ".dark &:hover": { backgroundColor: "#60a5fa" },
         }}
       >
         <Add fontSize="large" />
