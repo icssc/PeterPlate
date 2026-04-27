@@ -15,6 +15,20 @@ import {
 import { createTRPCRouter, publicProcedure } from "./trpc";
 import { userRouter } from "./users/router";
 
+const toLegacyHallPayload = (
+  hall: Awaited<ReturnType<typeof getRestaurantByDate>>,
+) => ({
+  name: hall.name,
+  menus: hall.periods.map((period) => ({
+    period: {
+      name: period.name,
+      startTime: period.startTime,
+      endTime: period.endTime,
+    },
+    stations: period.stations,
+  })),
+});
+
 export const appRouter = createTRPCRouter({
   event: eventRouter,
   dish: dishRouter,
@@ -33,12 +47,30 @@ export const appRouter = createTRPCRouter({
       }),
     )
     .query(async ({ input, ctx: { db } }) =>
-      getRestaurantByDate("anteatery", db, input.date),
+      getRestaurantByDate(input.restaurant, db, input.date),
     ),
   /** Get earliest and latest days we currently have meal info for. */
   pickableDates: publicProcedure.query(
     async () => await getAvailableDateRange(),
   ),
+  /** Legacy combined dining payload kept for tracker compatibility. */
+  peterplate: publicProcedure
+    .input(
+      z.object({
+        date: z.date(),
+      }),
+    )
+    .query(async ({ input, ctx: { db } }) => {
+      const [anteatery, brandywine] = await Promise.all([
+        getRestaurantByDate("anteatery", db, input.date),
+        getRestaurantByDate("brandywine", db, input.date),
+      ]);
+
+      return {
+        anteatery: toLegacyHallPayload(anteatery),
+        brandywine: toLegacyHallPayload(brandywine),
+      };
+    }),
   /** Get all current contributors to PeterPlate's GitHub repo. */
   peterplate_contributors: publicProcedure.query(
     async ({ ctx: { db } }) =>
