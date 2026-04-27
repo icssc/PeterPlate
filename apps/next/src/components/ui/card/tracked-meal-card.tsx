@@ -262,7 +262,7 @@ export default function TrackedMealCard({
     });
   };
 
-  const imageUrl = dish?.image_url;
+  const imageUrl = dish?.imageUrl;
   const dishNameForIcon = dish?.name ?? meal.dishName;
 
   if (isDesktop)

@@ -29,7 +29,7 @@ export default function FoodDrawerContent({
   isAddingToMealTracker = false,
 }: {
   dish: DishWithRating;
-  restaurant: RestaurantId;
+  restaurant?: RestaurantId;
   onAddToMealTracker?: OnAddToMealTracker;
   isAddingToMealTracker?: boolean;
 }) {
@@ -101,7 +101,7 @@ export default function FoodDrawerContent({
 
           <div className="flex flex-wrap items-center gap-2 text-zinc-500">
             <span className="whitespace-nowrap">
-              {toTitleCase(restaurant)} •{" "}
+              {restaurant ? `${toTitleCase(restaurant)} • ` : ""}
               {!caloricInformationAvailable
                 ? "-"
                 : `${Math.round(dish.nutritionInfo.calories ?? 0)} cal`}

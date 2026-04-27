@@ -1,3 +1,4 @@
+import { getDishes } from "@api/dishes/services";
 import { upsert } from "@api/utils";
 import type { Drizzle, InsertRating } from "@peterplate/db";
 import { dishes, ratings } from "@peterplate/db";
@@ -86,30 +87,31 @@ export const deleteRating = async (
 
 export const getUserRatedDishes = async (db: Drizzle, userId: string) => {
   try {
-    // Step 1: Get all ratings for this user
     const allRatings = await db.query.ratings.findMany({
       where: (ratings, { eq }) => eq(ratings.userId, userId),
       orderBy: (ratings, { desc }) => [desc(ratings.updatedAt)],
     });
 
-    // Step 2: For each rating, fetch the full dish info
-    const enrichedResults = await Promise.all(
-      allRatings.map(async (rating) => {
-        const dish = await db.query.dishes.findFirst({
-          where: (dishes, { eq }) => eq(dishes.id, rating.dishId),
-        });
+    if (allRatings.length === 0) return [];
 
-        if (!dish) {
-          console.warn(`Dish not found for rating: ${rating.dishId}`);
-          return null;
-        }
-
-        return { ...dish, restaurant: rating.restaurant };
-      }),
+    const dishes = await getDishes(
+      allRatings.map((rating) => rating.dishId),
+      db,
     );
+    const dishesById = new Map(dishes.map((dish) => [dish.id, dish]));
 
-    const result = enrichedResults.filter((item) => item !== null);
-    return result;
+    return allRatings
+      .map((rating) => {
+        const dish = dishesById.get(rating.dishId);
+        if (!dish) return null;
+
+        return {
+          ...dish,
+          restaurant: rating.restaurant,
+          ratedAt: rating.updatedAt ?? rating.createdAt,
+        };
+      })
+      .filter((dish) => dish !== null);
   } catch (error) {
     console.error("Error fetching rated dishes:", error);
     return [];

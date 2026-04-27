@@ -51,7 +51,7 @@ export default function SearchMealCard({ meal, isUnavailable, onAdd }: Props) {
     return undefined;
   }, [data, meal.dishId]);
 
-  const imageUrl = dish?.image_url;
+  const imageUrl = dish?.imageUrl;
   const dishNameForIcon = dish?.name ?? meal.dishName;
   const showImage =
     typeof imageUrl === "string" && imageUrl.trim() !== "" && !imageError;

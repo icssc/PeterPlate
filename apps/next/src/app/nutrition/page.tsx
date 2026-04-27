@@ -1,5 +1,6 @@
 "use client";
 
+import type { RouterOutputs } from "@peterplate/api";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import SearchMealCard from "@/components/ui/card/search-meal-card";
@@ -16,6 +17,9 @@ import { useSnackbarStore } from "@/context/useSnackbar";
 import { useUserStore } from "@/context/useUserStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { trpc } from "@/utils/trpc";
+
+type LoggedMealWithNutrition =
+  RouterOutputs["nutrition"]["getMealsInLastWeek"][number];
 
 export default function MealTracker() {
   const utils = trpc.useUtils();
@@ -66,7 +70,7 @@ export default function MealTracker() {
 
   const mealsGroupedByDay = useMemo(() => {
     if (!meals) return [];
-    const groups: Record<string, typeof meals> = {};
+    const groups: Record<string, LoggedMealWithNutrition[]> = {};
 
     meals.forEach((meal) => {
       const dateKey = new Date(meal.eatenAt).toDateString();
@@ -87,7 +91,7 @@ export default function MealTracker() {
   const selectedDay =
     activeDayIndex !== null ? mealsGroupedByDay[activeDayIndex] : null;
 
-  const toNum = (v: string | null) => {
+  const toNum = (v: number | string | null | undefined) => {
     const n = v == null ? 0 : Number(v);
     return Number.isFinite(n) ? n : 0;
   };
@@ -152,7 +156,7 @@ export default function MealTracker() {
               protein: Number(dish.nutritionInfo?.proteinG ?? 0),
               carbs: Number(dish.nutritionInfo?.totalCarbsG ?? 0),
               fat: Number(dish.nutritionInfo?.totalFatG ?? 0),
-              image_url: dish.image_url,
+              image_url: dish.imageUrl,
             });
           }
         }
@@ -166,7 +170,7 @@ export default function MealTracker() {
   const suggestedMeals = useMemo(() => {
     if (!meals) return [];
     const servingCounts: Record<string, number> = {};
-    const latestByDish: Record<string, (typeof meals)[0]> = {};
+    const latestByDish: Record<string, LoggedMealWithNutrition> = {};
 
     for (const meal of meals) {
       if (!meal.dishId) continue;
@@ -407,7 +411,10 @@ export default function MealTracker() {
                     logMeal.mutate({
                       userId: userId ?? "",
                       dishId: meal.dishId ?? "",
-                      dishName: meal.dishName ?? "",
+                      dishName:
+                        "dishName" in meal && typeof meal.dishName === "string"
+                          ? meal.dishName
+                          : "",
                       servings,
                       eatenAt: new Date(),
                     })

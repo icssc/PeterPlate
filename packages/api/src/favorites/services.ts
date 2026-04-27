@@ -1,3 +1,4 @@
+import { getDishes } from "@api/dishes/services";
 import { upsert } from "@api/utils";
 import type { Drizzle, RestaurantId, SelectFavorite } from "@peterplate/db";
 import { favorites } from "@peterplate/db";
@@ -11,12 +12,27 @@ import { and, eq } from "drizzle-orm";
 export async function getFavorites(db: Drizzle, userId: string) {
   const userFavorites = await db.query.favorites.findMany({
     where: (favorites, { eq }) => eq(favorites.userId, userId),
-    with: {
-      dish: {},
-    },
   });
 
-  return userFavorites;
+  if (userFavorites.length === 0) return [];
+
+  const dishes = await getDishes(
+    userFavorites.map((favorite) => favorite.dishId),
+    db,
+  );
+  const dishesById = new Map(dishes.map((dish) => [dish.id, dish]));
+
+  return userFavorites
+    .map((favorite) => {
+      const dish = dishesById.get(favorite.dishId);
+      if (!dish) return null;
+
+      return {
+        ...favorite,
+        dish,
+      };
+    })
+    .filter((favorite) => favorite !== null);
 }
 
 /**

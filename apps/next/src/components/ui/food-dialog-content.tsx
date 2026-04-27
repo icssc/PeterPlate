@@ -45,7 +45,7 @@ export default function FoodDialogContent({
   isAddingToMealTracker = false,
 }: {
   dish: DishWithRating;
-  restaurant: "brandywine" | "anteatery";
+  restaurant?: "brandywine" | "anteatery";
   onAddToMealTracker?: OnAddToMealTracker;
   isAddingToMealTracker?: boolean;
 }) {
@@ -140,7 +140,8 @@ export default function FoodDialogContent({
                     className="w-4 h-4 stroke-zinc-400"
                     strokeWidth={1.5}
                   />
-                  {averageRating.toFixed(1)} • {toTitleCase(restaurant)} •{" "}
+                  {averageRating.toFixed(1)}
+                  {restaurant ? ` • ${toTitleCase(restaurant)}` : ""} •{" "}
                   {!caloricInformationAvailable
                     ? "-"
                     : `${Math.round(dish.nutritionInfo.calories ?? 0)} cal`}

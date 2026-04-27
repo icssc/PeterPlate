@@ -40,9 +40,9 @@ export default function PopularDishCard({
       >
         {/* Dish image */}
         <div className="relative w-full aspect-[16/9] flex-shrink-0 bg-amber-50 dark:bg-neutral-800">
-          {dish.image_url ? (
+          {dish.imageUrl ? (
             <Image
-              src={dish.image_url}
+              src={dish.imageUrl}
               alt={dish.name}
               fill
               className="object-cover"
