@@ -1,6 +1,7 @@
 import { AccessTime, CalendarMonth, LocationOn } from "@mui/icons-material";
 import { Card, Dialog } from "@mui/material";
 import { useState } from "react";
+import { classifyEvent } from "@/utils/classifyEvent";
 import { timeToString, toTitleCase } from "@/utils/funcs";
 import { HallEnum, numToMonth } from "@/utils/types";
 import EventDialogContent from "../event-dialog-content";
@@ -26,7 +27,10 @@ export default function UpcomingEventCard({
   const [open, setOpen] = useState(false);
   const startDate = event.start ? new Date(event.start) : null;
   const endDate = event.end ? new Date(event.end) : null;
-
+  const eventType = classifyEvent(
+    event.title,
+    `${event.shortDescription ?? ""} ${event.longDescription ?? ""}`,
+  );
   /*
 
     Seems to be an error where HallEnum is not properly getting the info
@@ -50,6 +54,7 @@ export default function UpcomingEventCard({
     isOngoing: startDate
       ? startDate <= new Date() && (endDate ? endDate >= new Date() : false)
       : false,
+    eventType,
   };
 
   // alternative sizing depending on mobile/desktop
@@ -61,16 +66,20 @@ export default function UpcomingEventCard({
   return (
     <>
       <Card
-        className="w-full rounded-xl border border-neutral-200 dark:border-neutral-700 p-5 shadow-sm hover:shadow-md transition cursor-pointer text-left bg-transparent"
+        className="relative w-full rounded-xl border border-neutral-200 dark:border-neutral-700 p-5 shadow-sm hover:shadow-md transition cursor-pointer text-left bg-transparent"
         onClick={() => setOpen(true)}
       >
-        <div className="mb-3 flex items-start gap-2 min-w-0">
+        <div className="absolute top-2 right-0 h-14 w-48 scale-75 origin-top-right">
+          <div className="[&>span]:!bg-sky-100 [&>span]:!text-sky-700 [&>span]:!shadow-sm">
+            <EventTypeBadge type={eventType} />
+          </div>
+        </div>
+        <div className="mb-3 flex items-start gap-2 min-w-0 pr-28">
           <h3
-            className={`${titleSize} line-clamp-2 min-w-0 flex-1 whitespace-normal break-normal font-bold leading-tight text-sky-700`}
+            className={`${titleSize} whitespace-normal break-normal min-w-0 flex-1 whitespace-normal break-normal font-bold leading-tight text-sky-700`}
           >
             {event.title}
           </h3>
-          {<EventTypeBadge title={event.longDescription ?? event.title} />}
         </div>
         <div className={spacing}>
           {startDate && (
