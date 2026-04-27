@@ -1,10 +1,13 @@
 // utils/classifyEvent.ts
 
-export type EventCategory =
-  | "Cultural & Heritage"
-  | "Campus Life"
-  | "Dessert Spotlight"
-  | "Special Meal";
+export const EVENT_CATEGORIES = [
+  "Cultural & Heritage",
+  "Campus Life",
+  "Dessert Spotlight",
+  "Special Meal",
+] as const;
+
+export type EventCategory = (typeof EVENT_CATEGORIES)[number];
 
 const CULTURAL_KEYWORDS = [
   "heritage",

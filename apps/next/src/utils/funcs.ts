@@ -586,7 +586,7 @@ export {
 /**
  * Hardcoded function for celebration vs special meals
  */
-/* 
+
 export function getEventType(title: string): string {
   const celebrations = ["mardi gras", "senior", "men's vb"];
   const specialMeals = ["desserts", "banh mi", "takeover", "appetizer trio"];
@@ -595,4 +595,4 @@ export function getEventType(title: string): string {
   if (celebrations.some((c) => lower.includes(c))) return "celebration";
   if (specialMeals.some((s) => lower.includes(s))) return "special";
   return "all";
-} */
+}
