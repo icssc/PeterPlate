@@ -15,6 +15,7 @@ import { trpc } from "@/utils/trpc";
 import { cn } from "@/utils/tw";
 
 type LoggedMealJoinedWithNutrition = SelectLoggedMeal & {
+  dishName?: string;
   calories: number;
   protein: number;
   carbs: number;
@@ -32,7 +33,7 @@ export default function SearchMealCard({ meal, isUnavailable, onAdd }: Props) {
   const [servingsDraft, setServingsDraft] = React.useState(meal.servings ?? 1);
   const [imageError, setImageError] = React.useState(false);
 
-  // fetch dish detail for image URL + icon
+  // Tracker meals still look up dish media/details through the temporary compatibility payload.
   const { data } = trpc.peterplate.useQuery(
     { date: new Date(meal.eatenAt) },
     { enabled: !!meal.dishId },

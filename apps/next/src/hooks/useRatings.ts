@@ -26,6 +26,8 @@ export function useRatings(userId: string) {
         userId,
         dishId,
         rating,
+        // The current UI does not carry restaurant context into every rating action yet so we have this
+        restaurant: "anteatery",
       });
     },
     [rateDishMutation, userId],

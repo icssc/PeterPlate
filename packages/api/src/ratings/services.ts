@@ -105,9 +105,11 @@ export const getUserRatedDishes = async (db: Drizzle, userId: string) => {
         const dish = dishesById.get(rating.dishId);
         if (!dish) return null;
 
+        // Ratings stay local, but dish content now comes from AAPI.
         return {
           ...dish,
           restaurant: rating.restaurant,
+          rating: rating.rating,
           ratedAt: rating.updatedAt ?? rating.createdAt,
         };
       })

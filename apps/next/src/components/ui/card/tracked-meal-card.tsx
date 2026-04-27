@@ -20,6 +20,7 @@ import { trpc } from "@/utils/trpc";
 import { cn } from "@/utils/tw";
 
 type LoggedMealJoinedWithNutrition = SelectLoggedMeal & {
+  dishName?: string;
   calories: number;
   protein: number;
   carbs: number;
@@ -205,6 +206,7 @@ export default function TrackedMealCard({
   const { selectedDate } = useDate();
   const today = useRestaurantStore((s) => s.today);
 
+  // This still reads from the temporary compatibility route until tracker UI is fully normalized and ready to go.
   const { data, isLoading } = trpc.peterplate.useQuery(
     { date: selectedDate ?? today },
     { enabled: open },
