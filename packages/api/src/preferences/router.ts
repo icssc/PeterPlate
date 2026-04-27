@@ -1,4 +1,5 @@
 import { createTRPCRouter, publicProcedure } from "@api/trpc";
+import type { UserDietaryPreference } from "@peterplate/db";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
@@ -32,7 +33,7 @@ const addDietaryPreferencesProcedure = publicProcedure
     return await addDietaryPreferences(
       db,
       input.userId,
-      input.preferences,
+      input.preferences as UserDietaryPreference[],
     ).catch((e) => {
       if (e instanceof TRPCError) throw e;
       console.error(e);
@@ -51,16 +52,18 @@ const deletePreferenceProcedure = publicProcedure
     }),
   )
   .mutation(async ({ ctx: { db }, input }) => {
-    return await deletePreference(db, input.userId, input.preference).catch(
-      (e) => {
-        if (e instanceof TRPCError) throw e;
-        console.error(e);
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "error deleting preference",
-        });
-      },
-    );
+    return await deletePreference(
+      db,
+      input.userId,
+      input.preference as UserDietaryPreference,
+    ).catch((e) => {
+      if (e instanceof TRPCError) throw e;
+      console.error(e);
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "error deleting preference",
+      });
+    });
   });
 
 export const preferencesRouter = createTRPCRouter({

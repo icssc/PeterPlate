@@ -34,7 +34,7 @@ const theme = createTheme({
     },
   },
   typography: {
-    fontFamily: "var(--font-poppins), sans-serif",
+    fontFamily: "Poppins, Arial, Helvetica, sans-serif",
   },
 });
 
