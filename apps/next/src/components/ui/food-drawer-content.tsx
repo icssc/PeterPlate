@@ -29,7 +29,7 @@ export default function FoodDrawerContent({
   isAddingToMealTracker = false,
 }: {
   dish: DishWithRating;
-  restaurant?: RestaurantId;
+  restaurant: RestaurantId;
   onAddToMealTracker?: OnAddToMealTracker;
   isAddingToMealTracker?: boolean;
 }) {
@@ -138,7 +138,7 @@ export default function FoodDrawerContent({
 
           {/* Interactive rating stars */}
           <div className="flex gap-2 pt-0.5">
-            <InteractiveStarRating dishId={dish.id} />
+            <InteractiveStarRating dishId={dish.id} restaurant={restaurant} />
           </div>
 
           <p className="text-black leading-relaxed">

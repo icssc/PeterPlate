@@ -45,7 +45,7 @@ export default function FoodDialogContent({
   isAddingToMealTracker = false,
 }: {
   dish: DishWithRating;
-  restaurant?: "brandywine" | "anteatery";
+  restaurant: "brandywine" | "anteatery";
   onAddToMealTracker?: OnAddToMealTracker;
   isAddingToMealTracker?: boolean;
 }) {
@@ -132,7 +132,7 @@ export default function FoodDialogContent({
                     {formatFoodName(dish.name)}
                   </h2>
                 </div>
-                <Rating dishId={dish.id} />
+                <Rating dishId={dish.id} restaurant={restaurant} />
               </div>
               <div className="px-4 flex flex-wrap items-center gap-2 text-zinc-500 dark:text-zinc-400">
                 <span className="whitespace-nowrap flex items-center gap-1">

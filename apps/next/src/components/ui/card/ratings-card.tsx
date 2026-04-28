@@ -20,6 +20,7 @@ interface RatingsCardProps {
   food: DishInfo & {
     rating: number;
     ratedAt: string | Date;
+    restaurant: "anteatery" | "brandywine";
   };
 }
 
@@ -54,7 +55,10 @@ const RatingsCardContent = React.forwardRef<
               className="flex flex-row items-center ml-4 gap-4"
               onClick={(e) => e.stopPropagation()}
             >
-              <InteractiveStarRating dishId={food.id} />
+              <InteractiveStarRating
+                dishId={food.id}
+                restaurant={food.restaurant}
+              />
               <IconButton
                 onClick={handleDelete}
                 disabled={deleteLoading}
@@ -128,7 +132,7 @@ export default function RatingsCard({ food }: RatingsCardProps) {
           },
         }}
       >
-        <FoodDialogContent dish={food} />
+        <FoodDialogContent dish={food} restaurant={food.restaurant} />
       </Dialog>
     </>
   );

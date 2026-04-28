@@ -21,13 +21,16 @@ export function useRatings(userId: string) {
   });
 
   const rateDish = useCallback(
-    (dishId: string, rating: number) => {
+    (
+      dishId: string,
+      rating: number,
+      restaurant: "anteatery" | "brandywine",
+    ) => {
       rateDishMutation.mutate({
         userId,
         dishId,
         rating,
-        // The current UI does not carry restaurant context into every rating action yet so we have this
-        restaurant: "anteatery",
+        restaurant,
       });
     },
     [rateDishMutation, userId],
