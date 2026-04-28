@@ -62,9 +62,7 @@ export default function EventDialogContent(
             <span>{toTitleCase(HallEnum[props.location])}</span>
           </div>
         </div>
-        <p className="text-sm leading-relaxed mt-2">
-          {props.longDesc ?? props.shortDesc ?? ""}
-        </p>
+        <p className="text-sm leading-relaxed mt-2">{props.desc}</p>
       </DialogContent>
     </>
   );

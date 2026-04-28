@@ -70,8 +70,7 @@ const Events = () => {
     const resource = calendarEvent.resource;
     setSelectedEventData({
       name: resource.title,
-      shortDesc: resource.description,
-      longDesc: resource.description,
+      desc: resource.description,
       imgSrc: resource.image,
       alt: resource.title + " promotional image",
       startTime: resource.start,
@@ -270,8 +269,7 @@ const Events = () => {
                         ? HallEnum.ANTEATERY
                         : HallEnum.BRANDYWINE
                     }
-                    shortDesc={event.description}
-                    longDesc={event.description}
+                    desc={event.description}
                     isOngoing={event.start <= now && event.end >= now}
                   />
                 ))}
