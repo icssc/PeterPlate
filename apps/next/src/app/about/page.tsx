@@ -24,13 +24,14 @@ export default function About() {
         height={2000}
       />
       <div
-        className="flex flex-col md:flex-row p-8 gap-6 max-w-100"
+        className="flex flex-col md:flex-row p-8 gap-6 max-w-100 dark:text-zinc-200"
         id="about-content"
       >
         <div className="flex flex-col" id="about-text">
           <div className="flex gap-4 items-center mb-2" id="about-header">
             <h1 className="text-3xl font-bold" id="about-title">
-              About <span className="text-sky-700">PeterPlate</span>
+              About{" "}
+              <span className="text-sky-700 dark:text-sky-400">PeterPlate</span>
             </h1>
           </div>
           <div id="about-paragraph" className="grid gap-4 max-w-100">
@@ -44,7 +45,7 @@ export default function About() {
             <p>
               This project is proudly developed and maintained by&nbsp;
               <a
-                className="underline text-sky-600"
+                className="underline text-sky-600 dark:text-sky-400"
                 href="https://studentcouncil.ics.uci.edu/"
                 rel="noreferrer"
                 target="_blank"
@@ -56,17 +57,17 @@ export default function About() {
               life through technology.
             </p>
             <div className="flex flex-col gap-4" id="contributors">
-              <h1 className="text-xl max-md:text-base max-sm:text-sm font-bold">
+              <h1 className="text-xl max-md:text-base max-sm:text-sm font-bold dark:text-white">
                 Our Lovely Contributors
               </h1>
               <div className="flex flex-wrap gap-2" id="contributor-grid">
                 {isLoading && (
-                  <p className="text-sm text-zinc-400">
+                  <p className="text-sm text-zinc-400 dark:text-zinc-500">
                     Loading contributors...
                   </p>
                 )}
                 {!isLoading && isError && (
-                  <p className="text-sm text-red-500 text-center">
+                  <p className="text-sm text-red-500 dark:text-red-400 text-center">
                     Error occurred while fetching contributors: {error?.message}
                   </p>
                 )}
@@ -89,7 +90,7 @@ export default function About() {
               Want to contribute? PeterPlate is open-source, and we welcome
               contributions on our&nbsp;
               <a
-                className="underline text-sky-600"
+                className="underline text-sky-600 dark:text-sky-400"
                 href="https://github.com/icssc/PeterPlate"
                 rel="noreferrer"
                 target="_blank"
@@ -98,7 +99,7 @@ export default function About() {
               </a>
               ! Have questions or ideas? Join the conversation on our&nbsp;
               <a
-                className="underline text-sky-600"
+                className="underline text-sky-600 dark:text-sky-400"
                 href="https://discord.gg/GzF76D7UhY"
                 rel="noreferrer"
                 target="_blank"
@@ -109,7 +110,7 @@ export default function About() {
             </p>
             <div className="flex align-items gap-4">
               <Button
-                className="bg-sky-700"
+                className="bg-sky-700 dark:bg-sky-600 dark:hover:bg-sky-500 dark:text-white"
                 onClick={() =>
                   window.open(
                     "https://github.com/icssc/PeterPlate/",
@@ -121,7 +122,7 @@ export default function About() {
                 <GitHub /> GitHub
               </Button>
               <Button
-                className="bg-sky-700"
+                className="bg-sky-700 dark:bg-sky-600 dark:hover:bg-sky-500 dark:text-white"
                 onClick={() =>
                   window.open(
                     "https://studentcouncil.ics.uci.edu/",
