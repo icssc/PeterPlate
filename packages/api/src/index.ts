@@ -1,4 +1,3 @@
-import type { DishWithRating } from "@peterplate/validators";
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 import type { AppRouter } from "./root";
 import { appRouter } from "./root";
@@ -33,6 +32,5 @@ export { createTRPCContext, appRouter, createCaller };
 export type { AppRouter, RouterInputs, RouterOutputs };
 export type * from "./dining/types";
 export * from "./server";
-export type DishInfo = DishWithRating;
 
 export const AAPI_DINING_ROUTE = "https://anteaterapi.com/v2/rest/dining";

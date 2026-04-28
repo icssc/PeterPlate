@@ -1,4 +1,5 @@
 import { Restaurant } from "@mui/icons-material";
+import type { DishWithRating, Event } from "@peterplate/validators";
 import {
   foodIconKeywords,
   foodIcons,
@@ -435,30 +436,13 @@ function isSameDay(a: Date, b: Date): boolean {
   );
 }
 
-// Handles getting hall data for easier access to dishes and status
-type HallInput =
-  | {
-      menus?: {
-        period: { startTime: string; endTime: string };
-        stations: {
-          name: string;
-          dishes: Array<Record<string, any>>;
-        }[];
-      }[];
-    }
-  | undefined;
-
-// Handles Popular Today: gets top unique dishes sorted by average rating (descending)
-type DishRatings = {
-  name: string;
-  numRatings: number;
-  totalRating: number;
-};
-
-function getPopularDishes<T extends DishRatings>(
-  allDishes: T[] | null | undefined,
+function getPopularDishes(
+  allDishes: (DishWithRating & {
+    restaurant: "brandywine" | "anteatery";
+    stationName: string;
+  })[],
   numCards: number,
-): T[] {
+) {
   const seenNames = new Set<string>();
 
   return (allDishes ?? [])
@@ -476,15 +460,7 @@ function getPopularDishes<T extends DishRatings>(
     .slice(0, numCards);
 }
 
-// Handles Upcoming Events: gets top upcoming events sorted by start time (ascending)
-type EventItem = {
-  start?: string | Date | null;
-};
-
-export function sortedEvents<T extends EventItem>(
-  events: T[] | null | undefined,
-  numCards: number,
-): T[] {
+export function sortedEvents(events: Event[], numCards: number) {
   return [...(events ?? [])]
     .sort((event, nextEvent) => {
       const eventStartTime = event.start ? new Date(event.start).getTime() : 0;

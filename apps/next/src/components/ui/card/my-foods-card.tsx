@@ -69,7 +69,7 @@ function UserRatingDisplay({
 interface MyFoodsCardProps {
   dish: DishWithRating;
   isFavorited: boolean;
-  restaurant: string;
+  restaurant: "anteatery" | "brandywine";
   stationName?: string;
   favoriteDisabled?: boolean;
   onToggleFavorite?: (
@@ -321,6 +321,7 @@ export default function MyFoodsCard({
             dish={dish}
             onAddToMealTracker={handleAddToMealTracker}
             isAddingToMealTracker={logMealMutation.isPending}
+            restaurant={restaurant}
           />
         </Dialog>
       ) : (
@@ -334,6 +335,7 @@ export default function MyFoodsCard({
             dish={dish}
             onAddToMealTracker={handleAddToMealTracker}
             isAddingToMealTracker={logMealMutation.isPending}
+            restaurant={restaurant}
           />
         </Drawer>
       )}

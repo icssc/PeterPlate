@@ -140,8 +140,8 @@ export const nutritionRouter = createTRPCRouter({
 
       // Retrieve the nutrition information
       const dishIds = meals.map((meal) => meal.dishId);
-      const dishInfo = await getDishes(dishIds, ctx.db);
-      const infoMap = new Map(dishInfo.map((dish) => [dish.id, dish]));
+      const DishWithRating = await getDishes(dishIds, ctx.db);
+      const infoMap = new Map(DishWithRating.map((dish) => [dish.id, dish]));
 
       return meals.map((meal) => {
         const dish = infoMap.get(meal.dishId);

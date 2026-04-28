@@ -20,7 +20,7 @@ import { nutrientToUnit } from "@/utils/types";
 import IngredientsDialog from "../ingredients-dialog";
 import { AllergenBadge } from "./allergen-badge";
 import type { OnAddToMealTracker } from "./card/food-card";
-import InteractiveStarRating from "./rating";
+import Rating from "./rating";
 
 export default function FoodDrawerContent({
   dish,
@@ -29,7 +29,7 @@ export default function FoodDrawerContent({
   isAddingToMealTracker = false,
 }: {
   dish: DishWithRating;
-  restaurant: RestaurantId;
+  restaurant?: RestaurantId;
   onAddToMealTracker?: OnAddToMealTracker;
   isAddingToMealTracker?: boolean;
 }) {
@@ -137,9 +137,11 @@ export default function FoodDrawerContent({
           </div>
 
           {/* Interactive rating stars */}
-          <div className="flex gap-2 pt-0.5">
-            <InteractiveStarRating dishId={dish.id} restaurant={restaurant} />
-          </div>
+          {restaurant && (
+            <div className="flex gap-2 pt-0.5">
+              <Rating dishId={dish.id} restaurant={restaurant} />
+            </div>
+          )}
 
           <p className="text-black leading-relaxed">
             {enhanceDescription(dish.name, dish.description)}

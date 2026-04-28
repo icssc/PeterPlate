@@ -3,44 +3,22 @@
 import { AccessTime, PinDrop } from "@mui/icons-material";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import { Card, CardContent, Dialog, Drawer } from "@mui/material";
+import type { Event } from "@peterplate/validators";
 import Image from "next/image";
 import React from "react";
 import EventTypeBadge from "@/components/ui/event-type-badge";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-import { dateToString, timeToString, toTitleCase } from "@/utils/funcs";
-import { HallEnum } from "@/utils/types";
+import { timeToString, toTitleCase } from "@/utils/funcs";
 import EventDialogContent from "../event-dialog-content";
 import EventDrawerContent from "../event-drawer-content";
 import OngoingBadge from "../ongoing-badge";
-
-/**
- * Defines the structure for event information used by event-related components.
- */
-export interface EventInfo {
-  /** The name or title of the event. */
-  name: string;
-  /** A description of the event. */
-  desc: string;
-  /** The URL or path to the event's image, used on the card. */
-  imgSrc: string;
-  /** The alt text for the event's image, for accessibility. */
-  alt: string;
-  /** The start date and time of the event. */
-  startTime: Date;
-  /** The end date and time of the event. */
-  endTime: Date;
-  /** The physical location of the event, from {@link HallEnum}. */
-  location: HallEnum;
-  /** If true, indicates the event is currently ongoing and displays a badge. */
-  isOngoing: boolean;
-}
 
 /**
  * Props for the {@link EventCardContent} component.
  */
 interface EventCardContentProps extends React.HTMLAttributes<HTMLDivElement> {
   /** The event data object ({@link EventInfo}) to display within the card. */
-  props: EventInfo;
+  props: Event;
 }
 
 /**
@@ -69,26 +47,26 @@ const EventCardContent = React.forwardRef<
       >
         <div className="p-7 pb-2 relative">
           <Image
-            src={props.imgSrc}
-            alt={props.alt}
+            src={props.image}
+            alt={`An image for an event "${props.title}" at ${props.restaurantId}.`}
             width={400}
             height={300}
             className="w-full object-contain"
           />
-          <EventTypeBadge title={props.name} />
+          <EventTypeBadge title={props.title} />
         </div>
         <CardContent className="flex flex-col gap-2 p-4">
           <div className="flex flex-row gap-2 items-center">
             <h3 className="text-lg font-semibold text-sky-700 dark:text-sky-400">
-              {props.name}
+              {props.title}
             </h3>
-            {props.isOngoing && <OngoingBadge />}
+            {/*props.isOngoing && <OngoingBadge /> */}
           </div>
           <div className="flex flex-col gap-2 text-sm text-zinc-500 dark:text-zinc-400 mt-1">
             <div className="flex gap-3 items-center">
               <CalendarTodayOutlinedIcon sx={{ fontSize: 16 }} />
               <span>
-                {props.startTime.toLocaleDateString(undefined, {
+                {props.start.toLocaleDateString(undefined, {
                   year: "numeric",
                   month: "long",
                   day: "numeric",
@@ -98,16 +76,16 @@ const EventCardContent = React.forwardRef<
             <div className="flex gap-3 items-center">
               <AccessTime sx={{ fontSize: 16 }} />
               <span>
-                {timeToString(props.startTime)} – {timeToString(props.endTime)}
+                {timeToString(props.start)} – {timeToString(props.end)}
               </span>
             </div>
             <div className="flex gap-3 items-center">
               <PinDrop sx={{ fontSize: 16 }} />
-              <span>{toTitleCase(HallEnum[props.location])}</span>
+              <span>{toTitleCase(props.restaurantId)}</span>
             </div>
           </div>
           <p className="text-sm text-zinc-900 dark:text-zinc-100 mt-2">
-            {props.desc}
+            {props.description}
           </p>
         </CardContent>
       </Card>
@@ -124,10 +102,10 @@ EventCardContent.displayName = "EventCardContent";
  * This component combines an `EventCardContent` (the visual card) with a
  * `Dialog` and {@link EventDialogContent} (the full event details dialog).
  *
- * @param {EventInfo} props - The event data to be displayed. See {@link EventInfo} for detailed property descriptions.
+ * @param {Event} props - The event data to be displayed. See {@link Event} for detailed property descriptions.
  * @returns {JSX.Element} A React component representing an event card.
  */
-export default function EventCard(props: EventInfo): React.JSX.Element {
+export default function EventCard(props: Event): React.JSX.Element {
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   const handleOpen = () => setOpen(true);

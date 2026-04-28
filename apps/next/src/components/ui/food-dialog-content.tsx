@@ -33,7 +33,7 @@ import Rating from "./rating";
  *
  * This component is typically used as the content for a `Dialog` triggered by a {@link FoodCard}.
  *
- * @param {DishInfo} dish - The dish data to display. See {@link DishInfo} (from `@peterplate/api`) for detailed property descriptions.
+ * @param {DishWithRating} dish - The dish data to display. See {@link DishWithRating} (from `@peterplate/api`) for detailed property descriptions.
  * @param {OnAddToMealTracker} onAddToMealTracker - Called when the user clicks "Add to Meal Tracker"
  * @param {boolean} isAddingToMealTracker - Whether the add-to-tracker mutation is pending.
  * @returns {JSX.Element} The rendered content for the food item dialog.
@@ -45,7 +45,7 @@ export default function FoodDialogContent({
   isAddingToMealTracker = false,
 }: {
   dish: DishWithRating;
-  restaurant: "brandywine" | "anteatery";
+  restaurant?: "brandywine" | "anteatery";
   onAddToMealTracker?: OnAddToMealTracker;
   isAddingToMealTracker?: boolean;
 }) {
@@ -132,7 +132,9 @@ export default function FoodDialogContent({
                     {formatFoodName(dish.name)}
                   </h2>
                 </div>
-                <Rating dishId={dish.id} restaurant={restaurant} />
+                {restaurant && (
+                  <Rating dishId={dish.id} restaurant={restaurant} />
+                )}
               </div>
               <div className="px-4 flex flex-wrap items-center gap-2 text-zinc-500 dark:text-zinc-400">
                 <span className="whitespace-nowrap flex items-center gap-1">

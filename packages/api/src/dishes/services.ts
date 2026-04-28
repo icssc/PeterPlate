@@ -78,7 +78,7 @@ export async function getDishes(ids: string[], db: Drizzle) {
   );
 
   // Merge the ratings with dish information
-  const dishInfo = data.map((apiDish) => {
+  const DishWithRating = data.map((apiDish) => {
     const ratingInfo = ratingMap.get(apiDish.id ?? null);
 
     return {
@@ -88,5 +88,5 @@ export async function getDishes(ids: string[], db: Drizzle) {
     };
   });
 
-  return dishInfo as DishWithRating[];
+  return DishWithRating as DishWithRating[];
 }

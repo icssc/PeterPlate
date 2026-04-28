@@ -194,7 +194,7 @@ export default function MealTracker() {
       .filter(([, total]) => total >= 1)
       .sort(([, a], [, b]) => b - a)
       .map(([dishId]) => {
-        const meal = latestByDish[dishId]!;
+        const meal = latestByDish[dishId];
         return {
           ...meal,
           calories: Number(meal.calories ?? 0),

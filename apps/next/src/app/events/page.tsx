@@ -6,13 +6,13 @@ import Button from "@mui/material/Button";
 import { useState } from "react";
 import { trpc } from "@/utils/trpc";
 import "react-big-calendar/lib/css/react-big-calendar.css";
+import type { Event } from "@peterplate/validators";
 import { addMonths, endOfMonth, startOfMonth, subMonths } from "date-fns";
 import CalendarView from "@/components/ui/calendar-view";
-import EventCard, { type EventInfo } from "@/components/ui/card/event-card";
+import EventCard from "@/components/ui/card/event-card";
 import EventCardSkeleton from "@/components/ui/skeleton/event-card-skeleton";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { getEventType } from "@/utils/funcs";
-import { HallEnum } from "@/utils/types";
 
 const Events = () => {
   const [selectedDiningHall, setSelectedDiningHall] = useState<
@@ -22,11 +22,10 @@ const Events = () => {
     "both" | "special" | "celebration"
   >("both");
   const [viewMode, setViewMode] = useState<"grid" | "calendar">("grid");
-  const [selectedEventData, setSelectedEventData] = useState<EventInfo | null>(
+  const [selectedEventData, setSelectedEventData] = useState<Event | null>(
     null,
   );
   const [currentDate, setCurrentDate] = useState(new Date());
-  const now = new Date();
 
   const { data: events, isLoading, error } = trpc.event.upcoming.useQuery();
   // TODO: Add inBetween here when route is complete
@@ -67,20 +66,7 @@ const Events = () => {
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   const handleSelectEvent = (calendarEvent: any) => {
-    const resource = calendarEvent.resource;
-    setSelectedEventData({
-      name: resource.title,
-      desc: resource.description,
-      imgSrc: resource.image,
-      alt: resource.title + " promotional image",
-      startTime: resource.start,
-      endTime: resource.end,
-      location:
-        resource.restaurantId === "anteatery"
-          ? HallEnum.ANTEATERY
-          : HallEnum.BRANDYWINE,
-      isOngoing: resource.start <= now && resource.end >= now,
-    });
+    setSelectedEventData(calendarEvent.resource);
   };
 
   const handleClose = () => setSelectedEventData(null);
@@ -259,18 +245,7 @@ const Events = () => {
                 {filteredEvents?.map((event) => (
                   <EventCard
                     key={`${event.title}-${event.start}-${event.restaurantId}`}
-                    name={event.title}
-                    imgSrc={event.image}
-                    alt={`${event.title} promotion image.`}
-                    startTime={event.start}
-                    endTime={event.end}
-                    location={
-                      event.restaurantId === "anteatery"
-                        ? HallEnum.ANTEATERY
-                        : HallEnum.BRANDYWINE
-                    }
-                    desc={event.description}
-                    isOngoing={event.start <= now && event.end >= now}
+                    {...event}
                   />
                 ))}
               </div>

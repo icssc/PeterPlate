@@ -2,12 +2,11 @@ import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import PinDropOutlinedIcon from "@mui/icons-material/PinDropOutlined";
 import { DialogContent } from "@mui/material";
+import type { Event } from "@peterplate/validators";
 import Image from "next/image";
 import type React from "react";
 import EventTypeBadge from "@/components/ui/event-type-badge";
-import { generateGCalLink, timeToString, toTitleCase } from "@/utils/funcs";
-import { HallEnum } from "@/utils/types";
-import type { EventInfo } from "./card/event-card";
+import { timeToString, toTitleCase } from "@/utils/funcs";
 
 /**
  * `EventDialogContent` renders the detailed view of an event within a dialog.
@@ -15,36 +14,35 @@ import type { EventInfo } from "./card/event-card";
  * and a button to add the event to Google Calendar.
  *
  * This component is typically used as the content for a `Dialog` triggered by an {@link EventCard}.
- * @param {EventInfo} props - The event data to display. See {@link EventInfo} for detailed property descriptions.
+ * @param {Event} props - The event data to display. See {@link Event} for detailed property descriptions.
  * @returns {JSX.Element} The rendered content for the event dialog.
  */
-export default function EventDialogContent(
-  props: EventInfo,
-): React.JSX.Element {
+// TODO: Add buttons to add to Google (see generateGCalLink), Apple Calendar, stream for calendar
+export default function EventDialogContent(props: Event): React.JSX.Element {
   return (
     <>
       <div className="relative">
         <Image
-          src={props.imgSrc}
-          alt={props.alt}
+          src={props.image}
+          alt={`An image for an event "${props.title}" at ${props.restaurantId}.`}
           width={600}
           height={600}
           className="w-full object-contain"
         />
-        <EventTypeBadge title={props.name} />
+        <EventTypeBadge title={props.title} />
       </div>
       <DialogContent
         sx={{ padding: "20px 24px 24px !important" }}
         className="flex flex-col gap-2 dark:bg-zinc-800 dark:text-zinc-400"
       >
         <h2 className="text-2xl font-semibold text-sky-700 leading-tight">
-          {props.name}
+          {props.title}
         </h2>
         <div className="flex flex-col gap-2 text-sm text-zinc-500 mt-1">
           <div className="flex gap-2 items-center">
             <CalendarTodayOutlinedIcon sx={{ fontSize: 16 }} />
             <span>
-              {props.startTime.toLocaleDateString(undefined, {
+              {props.start.toLocaleDateString(undefined, {
                 year: "numeric",
                 month: "long",
                 day: "numeric",
@@ -54,15 +52,15 @@ export default function EventDialogContent(
           <div className="flex gap-2 items-center">
             <AccessTimeOutlinedIcon sx={{ fontSize: 16 }} />
             <span>
-              {timeToString(props.startTime)} – {timeToString(props.endTime)}
+              {timeToString(props.start)} - {timeToString(props.end)}
             </span>
           </div>
           <div className="flex gap-2 items-center">
             <PinDropOutlinedIcon sx={{ fontSize: 16 }} />
-            <span>{toTitleCase(HallEnum[props.location])}</span>
+            <span>{toTitleCase(props.restaurantId)}</span>
           </div>
         </div>
-        <p className="text-sm leading-relaxed mt-2">{props.desc}</p>
+        <p className="text-sm leading-relaxed mt-2">{props.description}</p>
       </DialogContent>
     </>
   );

@@ -7,7 +7,6 @@ import {
   Restaurant,
 } from "@mui/icons-material";
 import { Card, CardContent, Dialog, Drawer } from "@mui/material";
-import type { DishInfo } from "@peterplate/api";
 import type { SelectLoggedMeal } from "@peterplate/db";
 import Image from "next/image";
 import React from "react";
@@ -26,7 +25,7 @@ type LoggedMealJoinedWithNutrition = SelectLoggedMeal & {
   fat: number;
 };
 
-interface Props {
+interface TrackedMealCardProps {
   meal: LoggedMealJoinedWithNutrition;
   dish?: {
     id: string;
@@ -201,7 +200,7 @@ export default function TrackedMealCard({
   meal,
   dish: previewDish,
   isUnavailable = false,
-}: Props) {
+}: TrackedMealCardProps) {
   /* Handle Display Food Card Info */
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const [open, setOpen] = React.useState(false);

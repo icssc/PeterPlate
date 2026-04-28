@@ -222,7 +222,7 @@ FoodCardContent.displayName = "FoodCardContent";
  * This component combines an `FoodCardContent` (the visual card) with a
  * `Dialog` and {@link FoodDialogContent} (the full dish details dialog).
  *
- * @param {DishInfo} dish - The dish information to display and pass to the dialog.
+ * @param {DishWithRating} dish - The dish information to display and pass to the dialog.
  * @returns {JSX.Element} A React component representing a food card.
  */
 interface FoodCardProps extends DishWithRating {
