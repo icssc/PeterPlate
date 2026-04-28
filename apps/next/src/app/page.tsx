@@ -1,12 +1,7 @@
 "use client";
 
-import {
-  AccessTime,
-  CalendarMonth,
-  ChevronRight,
-  LocationOn,
-  Star,
-} from "@mui/icons-material";
+import { AccessTime, ChevronRight, LocationOn } from "@mui/icons-material";
+import type { DishWithRating } from "@peterplate/validators";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -18,8 +13,13 @@ import { useDate } from "@/context/date-context";
 import { useUserStore } from "@/context/useUserStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useSession } from "@/utils/auth-client";
-import { getHallDishData, getPopularDishes, sortedEvents } from "@/utils/funcs";
+import { getHallStatus, getPopularDishes, sortedEvents } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
+
+type DishDataRestaurantStation = DishWithRating & {
+  restaurant: "brandywine" | "anteatery";
+  stationName: string;
+};
 
 export default function Home() {
   const isDesktop = useMediaQuery("(min-width: 768px)");
@@ -48,24 +48,55 @@ function DesktopHome(): React.JSX.Element {
   const { selectedDate } = useDate();
   const today = selectedDate ?? new Date();
 
-  const { data, isLoading } = trpc.peterplate.useQuery(
-    { date: today },
-    { staleTime: 2 * 60 * 60 * 1000 },
-  );
+  const { data: brandywineData, isLoading: brandywineIsLoading } =
+    trpc.restaurant.useQuery(
+      { date: today, restaurant: "brandywine" },
+      { staleTime: 2 * 60 * 60 * 1000 },
+    );
+
+  const { data: anteateryData, isLoading: anteateryIsLoading } =
+    trpc.restaurant.useQuery(
+      { date: today, restaurant: "anteatery" },
+      { staleTime: 2 * 60 * 60 * 1000 },
+    );
+
+  const isLoading = brandywineIsLoading || anteateryIsLoading;
 
   const { data: events } = trpc.event.upcoming.useQuery(undefined, {
     staleTime: 5 * 60 * 1000,
   });
 
   // Get hall information
-  const brandywine = getHallDishData(data?.brandywine, "Brandywine");
-  const anteatery = getHallDishData(data?.anteatery, "Anteatery");
+  const brandywineStatus = getHallStatus(brandywineData?.periods ?? []);
+  const anteateryStatus = getHallStatus(anteateryData?.periods ?? []);
 
-  const brandywineStatus = brandywine.status;
-  const anteateryStatus = anteatery.status;
+  const brandywineDishes =
+    brandywineData?.periods.flatMap((period) =>
+      period.stations.flatMap((station) =>
+        station.dishes.map(
+          (dish) =>
+            ({
+              ...dish,
+              restaurant: "brandywine",
+              stationName: station.name,
+            }) satisfies DishDataRestaurantStation as DishDataRestaurantStation,
+        ),
+      ),
+    ) ?? [];
 
-  const brandywineDishes = brandywine.dishes;
-  const anteateryDishes = anteatery.dishes;
+  const anteateryDishes =
+    anteateryData?.periods.flatMap((period) =>
+      period.stations.flatMap((station) =>
+        station.dishes.map(
+          (dish) =>
+            ({
+              ...dish,
+              restaurant: "anteatery",
+              stationName: station.name,
+            }) satisfies DishDataRestaurantStation as DishDataRestaurantStation,
+        ),
+      ),
+    ) ?? [];
 
   // Popular Today
   const allDishes = [...brandywineDishes, ...anteateryDishes];
@@ -176,7 +207,7 @@ function DesktopHome(): React.JSX.Element {
                 <PopularDishCard
                   key={`${dish.id}-${idx}`}
                   dish={dish}
-                  hallName={dish.hallName}
+                  restaurant={dish.restaurant}
                   stationName={dish.stationName}
                 />
               ))}
@@ -219,24 +250,55 @@ function MobileHome(): React.JSX.Element {
   const { selectedDate } = useDate();
   const today = selectedDate ?? new Date();
 
-  const { data, isLoading } = trpc.peterplate.useQuery(
-    { date: today },
-    { staleTime: 2 * 60 * 60 * 1000 },
-  );
+  const { data: brandywineData, isLoading: brandywineIsLoading } =
+    trpc.restaurant.useQuery(
+      { date: today, restaurant: "brandywine" },
+      { staleTime: 2 * 60 * 60 * 1000 },
+    );
+
+  const { data: anteateryData, isLoading: anteateryIsLoading } =
+    trpc.restaurant.useQuery(
+      { date: today, restaurant: "anteatery" },
+      { staleTime: 2 * 60 * 60 * 1000 },
+    );
+
+  const isLoading = brandywineIsLoading || anteateryIsLoading;
 
   const { data: events } = trpc.event.upcoming.useQuery(undefined, {
     staleTime: 5 * 60 * 1000,
   });
 
   // Get hall information
-  const brandywine = getHallDishData(data?.brandywine, "Brandywine");
-  const anteatery = getHallDishData(data?.anteatery, "Anteatery");
+  const brandywineStatus = getHallStatus(brandywineData?.periods);
+  const anteateryStatus = getHallStatus(anteateryData?.periods);
 
-  const brandywineStatus = brandywine.status;
-  const anteateryStatus = anteatery.status;
+  const brandywineDishes =
+    brandywineData?.periods.flatMap((period) =>
+      period.stations.flatMap((station) =>
+        station.dishes.map(
+          (dish) =>
+            ({
+              ...dish,
+              restaurant: "brandywine",
+              stationName: station.name,
+            }) satisfies DishDataRestaurantStation as DishDataRestaurantStation,
+        ),
+      ),
+    ) ?? [];
 
-  const brandywineDishes = brandywine.dishes;
-  const anteateryDishes = anteatery.dishes;
+  const anteateryDishes =
+    anteateryData?.periods.flatMap((period) =>
+      period.stations.flatMap((station) =>
+        station.dishes.map(
+          (dish) =>
+            ({
+              ...dish,
+              restaurant: "anteatery",
+              stationName: station.name,
+            }) satisfies DishDataRestaurantStation as DishDataRestaurantStation,
+        ),
+      ),
+    ) ?? [];
 
   // Popular Today
   const allDishes = [...brandywineDishes, ...anteateryDishes];
@@ -352,8 +414,8 @@ function MobileHome(): React.JSX.Element {
                 <PopularDishCard
                   key={`${dish.id}-${idx}`}
                   dish={dish}
-                  hallName={dish.hallName}
                   stationName={dish.stationName}
+                  restaurant={dish.restaurant}
                   compact={true}
                 />
               ))}

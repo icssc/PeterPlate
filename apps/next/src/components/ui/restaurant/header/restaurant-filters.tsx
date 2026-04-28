@@ -3,9 +3,8 @@ import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import type { DateList } from "@peterplate/db";
 import type { CalendarRange } from "@/components/ui/toolbar";
-import { formatOpenCloseTime, isSameDay, toTitleCase } from "@/utils/funcs";
+import { formatOpenCloseTime, toTitleCase } from "@/utils/funcs";
 
 interface RestaurantFiltersProps {
   isDesktop: boolean;
@@ -16,7 +15,6 @@ interface RestaurantFiltersProps {
   selectedDate: Date | undefined;
   handleDateSelect: (date: Date | undefined) => void;
   calendarRange: CalendarRange | null;
-  enabledDates: DateList;
   isDatePickerOpen: boolean;
   setIsDatePickerOpen: (isOpen: boolean) => void;
   showPreferencesOnly: boolean;
@@ -32,7 +30,6 @@ export function RestaurantFilters({
   selectedDate,
   handleDateSelect,
   calendarRange,
-  enabledDates,
   isDatePickerOpen,
   setIsDatePickerOpen,
   showPreferencesOnly,
@@ -107,7 +104,7 @@ export function RestaurantFilters({
         </FormControl>
       </div>
 
-      {calendarRange && enabledDates && (
+      {calendarRange && (
         <div className={isDesktop ? "w-[240px]" : "w-full"}>
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <DatePicker
@@ -116,11 +113,6 @@ export function RestaurantFilters({
               onChange={(newValue) => handleDateSelect(newValue || undefined)}
               minDate={calendarRange.earliest}
               maxDate={calendarRange.latest}
-              shouldDisableDate={(date) =>
-                !enabledDates.some((enabledDate) =>
-                  isSameDay(date, enabledDate),
-                )
-              }
               open={isDatePickerOpen}
               onOpen={() => setIsDatePickerOpen(true)}
               onClose={() => setIsDatePickerOpen(false)}

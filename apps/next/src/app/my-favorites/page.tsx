@@ -62,8 +62,8 @@ export default function MyFavoritesPage() {
             {favorites.map((favorite: FavoriteEntry) => (
               <FoodCard
                 key={favorite.dishId}
-                menuId="favorite-menu"
                 {...favorite.dish}
+                restaurant={favorite.restaurant as "anteatery" | "brandywine"}
                 isFavorited
                 favoriteIsLoading={isFavoritePending?.(favorite.dishId)}
                 onToggleFavorite={toggleFavorite}

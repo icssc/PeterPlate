@@ -12,22 +12,26 @@ import Image from "next/image";
 import React from "react";
 import FoodDialogContent from "@/components/ui/food-dialog-content";
 import FoodDrawerContent from "@/components/ui/food-drawer-content";
-import { useDate } from "@/context/date-context";
-import { useHallStore } from "@/context/useHallStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { getFoodIcon } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
 import { cn } from "@/utils/tw";
 
 type LoggedMealJoinedWithNutrition = SelectLoggedMeal & {
+  dishName?: string;
   calories: number;
   protein: number;
   carbs: number;
   fat: number;
 };
 
-interface Props {
+interface TrackedMealCardProps {
   meal: LoggedMealJoinedWithNutrition;
+  dish?: {
+    id: string;
+    name: string;
+    imageUrl?: string | null;
+  };
   isUnavailable?: boolean;
 }
 
@@ -194,34 +198,21 @@ TrackedMealCardContent.displayName = "TrackedMealCardContent";
 
 export default function TrackedMealCard({
   meal,
+  dish: previewDish,
   isUnavailable = false,
-}: Props) {
+}: TrackedMealCardProps) {
   /* Handle Display Food Card Info */
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const { selectedDate } = useDate();
-  const today = useHallStore((s) => s.today);
-
-  const { data, isLoading } = trpc.peterplate.useQuery(
-    { date: selectedDate ?? today },
+  const { data: dishResults, isLoading } = trpc.dish.get.useQuery(
+    { ids: [meal.dishId] },
     { enabled: open },
   );
-
-  const dish = React.useMemo(() => {
-    const halls = [data?.anteatery, data?.brandywine].filter(Boolean);
-    for (const hall of halls) {
-      for (const menu of hall?.menus ?? []) {
-        for (const station of menu.stations ?? []) {
-          const found = station.dishes?.find((d) => d.id === meal.dishId);
-          if (found) return found;
-        }
-      }
-    }
-    return undefined;
-  }, [data, meal.dishId]);
+  const fullDish = dishResults?.[0];
+  const displayDish = fullDish ?? previewDish;
 
   const utils = trpc.useUtils();
 
@@ -262,8 +253,8 @@ export default function TrackedMealCard({
     });
   };
 
-  const imageUrl = dish?.image_url;
-  const dishNameForIcon = dish?.name ?? meal.dishName;
+  const imageUrl = displayDish?.imageUrl;
+  const dishNameForIcon = displayDish?.name ?? meal.dishName;
 
   if (isDesktop)
     return (
@@ -301,8 +292,8 @@ export default function TrackedMealCard({
             },
           }}
         >
-          {dish ? (
-            <FoodDialogContent dish={dish} />
+          {fullDish ? (
+            <FoodDialogContent dish={fullDish} />
           ) : (
             <div className="p-4">
               {isLoading ? "Loading..." : "Dish not found"}
@@ -356,8 +347,8 @@ export default function TrackedMealCard({
           },
         }}
       >
-        {dish ? (
-          <FoodDrawerContent dish={dish} />
+        {fullDish ? (
+          <FoodDrawerContent dish={fullDish} />
         ) : (
           <div className="p-4">
             {isLoading ? "Loading..." : "Dish not found"}

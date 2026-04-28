@@ -1,24 +1,20 @@
-import type { RestaurantInfo } from "@peterplate/api";
-import { useMemo } from "react";
+import type { AppRouter, FormattedRestaurantInfo, Station } from "@api/index";
+import type { DishWithRating } from "@peterplate/validators";
+import type { TRPCClientErrorLike } from "@trpc/client";
 import DishesInfo from "@/components/ui/dishes-info";
 import { useUserStore } from "@/context/useUserStore";
-import {
-  ALLERGY_MAP,
-  type AllergyName,
-  PREFERENCE_MAP,
-  type PreferenceName,
-} from "@/utils/dietary";
+import { getDietaryConflicts } from "@/utils/dietary";
 import { toTitleCase } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
 
 interface DishesViewProps {
   isCompactView: boolean;
-  stations: any[]; // Ideally typed better, but keeping consistent with usage
-  activeStation: any | undefined;
+  stations: Station[];
+  activeStation: Station;
   isLoading: boolean;
   isError: boolean;
-  error: any;
-  hallData: RestaurantInfo | undefined;
+  error: TRPCClientErrorLike<AppRouter> | null;
+  hallData: FormattedRestaurantInfo | undefined;
   showPreferencesOnly: boolean;
 }
 
@@ -45,69 +41,27 @@ export function DishesView({
   const errorMessage = getErrorMessage();
 
   const userId = useUserStore((s) => s.userId);
+  const { data: preferences } = trpc.preference.getDietaryPreferences.useQuery({
+    userId: userId ?? "",
+  });
+  const { data: allergies } = trpc.allergy.getAllergies.useQuery({
+    userId: userId ?? "",
+  });
 
-  const { data: preferences } = trpc.preference.getDietaryPreferences.useQuery(
-    { userId: userId ?? "" },
-    { enabled: !!userId },
-  );
-
-  const { data: allergies } = trpc.allergy.getAllergies.useQuery(
-    { userId: userId ?? "" },
-    { enabled: !!userId },
-  );
-
-  const enrichedStations = useMemo(() => {
-    if (!stations) return [];
-
-    return stations.map((station) => ({
-      ...station,
-      dishes: station.dishes.map((dish: any) => {
-        if (!preferences || !allergies) {
-          return { ...dish, doesNotMeetPreferences: false };
-        }
-
-        const flags = dish.dietRestriction;
-
-        const violatesAllergy = allergies.some((allergy) => {
-          if (!(allergy in ALLERGY_MAP)) return false;
-          const key = ALLERGY_MAP[allergy as AllergyName];
-          return flags?.[key] === true;
-        });
-
-        const violatesPreferences = preferences.some((pref) => {
-          if (!(pref in PREFERENCE_MAP)) return false;
-          const key = PREFERENCE_MAP[pref as PreferenceName];
-          return flags?.[key] === false;
-        });
-
-        return {
-          ...dish,
-          doesNotMeetPreferences: violatesAllergy || violatesPreferences,
-        };
-      }),
-    }));
-  }, [stations, preferences, allergies]);
-
-  const getFilteredDishes = (dishes: any[]) => {
-    // console.log("running filtered dishes function")
-    if (!showPreferencesOnly) return dishes;
-    console.log("showprefs only is true");
-    console.log(
-      "Preferences: ",
-      dishes.map((d) => d.doesNotMeetPreferences),
+  const getFilteredDishes = (dishes: DishWithRating[]) => {
+    if (!showPreferencesOnly || !allergies || !preferences) return dishes;
+    return dishes.filter(
+      (dish) =>
+        getDietaryConflicts(dish.dietRestriction, preferences, allergies)
+          .length > 0,
     );
-    console.log(dishes.filter((d) => !d.doesNotMeetPreferences));
-    return dishes.filter((d) => !d.doesNotMeetPreferences);
   };
-  const enrichedActiveStation = enrichedStations.find(
-    (s) => s.name === activeStation?.name,
-  );
 
   return (
     <div className="w-full">
       {isCompactView
         ? // Compact View: Render ALL stations
-          enrichedStations.map((station) => (
+          stations.map((station) => (
             <div
               key={station.name}
               id={station.name.toLowerCase()}
@@ -124,6 +78,7 @@ export function DishesView({
                 isError={isError || (!isLoading && !hallData)}
                 errorMessage={errorMessage}
                 isCompactView={isCompactView}
+                restaurant={hallData?.name ?? "brandywine"}
               />
             </div>
           ))
@@ -136,10 +91,11 @@ export function DishesView({
                 </h1>
               </div>
               <DishesInfo
-                dishes={getFilteredDishes(enrichedActiveStation?.dishes ?? [])}
+                dishes={getFilteredDishes(activeStation?.dishes ?? [])}
                 isLoading={isLoading}
                 isError={isError || (!isLoading && !hallData)}
                 errorMessage={errorMessage}
+                restaurant={hallData?.name ?? "brandywine"}
                 isCompactView={isCompactView}
               />
             </div>

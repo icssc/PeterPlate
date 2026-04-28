@@ -1,7 +1,7 @@
 import { createTRPCRouter, publicProcedure } from "@api/trpc";
+import { allergyEnum } from "@peterplate/db";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-
 import { addAllergies, deleteAllergy, getAllergies } from "./services";
 
 const getAllergiesProcedure = publicProcedure
@@ -21,7 +21,7 @@ const addAllergiesProcedure = publicProcedure
   .input(
     z.object({
       userId: z.string(),
-      allergies: z.array(z.string()),
+      allergies: z.array(z.enum(allergyEnum.enumValues)),
     }),
   )
   .mutation(async ({ ctx: { db }, input }) => {
@@ -39,7 +39,7 @@ const deleteAllergyProcedure = publicProcedure
   .input(
     z.object({
       userId: z.string(),
-      allergy: z.string(),
+      allergy: z.enum(allergyEnum.enumValues),
     }),
   )
   .mutation(async ({ ctx: { db }, input }) => {

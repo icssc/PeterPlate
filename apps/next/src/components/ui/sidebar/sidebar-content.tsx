@@ -18,6 +18,7 @@ import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in";
 import { signOut, useSession } from "@/utils/auth-client";
+import { formatDietaryKey } from "@/utils/dietary";
 import { trpc } from "@/utils/trpc";
 
 interface ProfileMenuContentProps {
@@ -104,7 +105,7 @@ export default function SidebarContent({
                   key={pref}
                   className="rounded-md border border-blue-500 px-2.5 py-0.5 text-xs text-blue-600 dark:text-blue-400"
                 >
-                  {pref}
+                  {formatDietaryKey(pref)}
                 </span>
               ))
             ) : (
@@ -122,7 +123,7 @@ export default function SidebarContent({
                   key={allergy}
                   className="rounded-md border border-blue-500 px-2.5 py-0.5 text-xs text-blue-600 dark:text-blue-400"
                 >
-                  {allergy}
+                  {formatDietaryKey(allergy)}
                 </span>
               ))
             ) : (

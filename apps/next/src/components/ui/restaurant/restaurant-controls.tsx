@@ -1,4 +1,4 @@
-import type { DateList } from "@peterplate/db";
+import type { DishWithRating } from "@peterplate/validators";
 import { DiningHallStatus } from "@/components/ui/status";
 import type { CalendarRange } from "@/components/ui/toolbar";
 import type { HallEnum, HallStatusEnum } from "@/utils/types";
@@ -18,12 +18,11 @@ interface RestaurantControlsProps {
   selectedDate: Date | undefined;
   handleDateSelect: (date: Date | undefined) => void;
   calendarRange: CalendarRange | null;
-  enabledDates: DateList;
   isDatePickerOpen: boolean;
   setIsDatePickerOpen: (isOpen: boolean) => void;
   isLoading: boolean;
   isError: boolean;
-  dishes: any[];
+  dishes: DishWithRating[];
   stations: any[];
   menuAnchor: HTMLElement | null;
   setMenuAnchor: (el: HTMLElement | null) => void;
@@ -49,7 +48,6 @@ export function RestaurantControls({
   selectedDate,
   handleDateSelect,
   calendarRange,
-  enabledDates,
   isDatePickerOpen,
   setIsDatePickerOpen,
   isLoading,
@@ -93,7 +91,6 @@ export function RestaurantControls({
             selectedDate={selectedDate}
             handleDateSelect={handleDateSelect}
             calendarRange={calendarRange}
-            enabledDates={enabledDates}
             isDatePickerOpen={isDatePickerOpen}
             setIsDatePickerOpen={setIsDatePickerOpen}
             showPreferencesOnly={showPreferencesOnly}

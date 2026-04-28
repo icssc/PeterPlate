@@ -3,6 +3,7 @@
 import {
   createContext,
   type Dispatch,
+  type JSX,
   type ReactNode,
   type SetStateAction,
   useContext,

@@ -3,6 +3,7 @@ import { pgTable, primaryKey, real, text } from "drizzle-orm/pg-core"; // switch
 import { createInsertSchema } from "drizzle-zod";
 
 import { dishes } from "./dishes";
+import { restaurantIdEnum } from "./enums";
 import { users } from "./users";
 import { metadataColumns } from "./utils";
 
@@ -22,6 +23,7 @@ export const ratings = pgTable(
         onUpdate: "cascade",
       }),
     rating: real("rating").notNull(),
+    restaurant: restaurantIdEnum().notNull(),
     ...metadataColumns,
   },
   (table) => {
@@ -52,6 +54,12 @@ export const ratingsRelations = relations(ratings, ({ one }) => ({
  *
  * {@linkcode users}
  * {@linkcode dishes}
+ * {@linkcode restaurantIdEnum}
+ *
+ *
+ * This signifies a user, rating a certain dish, at one restaurant.
+ * This allows a user to rate a dish differently depending on the restaurant
+ * eaten at.
  */
 export type InsertRating = typeof ratings.$inferInsert;
 export type SelectRating = typeof ratings.$inferSelect;

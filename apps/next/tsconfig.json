@@ -29,6 +29,9 @@
       ],
       "@api/*": [
         "../../packages/api/src/*"
+      ],
+      "@peterplate/validators": [
+        "../../packages/validators/src/index.ts"
       ]
     }
   },

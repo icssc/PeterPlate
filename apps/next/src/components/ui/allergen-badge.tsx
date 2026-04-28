@@ -62,7 +62,7 @@ function AllergenBadge({
   variant,
   label,
   ...props
-}: BadgeProps): JSX.Element {
+}: BadgeProps): React.JSX.Element {
   const displayText =
     label ?? toTitleCase(variant?.replace("_", "-") ?? "default");
   return (

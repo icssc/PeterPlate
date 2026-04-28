@@ -1,24 +1,31 @@
-import type { RestaurantInfo } from "@api/index";
+import type { FormattedRestaurantInfo } from "@api/index";
 import { create } from "zustand";
 import { militaryToStandard } from "@/utils/funcs";
 import { HallStatusEnum } from "@/utils/types";
 
 interface HallStore {
-  hallData?: RestaurantInfo;
+  hallData?: FormattedRestaurantInfo;
   selectedDate?: Date;
+  restaurant?: "anteatery" | "brandywine";
   today: Date;
-  setInputs: (input: { hallData: RestaurantInfo; selectedDate: Date }) => void;
+  setInputs: (input: {
+    hallData: FormattedRestaurantInfo;
+    selectedDate: Date;
+    restaurant: "anteatery" | "brandywine";
+  }) => void;
 }
 
-export const useHallStore = create<HallStore>((set) => ({
+export const useRestaurantStore = create<HallStore>((set) => ({
   hallData: undefined,
   selectedDate: undefined,
+  restaurant: undefined,
   today: new Date(),
-  setInputs: ({ hallData, selectedDate }) => set({ hallData, selectedDate }),
+  setInputs: ({ hallData, selectedDate, restaurant }) =>
+    set({ hallData, selectedDate, restaurant }),
 }));
 
 export const useHallDerived = () =>
-  useHallStore((state) => {
+  useRestaurantStore((state) => {
     const { hallData, selectedDate, today } = state;
 
     const availablePeriodTimes: Record<string, [Date, Date]> = {};
@@ -26,18 +33,18 @@ export const useHallDerived = () =>
     let openTime: Date | undefined;
     let closeTime: Date | undefined;
 
-    if (!hallData?.menus?.length || !selectedDate) {
+    if (!hallData || !selectedDate) {
       return { availablePeriodTimes, derivedHallStatus, openTime, closeTime };
     }
 
     let earliestOpen: Date | undefined;
     let latestClose: Date | undefined;
 
-    for (const menu of hallData.menus) {
+    for (const period of hallData.periods) {
       try {
-        const name = menu.period.name.toLowerCase();
-        const open = militaryToStandard(menu.period.startTime);
-        const close = militaryToStandard(menu.period.endTime);
+        const name = period.name.toLowerCase();
+        const open = militaryToStandard(period.startTime);
+        const close = militaryToStandard(period.endTime);
 
         if (name === "latenight") {
           open.setDate(open.getDate() + 1);
@@ -64,10 +71,10 @@ export const useHallDerived = () =>
     openTime = earliestOpen ?? undefined;
     closeTime = latestClose ?? undefined;
 
-    if (!openTime && !closeTime) derivedHallStatus = HallStatusEnum.ERROR;
+    if (!openTime || !closeTime) derivedHallStatus = HallStatusEnum.ERROR;
     else if (today.getDay() !== openTime?.getDay())
       derivedHallStatus = HallStatusEnum.PREVIEW;
-    else if (selectedDate >= openTime! && selectedDate < closeTime!)
+    else if (selectedDate >= openTime && selectedDate < closeTime)
       derivedHallStatus = HallStatusEnum.OPEN;
     else derivedHallStatus = HallStatusEnum.CLOSED;
 

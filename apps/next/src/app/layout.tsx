@@ -1,14 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import { Poppins } from "next/font/google";
 import "./globals.css";
 import { RootClient } from "./layout-client";
-
-const poppins = Poppins({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  display: "swap",
-  variable: "--font-poppins",
-});
 
 export const metadata: Metadata = {
   title: "PeterPlate",
@@ -49,8 +41,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={poppins.variable} suppressHydrationWarning>
-      <body className={poppins.className}>
+    <html lang="en" suppressHydrationWarning>
+      <body>
         <RootClient>{children}</RootClient>
       </body>
     </html>

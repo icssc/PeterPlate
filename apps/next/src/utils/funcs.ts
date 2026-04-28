@@ -1,4 +1,5 @@
 import { Restaurant } from "@mui/icons-material";
+import type { DishWithRating, Event } from "@peterplate/validators";
 import {
   foodIconKeywords,
   foodIcons,
@@ -435,57 +436,13 @@ function isSameDay(a: Date, b: Date): boolean {
   );
 }
 
-// Handles getting hall data for easier access to dishes and status
-type HallInput =
-  | {
-      menus?: {
-        period: { startTime: string; endTime: string };
-        stations: {
-          name: string;
-          dishes: Array<Record<string, any>>;
-        }[];
-      }[];
-    }
-  | undefined;
-
-function getHallDishData<TDish extends Record<string, any>>(
-  hallData:
-    | (Omit<NonNullable<HallInput>, "menus"> & {
-        menus?: {
-          period: { startTime: string; endTime: string };
-          stations: { name: string; dishes: TDish[] }[];
-        }[];
-      })
-    | undefined,
-  hallName: string,
-) {
-  const status = getHallStatus(hallData);
-  const menus = hallData?.menus ?? [];
-
-  const dishes = menus.flatMap((menu) =>
-    menu.stations.flatMap((station) =>
-      station.dishes.map((dish) => ({
-        ...dish,
-        hallName,
-        stationName: station.name,
-      })),
-    ),
-  );
-
-  return { status, dishes };
-}
-
-// Handles Popular Today: gets top unique dishes sorted by average rating (descending)
-type DishRatings = {
-  name: string;
-  numRatings: number;
-  totalRating: number;
-};
-
-function getPopularDishes<T extends DishRatings>(
-  allDishes: T[] | null | undefined,
+function getPopularDishes(
+  allDishes: (DishWithRating & {
+    restaurant: "brandywine" | "anteatery";
+    stationName: string;
+  })[],
   numCards: number,
-): T[] {
+) {
   const seenNames = new Set<string>();
 
   return (allDishes ?? [])
@@ -503,15 +460,7 @@ function getPopularDishes<T extends DishRatings>(
     .slice(0, numCards);
 }
 
-// Handles Upcoming Events: gets top upcoming events sorted by start time (ascending)
-type EventItem = {
-  start?: string | Date | null;
-};
-
-export function sortedEvents<T extends EventItem>(
-  events: T[] | null | undefined,
-  numCards: number,
-): T[] {
+export function sortedEvents(events: Event[], numCards: number) {
   return [...(events ?? [])]
     .sort((event, nextEvent) => {
       const eventStartTime = event.start ? new Date(event.start).getTime() : 0;
@@ -524,32 +473,23 @@ export function sortedEvents<T extends EventItem>(
     .slice(0, numCards);
 }
 
-// Get open/close status for each hall
-type HallData =
-  | {
-      menus?: {
-        period: {
-          startTime: string;
-          endTime: string;
-        };
-      }[];
-    }
-  | undefined;
-
-function getHallStatus(hallData: HallData) {
-  if (!hallData?.menus?.length) return { isOpen: false, statusText: "" };
+function getHallStatus(
+  periods?: { startTime?: string | null; endTime?: string | null }[] | null,
+) {
+  if (!periods || periods.length === 0)
+    return { isOpen: false, statusText: "" };
   let earliestOpen: Date | undefined;
   let latestClose: Date | undefined;
-  for (const menu of hallData.menus) {
+  periods.forEach((period) => {
     try {
-      const open = militaryToStandard(menu.period.startTime);
-      const close = militaryToStandard(menu.period.endTime);
+      const open = militaryToStandard(period.startTime ?? "");
+      const close = militaryToStandard(period.endTime ?? "");
       if (!earliestOpen || open < earliestOpen) earliestOpen = open;
       if (!latestClose || close > latestClose) latestClose = close;
     } catch {
       /* skip */
     }
-  }
+  });
   if (earliestOpen && latestClose) {
     const now = new Date();
     const isOpen = now >= earliestOpen && now <= latestClose;
@@ -578,7 +518,6 @@ export {
   sortCategoryKeys,
   getFoodIcon,
   isSameDay,
-  getHallDishData,
   getHallStatus,
   getPopularDishes,
 };

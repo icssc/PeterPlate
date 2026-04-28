@@ -10,15 +10,13 @@ import {
   ToggleButtonGroup,
   Typography,
 } from "@mui/material";
+import type { UserAllergy } from "@peterplate/db";
+import { AllergenKeys, PreferenceKeys } from "@peterplate/validators";
 import React, { useEffect, useState } from "react";
 import { useUserStore } from "@/context/useUserStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useSession } from "@/utils/auth-client";
 import { trpc } from "@/utils/trpc";
-import {
-  AllergenKeys,
-  PreferenceKeys,
-} from "../../../../../packages/validators/src/adobe-ecommerce";
 import { GoogleSignInButton } from "../auth/google-sign-in";
 
 interface PersonalizeViewProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -263,7 +261,7 @@ const OnboardingContent = React.forwardRef<
     try {
       await addAllergies.mutateAsync({
         userId: session.user.id,
-        allergies: formData.allergies,
+        allergies: formData.allergies as UserAllergy[],
       });
       await addPreferences.mutateAsync({
         userId: session.user.id,

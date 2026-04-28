@@ -1,10 +1,6 @@
+import { getDishes } from "@api/dishes/services";
 import { createTRPCRouter, publicProcedure } from "@api/trpc";
-import {
-  loggedMeals,
-  nutritionInfos,
-  userGoals,
-  userGoalsByDay,
-} from "@peterplate/db";
+import { loggedMeals, userGoals, userGoalsByDay } from "@peterplate/db";
 import { TRPCError } from "@trpc/server";
 import { and, desc, eq, gt, gte, lt } from "drizzle-orm";
 import { z } from "zod";
@@ -75,7 +71,6 @@ export const nutritionRouter = createTRPCRouter({
         .values({
           userId: input.userId,
           dishId: input.dishId,
-          dishName: input.dishName,
           servings: input.servings,
           eatenAt,
         })
@@ -131,18 +126,10 @@ export const nutritionRouter = createTRPCRouter({
           id: loggedMeals.id,
           userId: loggedMeals.userId,
           dishId: loggedMeals.dishId,
-          dishName: loggedMeals.dishName,
           eatenAt: loggedMeals.eatenAt,
           servings: loggedMeals.servings,
-
-          // from the join on nutrition_infos table
-          calories: nutritionInfos.calories,
-          protein: nutritionInfos.proteinG,
-          carbs: nutritionInfos.totalCarbsG,
-          fat: nutritionInfos.totalFatG,
         })
         .from(loggedMeals)
-        .leftJoin(nutritionInfos, eq(loggedMeals.dishId, nutritionInfos.dishId))
         .where(
           and(
             gt(loggedMeals.eatenAt, oneWeekAgo),
@@ -151,7 +138,24 @@ export const nutritionRouter = createTRPCRouter({
         )
         .orderBy(desc(loggedMeals.eatenAt));
 
-      return meals;
+      // Retrieve the nutrition information
+      const dishIds = meals.map((meal) => meal.dishId);
+      const DishWithRating = await getDishes(dishIds, ctx.db);
+      const infoMap = new Map(DishWithRating.map((dish) => [dish.id, dish]));
+
+      return meals.map((meal) => {
+        const dish = infoMap.get(meal.dishId);
+        const nutritionInfo = dish?.nutritionInfo;
+
+        return {
+          ...meal,
+          dishName: dish?.name ?? "",
+          calories: nutritionInfo?.calories,
+          protein: nutritionInfo?.proteinG,
+          carbs: nutritionInfo?.totalCarbsG,
+          fat: nutritionInfo?.totalFatG,
+        };
+      });
     }),
   deleteLoggedMeal: publicProcedure
     .input(
@@ -168,7 +172,7 @@ export const nutritionRouter = createTRPCRouter({
       if (!result[0]) {
         throw new TRPCError({
           code: "NOT_FOUND",
-          message: "Logged meal not found",
+          message: "Could not find logged meal.",
         });
       }
 

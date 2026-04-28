@@ -1,7 +1,7 @@
 "use client";
 
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
-import type { DishInfo } from "@peterplate/api";
+import type { DishWithRating } from "@peterplate/validators";
 import { useMemo, useState } from "react";
 import MyFoodsCard from "@/components/ui/card/my-foods-card";
 import FoodCardSkeleton from "@/components/ui/skeleton/food-card-skeleton";
@@ -15,10 +15,9 @@ type LocationFilter = "all" | "brandywine" | "anteatery";
 type SortOption = "recent" | "oldest" | "highest" | "lowest" | "az" | "za";
 
 interface MergedEntry {
-  dishId: string;
-  dish: DishInfo;
+  dish: DishWithRating;
   isFavorited: boolean;
-  stationName?: string;
+  restaurant: "brandywine" | "anteatery";
   modifiedAt: Date;
 }
 
@@ -55,57 +54,51 @@ export default function MyFoodsPage() {
   } = useFavorites(userId ?? "");
 
   const {
-    data: ratedFoods,
+    data: ratedDishes,
     isLoading: isLoadingRated,
     error: ratedError,
   } = trpc.dish.rated.useQuery({ userId: userId ?? "" }, { enabled: !!userId });
 
+  const { allIds, favoriteSet, restaurantMap } = useMemo(() => {
+    const favSet = new Set(favorites.map((fav) => fav.dishId));
+    const ratedSet = new Set(ratedDishes?.map((rated) => rated.id) ?? []);
+    const ids = Array.from(new Set([...favSet, ...ratedSet]));
+
+    const map = new Map<string, "brandywine" | "anteatery">();
+    ratedDishes?.forEach((rated) => {
+      map.set(rated.id, rated.restaurant as "brandywine" | "anteatery");
+    });
+    favorites.forEach((fav) => {
+      if (!map.has(fav.dishId))
+        map.set(fav.dishId, fav.restaurant as "brandywine" | "anteatery");
+    });
+
+    return { allIds: ids, favoriteSet: favSet, restaurantMap: map };
+  }, [favorites, ratedDishes]);
+
+  const {
+    data: myDishesInfo,
+    isLoading: isLoadingDishes,
+    error: dishesError,
+  } = trpc.dish.get.useQuery({ ids: allIds }, { enabled: allIds.length > 0 });
+
   const mergedEntries = useMemo<MergedEntry[]>(() => {
-    const map = new Map<string, MergedEntry>();
+    if (!myDishesInfo) return [];
 
-    // Process favorites first
-    for (const fav of favorites) {
-      const ts = fav.updatedAt ?? fav.createdAt;
-      map.set(fav.dishId, {
-        dishId: fav.dishId,
-        dish: fav.dish as unknown as DishInfo,
-        isFavorited: true,
-        stationName: (fav.dish as unknown as { stationName?: string })
-          .stationName,
-        modifiedAt: ts ? new Date(ts) : new Date(0),
-      });
-    }
-
-    // Merge rated dishes
-    for (const rated of ratedFoods ?? []) {
-      const ratedAt = rated.ratedAt ? new Date(rated.ratedAt) : new Date(0);
-      const existing = map.get(rated.id);
-      if (existing) {
-        // Keep the most recent timestamp
-        if (ratedAt > existing.modifiedAt) {
-          existing.modifiedAt = ratedAt;
-        }
-      } else {
-        map.set(rated.id, {
-          dishId: rated.id,
-          dish: rated as unknown as DishInfo,
-          isFavorited: false,
-          stationName: (rated as unknown as { stationName?: string })
-            .stationName,
-          modifiedAt: ratedAt,
-        });
-      }
-    }
-
-    return Array.from(map.values());
-  }, [favorites, ratedFoods]);
+    return myDishesInfo.map((dish) => ({
+      dish,
+      isFavorited: favoriteSet.has(dish.id),
+      restaurant: restaurantMap.get(dish.id) ?? "anteatery",
+      modifiedAt: dish.updatedAt,
+    }));
+  }, [myDishesInfo, favoriteSet, restaurantMap]);
 
   const filteredEntries = useMemo<MergedEntry[]>(() => {
     let result = mergedEntries;
 
     if (locationFilter !== "all") {
       result = result.filter(
-        (e) => e.dish.restaurant?.toLowerCase() === locationFilter,
+        (e) => restaurantMap.get(e.dish.id)?.toLowerCase() === locationFilter,
       );
     }
 
@@ -132,10 +125,16 @@ export default function MyFoodsPage() {
           return 0;
       }
     });
-  }, [mergedEntries, locationFilter, searchQuery, sortOption]);
+  }, [
+    mergedEntries,
+    locationFilter,
+    searchQuery,
+    sortOption,
+    restaurantMap.get,
+  ]);
 
-  const isLoading = isLoadingFavorites || isLoadingRated;
-  const hasError = !!favoritesError || !!ratedError;
+  const isLoading = isLoadingFavorites || isLoadingRated || isLoadingDishes;
+  const hasError = !!favoritesError || !!ratedError || !!dishesError;
 
   return (
     <div
@@ -366,11 +365,11 @@ export default function MyFoodsPage() {
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-10">
               {filteredEntries.map((entry) => (
                 <MyFoodsCard
-                  key={entry.dishId}
+                  key={entry.dish.id}
                   dish={entry.dish}
                   isFavorited={entry.isFavorited}
-                  stationName={entry.stationName}
-                  favoriteDisabled={!!isFavoritePending?.(entry.dishId)}
+                  restaurant={entry.restaurant}
+                  favoriteDisabled={!!isFavoritePending?.(entry.dish.id)}
                   onToggleFavorite={toggleFavorite}
                 />
               ))}

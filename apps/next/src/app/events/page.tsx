@@ -6,13 +6,13 @@ import Button from "@mui/material/Button";
 import { useState } from "react";
 import { trpc } from "@/utils/trpc";
 import "react-big-calendar/lib/css/react-big-calendar.css";
+import type { Event } from "@peterplate/validators";
 import { addMonths, endOfMonth, startOfMonth, subMonths } from "date-fns";
 import CalendarView from "@/components/ui/calendar-view";
-import EventCard, { type EventInfo } from "@/components/ui/card/event-card";
+import EventCard from "@/components/ui/card/event-card";
 import EventCardSkeleton from "@/components/ui/skeleton/event-card-skeleton";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { getEventType } from "@/utils/funcs";
-import { HallEnum } from "@/utils/types";
 
 const Events = () => {
   const [selectedDiningHall, setSelectedDiningHall] = useState<
@@ -22,30 +22,26 @@ const Events = () => {
     "both" | "special" | "celebration"
   >("both");
   const [viewMode, setViewMode] = useState<"grid" | "calendar">("grid");
-  const [selectedEventData, setSelectedEventData] = useState<EventInfo | null>(
+  const [selectedEventData, setSelectedEventData] = useState<Event | null>(
     null,
   );
   const [currentDate, setCurrentDate] = useState(new Date());
-  const now = new Date();
 
-  const {
-    data: events,
-    isLoading,
-    error,
-  } = trpc.event.inBetween.useQuery({
-    after: startOfMonth(currentDate),
-    before: endOfMonth(currentDate),
-  });
+  const { data: events, isLoading, error } = trpc.event.upcoming.useQuery();
+  // TODO: Add inBetween here when route is complete
+  // } = trpc.event.inBetween.useQuery({
+  //   after: startOfMonth(currentDate),
+  //   before: endOfMonth(currentDate),
+  // });
 
   const sortedEvents =
-    events?.length > 0
-      ? [...events].sort(
-          (a: any, b: any) =>
-            new Date(a.start).getTime() - new Date(b.start).getTime(),
+    (events?.length ?? -1 > 0)
+      ? events?.sort(
+          (a, b) => new Date(a.start).getTime() - new Date(b.start).getTime(),
         )
       : [];
 
-  const filteredEvents = sortedEvents.filter((event: any) => {
+  const filteredEvents = sortedEvents?.filter((event) => {
     const matchesDiningHall =
       selectedDiningHall === "both" ||
       (selectedDiningHall === "anteatery" &&
@@ -55,10 +51,11 @@ const Events = () => {
     const matchesEventType =
       selectedEventType === "both" ||
       getEventType(event.title) === selectedEventType;
-    return matchesDiningHall && matchesEventType;
+    const notInPast = new Date(event.start) >= new Date();
+    return matchesDiningHall && matchesEventType && notInPast;
   });
 
-  const calendarEvents = filteredEvents.map((event: any) => ({
+  const calendarEvents = filteredEvents?.map((event) => ({
     title: event.title,
     start: new Date(event.start),
     end: new Date(event.end),
@@ -69,21 +66,7 @@ const Events = () => {
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   const handleSelectEvent = (calendarEvent: any) => {
-    const resource = calendarEvent.resource;
-    setSelectedEventData({
-      name: resource.title,
-      shortDesc: resource.shortDescription,
-      longDesc: resource.longDescription,
-      imgSrc: resource.image,
-      alt: resource.title + " promotion image",
-      startTime: resource.start,
-      endTime: resource.end,
-      location:
-        resource.restaurantId === "anteatery"
-          ? HallEnum.ANTEATERY
-          : HallEnum.BRANDYWINE,
-      isOngoing: resource.start <= now && resource.end >= now,
-    });
+    setSelectedEventData(calendarEvent.resource);
   };
 
   const handleClose = () => setSelectedEventData(null);
@@ -254,31 +237,19 @@ const Events = () => {
           {!isLoading && !error && viewMode === "grid" && (
             <>
               <p className="text-sm text-zinc-700 dark:text-zinc-400">
-                Showing {filteredEvents.length} event
-                {filteredEvents.length !== 1 ? "s" : ""}
+                Showing {filteredEvents?.length} event
+                {filteredEvents?.length !== 1 ? "s" : ""}
               </p>
 
               <div className="flex sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12 overflow-x-auto sm:overflow-visible pb-2 sm:pb-0">
-                {filteredEvents.map((event: any): any => (
+                {filteredEvents?.map((event) => (
                   <EventCard
                     key={`${event.title}-${event.start}-${event.restaurantId}`}
-                    name={event.title}
-                    imgSrc={event.image}
-                    alt={`${event.title} promotion image.`}
-                    startTime={event.start}
-                    endTime={event.end}
-                    location={
-                      event.restaurantId === "anteatery"
-                        ? HallEnum.ANTEATERY
-                        : HallEnum.BRANDYWINE
-                    }
-                    shortDesc={event.shortDescription}
-                    longDesc={event.longDescription}
-                    isOngoing={event.start <= now && event.end >= now}
+                    {...event}
                   />
                 ))}
               </div>
-              {filteredEvents.length === 0 && (
+              {filteredEvents?.length === 0 && (
                 <p className="text-center text-zinc-700 py-5">
                   No events found :(
                 </p>
@@ -294,7 +265,7 @@ const Events = () => {
               isLoading={isLoading}
               error={error}
               currentDate={currentDate}
-              calendarEvents={calendarEvents}
+              calendarEvents={calendarEvents ?? []}
               selectedEventData={selectedEventData}
               onPreviousMonth={viewPreviousMonthsEvents}
               onNextMonth={viewNextMonthsEvents}

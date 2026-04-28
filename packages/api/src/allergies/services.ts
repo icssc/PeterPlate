@@ -1,7 +1,6 @@
 import { upsert } from "@api/utils";
-import type { Drizzle, InsertAllergy, SelectAllergy } from "@peterplate/db";
-import { userAllergies, users } from "@peterplate/db";
-import { TRPCError } from "@trpc/server";
+import type { Drizzle, UserAllergy } from "@peterplate/db";
+import { userAllergies } from "@peterplate/db";
 import { and, eq } from "drizzle-orm";
 
 /**
@@ -12,14 +11,14 @@ export async function getAllergies(db: Drizzle, userId: string) {
   const allergies = await db.query.userAllergies.findMany({
     where: (ua, { eq }) => eq(ua.userId, userId),
   });
-  //Return each allergy string
+  // Return each allergy string
   return allergies.map((a) => a.allergy);
 }
 
 export async function addAllergies(
   db: Drizzle,
   userId: string,
-  allergies: Array<string>,
+  allergies: Array<UserAllergy>,
 ): Promise<void> {
   try {
     const upsertPromises = allergies.map((a) =>
@@ -36,7 +35,7 @@ export async function addAllergies(
 
     const results = await Promise.all(upsertPromises);
     console.log(`Successfully synced ${results.length} preferences.`);
-  } catch (error) {
+  } catch (_) {
     console.error("Failed to save dietary preferences.");
   }
 }
@@ -44,7 +43,7 @@ export async function addAllergies(
 export async function deleteAllergy(
   db: Drizzle,
   userId: string,
-  allergy: string,
+  allergy: UserAllergy,
 ): Promise<void> {
   await db
     .delete(userAllergies)

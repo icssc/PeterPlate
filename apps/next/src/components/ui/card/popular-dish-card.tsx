@@ -1,6 +1,6 @@
-import type { DishInfo } from "@api/index";
 import { Star } from "@mui/icons-material";
 import { Card, Dialog } from "@mui/material";
+import type { DishWithRating } from "@peterplate/validators";
 import Image from "next/image";
 import { useState } from "react";
 import { formatFoodName, getFoodIcon, toTitleCase } from "@/utils/funcs";
@@ -9,14 +9,14 @@ import FoodDialogContent from "../food-dialog-content";
 
 export default function PopularDishCard({
   dish,
-  hallName,
   stationName,
   compact = false,
+  restaurant,
 }: {
-  dish: DishInfo;
-  hallName: string;
+  dish: DishWithRating;
   stationName: string;
   compact?: boolean;
+  restaurant: "anteatery" | "brandywine";
 }) {
   const [open, setOpen] = useState(false);
 
@@ -40,9 +40,9 @@ export default function PopularDishCard({
       >
         {/* Dish image */}
         <div className="relative w-full aspect-[16/9] flex-shrink-0 bg-amber-50 dark:bg-neutral-800">
-          {dish.image_url ? (
+          {dish.imageUrl ? (
             <Image
-              src={dish.image_url}
+              src={dish.imageUrl}
               alt={dish.name}
               fill
               className="object-cover"
@@ -64,7 +64,7 @@ export default function PopularDishCard({
           <p
             className={`${descSize} text-neutral-500 dark:text-neutral-400 mb-1`}
           >
-            {hallName} • {toTitleCase(stationName)}
+            {toTitleCase(restaurant)} • {toTitleCase(stationName)}
           </p>
           <div className="flex items-center gap-1 text-xs text-neutral-400 mt-auto">
             <Star style={{ fontSize: iconSize }} />
@@ -89,7 +89,7 @@ export default function PopularDishCard({
           },
         }}
       >
-        <FoodDialogContent dish={dish} />
+        <FoodDialogContent dish={dish} restaurant={restaurant} />
       </Dialog>
     </>
   );

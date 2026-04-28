@@ -2,10 +2,11 @@ import type { NextConfig } from "next";
 import path from "node:path";
 
 const nextConfig: NextConfig = {
-  // ! TODO: Fix these errors
-  typescript: {
-    ignoreBuildErrors: true,
-  },
+  transpilePackages: [
+    "@peterplate/api",
+    "@peterplate/db",
+    "@peterplate/validators",
+  ],
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "uci.campusdish.com" },
@@ -65,4 +66,3 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
-
