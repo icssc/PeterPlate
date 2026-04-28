@@ -13,9 +13,11 @@ export default {
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
+			"accent-primary": "hsl(var(--accent-primary))",
   			card: {
   				DEFAULT: 'hsl(var(--card))',
   				foreground: 'hsl(var(--card-foreground))'
+			
   			},
   			popover: {
   				DEFAULT: 'hsl(var(--popover))',

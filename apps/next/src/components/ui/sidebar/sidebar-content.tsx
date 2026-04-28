@@ -89,11 +89,11 @@ export default function SidebarContent({
       <div className="flex-1 px-5 pt-4 space-y-5">
         {/* Dietary Preferences */}
         <div>
-          <h3 className="text-sm font-semibold text-blue-600 dark:text-blue-400 mb-2">
+          <h3 className="text-sm font-bold text-sky-700 dark:text-blue-400 mb-2">
             Dietary Preferences
           </h3>
 
-          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+          <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">
             Restrictions:
           </p>
 
@@ -102,7 +102,7 @@ export default function SidebarContent({
               preferences.map((pref) => (
                 <span
                   key={pref}
-                  className="rounded-md border border-blue-500 px-2.5 py-0.5 text-xs text-blue-600 dark:text-blue-400"
+                  className="rounded-md border border-sky-700 px-2.5 py-0.5 text-xs text-sky-700 bg-sky-100 dark:text-blue-400"
                 >
                   {pref}
                 </span>
@@ -112,7 +112,7 @@ export default function SidebarContent({
             )}
           </div>
 
-          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+          <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">
             Allergies:
           </p>
           <div className="flex flex-wrap gap-1.5">
@@ -120,7 +120,7 @@ export default function SidebarContent({
               allergies.map((allergy) => (
                 <span
                   key={allergy}
-                  className="rounded-md border border-blue-500 px-2.5 py-0.5 text-xs text-blue-600 dark:text-blue-400"
+                  className="rounded-md border border-sky-700 px-2.5 py-0.5 text-xs text-sky-700 bg-sky-100 dark:text-blue-400"
                 >
                   {allergy}
                 </span>
@@ -133,11 +133,11 @@ export default function SidebarContent({
 
         {/* Appearance */}
         <div>
-          <h3 className="text-sm font-semibold text-blue-600 dark:text-blue-400 mb-2">
+          <h3 className="text-sm font-bold text-sky-700 dark:text-blue-400 mb-2">
             Appearance
           </h3>
 
-          <div className="flex rounded-lg border border-blue-500 overflow-hidden">
+          <div className="flex rounded-lg border border-sky-700 overflow-hidden">
             <ThemeButton
               active={theme === "light"}
               onClick={() => setTheme("light")}
@@ -172,8 +172,11 @@ export default function SidebarContent({
                 }}
                 className="w-full flex items-center gap-3 rounded-lg px-4 py-2 text-sm text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:dark:hover:bg-transparent"
               >
-                <EditIcon fontSize="small" />
-                <span className="font-semibold">Edit Preferences</span>
+                <EditIcon
+                  fontSize="small"
+                  sx={{ color: "hsl(var(--accent-primary))" }}
+                />
+                <span className="font-medium">Edit Preferences</span>
               </button>
             </span>
           </Tooltip>
@@ -181,7 +184,12 @@ export default function SidebarContent({
           <MenuLink
             href="/feedback"
             onClick={onClose}
-            icon={<FeedbackIcon fontSize="small" />}
+            icon={
+              <FeedbackIcon
+                fontSize="small"
+                sx={{ color: "hsl(var(--accent-primary))" }}
+              />
+            }
           >
             Feedback
           </MenuLink>
@@ -189,7 +197,12 @@ export default function SidebarContent({
           <MenuLink
             href="/about"
             onClick={onClose}
-            icon={<InfoIcon fontSize="small" />}
+            icon={
+              <InfoIcon
+                fontSize="small"
+                sx={{ color: "hsl(var(--accent-primary))" }}
+              />
+            }
           >
             About PeterPlate
           </MenuLink>
@@ -203,9 +216,9 @@ export default function SidebarContent({
           <button
             type="button"
             onClick={handleSignOut}
-            className="w-full rounded-lg bg-blue-600
+            className="w-full rounded-lg bg-sky-700
             py-2.5 text-sm font-semibold text-white
-            hover:bg-blue-700 flex items-center justify-center"
+            hover:bg-sky-800 flex items-center justify-center"
           >
             <span className="inline-flex items-center gap-2">
               <LogoutIcon fontSize="small" />
@@ -236,7 +249,9 @@ function ThemeButton({
       type="button"
       onClick={onClick}
       className={`flex-1 flex items-center justify-center gap-1 py-2 text-xs font-medium transition-colors ${
-        active ? "bg-blue-100 text-blue-700" : "text-blue-600 hover:bg-blue-50"
+        active
+          ? "bg-accent-primary text-white"
+          : "text-black hover:bg-accent-primary/85 hover:text-white"
       }`}
     >
       {icon}
