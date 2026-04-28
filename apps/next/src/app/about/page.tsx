@@ -47,6 +47,7 @@ export default function About() {
                 className="underline text-sky-600"
                 href="https://studentcouncil.ics.uci.edu/"
                 rel="noreferrer"
+                target="_blank"
               >
                 ICS Student Council
               </a>
@@ -91,6 +92,7 @@ export default function About() {
                 className="underline text-sky-600"
                 href="https://github.com/icssc/PeterPlate"
                 rel="noreferrer"
+                target="_blank"
               >
                 GitHub
               </a>
@@ -98,6 +100,8 @@ export default function About() {
               <a
                 className="underline text-sky-600"
                 href="https://discord.gg/GzF76D7UhY"
+                rel="noreferrer"
+                target="_blank"
               >
                 Discord
               </a>
