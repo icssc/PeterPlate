@@ -536,31 +536,22 @@ function MobileToolbar(): React.JSX.Element {
         </div>
       </div>
 
-      <Menu
-        anchorEl={profileAnchor}
+      <Drawer
+        anchor="bottom"
         open={profileOpen}
         onClose={handleProfileClose}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "right",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "right",
-        }}
-        PaperProps={{
-          className:
-            "bg-transparent shadow-none p-0 w-[357px] max-h-[658px] mt-1",
-        }}
-        MenuListProps={{
-          className: "p-0",
+        slotProps={{
+          paper: {
+            className:
+              "p-0 overflow-hidden rounded-t-[10px] h-auto max-h-[85vh] flex flex-col min-h-0 bg-white dark:bg-zinc-900",
+          },
         }}
       >
         <SidebarContent
           onClose={handleProfileClose}
           onEditPreferencesClick={handleEditPreferencesOpen}
         />
-      </Menu>
+      </Drawer>
 
       <Drawer
         anchor="bottom"
