@@ -30,7 +30,7 @@ export default function EventDrawerContent(
           height={600}
           className="w-full object-contain"
         />
-        <EventTypeBadge title={props.name} />
+        <EventTypeBadge title={props.name} desc={props.longDesc} />
       </div>
       <Box sx={{ padding: "20px 24px 24px" }} className="flex flex-col gap-2">
         <h2 className="text-2xl font-semibold text-sky-700 leading-tight">
