@@ -54,6 +54,12 @@ export const ratingsRelations = relations(ratings, ({ one }) => ({
  *
  * {@linkcode users}
  * {@linkcode dishes}
+ * {@linkcode restaurantIdEnum}
+ *
+ *
+ * This signifies a user, rating a certain dish, at one restaurant.
+ * This allows a user to rate a dish differently depending on the restaurant
+ * eaten at.
  */
 export type InsertRating = typeof ratings.$inferInsert;
 export type SelectRating = typeof ratings.$inferSelect;

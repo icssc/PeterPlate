@@ -79,6 +79,7 @@ const rating = {
   dishId,
   userId,
   rating: 1,
+  restaurant: "anteatery",
 } as const satisfies InsertRating;
 
 export const testData = {
