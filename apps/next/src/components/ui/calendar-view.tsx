@@ -111,15 +111,16 @@ const CalendarView = ({
         <Dialog
           open={Boolean(selectedEventData)}
           onClose={onCloseDetails}
-          maxWidth={false}
-          slotProps={{
-            paper: {
-              sx: {
-                width: "570px",
-                maxWidth: "90vw",
-                borderRadius: "6px",
-                overflow: "hidden",
-              },
+          maxWidth="sm"
+          PaperProps={{
+            sx: {
+              bgcolor: "background.paper",
+              width: "570px",
+              maxWidth: "90vw",
+              margin: 2,
+              padding: 0,
+              borderRadius: "6px",
+              overflow: "hidden",
             },
           }}
         >
