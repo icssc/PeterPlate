@@ -2,7 +2,7 @@
 
 import type { SelectChangeEvent } from "@mui/material/Select";
 import { addMonths, endOfMonth, startOfMonth, subMonths } from "date-fns";
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import type { EventInfo } from "@/components/ui/card/event-card";
 import DesktopEventsView from "@/components/ui/desktop-events-view";
 import MobileEventsView from "@/components/ui/mobile-events-view";
@@ -39,6 +39,27 @@ const Events = () => {
     before: endOfMonth(currentDate),
   });
 
+  const { data: upcomingEvents } = trpc.event.upcoming.useQuery();
+
+  const availableMonths = useMemo(() => {
+    if (!upcomingEvents?.length) return [];
+    const seen = new Set<string>();
+    const months: { year: number; monthIndex: number }[] = [];
+    for (const event of upcomingEvents) {
+      if (!event.start) continue;
+      const date = new Date(event.start);
+      const year = date.getFullYear();
+      const monthIndex = date.getMonth();
+      const key = `${year}-${monthIndex}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      months.push({ year, monthIndex });
+    }
+    return months.sort(
+      (a, b) => a.year - b.year || a.monthIndex - b.monthIndex,
+    );
+  }, [upcomingEvents]);
+
   const sortedEvents =
     events?.length > 0
       ? [...events].sort(
@@ -46,18 +67,30 @@ const Events = () => {
         )
       : [];
 
-  const filteredEvents = sortedEvents.filter((event) => {
-    const matchesDiningHall =
-      selectedDiningHall === "both" ||
-      (selectedDiningHall === "anteatery" &&
-        event.restaurantId === "anteatery") ||
-      (selectedDiningHall === "brandywine" &&
-        event.restaurantId === "brandywine");
-    const matchesEventType =
-      selectedEventType === "both" ||
-      getEventType(event.title) === selectedEventType;
-    return matchesDiningHall && matchesEventType;
-  });
+  const matchesFilters = useCallback(
+    (event: { restaurantId: string; title: string }) => {
+      const matchesDiningHall =
+        selectedDiningHall === "both" ||
+        (selectedDiningHall === "anteatery" &&
+          event.restaurantId === "anteatery") ||
+        (selectedDiningHall === "brandywine" &&
+          event.restaurantId === "brandywine");
+      const matchesEventType =
+        selectedEventType === "both" ||
+        getEventType(event.title) === selectedEventType;
+      return matchesDiningHall && matchesEventType;
+    },
+    [selectedDiningHall, selectedEventType],
+  );
+
+  const filteredEvents = sortedEvents.filter(matchesFilters);
+
+  const filteredUpcomingEvents = useMemo(() => {
+    if (!upcomingEvents?.length) return [];
+    return [...upcomingEvents]
+      .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime())
+      .filter(matchesFilters);
+  }, [upcomingEvents, matchesFilters]);
 
   const calendarEvents = filteredEvents.map((event) => ({
     title: event.title,
@@ -140,12 +173,14 @@ const Events = () => {
       setCurrentDate={setCurrentDate}
       selectedDiningHall={selectedDiningHall}
       filteredEvents={filteredEvents}
+      filteredUpcomingEvents={filteredUpcomingEvents}
       selectedEventData={selectedEventData}
       isLoading={isLoading}
       error={error}
       handleLocationChange={handleLocationChange}
       handleSelectEvent={handleSelectEvent}
       handleClose={handleClose}
+      availableMonths={availableMonths}
     />
   );
 };

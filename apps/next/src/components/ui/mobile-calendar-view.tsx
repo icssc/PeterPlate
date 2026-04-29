@@ -90,7 +90,7 @@ const MobileCalendarView = ({
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      <div className="bg-[#0069A833] dark:bg-sky-950 rounded-2xl px-4 py-4 w-full max-w-sm mx-auto mb-4">
+      <div className="bg-[#0069A833] dark:bg-sky-950 rounded-2xl px-3 py-4 w-full mb-4">
         <div className="flex items-center justify-between mb-4">
           <button
             type="button"
@@ -114,7 +114,7 @@ const MobileCalendarView = ({
           </div>
         </div>
 
-        <div className="grid grid-cols-7 gap-x-2 text-center">
+        <div className="grid grid-cols-7 gap-x-1 text-center">
           {weekDays.map((day) => (
             <div
               key={`header-${day}`}
@@ -126,7 +126,7 @@ const MobileCalendarView = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-7 gap-y-6 gap-x-2 text-center w-full max-w-sm mx-auto pb-10">
+      <div className="grid grid-cols-7 gap-y-6 gap-x-1 text-center w-full pb-10">
         {daysList.map((date, _idx) => {
           const eventsOnDay = getEventsForDay(date);
           const isCurrentMonth = isSameMonth(date, currentDate);
@@ -148,15 +148,18 @@ const MobileCalendarView = ({
                   : "text-slate-300 dark:text-zinc-600"
               }`}
             >
+              {isCurrentDate && (
+                <div className="absolute left-1/2 -translate-x-1/2 top-2 -bottom-6 w-10 rounded-lg bg-[#CCE1EE] dark:bg-sky-950 z-0" />
+              )}
               <div
-                className={`flex items-center justify-center w-8 h-8 rounded-full ${
-                  isCurrentDate ? "bg-sky-100 dark:bg-sky-900 font-bold" : ""
+                className={`relative z-10 flex items-center justify-center w-8 h-8 rounded-full ${
+                  isCurrentDate ? "font-semibold" : ""
                 }`}
               >
                 {format(date, "d")}
               </div>
               {hasEvents && (
-                <div className="absolute -bottom-3 flex space-x-0.5">
+                <div className="absolute z-10 -bottom-3 flex space-x-0.5">
                   {eventsOnDay.slice(0, 3).map((event) => (
                     <div
                       key={`${event.title}-${String(event.start)}-${event.restaurantId || event.location}`}

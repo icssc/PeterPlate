@@ -1,7 +1,6 @@
 "use client";
 
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-import CloseIcon from "@mui/icons-material/Close";
 import MenuIcon from "@mui/icons-material/Menu";
 import {
   FormControl,
@@ -9,12 +8,11 @@ import {
   Select,
   type SelectChangeEvent,
 } from "@mui/material";
-import Drawer from "@mui/material/Drawer";
 import { useState } from "react";
 import { getEventType } from "@/utils/funcs";
 import { HallEnum } from "@/utils/types";
 import type { EventInfo } from "./card/event-card";
-import EventDrawerContent from "./event-drawer-content";
+import EventDetailsDrawer from "./event-details-drawer";
 import MobileCalendarView from "./mobile-calendar-view";
 import MobileListView from "./mobile-list-view";
 import MonthPickerDrawer from "./month-picker-drawer";
@@ -27,6 +25,7 @@ interface MobileEventsViewProps {
   isLoading: boolean;
   error: Error | null;
   filteredEvents: EventInfo[];
+  filteredUpcomingEvents: EventInfo[];
   currentDate: Date;
   setCurrentDate: (date: Date) => void;
   selectedEventData: EventInfo | null;
@@ -34,6 +33,7 @@ interface MobileEventsViewProps {
     resource: Record<string, unknown>;
   }) => void;
   handleClose: () => void;
+  availableMonths: { year: number; monthIndex: number }[];
 }
 
 const MobileEventsView = ({
@@ -42,11 +42,13 @@ const MobileEventsView = ({
   isLoading,
   error,
   filteredEvents,
+  filteredUpcomingEvents,
   currentDate,
   setCurrentDate,
   selectedEventData,
   handleSelectEvent,
   handleClose,
+  availableMonths,
 }: MobileEventsViewProps) => {
   const [mobileView, setMobileView] = useState<"calendar" | "list">("calendar");
   const [monthPickerOpen, setMonthPickerOpen] = useState(false);
@@ -57,9 +59,13 @@ const MobileEventsView = ({
   const locationSelectClasses =
     "[&_.MuiSelect-select]:!py-2 [&_.MuiSelect-select]:!pl-3 [&_.MuiSelect-select]:!pr-6 [&_.MuiSelect-icon]:right-1 [&_.MuiSelect-icon]:text-sky-700";
 
+  const handleEventDrawerClose = () => {
+    handleClose();
+    setSelectedDayEvents([]);
+  };
+
   return (
     <div className="flex flex-col h-screen w-full bg-white dark:bg-zinc-950 overflow-hidden font-sans">
-      {/* HEADER */}
       <div className="flex flex-col px-4 pt-12 pb-4 bg-white dark:bg-zinc-950 z-20">
         <h1 className="text-4xl font-bold text-sky-700 dark:text-sky-400 mb-4">
           Events
@@ -78,7 +84,6 @@ const MobileEventsView = ({
             </Select>
           </FormControl>
 
-          {/* View Toggle */}
           <div className="flex bg-white dark:bg-zinc-900 border border-sky-700 dark:border-sky-500 rounded-lg overflow-hidden h-[38px]">
             <button
               type="button"
@@ -118,7 +123,6 @@ const MobileEventsView = ({
         </div>
       )}
 
-      {/* CONTENT */}
       {!isLoading &&
         !error &&
         (mobileView === "calendar" ? (
@@ -129,7 +133,9 @@ const MobileEventsView = ({
             onSelectEventDay={(_date, eventsForDay) => {
               if (eventsForDay.length > 0) {
                 const now = new Date();
-                const mappedEvents = (eventsForDay as any[]).map(
+                const mappedEvents = (
+                  eventsForDay as unknown as Record<string, unknown>[]
+                ).map(
                   (resource) =>
                     ({
                       name: (resource.title as string) || "",
@@ -158,7 +164,7 @@ const MobileEventsView = ({
           <MobileListView
             currentDate={currentDate}
             onDateChange={setCurrentDate}
-            filteredEvents={filteredEvents}
+            filteredEvents={filteredUpcomingEvents}
             onOpenMonthPicker={() => setMonthPickerOpen(true)}
             onSelectEvent={(evtInfo) =>
               handleSelectEvent({ resource: evtInfo })
@@ -166,73 +172,22 @@ const MobileEventsView = ({
           />
         ))}
 
-      {/* Month Picker Drawer */}
       <MonthPickerDrawer
         open={monthPickerOpen}
         onClose={() => setMonthPickerOpen(false)}
         currentDate={currentDate}
+        availableMonths={availableMonths}
         onSelectMonth={(year, monthIndex) => {
           setCurrentDate(new Date(year, monthIndex, 1));
           setMonthPickerOpen(false);
         }}
       />
 
-      {/* Event Details Drawer */}
-      <Drawer
-        anchor="bottom"
-        open={Boolean(selectedEventData) || selectedDayEvents.length > 0}
-        onClose={() => {
-          handleClose();
-          setSelectedDayEvents([]);
-        }}
-        sx={{
-          "& .MuiDrawer-paper": {
-            borderTopLeftRadius: "10px",
-            borderTopRightRadius: "10px",
-            height: "auto",
-            maxHeight: "90vh",
-            backgroundColor:
-              selectedDayEvents.length === 1 ? "white" : "#f8fafc",
-          },
-        }}
-        className="dark:[&_.MuiDrawer-paper]:!bg-zinc-950"
-      >
-        <div className="relative w-full h-full flex flex-col overflow-y-auto">
-          {(Boolean(selectedEventData) || selectedDayEvents.length > 0) && (
-            <button
-              type="button"
-              className="absolute top-3 right-4 z-50 bg-white/80 dark:bg-zinc-900/80 backdrop-blur rounded-full p-1 shadow hover:bg-white dark:hover:bg-zinc-800 transition-colors"
-              onClick={() => {
-                handleClose();
-                setSelectedDayEvents([]);
-              }}
-            >
-              <CloseIcon
-                className="text-zinc-600 dark:text-zinc-300"
-                fontSize="small"
-              />
-            </button>
-          )}
-
-          {selectedEventData ? (
-            <EventDrawerContent {...selectedEventData} />
-          ) : selectedDayEvents.length === 1 ? (
-            <EventDrawerContent {...selectedDayEvents[0]} />
-          ) : (
-            <div className="flex flex-col gap-4 p-4 pt-12 pb-10">
-              {selectedDayEvents.map((event, idx) => (
-                <div
-                  // biome-ignore lint/suspicious/noArrayIndexKey: list events lack unique IDs and are statically ordered
-                  key={`event-drawer-${event.name}-${idx}`}
-                  className="bg-white dark:bg-zinc-900 rounded-xl overflow-hidden shadow-sm border border-slate-200 dark:border-zinc-800"
-                >
-                  <EventDrawerContent {...event} />
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </Drawer>
+      <EventDetailsDrawer
+        selectedEventData={selectedEventData}
+        selectedDayEvents={selectedDayEvents}
+        onClose={handleEventDrawerClose}
+      />
     </div>
   );
 };
