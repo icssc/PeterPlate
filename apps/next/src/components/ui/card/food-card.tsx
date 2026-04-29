@@ -102,10 +102,15 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
         ref={ref}
         {...divProps}
         className={cn(
-          "relative cursor-pointer hover:shadow-lg transition w-full border",
+          "relative cursor-pointer hover:shadow-lg transition w-full dark:bg-[#303035]",
           doesNotMeetPreferences && "opacity-70",
         )}
-        sx={{ borderRadius: "12px" }}
+        sx={{
+          borderRadius: "12px",
+          border: 1,
+          borderColor: "divider",
+          backgroundImage: "none",
+        }}
       >
         <CardContent sx={{ padding: 0, "&:last-child": { paddingBottom: 0 } }}>
           <div className="flex justify-between h-full w-full p-4 gap-4">
@@ -126,7 +131,10 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                 />
               )}
               {!isCompact && !showImage && IconComponent && (
-                <IconComponent className="w-12 h-12 text-zinc-700 dark:text-zinc-400 flex-shrink-0" />
+                <IconComponent
+                  className="w-12 h-12 flex-shrink-0"
+                  color="primary"
+                />
               )}
               <div
                 className={cn(
@@ -136,8 +144,9 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                 )}
               >
                 <Typography
+                  color="primary"
                   className={cn(
-                    "font-semibold text-base text-sky-700 dark:text-sky-600",
+                    "font-semibold text-base",
                     isCompact && "font-bold",
                   )}
                   noWrap
@@ -153,7 +162,8 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                 <div className="flex gap-2 items-center text-zinc-700 text-sm w-fit flex-shrink">
                   <Typography
                     noWrap
-                    className="text-zinc-900 dark:text-zinc-300 font-normal"
+                    color="text.primary"
+                    className="font-normal"
                   >
                     {dish.nutritionInfo.calories == null
                       ? "-"
@@ -172,9 +182,10 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                 </div>
                 <Typography
                   noWrap
+                  color="text.primary"
                   className={cn(
-                    "text-zinc-900 text-sm font-normal dark:text-zinc-300",
-                    !dish.description && "italic text-zinc-700",
+                    "text-sm font-normal",
+                    !dish.description && "italic",
                   )}
                 >
                   {dish.description

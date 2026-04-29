@@ -1,7 +1,7 @@
 "use client";
 
 import CloseIcon from "@mui/icons-material/Close";
-import { Drawer, IconButton } from "@mui/material";
+import { Drawer, IconButton, Typography } from "@mui/material";
 import MobileCalorieCard from "@/components/ui/mobile-calorie-card";
 import MobileNutritionBars from "@/components/ui/mobile-nutrition-bars";
 import type { LoggedMealJoinedWithNutrition } from "@/components/ui/nutrition-breakdown";
@@ -56,13 +56,17 @@ export default function TrackerHistoryDrawer({
           borderTopRightRadius: "16px",
           maxHeight: "85vh",
         },
+        ".dark & .MuiDrawer-paper": {
+          backgroundImage: "none",
+          backgroundColor: "#303035",
+        },
       }}
     >
       <div className="p-4 flex flex-col gap-4 overflow-y-auto">
         <div className="flex items-center justify-between">
-          <span className="font-semibold text-sky-700 text-lg">
+          <Typography fontWeight={600} color="primary" fontSize="1.125rem">
             What you ate on {dateLabel}
-          </span>
+          </Typography>
           <IconButton onClick={onClose} size="small">
             <CloseIcon />
           </IconButton>

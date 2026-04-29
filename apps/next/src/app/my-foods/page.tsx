@@ -1,7 +1,15 @@
 "use client";
 
-import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import {
+  Box,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Typography,
+} from "@mui/material";
 import type { DishInfo } from "@peterplate/api";
+import { useTheme } from "next-themes";
 import { useMemo, useState } from "react";
 import MyFoodsCard from "@/components/ui/card/my-foods-card";
 import FoodCardSkeleton from "@/components/ui/skeleton/food-card-skeleton";
@@ -45,6 +53,7 @@ export default function MyFoodsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOption, setSortOption] = useState<SortOption>("recent");
   const [showMobileSort, setShowMobileSort] = useState(false);
+  const { resolvedTheme } = useTheme();
 
   const {
     favorites,
@@ -138,36 +147,51 @@ export default function MyFoodsPage() {
   const hasError = !!favoritesError || !!ratedError;
 
   return (
-    <div
+    <Box
       className={`mx-auto flex max-w-7xl flex-col gap-4 px-4 pb-8 ${isDesktop ? "pt-20" : ""} sm:px-6 lg:px-8`}
+      sx={{ bgcolor: "background.default", minHeight: "100vh" }}
     >
       {/* Header */}
       <header className="space-y-1">
-        <h1 className="text-4xl text-sky-700 font-bold mb-4">My Foods</h1>
-        <p className="hidden text-sm md:block">
+        <Typography color="primary" fontWeight={700} className="text-4xl mb-4">
+          My Foods
+        </Typography>
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          className="hidden md:block"
+        >
           View all the dishes you have favorited or rated across UCI dining
           halls!
-        </p>
+        </Typography>
       </header>
 
       {/* Filter bar */}
       {isDesktop ? (
         /* ── Desktop: single row ── */
-        <div className="flex flex-row flex-wrap items-center gap-4 rounded-2xl bg-sky-100 p-4">
+        <div className="flex flex-row flex-wrap items-center gap-4 rounded-2xl bg-sky-100 dark:bg-[#434e5d] p-4">
           {/* Location */}
           <div className="flex flex-col gap-1.5 flex-shrink-0">
-            <span className="text-sm font-medium">Location</span>
+            <Typography variant="body2" fontWeight={500} color="text.primary">
+              Location
+            </Typography>
             <div className="flex flex-row gap-2">
               {(Object.keys(LOCATION_LABELS) as LocationFilter[]).map((loc) => (
                 <button
                   key={loc}
                   type="button"
                   onClick={() => setLocationFilter(loc)}
+                  style={{
+                    color:
+                      locationFilter === loc
+                        ? undefined
+                        : "var(--mui-palette-text-primary)",
+                  }}
                   className={cn(
                     "rounded-lg px-4 py-1.5 h-8 text-sm font-medium transition whitespace-nowrap",
                     locationFilter === loc
-                      ? "bg-sky-700 text-white shadow-sm"
-                      : "bg-white border border-sky-700 hover:bg-zinc-100",
+                      ? "bg-sky-700 dark:bg-blue-300 text-white dark:text-gray-900 shadow-sm"
+                      : "bg-white dark:bg-transparent border border-sky-700 dark:border-blue-300 hover:bg-zinc-100 dark:hover:bg-blue-300/10",
                   )}
                 >
                   {LOCATION_LABELS[loc]}
@@ -180,7 +204,7 @@ export default function MyFoodsPage() {
             {/* Search */}
             <div className="relative w-64">
               <svg
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-zinc-400 pointer-events-none"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth={2}
@@ -195,7 +219,7 @@ export default function MyFoodsPage() {
                 placeholder="Search meals..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-sky-700 bg-white focus:ring-2 focus:ring-sky-700 focus:outline-none"
+                className="w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-sky-700 dark:border-blue-300 !bg-white dark:!bg-[#323235] dark:!text-white focus:ring-2 focus:ring-sky-700 dark:focus:ring-blue-300 focus:outline-none"
               />
             </div>
 
@@ -209,7 +233,7 @@ export default function MyFoodsPage() {
                 <InputLabel
                   id="sort-label"
                   shrink
-                  className="!text-sky-700 !text-sm !font-semibold [&.Mui-focused]:!text-sky-700"
+                  className="!text-sky-700 dark:!text-blue-300 !text-sm !font-semibold [&.Mui-focused]:!text-sky-700 dark:[&.Mui-focused]:!text-blue-300"
                 >
                   Filter by
                 </InputLabel>
@@ -217,7 +241,32 @@ export default function MyFoodsPage() {
                   value={sortOption}
                   onChange={(e) => setSortOption(e.target.value as SortOption)}
                   label="Filter by"
-                  className="!h-9 !text-sm !rounded-xl !bg-white [&_.MuiOutlinedInput-notchedOutline]:!border-sky-700 [&:hover_.MuiOutlinedInput-notchedOutline]:!border-sky-700 [&.Mui-focused_.MuiOutlinedInput-notchedOutline]:!border-sky-700 [&_.MuiSelect-select]:!py-1.5"
+                  MenuProps={{
+                    PaperProps: {
+                      sx: {
+                        bgcolor:
+                          resolvedTheme === "dark" ? "#323235" : undefined,
+                        backgroundImage: "none",
+                        "& .MuiMenuItem-root": {
+                          color: resolvedTheme === "dark" ? "white" : undefined,
+                        },
+                        "& .MuiMenuItem-root:hover": {
+                          bgcolor:
+                            resolvedTheme === "dark" ? "#434e5d" : undefined,
+                        },
+                        "& .MuiMenuItem-root.Mui-selected": {
+                          bgcolor:
+                            resolvedTheme === "dark" ? "#93C5FD" : "#0369a1",
+                          color: resolvedTheme === "dark" ? "#111827" : "white",
+                        },
+                        "& .MuiMenuItem-root.Mui-selected:hover": {
+                          bgcolor:
+                            resolvedTheme === "dark" ? "#93C5FD" : "#0369a1",
+                        },
+                      },
+                    },
+                  }}
+                  className="!h-9 !text-sm !rounded-xl !bg-white dark:!bg-[#323235] dark:!text-white [&_.MuiOutlinedInput-notchedOutline]:!border-sky-700 dark:[&_.MuiOutlinedInput-notchedOutline]:!border-blue-300 [&:hover_.MuiOutlinedInput-notchedOutline]:!border-sky-700 dark:[&:hover_.MuiOutlinedInput-notchedOutline]:!border-blue-300 [&.Mui-focused_.MuiOutlinedInput-notchedOutline]:!border-sky-700 dark:[&.Mui-focused_.MuiOutlinedInput-notchedOutline]:!border-blue-300 [&_.MuiSelect-select]:!py-1.5"
                 >
                   {SORT_OPTIONS.map(({ value, label }) => (
                     <MenuItem key={value} value={value}>
@@ -231,7 +280,7 @@ export default function MyFoodsPage() {
         </div>
       ) : (
         /* ── Mobile: stacked layout ── */
-        <div className="flex flex-col gap-3 rounded-2xl bg-sky-100 p-4">
+        <div className="flex flex-col gap-3 rounded-2xl bg-sky-100 dark:bg-[#434e5d] p-4">
           {/* Location buttons — no label */}
           <div className="flex flex-row gap-2">
             {(Object.keys(LOCATION_LABELS) as LocationFilter[]).map((loc) => (
@@ -242,8 +291,8 @@ export default function MyFoodsPage() {
                 className={cn(
                   "rounded-lg px-2 py-1.5 h-8 text-sm font-medium transition whitespace-nowrap flex-1 min-w-0 truncate",
                   locationFilter === loc
-                    ? "bg-sky-700 text-white shadow-sm"
-                    : "bg-white border border-sky-700 hover:bg-zinc-100",
+                    ? "bg-sky-700 dark:bg-blue-300 text-white dark:text-gray-900 shadow-sm"
+                    : "bg-white dark:bg-transparent border border-sky-700 dark:border-blue-300 hover:bg-zinc-100 dark:hover:bg-blue-300/10",
                 )}
               >
                 {LOCATION_LABELS[loc]}
@@ -255,7 +304,7 @@ export default function MyFoodsPage() {
           <div className="flex flex-row gap-2 items-center">
             <div className="relative flex-1">
               <svg
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-zinc-400 pointer-events-none"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth={2}
@@ -270,7 +319,7 @@ export default function MyFoodsPage() {
                 placeholder="Search meals..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-sky-700 bg-white focus:ring-2 focus:ring-sky-700 focus:outline-none"
+                className="w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-sky-700 dark:border-blue-300 !bg-white dark:!bg-[#323235] dark:!text-white focus:ring-2 focus:ring-sky-700 dark:focus:ring-blue-300 focus:outline-none"
               />
             </div>
 
@@ -282,8 +331,8 @@ export default function MyFoodsPage() {
               className={cn(
                 "flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-xl border transition",
                 showMobileSort
-                  ? "bg-sky-700 border-sky-700 text-white"
-                  : "bg-white border-sky-700 text-sky-700 hover:bg-sky-50",
+                  ? "bg-sky-700 dark:bg-blue-300 border-sky-700 dark:border-blue-300 text-white dark:text-gray-900"
+                  : "bg-white dark:bg-transparent border-sky-700 dark:border-blue-300 hover:bg-sky-50 dark:hover:bg-blue-300/10",
               )}
             >
               {/* Filter / funnel icon */}
@@ -312,11 +361,19 @@ export default function MyFoodsPage() {
                   key={value}
                   type="button"
                   onClick={() => setSortOption(value)}
+                  style={{
+                    color:
+                      sortOption === value
+                        ? undefined
+                        : resolvedTheme === "dark"
+                          ? "white"
+                          : "black",
+                  }}
                   className={cn(
                     "rounded-lg px-3 py-1.5 text-xs font-medium transition whitespace-nowrap border",
                     sortOption === value
-                      ? "bg-sky-700 text-white border-sky-700 shadow-sm"
-                      : "bg-white border-sky-700 text-sky-700 hover:bg-sky-50",
+                      ? "bg-sky-700 dark:bg-blue-300 text-white dark:text-gray-900 border-sky-700 dark:border-blue-300 shadow-sm"
+                      : "bg-white dark:bg-transparent border-sky-700 dark:border-blue-300 hover:bg-sky-50 dark:hover:bg-blue-300/10",
                   )}
                 >
                   {label}
@@ -346,21 +403,24 @@ export default function MyFoodsPage() {
       {/* Content */}
       {!isLoading && !hasError && (
         <>
-          <p className="text-sm">
+          <Typography variant="body2" color="text.primary">
             Showing <span>{filteredEntries.length}</span>{" "}
             {filteredEntries.length === 1 ? "dish" : "dishes"}
-          </p>
+          </Typography>
 
           {filteredEntries.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-zinc-200 bg-white/60 px-6 py-16 text-center shadow-sm">
-              <p className="text-lg font-medium text-zinc-800">
+            <div className="rounded-2xl border border-dashed border-zinc-200 dark:border-zinc-600 bg-white/60 dark:bg-[#323235] px-6 py-16 text-center shadow-sm">
+              <Typography variant="body1" fontWeight={500} color="text.primary">
                 No dishes found
-              </p>
-              <p className="mt-2 text-sm text-zinc-500">
+              </Typography>
+              <Typography
+                variant="body2"
+                className="mt-2 text-zinc-500 dark:text-zinc-400"
+              >
                 {mergedEntries.length === 0
                   ? "You haven't favorited or rated any meals yet. Browse the menus to get started!"
                   : "No dishes match your current filters. Try adjusting your search or location."}
-              </p>
+              </Typography>
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-10">
@@ -378,6 +438,6 @@ export default function MyFoodsPage() {
           )}
         </>
       )}
-    </div>
+    </Box>
   );
 }

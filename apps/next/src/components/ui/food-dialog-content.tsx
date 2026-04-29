@@ -2,7 +2,7 @@
 
 import { Add, StarBorder } from "@mui/icons-material";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
-import { Button, DialogContent, Tooltip } from "@mui/material";
+import { Box, Button, DialogContent, Tooltip, Typography } from "@mui/material";
 import type { DishInfo } from "@peterplate/api";
 import Image from "next/image";
 import { useState } from "react";
@@ -86,7 +86,7 @@ export default function FoodDialogContent({
   const userId = useUserStore((s) => s.userId);
 
   return (
-    <div className="font-poppins flex flex-col max-h-[90vh]">
+    <div className="font-poppins flex flex-col max-h-[90vh] dark:bg-[#303035]">
       {showImage ? (
         <Image
           src={dish.image_url as string}
@@ -121,21 +121,23 @@ export default function FoodDialogContent({
                 className="flex justify-between px-4 items-center"
                 id="food-header-info"
               >
-                <div className="flex gap-3 items-center pr-2">
-                  <h2
+                <div className="flex gap-3 items-center">
+                  <Typography
+                    variant="h5"
+                    fontWeight={700}
+                    color="primary"
                     className={cn(
-                      "text-3xl font-bold leading-tight tracking-normal",
-                      "text-sky-700 dark:text-sky-600",
+                      "leading-tight tracking-normal",
                       dish.name.length > 10 && "text-2xl",
                       dish.name.length > 30 && "text-md",
                     )}
                   >
                     {formatFoodName(dish.name)}
-                  </h2>
+                  </Typography>
                 </div>
                 <Rating dishId={dish.id} />
               </div>
-              <div className="px-4 flex flex-wrap items-center gap-2 text-zinc-500 dark:text-zinc-400">
+              <Box className="px-4 flex flex-wrap items-center gap-2 text-zinc-500 dark:text-zinc-400">
                 <span className="whitespace-nowrap flex items-center gap-1">
                   <StarBorder
                     className="w-4 h-4 stroke-zinc-400"
@@ -174,15 +176,22 @@ export default function FoodDialogContent({
                       />
                     ))}
                 </div>
-              </div>
-              <p className="text-black dark:text-zinc-300 px-4 leading-relaxed">
+              </Box>
+              <Typography className="px-4 leading-relaxed" color="text.primary">
                 {enhanceDescription(dish.name, dish.description)}
-              </p>
+              </Typography>
               <div>
-                <h1 className="px-4 text-2xl font-bold">Nutrients</h1>
-                <div
-                  className="grid grid-cols-2 gap-x-4 w-full px-4 text-black mb-4"
+                <Typography
+                  fontWeight={700}
+                  className="px-4"
+                  sx={{ fontSize: "1.5rem" }}
+                >
+                  Nutrients
+                </Typography>
+                <Box
+                  className="grid grid-cols-2 gap-x-4 w-full px-4 mb-4"
                   id="nutrient-content"
+                  sx={{ color: "text.primary" }}
                 >
                   {caloricInformationAvailable &&
                     Object.keys(dish.nutritionInfo)
@@ -215,7 +224,7 @@ export default function FoodDialogContent({
                                 "col-span-1",
                                 (nutrientKey === "transFatG" ||
                                   nutrientKey === "saturatedFatG") &&
-                                  "text-zinc-500 pl-4",
+                                  "text-gray-500 dark:text-zinc-400 pl-4",
                               )}
                             >
                               {formatNutrientLabel(nutrientKey)}
@@ -225,7 +234,7 @@ export default function FoodDialogContent({
                                 "col-span-1 text-right",
                                 (nutrientKey === "transFatG" ||
                                   nutrientKey === "saturatedFatG") &&
-                                  "text-zinc-500",
+                                  "text-gray-500 dark:text-zinc-400",
                               )}
                             >
                               {value == null
@@ -235,7 +244,7 @@ export default function FoodDialogContent({
                           </div>
                         );
                       })}
-                </div>
+                </Box>
                 {!caloricInformationAvailable && (
                   <h2 className="text-center w-full my-10 text-sm text-zinc-600">
                     Nutritional information not available.
@@ -300,7 +309,7 @@ export default function FoodDialogContent({
                 <button
                   type="button"
                   disabled={true}
-                  className="w-full inline-flex h-[30px] justify-center items-center gap-0.5 rounded-md border border-gray-300 bg-white text-[12px] font-normal leading-[18px] text-zinc-500 hover:bg-zinc-50 disabled:opacity-60"
+                  className="w-full inline-flex h-[30px] justify-center items-center gap-0.5 rounded-md border border-gray-300 dark:border-zinc-600 bg-white dark:bg-transparent text-[12px] font-normal leading-[18px] text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-700 disabled:opacity-60"
                 >
                   <Add sx={{ fontSize: 18, width: 18, height: 18 }} />
                   Add to Meal Tracker
@@ -314,7 +323,7 @@ export default function FoodDialogContent({
                 type="button"
                 onClick={onAddToMealTracker}
                 disabled={isAddingToMealTracker}
-                className="w-full inline-flex h-[30px] justify-center items-center gap-0.5 rounded-md border border-gray-300 bg-white text-[12px] font-normal leading-[18px] text-zinc-500 hover:bg-zinc-50 disabled:opacity-60"
+                className="w-full inline-flex h-[30px] justify-center items-center gap-0.5 rounded-md border border-gray-500 dark:border-zinc-300 bg-white dark:bg-transparent text-[12px] font-normal leading-[18px] text-zinc-500 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700 disabled:opacity-60"
                 style={{ fontFamily: "Poppins, sans-serif" }}
               >
                 <Add sx={{ fontSize: 18, width: 18, height: 18 }} />

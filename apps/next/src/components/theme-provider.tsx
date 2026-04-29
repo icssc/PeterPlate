@@ -28,8 +28,17 @@ const theme = createTheme({
     dark: {
       palette: {
         primary: {
-          main: twColors.sky["800"],
+          main: twColors.blue["300"],
         },
+        background: {
+          default: twColors.zinc["800"],
+          paper: twColors.zinc["700"],
+        },
+        text: {
+          primary: twColors.zinc["50"],
+          secondary: twColors.zinc["50"], //twColors.zinc["400"],
+        },
+        divider: twColors.zinc["700"],
       },
     },
   },

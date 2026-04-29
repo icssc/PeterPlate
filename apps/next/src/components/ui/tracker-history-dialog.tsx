@@ -60,9 +60,13 @@ export default function TrackerHistoryDialog({
           width: "700px",
           maxWidth: "700px",
         },
+        ".dark & .MuiDialog-paper": {
+          backgroundImage: "none",
+          backgroundColor: "#303035",
+        },
       }}
     >
-      <DialogTitle className="!font-semibold !text-sky-700">
+      <DialogTitle className="!font-semibold !text-sky-700 dark:!text-blue-300">
         What you ate on {dateLabel}
       </DialogTitle>
       <DialogContent>
@@ -87,7 +91,7 @@ export default function TrackerHistoryDialog({
         <Button
           onClick={onClose}
           variant="contained"
-          className="!bg-sky-700 !text-white !text-sm !font-semibold hover:!bg-sky-800 !rounded-lg !px-3 !py-1 !normal-case"
+          className="!bg-sky-700 !text-white !text-sm !font-semibold hover:!bg-sky-800 !rounded-lg !px-3 !py-1 !normal-case dark:!bg-blue-300 dark:!text-gray-900 dark:hover:!bg-blue-400"
         >
           Close
         </Button>

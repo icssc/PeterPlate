@@ -16,14 +16,19 @@ function MacroBar({ label, value, max, unit }: MacroBarProps) {
   const percent = Math.min((value / max) * 100, 100);
   return (
     <div className="flex items-center gap-4">
-      <span className="text-sky-700 font-semibold w-16">{label}</span>
-      <div className="flex-1 bg-white rounded-full h-3">
+      <span className="text-sky-700 dark:text-blue-300 font-semibold w-16">
+        {label}
+      </span>
+      <div className="flex-1 bg-white dark:bg-[#27272A] rounded-full h-3">
         <div
           className="h-3 rounded-full"
-          style={{ width: `${percent}%`, backgroundColor: "#0084D1" }}
+          style={{
+            width: `${percent}%`,
+            backgroundColor: "var(--mui-palette-primary-main)",
+          }}
         />
       </div>
-      <span className="text-sm text-zinc-500 w-24 text-right">
+      <span className="text-sm text-zinc-500 dark:text-white w-24 text-right">
         {Math.round(value)}
         {unit} / {max}
         {unit}
@@ -48,7 +53,7 @@ export default function MobileNutritionBars({
   const nutrition = compileMealData(mealsEaten);
 
   return (
-    <div className="bg-sky-100 rounded-xl p-4 flex flex-col gap-4 w-full">
+    <div className="bg-sky-100 dark:bg-[#8EC5FF33] rounded-xl p-4 flex flex-col gap-4 w-full">
       <MacroBar
         label="Protein"
         value={nutrition.protein_g}
