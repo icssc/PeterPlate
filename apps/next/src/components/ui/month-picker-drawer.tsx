@@ -2,7 +2,6 @@
 
 import CloseIcon from "@mui/icons-material/Close";
 import { Drawer } from "@mui/material";
-import Button from "@mui/material/Button";
 import { useMemo } from "react";
 
 interface MonthPickerDrawerProps {
@@ -114,23 +113,6 @@ const MonthPickerDrawer = ({
               </div>
             ))
           )}
-        </div>
-
-        <div className="fixed bottom-0 left-0 w-full p-4 bg-white dark:bg-zinc-950 border-t border-slate-200 dark:border-zinc-800 flex gap-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-          <Button
-            variant="outlined"
-            onClick={onClose}
-            className="flex-1 !normal-case !text-slate-800 !border-slate-300 !rounded-lg !py-3 dark:!text-zinc-200 dark:!border-zinc-700"
-          >
-            Back
-          </Button>
-          <Button
-            variant="contained"
-            onClick={onClose}
-            className="flex-1 !normal-case !bg-sky-700 !text-white !rounded-lg !py-3"
-          >
-            Jump
-          </Button>
         </div>
       </div>
     </Drawer>
