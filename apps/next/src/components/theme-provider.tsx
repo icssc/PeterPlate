@@ -7,42 +7,29 @@ import {
   StyledEngineProvider,
 } from "@mui/material/styles";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter";
-import { ThemeProvider as NextThemesProvider, useTheme } from "next-themes";
-import { useMemo } from "react";
+import { ThemeProvider as NextThemesProvider } from "next-themes";
 import resolveConfig from "tailwindcss/resolveConfig";
 import tailwindConfig from "../../tailwind.config";
 
 const twColors = resolveConfig(tailwindConfig).theme.colors;
 
-function MuiThemeWrapper({ children }: { children: React.ReactNode }) {
-  const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
-
-  const theme = useMemo(
-    () =>
-      createTheme({
-        palette: {
-          mode: isDark ? "dark" : "light",
-          primary: {
-            main: isDark ? twColors.sky["800"] : twColors.sky["700"],
-          },
-        },  
+const theme = createTheme({
+  cssVariables: {
+    colorSchemeSelector: "class",
+  },
+  colorSchemes: {
+    light: {
+      palette: {
+        primary: {
+          main: twColors.sky["700"],
+        },
       },
     },
     dark: {
       palette: {
         primary: {
-          main: twColors.blue["300"],
+          main: twColors.sky["800"],
         },
-        background: {
-          default: twColors.zinc["800"],
-          paper: twColors.zinc["700"],
-        },
-        text: {
-          primary: twColors.zinc["50"],
-          secondary: twColors.zinc["50"], //twColors.zinc["400"],
-        },
-        divider: twColors.zinc["700"],
       },
     },
   },
@@ -60,7 +47,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
           defaultTheme="system"
           enableSystem
         >
-          <MuiThemeWrapper>{children}</MuiThemeWrapper>
+          <MUIThemeProvider theme={theme}>
+            <CssBaseline />
+            {children}
+          </MUIThemeProvider>
         </NextThemesProvider>
       </AppRouterCacheProvider>
     </StyledEngineProvider>
