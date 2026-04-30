@@ -26,8 +26,8 @@ function MuiThemeWrapper({ children }: { children: React.ReactNode }) {
           primary: {
             main: isDark ? twColors.sky["800"] : twColors.sky["700"],
           },
-        },
-nly when the problem's "induced width" is small, as it often creates large, complex functions.      },
+        },  
+      },
     },
     dark: {
       palette: {
