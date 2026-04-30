@@ -5,10 +5,11 @@ import {
   createTheme,
   ThemeProvider as MUIThemeProvider,
   StyledEngineProvider,
+  useColorScheme,
 } from "@mui/material/styles";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter";
 import { ThemeProvider as NextThemesProvider, useTheme } from "next-themes";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import resolveConfig from "tailwindcss/resolveConfig";
 import tailwindConfig from "../../tailwind.config";
 
@@ -16,16 +17,22 @@ const twColors = resolveConfig(tailwindConfig).theme.colors;
 
 function MuiThemeWrapper({ children }: { children: React.ReactNode }) {
   const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
+  const { setMode } = useColorScheme();
+  const [mounted, setMounted] = useState(false);
+
+  // Sync next-themes state to MUI internal state
+  useEffect(() => {
+    setMounted(true);
+    if (resolvedTheme) {
+      setMode(resolvedTheme as "light" | "dark");
+    }
+  }, [resolvedTheme, setMode]);
 
   const theme = useMemo(
     () =>
       createTheme({
         cssVariables: {
           colorSchemeSelector: "class",
-        },
-        palette: {
-          mode: isDark ? "dark" : "light",
         },
         colorSchemes: {
           light: {
@@ -56,11 +63,16 @@ function MuiThemeWrapper({ children }: { children: React.ReactNode }) {
           fontFamily: "var(--font-poppins), sans-serif",
         },
       }),
-    [isDark],
+    [],
   );
 
+  if (!mounted) return null;
+
   return (
-    <MUIThemeProvider theme={theme}>
+    <MUIThemeProvider
+      theme={theme}
+      defaultMode={resolvedTheme as "light" | "dark"}
+    >
       <CssBaseline />
       {children}
     </MUIThemeProvider>
