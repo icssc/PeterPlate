@@ -27,20 +27,29 @@ function MuiThemeWrapper({ children }: { children: React.ReactNode }) {
             main: isDark ? twColors.sky["800"] : twColors.sky["700"],
           },
         },
-        typography: {
-          fontFamily: "var(--font-poppins), sans-serif",
+nly when the problem's "induced width" is small, as it often creates large, complex functions.      },
+    },
+    dark: {
+      palette: {
+        primary: {
+          main: twColors.blue["300"],
         },
-      }),
-    [isDark],
-  );
-
-  return (
-    <MUIThemeProvider theme={theme}>
-      <CssBaseline />
-      {children}
-    </MUIThemeProvider>
-  );
-}
+        background: {
+          default: twColors.zinc["800"],
+          paper: twColors.zinc["700"],
+        },
+        text: {
+          primary: twColors.zinc["50"],
+          secondary: twColors.zinc["50"], //twColors.zinc["400"],
+        },
+        divider: twColors.zinc["700"],
+      },
+    },
+  },
+  typography: {
+    fontFamily: "var(--font-poppins), sans-serif",
+  },
+});
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   return (

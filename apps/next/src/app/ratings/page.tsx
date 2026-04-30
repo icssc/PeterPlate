@@ -1,5 +1,6 @@
 "use client";
 
+import { Typography } from "@mui/material";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -56,7 +57,15 @@ export default function RatedFoods() {
         >
           <MealDivider title="My Rated Foods" />
 
-          {isLoading && <p className="text-center">Loading your ratings...</p>}
+          {isLoading && (
+            <Typography
+              variant="body1"
+              color="text.secondary"
+              className="text-center"
+            >
+              Loading your ratings...
+            </Typography>
+          )}
 
           {error && (
             <p className="text-red-500 w-full text-center">
@@ -71,9 +80,13 @@ export default function RatedFoods() {
                 <RatingsCard key={`${food.id}|${food.ratedAt}`} food={food} />
               ))
             ) : (
-              <p className="text-center text-zinc-700 py-5">
+              <Typography
+                variant="body1"
+                color="text.secondary"
+                className="text-center py-5"
+              >
                 You haven't rated any foods yet
-              </p>
+              </Typography>
             ))}
           {!isLoading &&
             !error &&
