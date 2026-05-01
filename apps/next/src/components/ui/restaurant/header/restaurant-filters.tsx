@@ -1,9 +1,12 @@
+"use client";
+
 import { ArrowDropDownRounded } from "@mui/icons-material";
 import {
   FormControl,
   InputLabel,
   MenuItem,
   Select,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -12,7 +15,9 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import type { DateList } from "@peterplate/db";
 import { useTheme } from "next-themes";
 import type { CalendarRange } from "@/components/ui/toolbar";
+import { useUserStore } from "@/context/useUserStore";
 import { formatOpenCloseTime, isSameDay, toTitleCase } from "@/utils/funcs";
+import { cn } from "@/utils/tw";
 
 interface RestaurantFiltersProps {
   isDesktop: boolean;
@@ -46,6 +51,27 @@ export function RestaurantFilters({
   setShowPreferencesOnly,
 }: RestaurantFiltersProps) {
   const { resolvedTheme } = useTheme();
+  const { userId } = useUserStore();
+  const ShowPrefsButton = (
+    <button
+      type="button"
+      onClick={() => setShowPreferencesOnly(!showPreferencesOnly)}
+      disabled={userId === null}
+      className={cn(
+        "h-[40px] rounded-md border text-sm font-medium transition-all duration-200 w-full",
+        userId === null && "text-black/50 border-sky-700/50",
+        isDesktop && "w-[240px]",
+        showPreferencesOnly &&
+          "bg-sky-700 text-white border-sky-700 shadow-md dark:bg-blue-300 dark:text-gray-900 dark:border-blue-300",
+        !showPreferencesOnly &&
+          userId &&
+          "bg-white text-sky-700 border-sky-700 hover:bg-sky-50 dark:bg-[#27272A] dark:text-blue-300 dark:border-blue-300 dark:hover:bg-zinc-700",
+      )}
+    >
+      Show Preferences Only
+    </button>
+  );
+
   return (
     <div className={isDesktop ? "flex gap-2" : "grid grid-cols-2 gap-2 w-full"}>
       <div className={isDesktop ? "w-52" : "w-full"}>
@@ -197,20 +223,12 @@ export function RestaurantFilters({
       )}
 
       <div>
-        <button
-          type="button"
-          onClick={() => setShowPreferencesOnly(!showPreferencesOnly)}
-          className={`${isDesktop ? "w-[240px]" : "w-full"}
-            h-[40px] rounded-md border text-sm font-medium transition-all duration-200
-            ${
-              showPreferencesOnly
-                ? "bg-sky-700 text-white border-sky-700 shadow-md dark:bg-blue-300 dark:text-gray-900 dark:border-blue-300"
-                : "bg-white text-sky-700 border-sky-700 hover:bg-sky-50 dark:bg-[#27272A] dark:text-blue-300 dark:border-blue-300 dark:hover:bg-zinc-700"
-            }
-          `}
-        >
-          Show Preferences Only
-        </button>
+        {!userId && (
+          <Tooltip title="Log in to filter by preferences!" placement="top">
+            {ShowPrefsButton}
+          </Tooltip>
+        )}
+        {userId && ShowPrefsButton}
       </div>
     </div>
   );

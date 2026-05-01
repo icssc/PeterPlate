@@ -6,7 +6,7 @@ import { Typography } from "@mui/material";
 import Button from "@mui/material/Button";
 import { useState } from "react";
 import { trpc } from "@/utils/trpc";
-// @ts-ignore
+// @ts-expect-error
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { addMonths, endOfMonth, startOfMonth, subMonths } from "date-fns";
 import CalendarView from "@/components/ui/calendar-view";
@@ -115,7 +115,9 @@ const Events = () => {
               dining halls!
             </Typography>
             <div className="flex gap-2 mt-3 items-center">
-              <span className="text-sm font-medium text-slate-900 dark:text-white">View:</span>
+              <span className="text-sm font-medium text-slate-900 dark:text-white">
+                View:
+              </span>
 
               {/* Grid View Button */}
               <Button
@@ -281,7 +283,11 @@ const Events = () => {
                 ))}
               </div>
               {filteredEvents.length === 0 && (
-                <Typography variant="body1" color="text.secondary" className="text-center py-5">
+                <Typography
+                  variant="body1"
+                  color="text.secondary"
+                  className="text-center py-5"
+                >
                   No events found :(
                 </Typography>
               )}

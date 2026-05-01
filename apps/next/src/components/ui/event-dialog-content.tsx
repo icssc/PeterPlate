@@ -5,7 +5,12 @@ import { Box, Button, DialogContent, Typography } from "@mui/material";
 import Image from "next/image";
 import type React from "react";
 import EventTypeBadge from "@/components/ui/event-type-badge";
-import { generateGCalLink, dateToString, timeToString, toTitleCase } from "@/utils/funcs";
+import {
+  dateToString,
+  generateGCalLink,
+  timeToString,
+  toTitleCase,
+} from "@/utils/funcs";
 import { HallEnum } from "@/utils/types";
 import type { EventInfo } from "./card/event-card";
 

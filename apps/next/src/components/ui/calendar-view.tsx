@@ -17,7 +17,7 @@ import { enUS } from "date-fns/locale";
 import { Calendar, dateFnsLocalizer } from "react-big-calendar";
 import EventDialogContent from "./event-dialog-content";
 import EventDrawerContent from "./event-drawer-content";
-// @ts-ignore
+// @ts-expect-error
 import "react-big-calendar/lib/css/react-big-calendar.css";
 
 const locales = {
