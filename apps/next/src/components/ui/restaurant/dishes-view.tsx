@@ -89,9 +89,7 @@ export function DishesView({
   }, [stations, preferences, allergies]);
 
   const getFilteredDishes = (dishes: any[]) => {
-    // console.log("running filtered dishes function")
     if (!showPreferencesOnly) return dishes;
-    console.log("showprefs only is true");
     console.log(
       "Preferences: ",
       dishes.map((d) => d.doesNotMeetPreferences),
