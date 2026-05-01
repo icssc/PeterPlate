@@ -1,5 +1,5 @@
 import { AccessTime, CalendarMonth, LocationOn } from "@mui/icons-material";
-import { Card, Dialog } from "@mui/material";
+import { Box, Card, Dialog, Typography } from "@mui/material";
 import { useState } from "react";
 import { timeToString, toTitleCase } from "@/utils/funcs";
 import { HallEnum, numToMonth } from "@/utils/types";
@@ -60,44 +60,48 @@ export default function UpcomingEventCard({
   return (
     <>
       <Card
-        className="w-full rounded-xl border border-neutral-200 dark:border-neutral-700 p-5 shadow-sm hover:shadow-md transition cursor-pointer text-left bg-transparent"
+        className="w-full rounded-xl p-5 shadow-sm hover:shadow-md transition cursor-pointer text-left bg-transparent"
+        sx={{ border: 1, borderColor: "divider" }}
         onClick={() => setOpen(true)}
       >
         <div className="mb-3 flex items-start gap-2 min-w-0">
-          <h3
-            className={`${titleSize} line-clamp-2 min-w-0 flex-1 whitespace-normal break-normal font-bold leading-tight text-sky-700`}
+          <Typography
+            className={`${titleSize} font-bold leading-tight pr-2 line-clamp-2 min-w-0 flex-1 whitespace-normal break-normal`}
+            color="primary"
           >
             {event.title}
-          </h3>
-          {/*           <span
-            className={`flex-shrink-0 ${tagSize} font-semibold uppercase tracking-wider bg-sky-100 text-sky-700 dark:bg-sky-900 dark:text-sky-300 px-2 py-0.5 rounded-full`}
+          </Typography>
+          <span
+            className={`flex-shrink-0 ${tagSize} font-semibold tracking-wider bg-sky-100 text-sky-700 dark:bg-transparent dark:border dark:border-blue-300 dark:text-blue-300 px-2 py-0.5 rounded-full`}
           >
             Celebration
-          </span> */}
+          </span>
         </div>
         <div className={spacing}>
           {startDate && (
             <>
-              <div className="flex items-center gap-1.5 text-xs text-neutral-500 dark:text-neutral-400">
+              <Box className="flex items-center gap-1.5">
                 <CalendarMonth style={{ fontSize: iconSize }} />
-                <span>
+                <Typography variant="caption" color="text.secondary">
                   {numToMonth[startDate.getMonth()]} {startDate.getDate()},{" "}
                   {startDate.getFullYear()}
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5 text-xs text-neutral-500 dark:text-neutral-400">
+                </Typography>
+              </Box>
+              <Box className="flex items-center gap-1.5">
                 <AccessTime style={{ fontSize: iconSize }} />
-                <span>
+                <Typography variant="caption" color="text.secondary">
                   {timeToString(startDate)}
                   {endDate ? ` - ${timeToString(endDate)}` : ""}
-                </span>
-              </div>
+                </Typography>
+              </Box>
             </>
           )}
-          <div className="flex items-center gap-1.5 text-xs text-neutral-500 dark:text-neutral-400">
+          <Box className="flex items-center gap-1.5">
             <LocationOn style={{ fontSize: iconSize }} />
-            <span>{toTitleCase(event.restaurantId)}</span>
-          </div>
+            <Typography variant="caption" color="text.secondary">
+              {toTitleCase(event.restaurantId)}
+            </Typography>
+          </Box>
         </div>
       </Card>
       <Dialog

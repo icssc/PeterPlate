@@ -1,0 +1,1 @@
+ALTER TABLE "user_goals" ALTER COLUMN "protein_goal" SET DEFAULT 100;
