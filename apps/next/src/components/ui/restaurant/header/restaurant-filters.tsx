@@ -60,6 +60,7 @@ export function RestaurantFilters({
         isDesktop && "w-[240px]",
         showPreferencesOnly && "bg-sky-700 text-white border-sky-700 shadow-md",
         !showPreferencesOnly &&
+          userId &&
           "bg-white text-sky-700 border-sky-700 hover:bg-sky-50",
       )}
     >
