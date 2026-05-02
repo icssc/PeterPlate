@@ -70,7 +70,7 @@ export default function UpcomingEventCard({
         onClick={() => setOpen(true)}
       >
         <div className="absolute top-2 right-0 h-14 w-48 scale-75 origin-top-right">
-          <div className="[&>span]:!bg-sky-100 [&>span]:!text-sky-700 [&>span]:!shadow-sm">
+          <div className="hidden md:block [&>span]:!bg-sky-100 [&>span]:!text-sky-700 [&>span]:!shadow-sm">
             <EventTypeBadge type={eventType} />
           </div>
         </div>
