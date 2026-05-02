@@ -10,6 +10,7 @@ export const EVENT_CATEGORIES = [
 export type EventCategory = (typeof EVENT_CATEGORIES)[number];
 
 const CULTURAL_KEYWORDS = [
+  "cultural",
   "heritage",
   "festival",
   "lunar",
@@ -19,12 +20,30 @@ const CULTURAL_KEYWORDS = [
   "cinco de mayo",
   "friendsgiving",
   "k-pop",
-  "pacific islander",
-  "filipino",
   "lunar new year",
-  "taste of hawaii",
+  "taste of",
   "celebration of",
   "festival of lights",
+
+  "mediterranean",
+  "italian",
+  "greek",
+  "european",
+  "asian",
+  "chinese",
+  "japanese",
+  "korean",
+  "vietnamese",
+  "thai",
+  "filipino",
+  "indian",
+  "middle eastern",
+  "african-american",
+  "hispanic",
+  "latin",
+  "mexican",
+  "caribbean",
+  "pacific islander",
 ];
 
 const CAMPUS_KEYWORDS = [
