@@ -1,5 +1,5 @@
 import { AccessTime, CalendarMonth, LocationOn } from "@mui/icons-material";
-import { Card, Dialog } from "@mui/material";
+import { Box, Card, Dialog, Typography } from "@mui/material";
 import { useState } from "react";
 import { classifyEvent } from "@/utils/classifyEvent";
 import { timeToString, toTitleCase } from "@/utils/funcs";
@@ -84,26 +84,28 @@ export default function UpcomingEventCard({
         <div className={spacing}>
           {startDate && (
             <>
-              <div className="flex items-center gap-1.5 text-xs text-neutral-500 dark:text-neutral-400">
+              <Box className="flex items-center gap-1.5">
                 <CalendarMonth style={{ fontSize: iconSize }} />
-                <span>
+                <Typography variant="caption" color="text.secondary">
                   {numToMonth[startDate.getMonth()]} {startDate.getDate()},{" "}
                   {startDate.getFullYear()}
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5 text-xs text-neutral-500 dark:text-neutral-400">
+                </Typography>
+              </Box>
+              <Box className="flex items-center gap-1.5">
                 <AccessTime style={{ fontSize: iconSize }} />
-                <span>
+                <Typography variant="caption" color="text.secondary">
                   {timeToString(startDate)}
                   {endDate ? ` - ${timeToString(endDate)}` : ""}
-                </span>
-              </div>
+                </Typography>
+              </Box>
             </>
           )}
-          <div className="flex items-center gap-1.5 text-xs text-neutral-500 dark:text-neutral-400">
+          <Box className="flex items-center gap-1.5">
             <LocationOn style={{ fontSize: iconSize }} />
-            <span>{toTitleCase(event.restaurantId)}</span>
-          </div>
+            <Typography variant="caption" color="text.secondary">
+              {toTitleCase(event.restaurantId)}
+            </Typography>
+          </Box>
         </div>
       </Card>
       <Dialog

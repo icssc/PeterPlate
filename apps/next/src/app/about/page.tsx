@@ -1,5 +1,6 @@
 "use client";
 
+import { Typography } from "@mui/material";
 import Image from "next/image";
 import Contributor from "@/components/ui/contributor";
 import { Button } from "@/components/ui/shadcn/button";
@@ -36,9 +37,14 @@ export default function About() {
       >
         <div className="flex flex-col" id="about-text">
           <div className="flex gap-4 items-center mb-2" id="about-header">
-            <h1 className="text-3xl font-bold" id="about-title">
+            <Typography
+              fontWeight={700}
+              color="primary"
+              id="about-title"
+              sx={{ fontSize: "1.875rem" }}
+            >
               About PeterPlate
-            </h1>
+            </Typography>
             <Image
               src="/peterplate-icon.webp"
               alt="PeterPlate's logo"
@@ -91,14 +97,16 @@ export default function About() {
             </p>
             <Dialog>
               <DialogTrigger asChild>
-                <Button className="w-fit">Privacy Policy</Button>
+                <Button className="w-fit bg-sky-700 text-white hover:bg-sky-800 dark:bg-blue-300 dark:text-gray-900 dark:hover:bg-blue-400">
+                  Privacy Policy
+                </Button>
               </DialogTrigger>
               <DialogContent className="w-md h-auto">
                 <DialogHeader>
-                  <DialogTitle className="p-4 text-center">
+                  <DialogTitle className="p-4 text-center text-sky-700 dark:text-blue-300">
                     Privacy Policy
                   </DialogTitle>
-                  <DialogDescription asChild className="p-4">
+                  <DialogDescription asChild className="p-4 dark:text-white">
                     <div>
                       <p className="mb-4">
                         PeterPlate is a cross-platform mobile application
@@ -127,9 +135,13 @@ export default function About() {
           </div>
         </div>
         <div className="flex flex-col items-center gap-4" id="contributors">
-          <h1 className="text-xl max-md:text-base max-sm:text-sm font-bold">
+          <Typography
+            fontWeight={700}
+            color="primary"
+            className="text-xl max-md:text-base max-sm:text-sm"
+          >
             Our Lovely Contributors
-          </h1>
+          </Typography>
           <div
             className="flex flex-wrap justify-center gap-2 max-w-xs"
             id="contributor-grid"
@@ -156,9 +168,13 @@ export default function About() {
                 />
               ))}
           </div>
-          <p className="text-sm italic font-light text-zinc-500">
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            className="italic font-light"
+          >
             .. you could be here!
-          </p>
+          </Typography>
         </div>
       </div>
     </div>

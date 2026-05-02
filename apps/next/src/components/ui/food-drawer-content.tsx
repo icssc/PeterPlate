@@ -2,7 +2,7 @@
 
 import { Add } from "@mui/icons-material";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
-import { Box, Button } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import type { DishInfo } from "@peterplate/api";
 import Image from "next/image";
 import { useState } from "react";
@@ -65,7 +65,7 @@ export default function FoodDrawerContent({
   ]);
 
   return (
-    <Box className="h-full max-h-[85vh] flex flex-col font-poppins min-h-0">
+    <Box className="h-full max-h-[85vh] flex flex-col font-poppins min-h-0 dark:bg-[#303035]">
       <Box className="pb-4 shrink-0">
         {showImage ? (
           <Image
@@ -87,19 +87,20 @@ export default function FoodDrawerContent({
         )}
         <Box className="px-4 pt-4 flex flex-col gap-2">
           <div className="flex items-center justify-between">
-            <h2
+            <Typography
+              fontWeight={700}
+              color="primary"
               className={cn(
-                "text-3xl font-bold leading-tight tracking-normal",
-                "text-sky-700 dark:text-sky-600",
+                "text-3xl leading-tight tracking-normal",
                 dish.name.length > 10 && "text-2xl",
                 dish.name.length > 30 && "text-md",
               )}
             >
               {formatFoodName(dish.name)}
-            </h2>
+            </Typography>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 text-zinc-500">
+          <div className="flex flex-wrap items-center gap-2 text-zinc-500 dark:text-zinc-400">
             <span className="whitespace-nowrap">
               {toTitleCase(dish.restaurant)} •{" "}
               {!caloricInformationAvailable
@@ -141,17 +142,24 @@ export default function FoodDrawerContent({
             <InteractiveStarRating dishId={dish.id} />
           </div>
 
-          <p className="text-black leading-relaxed">
+          <Typography color="text.primary" className="leading-relaxed">
             {enhanceDescription(dish.name, dish.description)}
-          </p>
+          </Typography>
         </Box>
       </Box>
 
       <Box className="flex-1 min-h-0 overflow-y-auto flex flex-col px-4">
-        <h1 className="text-2xl text-left font-bold mb-2">Nutrients</h1>
-        <div
-          className="grid grid-cols-2 gap-x-4 w-full px-2 text-black mb-4 auto-rows-max"
+        <Typography
+          fontWeight={700}
+          color="text.primary"
+          className="text-2xl mb-2"
+        >
+          Nutrients
+        </Typography>
+        <Box
+          className="grid grid-cols-2 gap-x-4 w-full px-2 mb-4 auto-rows-max"
           id="nutrient-content"
+          sx={{ color: "text.primary" }}
         >
           {caloricInformationAvailable &&
             Object.keys(dish.nutritionInfo)
@@ -177,7 +185,7 @@ export default function FoodDrawerContent({
                         "col-span-1 text-left",
                         (nutrientKey === "transFatG" ||
                           nutrientKey === "saturatedFatG") &&
-                          "text-gray-500 pl-4",
+                          "text-gray-500 dark:text-zinc-400 pl-4",
                       )}
                     >
                       {formatNutrientLabel(nutrientKey)}
@@ -187,7 +195,7 @@ export default function FoodDrawerContent({
                         "col-span-1 text-right",
                         (nutrientKey === "transFatG" ||
                           nutrientKey === "saturatedFatG") &&
-                          "text-gray-500",
+                          "text-gray-500 dark:text-zinc-400",
                       )}
                     >
                       {value == null
@@ -197,7 +205,7 @@ export default function FoodDrawerContent({
                   </div>
                 );
               })}
-        </div>
+        </Box>
         {!caloricInformationAvailable && (
           <h2 className="text-center w-full text-sm text-zinc-600">
             Nutritional information not available.
@@ -247,7 +255,7 @@ export default function FoodDrawerContent({
             type="button"
             onClick={onAddToMealTracker}
             disabled={isAddingToMealTracker}
-            className="w-full inline-flex h-[30px] justify-center items-center gap-0.5 rounded-md border border-gray-300 bg-white text-[12px] font-normal leading-[18px] text-zinc-500 hover:bg-zinc-50 disabled:opacity-60"
+            className="w-full inline-flex h-[30px] justify-center items-center gap-0.5 rounded-md border border-gray-300 dark:border-zinc-600 bg-white dark:bg-transparent text-[12px] font-normal leading-[18px] text-zinc-500 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700 disabled:opacity-60"
             style={{ fontFamily: "Poppins, sans-serif" }}
           >
             <Add sx={{ fontSize: 18, width: 18, height: 18 }} />
