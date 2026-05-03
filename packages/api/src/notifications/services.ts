@@ -1,5 +1,6 @@
-import type { Drizzle } from "@peterplate/db";
-import { pushTokens } from "@peterplate/db";
+import type { Drizzle, InsertPushSubscription } from "@peterplate/db";
+import { pushSubscriptions, pushTokens } from "@peterplate/db";
+import { eq } from "drizzle-orm";
 import type {
   ExpoPushErrorReceipt,
   ExpoPushMessage,
@@ -136,4 +137,30 @@ export async function handleNotificationReceipts(
       }
     }
   })();
+}
+
+export async function subscribeUser(
+  db: Drizzle,
+  subscription: InsertPushSubscription,
+): Promise<void> {
+  await db
+    .insert(pushSubscriptions)
+    .values(subscription)
+    .onConflictDoUpdate({
+      target: pushSubscriptions.userId,
+      set: {
+        endpoint: subscription.endpoint,
+        p256dh: subscription.p256dh,
+        auth: subscription.auth,
+      },
+    });
+}
+
+export async function unsubscribeUser(
+  db: Drizzle,
+  userId: string,
+): Promise<void> {
+  await db
+    .delete(pushSubscriptions)
+    .where(eq(pushSubscriptions.userId, userId));
 }
