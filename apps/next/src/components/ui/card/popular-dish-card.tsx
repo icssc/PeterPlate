@@ -1,6 +1,6 @@
 import type { DishInfo } from "@api/index";
 import { Star } from "@mui/icons-material";
-import { Card, Dialog } from "@mui/material";
+import { Box, Card, Dialog, Typography } from "@mui/material";
 import Image from "next/image";
 import { useState } from "react";
 import { formatFoodName, getFoodIcon, toTitleCase } from "@/utils/funcs";
@@ -35,11 +35,15 @@ export default function PopularDishCard({
   return (
     <>
       <Card
-        className="w-full h-full min-h-[210px] flex flex-col rounded-xl border border-neutral-200 dark:border-neutral-700 overflow-hidden shadow-sm hover:shadow-md transition cursor-pointer text-left bg-transparent p-0"
+        className="w-full h-full min-h-[210px] flex flex-col rounded-xl overflow-hidden shadow-sm hover:shadow-md transition cursor-pointer text-left bg-transparent p-0"
+        sx={{ border: 1, borderColor: "divider" }}
         onClick={() => setOpen(true)}
       >
         {/* Dish image */}
-        <div className="relative w-full aspect-[16/9] flex-shrink-0 bg-amber-50 dark:bg-neutral-800">
+        <Box
+          className="relative w-full aspect-[16/9] flex-shrink-0"
+          sx={{ bgcolor: "background.paper" }}
+        >
           {dish.image_url ? (
             <Image
               src={dish.image_url}
@@ -50,26 +54,29 @@ export default function PopularDishCard({
             />
           ) : (
             <div className="flex items-center justify-center w-full h-full">
-              <IconComponent
-                style={{ fontSize: 48 }}
-                className="text-slate-700"
-              />
+              <IconComponent style={{ fontSize: 48 }} color="primary" />
             </div>
           )}
-        </div>
+        </Box>
         <div className="flex flex-col flex-1 p-4">
-          <h3 className="text-sm font-semibold text-sky-700 leading-tight line-clamp-2 mb-1">
-            {formatFoodName(dish.name)}
-          </h3>
-          <p
-            className={`${descSize} text-neutral-500 dark:text-neutral-400 mb-1`}
+          <Typography
+            className="text-sm font-semibold leading-tight line-clamp-2 mb-1"
+            color="primary"
           >
+            {formatFoodName(dish.name)}
+          </Typography>
+          <Typography className={`${descSize} mb-1`} color="text.secondary">
             {hallName} • {toTitleCase(stationName)}
-          </p>
-          <div className="flex items-center gap-1 text-xs text-neutral-400 mt-auto">
+          </Typography>
+          <Box
+            className="flex items-center gap-1 mt-auto"
+            sx={{ color: "text.secondary" }}
+          >
             <Star style={{ fontSize: iconSize }} />
-            <span>{averageRating > 0 ? averageRating.toFixed(1) : "—"}</span>
-          </div>
+            <Typography variant="caption">
+              {averageRating > 0 ? averageRating.toFixed(1) : "—"}
+            </Typography>
+          </Box>
         </div>
       </Card>
       <Dialog
