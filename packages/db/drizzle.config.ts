@@ -22,6 +22,7 @@ export default defineConfig({
     "./src/schema/loggedMeals.ts",
     "./src/schema/periods.ts",
     "./src/schema/pushTokens.ts",
+    "./src/schema/pushNotifications.ts",
     "./src/schema/ratings.ts",
     "./src/schema/restaurants.ts",
     "./src/schema/stations.ts",

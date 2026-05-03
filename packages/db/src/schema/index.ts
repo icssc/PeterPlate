@@ -5,6 +5,7 @@ export * from "./dishes";
 export * from "./enums";
 export * from "./favorites";
 export * from "./loggedMeals";
+export * from "./pushNotifications";
 export * from "./pushTokens";
 export * from "./ratings";
 export * from "./userAllergies";
