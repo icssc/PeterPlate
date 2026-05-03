@@ -7,6 +7,7 @@ import Image from "next/image";
 import React from "react";
 import EventTypeBadge from "@/components/ui/event-type-badge";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import type { EventCategory } from "@/utils/classifyEvent";
 import { dateToString, timeToString, toTitleCase } from "@/utils/funcs";
 import { HallEnum } from "@/utils/types";
 import EventDialogContent from "../event-dialog-content";
@@ -35,6 +36,8 @@ export interface EventInfo {
   location: HallEnum;
   /** If true, indicates the event is currently ongoing and displays a badge. */
   isOngoing: boolean;
+  /** The category of the event, determined by its description. */
+  eventType: EventCategory;
 }
 
 /**
@@ -77,7 +80,7 @@ const EventCardContent = React.forwardRef<
             height={300}
             className="w-full object-contain"
           />
-          <EventTypeBadge title={props.name} />
+          <EventTypeBadge type={props.eventType} />
         </div>
         <CardContent className="flex flex-col gap-2 p-4">
           <div className="flex flex-row gap-2 items-center">

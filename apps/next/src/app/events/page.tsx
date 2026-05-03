@@ -13,7 +13,11 @@ import CalendarView from "@/components/ui/calendar-view";
 import EventCard, { type EventInfo } from "@/components/ui/card/event-card";
 import EventCardSkeleton from "@/components/ui/skeleton/event-card-skeleton";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-import { getEventType } from "@/utils/funcs";
+import {
+  classifyEvent,
+  EVENT_CATEGORIES,
+  type EventCategory,
+} from "@/utils/classifyEvent";
 import { HallEnum } from "@/utils/types";
 
 const Events = () => {
@@ -21,7 +25,7 @@ const Events = () => {
     "both" | "anteatery" | "brandywine"
   >("both");
   const [selectedEventType, setSelectedEventType] = useState<
-    "both" | "special" | "celebration"
+    "both" | EventCategory
   >("both");
   const [viewMode, setViewMode] = useState<"grid" | "calendar">("grid");
   const [selectedEventData, setSelectedEventData] = useState<EventInfo | null>(
@@ -39,15 +43,20 @@ const Events = () => {
     before: endOfMonth(currentDate),
   });
 
-  const sortedEvents =
-    (events?.length ?? 0) > 0
-      ? [...(events ?? [])].sort(
-          (a: any, b: any) =>
-            new Date(a.start).getTime() - new Date(b.start).getTime(),
-        )
-      : [];
+  const sortedEvents = (events ?? []).sort(
+    (a: any, b: any) =>
+      new Date(a.start).getTime() - new Date(b.start).getTime(),
+  );
 
-  const filteredEvents = sortedEvents.filter((event: any) => {
+  const eventsWithType = sortedEvents.map((event: any) => ({
+    ...event,
+    eventType: classifyEvent(
+      event.title,
+      `${event.shortDescription ?? ""} ${event.longDescription ?? ""}`,
+    ),
+  }));
+
+  const filteredEvents = eventsWithType.filter((event: any) => {
     const matchesDiningHall =
       selectedDiningHall === "both" ||
       (selectedDiningHall === "anteatery" &&
@@ -55,8 +64,7 @@ const Events = () => {
       (selectedDiningHall === "brandywine" &&
         event.restaurantId === "brandywine");
     const matchesEventType =
-      selectedEventType === "both" ||
-      getEventType(event.title) === selectedEventType;
+      selectedEventType === "both" || event.eventType === selectedEventType;
     return matchesDiningHall && matchesEventType;
   });
 
@@ -85,6 +93,7 @@ const Events = () => {
           ? HallEnum.ANTEATERY
           : HallEnum.BRANDYWINE,
       isOngoing: resource.start <= now && resource.end >= now,
+      eventType: resource.eventType,
     });
   };
 
@@ -156,7 +165,7 @@ const Events = () => {
                 <span className="text-sm font-medium text-slate-900 dark:text-white">
                   Event Type
                 </span>
-                <div className="flex gap-3">
+                <div className="flex flex-wrap gap-3">
                   <Button
                     variant="outlined"
                     size="small"
@@ -169,37 +178,32 @@ const Events = () => {
                   >
                     All Events
                   </Button>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={() => setSelectedEventType("special")}
-                    className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
-                      selectedEventType === "special"
-                        ? "!bg-sky-700 !text-white !border-sky-700 hover:!bg-sky-800 dark:!bg-blue-300 dark:!text-gray-900 dark:!border-blue-300 dark:hover:!bg-blue-400"
-                        : "!bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50 dark:!bg-transparent dark:!border-blue-300 dark:!text-white dark:hover:!bg-zinc-700"
-                    }`}
-                  >
-                    Special Meals
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={() => setSelectedEventType("celebration")}
-                    className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
-                      selectedEventType === "celebration"
-                        ? "!bg-sky-700 !text-white !border-sky-700 hover:!bg-sky-800 dark:!bg-blue-300 dark:!text-gray-900 dark:!border-blue-300 dark:hover:!bg-blue-400"
-                        : "!bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50 dark:!bg-transparent dark:!border-blue-300 dark:!text-white dark:hover:!bg-zinc-700"
-                    }`}
-                  >
-                    Celebration
-                  </Button>
+                  {EVENT_CATEGORIES.map((category) => {
+                    const isSelected = selectedEventType === category;
+
+                    return (
+                      <Button
+                        key={category}
+                        variant="outlined"
+                        size="small"
+                        onClick={() => setSelectedEventType(category)}
+                        className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
+                          isSelected
+                            ? "!bg-sky-700 dark:!bg-sky-400 !text-white !border-sky-700 dark:!border-sky-400 hover:!bg-sky-800 dark:hover:!bg-sky-500"
+                            : "!bg-white dark:!bg-zinc-800 !border-sky-700 dark:!border-sky-400 !text-slate-900 dark:!text-zinc-100 hover:!bg-sky-50 dark:hover:!bg-zinc-700"
+                        }`}
+                      >
+                        {category}
+                      </Button>
+                    );
+                  })}
                 </div>
               </div>
               <div className="flex flex-col gap-3">
                 <span className="text-sm font-medium text-slate-900 dark:text-white">
                   Location
                 </span>
-                <div className="flex gap-3">
+                <div className="flex flex-wrap gap-3">
                   <Button
                     variant="outlined"
                     size="small"
@@ -279,6 +283,7 @@ const Events = () => {
                     shortDesc={event.shortDescription}
                     longDesc={event.longDescription}
                     isOngoing={event.start <= now && event.end >= now}
+                    eventType={event.eventType}
                   />
                 ))}
               </div>

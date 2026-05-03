@@ -36,7 +36,7 @@ export default function EventDialogContent(
           height={600}
           className="w-full object-contain"
         />
-        <EventTypeBadge title={props.name} />
+        <EventTypeBadge type={props.eventType} />
       </div>
       <DialogContent
         sx={{ padding: "20px 24px 24px !important" }}
