@@ -26,21 +26,3 @@ self.addEventListener('notificationclick', function (event) {
     event.notification.close()
     event.waitUntil(clients.openWindow('/'))
 })
-
-function askForNotificationPermission() {
-    if (Notification.permission === 'granted') return;
-
-    Notification.requestPermission().then(permission => {
-        if (permission !== 'granted') {
-            alert("You will not receive notifications from PeterPlate");
-        }
-    });
-}
-
-async function triggerLocalNotification() {
-    const registration = await navigator.serviceWorker.ready;
-    registration.showNotification('Hello!', {
-        body: 'This is a local test notification.',
-        icon: '/icons/icon-192x192.png'
-    });
-}
