@@ -164,3 +164,11 @@ export async function unsubscribeUser(
     .delete(pushSubscriptions)
     .where(eq(pushSubscriptions.userId, userId));
 }
+
+export async function getSubscription(db: Drizzle, userId: string) {
+  const result = await db
+    .select()
+    .from(pushSubscriptions)
+    .where(eq(pushSubscriptions.userId, userId));
+  return result[0] ?? null;
+}
