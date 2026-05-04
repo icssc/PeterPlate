@@ -44,7 +44,10 @@ const PopularDishCardContent = React.forwardRef<
         onClick={onClick}
       >
         {/* Dish image */}
-        <div className="relative w-full aspect-[16/9] flex-shrink-0 bg-amber-50 dark:bg-neutral-800">
+        <Box
+          className="relative w-full aspect-[16/9] flex-shrink-0"
+          sx={{ bgcolor: "background.paper" }}
+        >
           {dish.image_url ? (
             <Image
               src={dish.image_url}
@@ -55,26 +58,29 @@ const PopularDishCardContent = React.forwardRef<
             />
           ) : (
             <div className="flex items-center justify-center w-full h-full">
-              <IconComponent
-                style={{ fontSize: 48 }}
-                className="text-slate-700"
-              />
+              <IconComponent style={{ fontSize: 48 }} color="primary" />
             </div>
           )}
-        </div>
+        </Box>
         <div className="flex flex-col flex-1 p-4">
-          <h3 className="text-sm font-semibold text-sky-700 leading-tight line-clamp-2 mb-1">
-            {formatFoodName(dish.name)}
-          </h3>
-          <p
-            className={`${descSize} text-neutral-500 dark:text-neutral-400 mb-1`}
+          <Typography
+            className="text-sm font-semibold leading-tight line-clamp-2 mb-1"
+            color="primary"
           >
+            {formatFoodName(dish.name)}
+          </Typography>
+          <Typography className={`${descSize} mb-1`} color="text.secondary">
             {hallName} • {toTitleCase(stationName)}
-          </p>
-          <div className="flex items-center gap-1 text-xs text-neutral-400 mt-auto">
+          </Typography>
+          <Box
+            className="flex items-center gap-1 mt-auto"
+            sx={{ color: "text.secondary" }}
+          >
             <Star style={{ fontSize: iconSize }} />
-            <span>{averageRating > 0 ? averageRating.toFixed(1) : "—"}</span>
-          </div>
+            <Typography variant="caption">
+              {averageRating > 0 ? averageRating.toFixed(1) : "—"}
+            </Typography>
+          </Box>
         </div>
       </Card>
     </>
