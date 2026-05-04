@@ -1,6 +1,6 @@
 import type { DishInfo } from "@api/index";
 import { Star } from "@mui/icons-material";
-import { Card, Dialog, Drawer } from "@mui/material";
+import { Box, Card, Dialog, Drawer, Typography } from "@mui/material";
 import Image from "next/image";
 import React, { useState } from "react";
 import { useSnackbarStore } from "@/context/useSnackbar";
@@ -62,7 +62,7 @@ const PopularDishCardContent = React.forwardRef<
             </div>
           )}
         </Box>
-        <div className="flex flex-col flex-1 p-4">
+        <Box className="flex flex-col flex-1 p-4">
           <Typography
             className="text-sm font-semibold leading-tight line-clamp-2 mb-1"
             color="primary"
@@ -81,7 +81,7 @@ const PopularDishCardContent = React.forwardRef<
               {averageRating > 0 ? averageRating.toFixed(1) : "—"}
             </Typography>
           </Box>
-        </div>
+        </Box>
       </Card>
     </>
   );
