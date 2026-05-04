@@ -57,6 +57,7 @@ export default function MyFoodsPage() {
 
   const {
     favorites,
+    isFavorited,
     isLoadingFavorites,
     favoritesError,
     toggleFavorite,
@@ -98,7 +99,7 @@ export default function MyFoodsPage() {
         map.set(rated.id, {
           dishId: rated.id,
           dish: rated as unknown as DishInfo,
-          isFavorited: false,
+          isFavorited: isFavorited(rated.id),
           stationName: (rated as unknown as { stationName?: string })
             .stationName,
           modifiedAt: ratedAt,
@@ -107,7 +108,7 @@ export default function MyFoodsPage() {
     }
 
     return Array.from(map.values());
-  }, [favorites, ratedFoods]);
+  }, [favorites, ratedFoods, isFavorited]);
 
   const filteredEntries = useMemo<MergedEntry[]>(() => {
     let result = mergedEntries;
