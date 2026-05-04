@@ -400,7 +400,7 @@ function MobileHome(): React.JSX.Element {
                   dish={dish}
                   hallName={dish.hallName}
                   stationName={dish.stationName}
-                  compact={true}
+                  isCompact={true}
                 />
               ))}
             </div>

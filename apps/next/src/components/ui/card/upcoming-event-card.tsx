@@ -60,7 +60,6 @@ export default function UpcomingEventCard({
   // alternative sizing depending on mobile/desktop
   const titleSize = compact ? "text-sm" : "text-base";
   const iconSize = compact ? 16 : 24;
-  const tagSize = compact ? "text-[8px]" : "text-[10px]";
   const spacing = compact ? "space-y-1" : "space-y-2";
 
   return (
@@ -74,7 +73,7 @@ export default function UpcomingEventCard({
             <EventTypeBadge type={eventType} />
           </div>
         </div>
-        <div className="mb-3 flex items-start gap-2 min-w-0 pr-28">
+        <div className="mb-3 flex items-start gap-2 min-w-0 pr-0 md:pr-28">
           <h3
             className={`${titleSize} line-clamp-2 min-w-0 flex-1 whitespace-normal break-words font-bold leading-tight text-sky-700`}
           >
