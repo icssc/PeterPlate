@@ -76,7 +76,7 @@ export default function UpcomingEventCard({
         </div>
         <div className="mb-3 flex items-start gap-2 min-w-0 pr-28">
           <h3
-            className={`${titleSize} whitespace-normal break-normal min-w-0 flex-1 whitespace-normal break-normal font-bold leading-tight text-sky-700`}
+            className={`${titleSize} line-clamp-2 min-w-0 flex-1 whitespace-normal break-words font-bold leading-tight text-sky-700`}
           >
             {event.title}
           </h3>
