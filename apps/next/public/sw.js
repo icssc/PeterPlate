@@ -190,8 +190,9 @@ if (url.pathname.startsWith('/api/trpc')) {
   // These are content-addressed or versioned by filename so staleness is
   // not a concern. Serve from cache instantly; populate cache on first miss.
   if (
+    url.pathname.startsWith('/_next/static/') ||
     url.pathname.startsWith('/icons/') ||
-    url.pathname.match(/\.(png|jpg|jpeg|webp|svg|ico|woff|woff2|ttf|otf)$/)
+    url.pathname.match(/\.(png|jpg|jpeg|webp|svg|ico|woff|woff2|ttf|otf|css)$/)
   ) {
     event.respondWith(
       caches.match(request).then((cached) => {
@@ -202,70 +203,7 @@ if (url.pathname.startsWith('/api/trpc')) {
     return;
   }
 
-  // ---- 3. CACHE FIRST with TTL — nutrition and ingredient data ----
-  // This data is relatively static (updated once per day at most).
-  // Serve from cache if fresh; otherwise re-fetch and update the cache.
-  if (
-    url.pathname.includes('/nutrition') ||
-    url.pathname.includes('/ingredients')
-  ) {
-    event.respondWith(
-      caches.match(request).then((cached) => {
-        if (cached && isCacheFresh(cached, CACHE_FIRST_MAX_AGE_SECONDS)) {
-          return cached;
-        }
-        // Cache is missing or stale — fetch and update.
-        return fetchAndCache(request, CACHE_NAME).catch(() => {
-          // If the network fails and we have a stale copy, return it rather
-          // than showing an error — stale nutrition data is better than nothing.
-          return cached || caches.match('/offline');
-        });
-      }),
-    );
-    return;
-  }
-
-  // ---- 4. NETWORK FIRST — ratings and events ----
-  // This data changes frequently. Always try the network; fall back to cache
-  // only when offline so users see something rather than a blank page.
-  if (
-    url.pathname.includes('/ratings') ||
-    url.pathname.includes('/events')
-  ) {
-    event.respondWith(
-      fetchAndCache(request, CACHE_NAME).catch(
-        () => caches.match(request),
-      ),
-    );
-    return;
-  }
-
-  // ---- 5. STALE-WHILE-REVALIDATE — restaurant and dish pages ----
-  // Return the cached version immediately for speed, but always fire a
-  // background fetch to keep the cache fresh for the next visit.
-  if (
-    url.pathname.startsWith('/anteatery') ||
-    url.pathname.startsWith('/brandywine') ||
-    url.pathname.includes('/restaurants') ||
-    url.pathname.includes('/dishes')
-  ) {
-    event.respondWith(
-      caches.open(CACHE_NAME).then((cache) => {
-        return cache.match(request).then((cached) => {
-          // Always kick off a background revalidation.
-          const networkFetch = fetch(request).then((res) => {
-            if (res.ok) cache.put(request, res.clone()).catch(() => {});
-            return res;
-          });
-          // Return stale immediately if available; otherwise wait for network.
-          return cached || networkFetch;
-        });
-      }),
-    );
-    return;
-  }
-
-  // ---- 6. NEVER CACHE — user-specific pages ----
+  // ---- NEVER CACHE — user-specific pages ----
   // These pages render personalised data (favorites, tracked meals, ratings).
   // Caching them risks showing one user's data after they log out or on a
   // shared device. Always fetch from network; fall back to offline page only.
