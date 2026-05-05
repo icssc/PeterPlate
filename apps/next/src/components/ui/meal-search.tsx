@@ -334,6 +334,7 @@ export default function MealSearchDialog(props: MealSearchDialogProps) {
   return (
     <>
       <Fab
+        id="tour-fab-search-btn"
         size="large"
         aria-label="Search meals"
         onClick={() => setOpen(true)}

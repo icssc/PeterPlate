@@ -58,7 +58,7 @@ export default function SearchMealCard({ meal, isUnavailable, onAdd }: Props) {
   const IconComponent = getFoodIcon(dishNameForIcon ?? "") ?? Restaurant;
 
   return (
-    <div className={cn("w-full md:w-72")}>
+    <div className={cn("w-full md:w-72 tour-suggested-card")}>
       <Card
         className={cn(
           "cursor-pointer transition w-full border",

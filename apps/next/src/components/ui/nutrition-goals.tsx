@@ -200,6 +200,7 @@ export default function NutritionGoals({ userId, date }: Props) {
   return (
     <div className="relative mt-4" ref={containerRef}>
       <Button
+        id="tour-edit-goals"
         onClick={() => setOpen(!open)}
         variant="contained"
         className="!bg-sky-700 !text-white hover:!bg-sky-800 !rounded-lg !min-w-0 !p-1 md:!p-2 dark:!bg-blue-300 dark:!text-gray-900 dark:hover:!bg-blue-400"

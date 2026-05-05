@@ -14,6 +14,7 @@ import NutritionGoals from "@/components/ui/nutrition-goals";
 import TrackerHistory from "@/components/ui/tracker-history";
 import TrackerHistoryDialog from "@/components/ui/tracker-history-dialog";
 import TrackerHistoryDrawer from "@/components/ui/tracker-history-drawer";
+import TrackerOnboarding from "@/components/ui/tracker-onboarding";
 import { useSnackbarStore } from "@/context/useSnackbar";
 import { useUserStore } from "@/context/useUserStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
@@ -102,10 +103,9 @@ export default function MealTracker() {
   }, [meals]);
 
   // Checks dish availability
-  const { data: hallData } = trpc.peterplate.useQuery(
-    { date: selectedDay?.rawDate ?? new Date() },
-    { enabled: Boolean(selectedDay) },
-  );
+  const { data: hallData } = trpc.peterplate.useQuery({
+    date: selectedDay?.rawDate ?? new Date(),
+  });
 
   const availableDishIds = useMemo(() => {
     const set = new Set<string>();
@@ -165,18 +165,19 @@ export default function MealTracker() {
 
   // suggested meals memo
   const suggestedMeals = useMemo(() => {
-    if (!meals) return [];
     const servingCounts: Record<string, number> = {};
     const latestByDish: Record<string, (typeof meals)[0]> = {};
 
-    for (const meal of meals) {
-      if (!meal.dishId) continue;
-      servingCounts[meal.dishId] =
-        (servingCounts[meal.dishId] ?? 0) + (meal.servings ?? 1);
-      if (!latestByDish[meal.dishId]) latestByDish[meal.dishId] = meal;
+    if (meals) {
+      for (const meal of meals) {
+        if (!meal.dishId) continue;
+        servingCounts[meal.dishId] =
+          (servingCounts[meal.dishId] ?? 0) + (meal.servings ?? 1);
+        if (!latestByDish[meal.dishId]) latestByDish[meal.dishId] = meal;
+      }
     }
 
-    return Object.entries(servingCounts)
+    const calculated = Object.entries(servingCounts)
       .filter(([, total]) => total >= 1)
       .sort(([, a], [, b]) => b - a)
       .map(([dishId]) => {
@@ -190,7 +191,51 @@ export default function MealTracker() {
           servings: 1,
         };
       });
-  }, [meals]);
+
+    if (calculated.length > 0) return calculated;
+
+    // Fallback: hardcode some dummy dishes so the tour target ALWAYS exists
+    const fallbackDishes = [
+      {
+        id: "dummy-1",
+        name: "Chicken Teriyaki",
+        calories: 110,
+        protein: 32,
+        carbs: 23,
+        fat: 16,
+      },
+      {
+        id: "dummy-2",
+        name: "White Rice",
+        calories: 239,
+        protein: 6,
+        carbs: 53,
+        fat: 0,
+      },
+      {
+        id: "dummy-3",
+        name: "Steamed Broccoli",
+        calories: 35,
+        protein: 2,
+        carbs: 7,
+        fat: 0,
+      },
+    ];
+
+    return fallbackDishes.map((d) => ({
+      id: `fallback-${d.id}`,
+      dishId: d.id,
+      dishName: d.name,
+      servings: 1,
+      calories: d.calories,
+      protein: d.protein,
+      carbs: d.carbs,
+      fat: d.fat,
+      eatenAt: new Date(),
+      userId: userId ?? "",
+      createdAt: new Date(),
+    }));
+  }, [meals, userId]);
 
   // logmeal mutation
   const logMeal = trpc.nutrition.logMeal.useMutation({
@@ -218,6 +263,7 @@ export default function MealTracker() {
       className="p-2 md:p-8 mt-2 md:mt-12"
     >
       <div className="px-2 md:px-8">
+        {!isMobile && <TrackerOnboarding />}
         <Typography
           variant="h5"
           fontWeight={700}
@@ -260,6 +306,7 @@ export default function MealTracker() {
           </Typography>
           {userId && (
             <TrackerHistory
+              tourId="tour-history-btn"
               onDateSelect={() => {}}
               onDayClick={(date) => {
                 setHistoryDate(date);
@@ -272,23 +319,19 @@ export default function MealTracker() {
 
         {/* Desktop: NutritionBreakdown */}
         <div className="hidden md:flex items-start gap-4">
-          {mealsGroupedByDay.length === 0 ? (
-            <div>No meals logged recently.</div>
-          ) : (
-            <NutritionBreakdown
-              mealsEaten={countedMeals.map((m) => ({
-                ...m,
-                calories: toNum(m.calories),
-                protein: toNum(m.protein),
-                carbs: toNum(m.carbs),
-                fat: toNum(m.fat),
-              }))}
-              calorieGoal={goals?.calorieGoal ?? 2000}
-              proteinGoal={goals?.proteinGoal ?? 75}
-              carbGoal={goals?.carbGoal ?? 250}
-              fatGoal={goals?.fatGoal ?? 50}
-            />
-          )}
+          <NutritionBreakdown
+            mealsEaten={countedMeals.map((m) => ({
+              ...m,
+              calories: toNum(m.calories),
+              protein: toNum(m.protein),
+              carbs: toNum(m.carbs),
+              fat: toNum(m.fat),
+            }))}
+            calorieGoal={goals?.calorieGoal ?? 2000}
+            proteinGoal={goals?.proteinGoal ?? 75}
+            carbGoal={goals?.carbGoal ?? 250}
+            fatGoal={goals?.fatGoal ?? 50}
+          />
           <div className="relative mt-4 ml-auto">
             {userId && (
               <NutritionGoals
