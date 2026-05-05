@@ -16,7 +16,7 @@ const steps: Step[] = [
     content:
       "Click the edit icon to set your daily nutrition goals for calories, protein, carbs, and fat.",
     title: "Set Your Goals",
-    disableBeacon: true,
+    skipBeacon: true,
     placement: "left",
   },
   {
@@ -24,7 +24,7 @@ const steps: Step[] = [
     content:
       "These widgets show your progress towards your daily nutrition goals.",
     title: "Track Your Progress",
-    disableBeacon: true,
+    skipBeacon: true,
     placement: "bottom",
   },
   {
@@ -32,14 +32,14 @@ const steps: Step[] = [
     content:
       "Click the plus button to add the suggested food to your meal tracker.",
     title: "Add Suggested Foods",
-    disableBeacon: true,
+    skipBeacon: true,
     placement: "bottom",
   },
   {
     target: "#tour-fab-search-btn",
     content: "Search and also view more foods to add to your tracker!",
     title: "View More Suggested Foods",
-    disableBeacon: true,
+    skipBeacon: true,
     placement: "top",
   },
   {
@@ -47,7 +47,7 @@ const steps: Step[] = [
     content:
       "Click History to view past meal tracker days and track your progress over time.",
     title: "View Your History",
-    disableBeacon: true,
+    skipBeacon: true,
     placement: "bottom",
   },
 ];
@@ -59,7 +59,6 @@ const CustomTooltip = ({
   tooltipProps,
   primaryProps,
   skipProps,
-  backProps,
   closeProps,
 }: TooltipRenderProps) => {
   return (
@@ -113,11 +112,13 @@ export default function TrackerOnboarding() {
     // DEBUG: Always run tour for debugging. Revert to localStorage check later.
     // const hasSeenTour = localStorage.getItem("hasSeenTrackerTour");
     const hasSeenTour = false; // forced false to always trigger
+
     if (!hasSeenTour) {
       // Add a slight delay so DOM renders before tour starts
       const timer = setTimeout(() => {
         setRun(true);
       }, 500);
+
       return () => clearTimeout(timer);
     }
   }, []);

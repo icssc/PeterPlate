@@ -77,8 +77,21 @@ const deleteRatingProcedure = publicProcedure
     return { success: true };
   });
 
+const getAllDishesProcedure = publicProcedure
+  .input(z.object({ limit: z.number().optional().default(6) }))
+  .query(async ({ ctx: { db }, input }) => {
+    const dishes = await db.query.dishes.findMany({
+      limit: input.limit,
+      with: {
+        nutritionInfo: true,
+      },
+    });
+    return dishes;
+  });
+
 export const dishRouter = createTRPCRouter({
   get: getDishProcedure,
+  getAll: getAllDishesProcedure,
   rate: rateDishProcedure,
   getAverageRating: getAverageRatingProcedure,
   rated: getUserRatedDishesProcedure,
