@@ -27,8 +27,8 @@
     "@types/aws-lambda": "catalog:",
     "@types/minimatch": "^6.0.0",
     "@types/node": "catalog:",
-    "dotenv-cli": "catalog:",
     "@types/web-push": "catalog:",
+    "dotenv-cli": "catalog:",
     "tsx": "catalog:"
   }
 }
