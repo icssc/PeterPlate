@@ -14,8 +14,6 @@ if (process.env.NODE_ENV !== "production") {
 
 const envSchema = z.object({
   DATABASE_URL: z.string(),
-  NEXT_PUBLIC_VAPID_PUBLIC_KEY: z.string(),
-  VAPID_PRIVATE_KEY: z.string(),
 });
 const env = envSchema.parse(process.env);
 
