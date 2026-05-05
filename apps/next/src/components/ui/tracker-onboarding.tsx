@@ -3,6 +3,7 @@
 import { Close } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import {
+  ACTIONS,
   type CallBackProps,
   Joyride,
   STATUS,
@@ -67,7 +68,7 @@ const CustomTooltip = ({
       className="bg-white dark:bg-[#323235] p-5 rounded-lg shadow-xl w-72 flex flex-col gap-2 relative"
     >
       <button
-        {...closeProps}
+        {...skipProps}
         className="absolute top-3 right-3 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
         aria-label="Close"
       >
