@@ -3,7 +3,6 @@
 import { Close } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import {
-  ACTIONS,
   type CallBackProps,
   Joyride,
   STATUS,
@@ -60,7 +59,6 @@ const CustomTooltip = ({
   tooltipProps,
   primaryProps,
   skipProps,
-  closeProps,
 }: TooltipRenderProps) => {
   return (
     <div
@@ -124,13 +122,32 @@ export default function TrackerOnboarding() {
     }
   }, []);
 
+  // We bypass Joyride and use a native browser listener to catch the gray background click
+  useEffect(() => {
+    const handleOverlayClick = (e: MouseEvent) => {
+      const target = e.target as Element;
+
+      if (target.closest(".react-joyride__overlay")) {
+        setRun(false);
+      }
+    };
+
+    if (run) {
+      // The 'true' parameter ensures we catch the click before Joyride's engine does
+      document.addEventListener("click", handleOverlayClick, true);
+    }
+
+    return () =>
+      document.removeEventListener("click", handleOverlayClick, true);
+  }, [run]);
+
   const handleJoyrideCallback = (data: CallBackProps) => {
     const { status } = data;
     const finishedStatuses: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
 
     if (finishedStatuses.includes(status)) {
       setRun(false);
-      // localStorage.setItem("hasSeenTrackerTour", "true"); // disabled for debugging
+      // localStorage.setItem("hasSeenTrackerTour", "true");
     }
   };
 
@@ -142,7 +159,7 @@ export default function TrackerOnboarding() {
       run={run}
       continuous
       scrollToFirstStep={false}
-      disableOverlayClose={false}
+      disableOverlayClose={true} // <-- MUST BE TRUE. Tells Joyride to stop fighting our custom click listener
       showProgress={false}
       showSkipButton={true}
       callback={handleJoyrideCallback}
@@ -150,9 +167,6 @@ export default function TrackerOnboarding() {
       styles={{
         options: {
           zIndex: 10000,
-        },
-        spotlight: {
-          borderradius: 8,
         },
       }}
     />
