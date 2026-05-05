@@ -5,7 +5,8 @@
   "scripts": {
     "clean": "rm -rf .turbo node_modules",
     "test:daily": "tsx -e \"import('./src/functions/cron/daily.ts').then(m => m.main())\"",
-    "test:weekly": "tsx -e \"import('./src/functions/cron/weekly.ts').then(m => m.main())\""
+    "test:weekly": "tsx -e \"import('./src/functions/cron/weekly.ts').then(m => m.main())\"",
+    "test:menu-notifications": "tsx -e \"import('./src/functions/cron/sendMenuNotification.ts').then(m => m.main())\""
   },
   "license": "MIT",
   "dependencies": {
@@ -18,6 +19,7 @@
     "dotenv": "catalog:",
     "expo-server-sdk": "catalog:",
     "pino": "catalog:",
+    "web-push": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
@@ -26,6 +28,7 @@
     "@types/minimatch": "^6.0.0",
     "@types/node": "catalog:",
     "dotenv-cli": "catalog:",
+    "@types/web-push": "catalog:",
     "tsx": "catalog:"
   }
 }
