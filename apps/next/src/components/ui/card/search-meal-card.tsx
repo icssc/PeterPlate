@@ -6,7 +6,7 @@ import {
   ArrowDropUp,
   Restaurant,
 } from "@mui/icons-material";
-import { Card, CardContent } from "@mui/material";
+import { Card, CardContent, Typography } from "@mui/material";
 import type { SelectLoggedMeal } from "@peterplate/db";
 import Image from "next/image";
 import React from "react";
@@ -62,9 +62,11 @@ export default function SearchMealCard({ meal, isUnavailable, onAdd }: Props) {
       <Card
         className={cn(
           "cursor-pointer transition w-full border",
-          isUnavailable ? "bg-zinc-200/90" : "bg-white hover:shadow-lg",
+          isUnavailable
+            ? "bg-zinc-200/90 dark:bg-zinc-700"
+            : "bg-white dark:bg-[#303035] hover:shadow-lg",
         )}
-        sx={{ borderRadius: "12px" }}
+        sx={{ borderRadius: "12px", backgroundImage: "none" }}
       >
         <CardContent sx={{ padding: "0 !important" }}>
           <div className="h-auto p-3 md:h-40 md:p-4 flex justify-between gap-3 text-left">
@@ -80,14 +82,18 @@ export default function SearchMealCard({ meal, isUnavailable, onAdd }: Props) {
                     onError={() => setImageError(true)}
                   />
                 ) : (
-                  <IconComponent className="w-12 h-12 text-slate-700 flex-shrink-0" />
+                  <IconComponent className="w-12 h-12 text-slate-700 dark:text-blue-300 flex-shrink-0" />
                 )}
 
                 <div className="min-w-0">
-                  <h3 className="text-sky-700 font-semibold text-lg truncate">
+                  <Typography
+                    color="primary"
+                    fontWeight={600}
+                    className="text-lg truncate"
+                  >
                     {meal.dishName}
-                  </h3>
-                  <div className="flex items-center gap-2 text-xs text-zinc-500">
+                  </Typography>
+                  <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-white">
                     <div
                       className={cn(
                         "inline-flex items-stretch rounded-md ring-1",
@@ -159,7 +165,7 @@ export default function SearchMealCard({ meal, isUnavailable, onAdd }: Props) {
               </div>
 
               {/* Nutrition content */}
-              <div className="flex gap-4 text-sm text-zinc-600">
+              <div className="flex gap-4 text-sm text-zinc-600 dark:text-zinc-400">
                 <span>{Math.round(meal.calories * servingsDraft)} cal</span>
                 <span>{Math.round(meal.protein * servingsDraft)}g protein</span>
                 <span>{Math.round(meal.carbs * servingsDraft)}g carbs</span>
@@ -177,7 +183,7 @@ export default function SearchMealCard({ meal, isUnavailable, onAdd }: Props) {
                     onAdd?.(meal, servingsDraft);
                   }
                 }}
-                className="shrink-0 p-2 text-zinc-500 hover:text-sky-600 transition"
+                className="shrink-0 p-2 text-zinc-500 dark:text-zinc-400 hover:text-sky-600 dark:hover:text-zinc-300 transition"
                 aria-label={`Add ${meal.dishName} to tracker`}
               >
                 <Add fontSize="small" />

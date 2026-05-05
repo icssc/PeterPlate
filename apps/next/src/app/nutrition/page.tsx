@@ -1,5 +1,7 @@
 "use client";
 
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import SearchMealCard from "@/components/ui/card/search-meal-card";
@@ -211,9 +213,17 @@ export default function MealTracker() {
   if (error) return <div>Error loading meals</div>;
 
   return (
-    <div className="min-h-screen p-2 md:p-8 mt-2 md:mt-12">
+    <Box
+      sx={{ bgcolor: "background.default", minHeight: "100vh" }}
+      className="p-2 md:p-8 mt-2 md:mt-12"
+    >
       <div className="px-2 md:px-8">
-        <h1 className="text-2xl md:text-3xl font-bold text-sky-700 dark:text-sky-400 flex items-center justify-between">
+        <Typography
+          variant="h5"
+          fontWeight={700}
+          color="primary"
+          className="text-2xl md:text-3xl flex items-center justify-between"
+        >
           <span className="flex items-center gap-2 flex-nowrap whitespace-nowrap">
             Tracker
             {selectedDay && (
@@ -240,14 +250,14 @@ export default function MealTracker() {
               />
             )}
           </div>
-        </h1>
+        </Typography>
 
         {/* Subheading + History - desktop only */}
         <div className="hidden md:flex items-center justify-between mt-1">
-          <p className="text-zinc-800 dark:text-zinc-400">
-            Keep track of your health using our Nutrition Tracker! Add dishes to
+          <Typography variant="body1" color="text.primary">
+            Keep track of your eating using our Nutrition Tracker! Add dishes to
             count them towards your totals!
-          </p>
+          </Typography>
           {userId && (
             <TrackerHistory
               onDateSelect={() => {}}
@@ -362,11 +372,13 @@ export default function MealTracker() {
 
         {/* Counted Foods */}
         <div className="mt-6">
-          <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
+          <Typography variant="h6" fontWeight={600} color="text.primary">
             Counted Foods
-          </h2>
+          </Typography>
           {countedMeals.length === 0 ? (
-            <p className="mt-2 text-sm text-zinc-500">No counted foods.</p>
+            <Typography variant="body2" color="text.secondary" className="mt-2">
+              No counted foods.
+            </Typography>
           ) : (
             <div className="flex flex-wrap gap-4 mt-4">
               {countedMeals.map((meal) => (
@@ -388,14 +400,18 @@ export default function MealTracker() {
 
         {/* Suggested Foods */}
         <div className="mt-6">
-          <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
+          <Typography variant="h6" fontWeight={600} color="text.primary">
             Suggested Foods
-          </h2>
+          </Typography>
           <div className="flex flex-wrap gap-4 mt-4">
             {suggestedMeals.length === 0 ? (
-              <p className="mt-2 text-zinc-500 text-sm">
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                className="mt-2"
+              >
                 Dishes from the past week logged 5+ times will appear here.
-              </p>
+              </Typography>
             ) : (
               suggestedMeals.map((meal) => (
                 <SearchMealCard
@@ -432,6 +448,6 @@ export default function MealTracker() {
           })
         }
       />
-    </div>
+    </Box>
   );
 }

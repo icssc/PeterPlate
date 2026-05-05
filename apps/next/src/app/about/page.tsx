@@ -1,6 +1,6 @@
 "use client";
 
-import { GitHub, Language } from "@mui/icons-material";
+import { GitHub, Language, Typography } from "@mui/icons-material";
 import Image from "next/image";
 import Contributor from "@/components/ui/contributor";
 import { Button } from "@/components/ui/shadcn/button";
@@ -29,10 +29,21 @@ export default function About() {
       >
         <div className="flex flex-col" id="about-text">
           <div className="flex gap-4 items-center mb-2" id="about-header">
-            <h1 className="text-3xl font-bold" id="about-title">
-              About{" "}
-              <span className="text-sky-700 dark:text-sky-400">PeterPlate</span>
-            </h1>
+            <Typography
+              fontWeight={700}
+              color="primary"
+              id="about-title"
+              sx={{ fontSize: "1.875rem" }}
+            >
+              About PeterPlate
+            </Typography>
+            <Image
+              src="/peterplate-icon.webp"
+              alt="PeterPlate's logo"
+              width={32}
+              height={32}
+              className="rounded-full"
+            />
           </div>
           <div id="about-paragraph" className="grid gap-4 max-w-100">
             <p>
@@ -108,33 +119,86 @@ export default function About() {
               </a>
               !
             </p>
-            <div className="flex align-items gap-4">
-              <Button
-                className="bg-sky-700 dark:bg-sky-600 dark:hover:bg-sky-500 dark:text-white"
-                onClick={() =>
-                  window.open(
-                    "https://github.com/icssc/PeterPlate/",
-                    "_blank",
-                    "noopener,noreferrer",
-                  )
-                }
-              >
-                <GitHub /> GitHub
-              </Button>
-              <Button
-                className="bg-sky-700 dark:bg-sky-600 dark:hover:bg-sky-500 dark:text-white"
-                onClick={() =>
-                  window.open(
-                    "https://studentcouncil.ics.uci.edu/",
-                    "_blank",
-                    "noopener,noreferrer",
-                  )
-                }
-              >
-                <Language /> Visit ICSSC
-              </Button>
-            </div>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button className="w-fit bg-sky-700 text-white hover:bg-sky-800 dark:bg-blue-300 dark:text-gray-900 dark:hover:bg-blue-400">
+                  Privacy Policy
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="w-md h-auto">
+                <DialogHeader>
+                  <DialogTitle className="p-4 text-center text-sky-700 dark:text-blue-300">
+                    Privacy Policy
+                  </DialogTitle>
+                  <DialogDescription asChild className="p-4 dark:text-white">
+                    <div>
+                      <p className="mb-4">
+                        PeterPlate is a cross-platform mobile application
+                        designed to help users view dining hall menus at the
+                        University of California, Irvine (UCI). We value your
+                        privacy and are committed to protecting any personal
+                        information you may share with us.
+                      </p>
+                      <p className="mb-4">
+                        PeterPlate does not collect or store any personally
+                        identifiable information. The app does not require login
+                        or account creation. We do not track or monitor user
+                        behavior within the app.
+                      </p>
+                      <p className="mb-4">
+                        PeterPlate fetches dining hall menu data from publicly
+                        available or authorized UCI resources. This data is used
+                        solely to display daily menus within the app and is not
+                        shared or stored beyond your device.
+                      </p>
+                    </div>
+                  </DialogDescription>
+                </DialogHeader>
+              </DialogContent>
+            </Dialog>
           </div>
+        </div>
+        <div className="flex flex-col items-center gap-4" id="contributors">
+          <Typography
+            fontWeight={700}
+            color="primary"
+            className="text-xl max-md:text-base max-sm:text-sm"
+          >
+            Our Lovely Contributors
+          </Typography>
+          <div
+            className="flex flex-wrap justify-center gap-2 max-w-xs"
+            id="contributor-grid"
+          >
+            {isLoading && (
+              <p className="text-sm text-zinc-400">Loading contributors...</p>
+            )}
+            {!isLoading && isError && (
+              <p className="text-sm text-red-500 text-center">
+                Error occurred while fetching contributors: {error?.message}
+              </p>
+            )}
+            {!isLoading &&
+              !isError &&
+              queryResponse &&
+              queryResponse.map((contributor) => (
+                <Contributor
+                  key={`${contributor.login}`}
+                  name={contributor.name || contributor.login}
+                  username={contributor.login}
+                  profileSrc={contributor.avatar_url}
+                  bio={contributor.bio || "PeterPlate Contributor"}
+                  contributions={contributor.contributions}
+                />
+              ))}
+          </div>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            className="italic font-light"
+          >
+            .. you could be here!
+          </Typography>
         </div>
       </div>
     </div>

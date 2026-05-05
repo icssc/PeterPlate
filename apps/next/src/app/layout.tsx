@@ -15,6 +15,7 @@ export const metadata: Metadata = {
   description: `PeterPlate: A dynamic web app to discover everything UCI's dining 
                 halls have to offer - from daily menus and special events to 
                 dining hall features and updates.`,
+  manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
