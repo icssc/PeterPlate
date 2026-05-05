@@ -33,7 +33,7 @@ const steps: Step[] = [
       "Click the plus button to add the suggested food to your meal tracker.",
     title: "Add Suggested Foods",
     skipBeacon: true,
-    placement: "bottom",
+    placement: "right",
   },
   {
     target: "#tour-fab-search-btn",
@@ -48,7 +48,7 @@ const steps: Step[] = [
       "Click History to view past meal tracker days and track your progress over time.",
     title: "View Your History",
     skipBeacon: true,
-    placement: "bottom",
+    placement: "left",
   },
 ];
 
@@ -159,16 +159,11 @@ export default function TrackerOnboarding() {
       run={run}
       continuous
       scrollToFirstStep={false}
-      disableOverlayClose={true} // <-- MUST BE TRUE. Tells Joyride to stop fighting our custom click listener
+      disableOverlayClose={true} // must be true tells Joyride to stop fighting our custom click listener
       showProgress={false}
       showSkipButton={true}
       callback={handleJoyrideCallback}
       tooltipComponent={CustomTooltip}
-      styles={{
-        options: {
-          zIndex: 10000,
-        },
-      }}
     />
   );
 }
