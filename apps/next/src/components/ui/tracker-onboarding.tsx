@@ -89,13 +89,13 @@ const CustomTooltip = ({
       <div className="flex items-center justify-between mt-3">
         <button
           {...skipProps}
-          className="text-sm font-medium text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 px-2 py-1 rounded"
+          className="text-sm font-medium text-gray-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300 px-2 py-1 rounded"
         >
           Skip Tour
         </button>
         <button
           {...primaryProps}
-          className="bg-sky-700 hover:bg-sky-800 text-white font-medium text-sm px-4 py-2 rounded-lg"
+          className="bg-sky-700 dark:bg-blue-300 text-white dark:text-black font-medium text-sm px-4 py-2 rounded-lg"
         >
           {index === size - 1 ? "Done" : "Next"}
         </button>
@@ -159,7 +159,7 @@ export default function TrackerOnboarding() {
       run={run}
       continuous
       scrollToFirstStep={false}
-      disableOverlayClose={true} // must be true tells Joyride to stop fighting our custom click listener
+      disableOverlayClose={true} // must be true tells Joyride to stop fighting the custom click listener
       showProgress={false}
       showSkipButton={true}
       callback={handleJoyrideCallback}
