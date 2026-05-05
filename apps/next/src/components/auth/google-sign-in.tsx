@@ -1,11 +1,13 @@
 "use client";
 /* Sign In Button */
 
+import posthog from "posthog-js";
 import { authClient } from "@/utils/auth-client";
 import { Button } from "../ui/shadcn/button";
 
 export function GoogleSignInButton() {
   const handleSignIn = async () => {
+    posthog.capture("sign_in_clicked", { provider: "google" });
     try {
       const result = await authClient.signIn.oauth2({
         providerId: "icssc",
@@ -14,6 +16,7 @@ export function GoogleSignInButton() {
       console.log("Sign in result:", result);
     } catch (error) {
       console.error("Sign in error:", error);
+      posthog.captureException(error);
       if (error instanceof Response) {
         const text = await error.text();
         console.error("Error response body:", text);

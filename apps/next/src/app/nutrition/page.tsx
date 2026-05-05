@@ -3,6 +3,7 @@
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { useRouter } from "next/navigation";
+import posthog from "posthog-js";
 import { useEffect, useMemo, useState } from "react";
 import SearchMealCard from "@/components/ui/card/search-meal-card";
 import TrackedMealCard from "@/components/ui/card/tracked-meal-card";
@@ -194,7 +195,12 @@ export default function MealTracker() {
 
   // logmeal mutation
   const logMeal = trpc.nutrition.logMeal.useMutation({
-    onSuccess: async () => {
+    onSuccess: async (_, variables) => {
+      posthog.capture("meal_logged", {
+        dish_id: variables.dishId,
+        dish_name: variables.dishName,
+        servings: variables.servings,
+      });
       await utils.nutrition.invalidate();
     },
     onError: (err) => {

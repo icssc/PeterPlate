@@ -1,5 +1,6 @@
 import { FavoriteBorder, Favorite as FavoriteIcon } from "@mui/icons-material";
 import { Tooltip } from "@mui/material";
+import posthog from "posthog-js";
 import { useUserStore } from "@/context/useUserStore";
 import { cn } from "@/utils/tw";
 
@@ -25,6 +26,9 @@ export default function Favorite({
     event.stopPropagation();
 
     if (favoriteDisabled || !onToggleFavorite) return;
+    posthog.capture(isFavorited ? "dish_unfavorited" : "dish_favorited", {
+      dish_id: dishId,
+    });
     onToggleFavorite(dishId, Boolean(isFavorited));
   };
 

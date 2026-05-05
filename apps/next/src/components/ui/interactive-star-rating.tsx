@@ -6,6 +6,7 @@
 "use client";
 
 import { StarBorder } from "@mui/icons-material";
+import posthog from "posthog-js";
 import { useEffect, useState } from "react";
 import { useSnackbarStore } from "@/context/useSnackbar";
 import { useUserStore } from "@/context/useUserStore";
@@ -50,6 +51,10 @@ export default function InteractiveStarRating({
     const newRating = stars === userRating ? 0 : stars;
     setUserRating(newRating);
     rateDish(dishId, newRating);
+    posthog.capture("dish_rated", {
+      dish_id: dishId,
+      rating: newRating,
+    });
   };
 
   const displayRating = hoverRating ?? userRating;
