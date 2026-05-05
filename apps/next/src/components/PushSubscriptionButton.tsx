@@ -1,4 +1,17 @@
 "use client";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import NotificationsOffIcon from "@mui/icons-material/NotificationsOff";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  IconButton,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import { useEffect, useState } from "react";
 import { useSession } from "@/utils/auth-client";
 import { trpc } from "@/utils/trpc";
@@ -45,6 +58,19 @@ export default function PushSubscriptionButton() {
   const { data: session } = useSession();
   const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [dialog, setDialog] = useState<{
+    open: boolean;
+    title: string;
+    message: string;
+  }>({
+    open: false,
+    title: "",
+    message: "",
+  });
+
+  const showDialog = (title: string, message: string) => {
+    setDialog({ open: true, title, message });
+  };
 
   const subscribeMutation = trpc.notification.subscribe.useMutation();
   const unsubscribeMutation = trpc.notification.unsubscribe.useMutation();
@@ -76,7 +102,10 @@ export default function PushSubscriptionButton() {
 
   const handleToggleSubscription = async () => {
     if (!session?.user?.id) {
-      alert("You must be logged in to enable notifications.");
+      showDialog(
+        "Sign In Required",
+        "You must be logged in to enable notifications.",
+      );
       return;
     }
 
@@ -89,11 +118,17 @@ export default function PushSubscriptionButton() {
         });
 
         setIsSubscribed(false);
-        alert("Notifications disabled.");
+        showDialog(
+          "Notifications Disabled",
+          "You will no longer receive notifications for your favorite meals.",
+        );
       } else {
         const permission = await requestNotificationPermission();
         if (permission !== "granted") {
-          alert("Permission denied. Reset permissions in your address bar.");
+          showDialog(
+            "Permission Denied",
+            "Reset notification permissions in your browser's address bar and try again.",
+          );
           return;
         }
 
@@ -112,37 +147,72 @@ export default function PushSubscriptionButton() {
         });
 
         setIsSubscribed(true);
-        alert("Meal notifications enabled!");
+        showDialog(
+          "Notifications Enabled",
+          "You'll be notified at 9am when your favorite meals are being served!",
+        );
       }
     } catch (err) {
       console.error("Subscription error:", err);
-      alert("Action failed. Please try again.");
+      showDialog("Something Went Wrong", "Action failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <button
-      onClick={handleToggleSubscription}
-      disabled={isLoading}
-      type="button"
-      title="Get notifications when your favorite meals are being served!"
-      style={{
-        padding: "10px 20px",
-        backgroundColor: isSubscribed ? "#e53e3e" : "#0070f3",
-        color: "#fff",
-        border: "none",
-        borderRadius: "5px",
-        cursor: isLoading ? "default" : "pointer",
-        opacity: isLoading ? 0.7 : 1,
-      }}
-    >
-      {isLoading
-        ? "Processing..."
-        : isSubscribed
-          ? "Disable Notifications"
-          : "Notify me about Favorites"}
-    </button>
+    <>
+      <Tooltip
+        title={
+          isSubscribed
+            ? "Disable meal notifications"
+            : "Get notified about your favorite meals"
+        }
+      >
+        <span>
+          <IconButton
+            onClick={handleToggleSubscription}
+            disabled={isLoading}
+            color={isSubscribed ? "error" : "primary"}
+            size="large"
+          >
+            {isSubscribed ? <NotificationsOffIcon /> : <NotificationsIcon />}
+          </IconButton>
+        </span>
+      </Tooltip>
+
+      <Dialog
+        open={dialog.open}
+        onClose={() => setDialog((d) => ({ ...d, open: false }))}
+        slotProps={{
+          paper: {
+            sx: {
+              borderRadius: "16px",
+              backgroundImage: "none",
+              ".dark &": {
+                backgroundColor: "#303035",
+                backgroundImage: "none",
+              },
+            },
+          },
+        }}
+      >
+        <DialogTitle>
+          <Typography fontWeight={600} color="primary">
+            {dialog.title}
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            <Typography color="text.primary">{dialog.message}</Typography>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDialog((d) => ({ ...d, open: false }))}>
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 }
