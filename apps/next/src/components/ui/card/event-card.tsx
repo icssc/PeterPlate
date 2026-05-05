@@ -2,23 +2,25 @@
 
 import { AccessTime, PinDrop } from "@mui/icons-material";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
-import { Card, CardContent, Dialog, Drawer } from "@mui/material";
+import { Card, CardContent, Dialog, Drawer, Typography } from "@mui/material";
 import type { Event } from "@peterplate/validators";
 import Image from "next/image";
 import React from "react";
 import EventTypeBadge from "@/components/ui/event-type-badge";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import type { EventCategory } from "@/utils/classifyEvent";
 import { timeToString, toTitleCase } from "@/utils/funcs";
 import EventDialogContent from "../event-dialog-content";
 import EventDrawerContent from "../event-drawer-content";
 import OngoingBadge from "../ongoing-badge";
 
+type EventWithType = Event & { type: EventCategory };
+
 /**
  * Props for the {@link EventCardContent} component.
  */
 interface EventCardContentProps extends React.HTMLAttributes<HTMLDivElement> {
-  /** The event data object ({@link EventInfo}) to display within the card. */
-  props: Event;
+  props: EventWithType;
 }
 
 /**
@@ -42,8 +44,8 @@ const EventCardContent = React.forwardRef<
   return (
     <div ref={ref} {...divProps}>
       <Card
-        className="cursor-pointer hover:shadow-lg transition h-full min-w-[280px] sm:min-w-0 dark:bg-zinc-900 dark:border-zinc-800"
-        sx={{ borderRadius: "6px" }}
+        className="cursor-pointer hover:shadow-lg transition h-full min-w-[280px] sm:min-w-0 dark:bg-[#303035]"
+        sx={{ borderRadius: "16px", backgroundImage: "none" }}
       >
         <div className="p-7 pb-2 relative">
           <Image
@@ -53,14 +55,13 @@ const EventCardContent = React.forwardRef<
             height={300}
             className="w-full object-contain"
           />
-          <EventTypeBadge title={props.title} />
+          <EventTypeBadge type={props.type} />
         </div>
         <CardContent className="flex flex-col gap-2 p-4">
           <div className="flex flex-row gap-2 items-center">
-            <h3 className="text-lg font-semibold text-sky-700 dark:text-sky-400">
+            <Typography className="text-lg font-semibold" color="primary">
               {props.title}
-            </h3>
-            {/*props.isOngoing && <OngoingBadge /> */}
+            </Typography>
           </div>
           <div className="flex flex-col gap-2 text-sm text-zinc-500 dark:text-zinc-400 mt-1">
             <div className="flex gap-3 items-center">
@@ -84,9 +85,9 @@ const EventCardContent = React.forwardRef<
               <span>{toTitleCase(props.restaurantId)}</span>
             </div>
           </div>
-          <p className="text-sm text-zinc-900 dark:text-zinc-100 mt-2">
+          <Typography color="text.primary" className="text-sm mt-2">
             {props.description}
-          </p>
+          </Typography>
         </CardContent>
       </Card>
     </div>
@@ -105,7 +106,7 @@ EventCardContent.displayName = "EventCardContent";
  * @param {Event} props - The event data to be displayed. See {@link Event} for detailed property descriptions.
  * @returns {JSX.Element} A React component representing an event card.
  */
-export default function EventCard(props: Event): React.JSX.Element {
+export default function EventCard(props: EventWithType): React.JSX.Element {
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   const handleOpen = () => setOpen(true);

@@ -1,10 +1,11 @@
 import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import PinDropOutlinedIcon from "@mui/icons-material/PinDropOutlined";
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import type { Event } from "@peterplate/validators";
 import Image from "next/image";
 import EventTypeBadge from "@/components/ui/event-type-badge";
+import { classifyEvent } from "@/utils/classifyEvent";
 import { timeToString, toTitleCase } from "@/utils/funcs";
 
 /**
@@ -18,7 +19,7 @@ import { timeToString, toTitleCase } from "@/utils/funcs";
  */
 export default function EventDrawerContent(props: Event): React.JSX.Element {
   return (
-    <Box>
+    <Box className="dark:bg-[#303035]">
       <div className="relative">
         <Image
           src={props.image}
@@ -27,13 +28,18 @@ export default function EventDrawerContent(props: Event): React.JSX.Element {
           height={600}
           className="w-full object-contain"
         />
-        <EventTypeBadge title={props.title} />
+        <EventTypeBadge type={classifyEvent(props.title, props.description)} />
       </div>
       <Box sx={{ padding: "20px 24px 24px" }} className="flex flex-col gap-2">
-        <h2 className="text-2xl font-semibold text-sky-700 leading-tight">
+        <Typography
+          fontWeight={600}
+          color="primary"
+          sx={{ fontSize: "1.5rem" }}
+          className="leading-tight"
+        >
           {props.title}
-        </h2>
-        <div className="flex flex-col gap-2 text-sm text-zinc-500 mt-1">
+        </Typography>
+        <div className="flex flex-col gap-2 text-sm text-zinc-500 dark:text-zinc-400 mt-1">
           <div className="flex gap-2 items-center">
             <CalendarTodayOutlinedIcon sx={{ fontSize: 16 }} />
             <span>
@@ -55,9 +61,13 @@ export default function EventDrawerContent(props: Event): React.JSX.Element {
             <span>{toTitleCase(props.restaurantId)}</span>
           </div>
         </div>
-        <p className="text-sm leading-relaxed mt-2">
-          {props.description.replace(/\u00A0+/g, " ")}
-        </p>
+        <Typography
+          variant="body2"
+          color="text.primary"
+          className="leading-relaxed mt-2"
+        >
+          {props.description?.replace(/\u00A0+/g, " ")}
+        </Typography>
       </Box>
     </Box>
   );

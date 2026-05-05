@@ -1,4 +1,5 @@
 import type { AppRouter, FormattedRestaurantInfo, Station } from "@api/index";
+import { Typography } from "@mui/material";
 import type { DishWithRating } from "@peterplate/validators";
 import type { TRPCClientErrorLike } from "@trpc/client";
 import DishesInfo from "@/components/ui/dishes-info";
@@ -67,10 +68,15 @@ export function DishesView({
               id={station.name.toLowerCase()}
               className="[&_#food-scroll]:h-auto [&_#food-scroll]:overflow-y-visible mb-8 scroll-mt-4"
             >
-              <div className="border-b-2 mb-4">
-                <h1 className="font-bold text-3xl">
+              <div className="mb-4">
+                <Typography
+                  variant="h5"
+                  fontWeight={700}
+                  color="text.primary"
+                  sx={{ fontSize: "1.875rem" }}
+                >
                   {toTitleCase(station.name)}
-                </h1>
+                </Typography>
               </div>
               <DishesInfo
                 dishes={getFilteredDishes(station.dishes)}
@@ -85,10 +91,15 @@ export function DishesView({
         : // Normal View: Render active station logic
           activeStation && (
             <div className="[&_#food-scroll]:h-auto [&_#food-scroll]:overflow-y-visible">
-              <div className="border-b-2 mb-4">
-                <h1 className="font-bold text-3xl">
+              <div className="mb-4">
+                <Typography
+                  variant="h5"
+                  fontWeight={700}
+                  color="text.primary"
+                  sx={{ fontSize: "1.875rem" }}
+                >
                   {toTitleCase(activeStation.name)}
-                </h1>
+                </Typography>
               </div>
               <DishesInfo
                 dishes={getFilteredDishes(activeStation?.dishes ?? [])}

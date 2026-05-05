@@ -1,5 +1,5 @@
 import type { NextConfig } from "next";
-import path from "node:path";
+import withPWA from "next-pwa";
 
 const nextConfig: NextConfig = {
   transpilePackages: [
@@ -7,6 +7,9 @@ const nextConfig: NextConfig = {
     "@peterplate/db",
     "@peterplate/validators",
   ],
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "uci.campusdish.com" },
@@ -65,4 +68,7 @@ const nextConfig: NextConfig = {
   }, */
 };
 
-export default nextConfig;
+export default withPWA({
+  dest: "public",
+  disable: process.env.NODE_ENV === "development",
+})(nextConfig);

@@ -1,7 +1,7 @@
 "use client";
 
 import { LocationOn } from "@mui/icons-material";
-import { Container, Link, Typography } from "@mui/material";
+import { Box, Container, Link, Typography } from "@mui/material";
 import type { FormattedRestaurantInfo } from "@peterplate/api";
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
@@ -76,7 +76,14 @@ export function RestaurantPage({
 
   const { data: upcomingEvents = [] } = trpc.event.upcoming.useQuery();
   const hallEvents = useMemo(
-    () => [...upcomingEvents].filter((e) => e.restaurantId === restaurantId),
+    () =>
+      [...upcomingEvents]
+        .filter((e) => e.restaurantId === restaurantId)
+        .sort(
+          (a, b) =>
+            (a.start ? new Date(a.start).getTime() : 0) -
+            (b.start ? new Date(b.start).getTime() : 0),
+        ),
     [upcomingEvents, restaurantId],
   );
 
@@ -178,7 +185,7 @@ export function RestaurantPage({
   const displayDate = selectedDate ?? today;
 
   return (
-    <div>
+    <Box sx={{ bgcolor: "background.default", minHeight: "100vh" }}>
       {/* Hero image & mobile header */}
       <div className="relative w-full h-[200px] md:h-[250px]">
         <Image
@@ -299,7 +306,7 @@ export function RestaurantPage({
           )}
         </div>
       </Container>
-    </div>
+    </Box>
   );
 }
 

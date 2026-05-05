@@ -1,4 +1,4 @@
-import { Button, Dialog } from "@mui/material";
+import { Button, Dialog, Typography } from "@mui/material";
 import { useState } from "react";
 
 interface IngredientsDialogProps {
@@ -34,13 +34,22 @@ export default function IngredientsDialog({
         Show All Ingredients
       </Button>
       <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-        <div className="grid gap-2 pb-6">
-          <h2 className="text-lg font-semibold leading-none tracking-tight px-5 pt-6">
+        <div className="grid gap-2 pb-6 dark:bg-[#303035]">
+          <Typography
+            variant="h6"
+            fontWeight={600}
+            color="primary"
+            className="px-5 pt-6"
+          >
             {name} Ingredients
-          </h2>
-          <p className="px-5 text-sm max-h-48 overflow-y-scroll">
+          </Typography>
+          <Typography
+            variant="body2"
+            color="text.primary"
+            className="px-5 max-h-48 overflow-y-scroll"
+          >
             {ingredients}
-          </p>
+          </Typography>
         </div>
       </Dialog>
     </>

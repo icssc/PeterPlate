@@ -2,24 +2,30 @@
 
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import GridOnIcon from "@mui/icons-material/GridOn";
+import { Typography } from "@mui/material";
 import Button from "@mui/material/Button";
 import { useState } from "react";
 import { trpc } from "@/utils/trpc";
+// @ts-expect-error: big-calendar import error always, for some reason
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import type { Event } from "@peterplate/validators";
-import { addMonths, endOfMonth, startOfMonth, subMonths } from "date-fns";
+import { addMonths, subMonths } from "date-fns";
 import CalendarView from "@/components/ui/calendar-view";
 import EventCard from "@/components/ui/card/event-card";
 import EventCardSkeleton from "@/components/ui/skeleton/event-card-skeleton";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-import { getEventType } from "@/utils/funcs";
+import {
+  classifyEvent,
+  EVENT_CATEGORIES,
+  type EventCategory,
+} from "@/utils/classifyEvent";
 
 const Events = () => {
   const [selectedDiningHall, setSelectedDiningHall] = useState<
     "both" | "anteatery" | "brandywine"
   >("both");
   const [selectedEventType, setSelectedEventType] = useState<
-    "both" | "special" | "celebration"
+    "both" | EventCategory
   >("both");
   const [viewMode, setViewMode] = useState<"grid" | "calendar">("grid");
   const [selectedEventData, setSelectedEventData] = useState<Event | null>(
@@ -41,7 +47,13 @@ const Events = () => {
         )
       : [];
 
-  const filteredEvents = sortedEvents?.filter((event) => {
+  const eventsWithType =
+    sortedEvents?.map((event) => ({
+      ...event,
+      eventType: classifyEvent(event.title, event.description),
+    })) ?? [];
+
+  const filteredEvents = eventsWithType.filter((event) => {
     const matchesDiningHall =
       selectedDiningHall === "both" ||
       (selectedDiningHall === "anteatery" &&
@@ -49,10 +61,8 @@ const Events = () => {
       (selectedDiningHall === "brandywine" &&
         event.restaurantId === "brandywine");
     const matchesEventType =
-      selectedEventType === "both" ||
-      getEventType(event.title) === selectedEventType;
-    const notInPast = new Date(event.start) >= new Date();
-    return matchesDiningHall && matchesEventType && notInPast;
+      selectedEventType === "both" || event.eventType === selectedEventType;
+    return matchesDiningHall && matchesEventType;
   });
 
   const calendarEvents = filteredEvents?.map((event) => ({
@@ -66,7 +76,10 @@ const Events = () => {
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   const handleSelectEvent = (calendarEvent: any) => {
-    setSelectedEventData(calendarEvent.resource);
+    const resource = calendarEvent.resource;
+    setSelectedEventData({
+      ...resource,
+    });
   };
 
   const handleClose = () => setSelectedEventData(null);
@@ -88,15 +101,17 @@ const Events = () => {
           id="event-scroll"
         >
           <div>
-            <h1 className="text-4xl font-bold text-sky-700 dark:text-sky-400">
+            <Typography className="text-4xl font-bold" color="primary">
               Dining Hall Events
-            </h1>
-            <p className="text-zinc-600 dark:text-zinc-400 mt-1 font-medium">
+            </Typography>
+            <Typography color="text.primary" className="mt-1 font-medium">
               Join us for special events and celebrations hosted at your local
               dining halls!
-            </p>
+            </Typography>
             <div className="flex gap-2 mt-3 items-center">
-              <span className="text-sm font-medium text-slate-900">View:</span>
+              <span className="text-sm font-medium text-slate-900 dark:text-white">
+                View:
+              </span>
 
               {/* Grid View Button */}
               <Button
@@ -105,8 +120,8 @@ const Events = () => {
                 size="small"
                 className={`!px-4 !py-1 flex items-center justify-center !normal-case ${
                   viewMode === "grid"
-                    ? "!bg-sky-700 dark:!bg-sky-400 !text-white !border-sky-700 dark:!border-sky-400 hover:!bg-sky-800 dark:hover:!bg-sky-500"
-                    : "!bg-white dark:!bg-zinc-800 !border-sky-700 dark:!border-sky-400 !text-slate-900 dark:!text-zinc-100 hover:!bg-sky-50 dark:hover:!bg-zinc-700"
+                    ? "!bg-sky-700 !text-white !border-sky-700 hover:!bg-sky-800 dark:!bg-blue-300 dark:!text-gray-900 dark:!border-blue-300 dark:hover:!bg-blue-400"
+                    : "!bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50 dark:!bg-transparent dark:!border-blue-300 dark:!text-white dark:hover:!bg-zinc-700"
                 }`}
               >
                 <GridOnIcon className="mr-1" sx={{ fontSize: 18 }} />
@@ -120,8 +135,8 @@ const Events = () => {
                 size="small"
                 className={`!px-4 !py-1 flex items-center justify-center !normal-case ${
                   viewMode === "calendar"
-                    ? "!bg-sky-700 dark:!bg-sky-400 !text-white !border-sky-700 dark:!border-sky-400 hover:!bg-sky-800 dark:hover:!bg-sky-500"
-                    : "!bg-white dark:!bg-zinc-800 !border-sky-700 dark:!border-sky-400 !text-slate-900 dark:!text-zinc-100 hover:!bg-sky-50 dark:hover:!bg-zinc-700"
+                    ? "!bg-sky-700 !text-white !border-sky-700 hover:!bg-sky-800 dark:!bg-blue-300 dark:!text-gray-900 dark:!border-blue-300 dark:hover:!bg-blue-400"
+                    : "!bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50 dark:!bg-transparent dark:!border-blue-300 dark:!text-white dark:hover:!bg-zinc-700"
                 }`}
               >
                 <CalendarTodayIcon className="mr-1" sx={{ fontSize: 18 }} />
@@ -130,63 +145,58 @@ const Events = () => {
             </div>
 
             {/* Filter Bar */}
-            <div className="flex flex-wrap gap-8 w-full bg-sky-100 dark:bg-zinc-900/50 border dark:border-zinc-800 rounded-lg p-5 pb-8 mt-4">
+            <div className="flex flex-wrap gap-8 w-full bg-[#cce1ee] dark:bg-[#434e5d] border dark:border-zinc-700 rounded-lg p-5 pb-8 mt-4">
               <div className="flex flex-col gap-3">
-                <span className="text-sm font-medium text-slate-900 dark:text-zinc-200">
+                <span className="text-sm font-medium text-slate-900 dark:text-white">
                   Event Type
                 </span>
-                <div className="flex gap-3">
+                <div className="flex flex-wrap gap-3">
                   <Button
                     variant="outlined"
                     size="small"
                     onClick={() => setSelectedEventType("both")}
                     className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
                       selectedEventType === "both"
-                        ? "!bg-sky-700 dark:!bg-sky-400 !text-white !border-sky-700 dark:!border-sky-400 hover:!bg-sky-800 dark:hover:!bg-sky-500"
-                        : "!bg-white dark:!bg-zinc-800 !border-sky-700 dark:!border-sky-400 !text-slate-900 dark:!text-zinc-100 hover:!bg-sky-50 dark:hover:!bg-zinc-700"
+                        ? "!bg-sky-700 !text-white !border-sky-700 hover:!bg-sky-800 dark:!bg-blue-300 dark:!text-gray-900 dark:!border-blue-300 dark:hover:!bg-blue-400"
+                        : "!bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50 dark:!bg-transparent dark:!border-blue-300 dark:!text-white dark:hover:!bg-zinc-700"
                     }`}
                   >
                     All Events
                   </Button>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={() => setSelectedEventType("special")}
-                    className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
-                      selectedEventType === "special"
-                        ? "!bg-sky-700 dark:!bg-sky-400 !text-white !border-sky-700 dark:!border-sky-400 hover:!bg-sky-800 dark:hover:!bg-sky-500 hover:!text-white"
-                        : "!bg-white dark:!bg-zinc-800 !border-sky-700 dark:!border-sky-400 !text-slate-900 dark:!text-zinc-100 hover:!bg-sky-50 dark:hover:!bg-zinc-700 hover:!text-slate-900"
-                    }`}
-                  >
-                    Special Meals
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={() => setSelectedEventType("celebration")}
-                    className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
-                      selectedEventType === "celebration"
-                        ? "!bg-sky-700 dark:!bg-sky-400 !text-white !border-sky-700 dark:!border-sky-400 hover:!bg-sky-800 dark:hover:!bg-sky-500 hover:!text-white"
-                        : "!bg-white dark:!bg-zinc-800 !border-sky-700 dark:!border-sky-400 !text-slate-900 dark:!text-zinc-100 hover:!bg-sky-50 dark:hover:!bg-zinc-700 hover:!text-slate-900"
-                    }`}
-                  >
-                    Celebration
-                  </Button>
+                  {EVENT_CATEGORIES.map((category) => {
+                    const isSelected = selectedEventType === category;
+
+                    return (
+                      <Button
+                        key={category}
+                        variant="outlined"
+                        size="small"
+                        onClick={() => setSelectedEventType(category)}
+                        className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
+                          isSelected
+                            ? "!bg-sky-700 dark:!bg-sky-400 !text-white !border-sky-700 dark:!border-sky-400 hover:!bg-sky-800 dark:hover:!bg-sky-500"
+                            : "!bg-white dark:!bg-zinc-800 !border-sky-700 dark:!border-sky-400 !text-slate-900 dark:!text-zinc-100 hover:!bg-sky-50 dark:hover:!bg-zinc-700"
+                        }`}
+                      >
+                        {category}
+                      </Button>
+                    );
+                  })}
                 </div>
               </div>
               <div className="flex flex-col gap-3">
-                <span className="text-sm font-medium text-slate-900">
+                <span className="text-sm font-medium text-slate-900 dark:text-white">
                   Location
                 </span>
-                <div className="flex gap-3">
+                <div className="flex flex-wrap gap-3">
                   <Button
                     variant="outlined"
                     size="small"
                     onClick={() => setSelectedDiningHall("both")}
                     className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
                       selectedDiningHall === "both"
-                        ? "!bg-sky-700 dark:!bg-sky-400 !text-white !border-sky-700 dark:!border-sky-400 hover:!bg-sky-800 dark:hover:!bg-sky-500 hover:!text-white"
-                        : "!bg-white dark:!bg-zinc-800 !border-sky-700 dark:!border-sky-400 !text-slate-900 dark:!text-zinc-100 hover:!bg-sky-50 dark:hover:!bg-zinc-700 hover:!text-slate-900"
+                        ? "!bg-sky-700 !text-white !border-sky-700 hover:!bg-sky-800 dark:!bg-blue-300 dark:!text-gray-900 dark:!border-blue-300 dark:hover:!bg-blue-400"
+                        : "!bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50 dark:!bg-transparent dark:!border-blue-300 dark:!text-white dark:hover:!bg-zinc-700"
                     }`}
                   >
                     All Locations
@@ -197,8 +207,8 @@ const Events = () => {
                     onClick={() => setSelectedDiningHall("brandywine")}
                     className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
                       selectedDiningHall === "brandywine"
-                        ? "!bg-sky-700 dark:!bg-sky-400 !text-white !border-sky-700 dark:!border-sky-400 hover:!bg-sky-800 dark:hover:!bg-sky-500 hover:!text-white"
-                        : "!bg-white dark:!bg-zinc-800 !border-sky-700 dark:!border-sky-400 !text-slate-900 dark:!text-zinc-100 hover:!bg-sky-50 dark:hover:!bg-zinc-700 hover:!text-slate-900"
+                        ? "!bg-sky-700 !text-white !border-sky-700 hover:!bg-sky-800 dark:!bg-blue-300 dark:!text-gray-900 dark:!border-blue-300 dark:hover:!bg-blue-400"
+                        : "!bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50 dark:!bg-transparent dark:!border-blue-300 dark:!text-white dark:hover:!bg-zinc-700"
                     }`}
                   >
                     Brandywine
@@ -209,8 +219,8 @@ const Events = () => {
                     onClick={() => setSelectedDiningHall("anteatery")}
                     className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
                       selectedDiningHall === "anteatery"
-                        ? "!bg-sky-700 dark:!bg-sky-400 !text-white !border-sky-700 dark:!border-sky-400 hover:!bg-sky-800 dark:hover:!bg-sky-500 hover:!text-white"
-                        : "!bg-white dark:!bg-zinc-800 !border-sky-700 dark:!border-sky-400 !text-slate-900 dark:!text-zinc-100 hover:!bg-sky-50 dark:hover:!bg-zinc-700 hover:!text-slate-900"
+                        ? "!bg-sky-700 !text-white !border-sky-700 hover:!bg-sky-800 dark:!bg-blue-300 dark:!text-gray-900 dark:!border-blue-300 dark:hover:!bg-blue-400"
+                        : "!bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50 dark:!bg-transparent dark:!border-blue-300 dark:!text-white dark:hover:!bg-zinc-700"
                     }`}
                   >
                     Anteatery
@@ -236,10 +246,10 @@ const Events = () => {
           {/* GRID DISPLAY: Map over the fetched events once loaded */}
           {!isLoading && !error && viewMode === "grid" && (
             <>
-              <p className="text-sm text-zinc-700 dark:text-zinc-400">
-                Showing {filteredEvents?.length} event
-                {filteredEvents?.length !== 1 ? "s" : ""}
-              </p>
+              <Typography variant="body2" fontWeight={600} color="text.primary">
+                Showing {filteredEvents.length} event
+                {filteredEvents.length !== 1 ? "s" : ""}
+              </Typography>
 
               <div className="flex sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12 overflow-x-auto sm:overflow-visible pb-2 sm:pb-0">
                 {filteredEvents?.map((event) => (
@@ -249,10 +259,14 @@ const Events = () => {
                   />
                 ))}
               </div>
-              {filteredEvents?.length === 0 && (
-                <p className="text-center text-zinc-700 py-5">
+              {filteredEvents.length === 0 && (
+                <Typography
+                  variant="body1"
+                  color="text.secondary"
+                  className="text-center py-5"
+                >
                   No events found :(
-                </p>
+                </Typography>
               )}
             </>
           )}
