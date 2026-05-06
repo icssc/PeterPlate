@@ -192,35 +192,13 @@ export default function MealTracker() {
         };
       });
 
+    // If user has history, show it
     if (calculated.length > 0) return calculated;
 
-    // Fallback: hardcode some dummy dishes so the tour target ALWAYS exists
-    const fallbackDishes = [
-      {
-        id: "dummy-1",
-        name: "Chicken Teriyaki",
-        calories: 110,
-        protein: 32,
-        carbs: 23,
-        fat: 16,
-      },
-      {
-        id: "dummy-2",
-        name: "White Rice",
-        calories: 239,
-        protein: 6,
-        carbs: 53,
-        fat: 0,
-      },
-      {
-        id: "dummy-3",
-        name: "Steamed Broccoli",
-        calories: 35,
-        protein: 2,
-        carbs: 7,
-        fat: 0,
-      },
-    ];
+    // Instead of using getPopularDishes which requires rating data,
+    // we safely grab 3 dishes from the already-calculated availableDishes
+    const fallbackDishes = availableDishes.slice(0, 3);
+    console.log(fallbackDishes.length, "fallback dishes found");
 
     return fallbackDishes.map((d) => ({
       id: `fallback-${d.id}`,
@@ -235,7 +213,7 @@ export default function MealTracker() {
       userId: userId ?? "",
       createdAt: new Date(),
     }));
-  }, [meals, userId]);
+  }, [meals, userId, availableDishes]); // <-- Changed dependency to availableDishes
 
   // logmeal mutation
   const logMeal = trpc.nutrition.logMeal.useMutation({
@@ -441,7 +419,7 @@ export default function MealTracker() {
           )}
         </div>
 
-        {/* Suggested Foods */}
+        {/* Suggested Foods (UPDATED JSX FOR TOUR) */}
         <div className="mt-6">
           <Typography variant="h6" fontWeight={600} color="text.primary">
             Suggested Foods
@@ -451,26 +429,28 @@ export default function MealTracker() {
               <Typography
                 variant="body2"
                 color="text.secondary"
-                className="mt-2"
+                className="mt-2 tour-suggested-card:first-of-type"
               >
                 Dishes from the past week logged 5+ times will appear here.
+                Start logging to see them!
               </Typography>
             ) : (
               suggestedMeals.map((meal) => (
-                <SearchMealCard
-                  key={meal.dishId}
-                  meal={meal}
-                  isUnavailable={isUnavailable(meal.dishId)}
-                  onAdd={(meal, servings) =>
-                    logMeal.mutate({
-                      userId: userId ?? "",
-                      dishId: meal.dishId ?? "",
-                      dishName: meal.dishName ?? "",
-                      servings,
-                      eatenAt: new Date(),
-                    })
-                  }
-                />
+                <div key={meal.dishId} className="tour-suggested-card">
+                  <SearchMealCard
+                    meal={meal}
+                    isUnavailable={isUnavailable(meal.dishId)}
+                    onAdd={(meal, servings) =>
+                      logMeal.mutate({
+                        userId: userId ?? "",
+                        dishId: meal.dishId ?? "",
+                        dishName: meal.dishName ?? "",
+                        servings,
+                        eatenAt: new Date(),
+                      })
+                    }
+                  />
+                </div>
               ))
             )}
           </div>
