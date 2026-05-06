@@ -156,8 +156,8 @@ export default function MyFoodsPage() {
       <header className="space-y-1">
         <Typography color="primary" fontWeight={700} className="text-4xl mb-4">
           My Foods
+          <PushSubscriptionButton />
         </Typography>
-        <PushSubscriptionButton />
         <Typography
           variant="body2"
           color="text.secondary"
