@@ -85,9 +85,9 @@ export default function MealTracker() {
     return result.sort((a, b) => b.rawDate.getTime() - a.rawDate.getTime());
   }, [meals]);
 
-  const activeDayIndex = mealsGroupedByDay.length > 0 ? 0 : null;
+  const todayKey = new Date().toDateString();
   const selectedDay =
-    activeDayIndex !== null ? mealsGroupedByDay[activeDayIndex] : null;
+    mealsGroupedByDay.find((g) => g.dateLabel === todayKey) ?? null;
 
   const toNum = (v: string | null) => {
     const n = v == null ? 0 : Number(v);
