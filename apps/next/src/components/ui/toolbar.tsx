@@ -488,7 +488,7 @@ function MobileToolbar(): React.JSX.Element {
         >
           {greeting}
         </span>
-        <div className="flex-shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center">
+        <div className="flex-shrink-0 min-h-[44px] flex items-center justify-center gap-2">
           {!isMounted || isPending ? (
             <IconButton
               type="button"
@@ -514,14 +514,19 @@ function MobileToolbar(): React.JSX.Element {
               />
             </IconButton>
           ) : (
-            <IconButton
-              type="button"
-              onClick={handleProfileOpen}
-              className="!p-0 !min-w-[44px] !min-h-[44px]"
-              aria-label="Open profile menu"
-            >
-              <AccountCircleIcon style={{ fontSize: 36, color: "#bdbdbd" }} />
-            </IconButton>
+            <div className="flex items-center gap-2">
+              <GoogleSignInButton />
+              <IconButton
+                type="button"
+                onClick={handleProfileOpen}
+                className="!min-w-[44px] !min-h-[44px] hover:!bg-gray-100 dark:hover:!bg-gray-700"
+                aria-label="Open sidebar"
+              >
+                <MenuIcon
+                  sx={{ color: isTransparent ? "white" : "text.primary" }}
+                />
+              </IconButton>
+            </div>
           )}
         </div>
       </div>
