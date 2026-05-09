@@ -99,6 +99,7 @@
 	<key>WKAppBoundDomains</key>
 	<array>
 		<string>www.peterplate.com</string>
+		<string>auth.icssc.club</string>
 	</array>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>

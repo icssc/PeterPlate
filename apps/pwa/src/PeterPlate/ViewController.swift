@@ -1,5 +1,6 @@
 import UIKit
 import WebKit
+import AuthenticationServices
 
 var webView: WKWebView! = nil
 
@@ -19,6 +20,9 @@ class ViewController: UIViewController, WKNavigationDelegate, UIDocumentInteract
     @IBOutlet weak var connectionProblemView: UIImageView!
     @IBOutlet weak var webviewView: UIView!
     var toolbarView: UIToolbar!
+
+    // Held strongly so ARC doesn't drop the session mid-flow.
+    var currentAuthSession: ASWebAuthenticationSession?
     
     var htmlIsLoaded = false;
     private var loadingMode = LoadingMode.defaultCachePolicy
@@ -165,9 +169,15 @@ class ViewController: UIViewController, WKNavigationDelegate, UIDocumentInteract
     
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
         htmlIsLoaded = false;
-        
-        if (error as NSError)._code == (-999) { return }
-        if (error as NSError)._code == 102 { return }
+
+        // WKWebView reports cancels in two domains:
+        //   - NSURLErrorDomain / NSURLErrorCancelled (-999): request-level cancel
+        //   - WebKitErrorDomain / 102 (frameLoadInterruptedByPolicyChange):
+        //     fired when we call decisionHandler(.cancel) to hand off to
+        //     ASWebAuthenticationSession.
+        let nsError = error as NSError
+        if nsError.domain == NSURLErrorDomain && nsError.code == NSURLErrorCancelled { return }
+        if nsError.domain == "WebKitErrorDomain" && nsError.code == 102 { return }
         
         self.overrideUIStyle(toDefault: true);
         webView.isHidden = true;
@@ -273,4 +283,80 @@ extension ViewController: WKScriptMessageHandler {
             handleFCMToken()
         }
   }
+}
+
+// MARK: - ASWebAuthenticationSession handoff
+//
+// When the WKWebView tries to navigate to auth.icssc.club/authorize (the ICSSC
+// OIDC issuer), we cancel the navigation and re-run the flow inside an
+// ASWebAuthenticationSession. Reasons:
+//   1. Google rejects OAuth inside embedded webviews with `disallowed_useragent`
+//      since 2021-09-30 (Google Developers Blog).
+//   2. Passkeys / WebAuthn bound to a third-party RP ID (e.g. google.com) only
+//      work in top-level Safari context, not in a WKWebView.
+//
+// The callback uses a Universal Link via ASWebAuthenticationSession's HTTPS-
+// callback initializer. The AASA file served at
+// https://www.peterplate.com/.well-known/apple-app-site-association lists the
+// callback path, so the callback can only be delivered to our AASA-verified app.
+//
+// On callback, we load the OAuth callback URL in the WKWebView so Better Auth's
+// server-side handler can validate the PKCE exchange, set the session cookie in
+// the WebView's cookie jar, and redirect to the app.
+//
+// IMPORTANT: Better Auth stores PKCE state in the database (verification table),
+// not cookies — so the code exchange works even though ASWebAuthenticationSession
+// runs in a separate browser context from the WKWebView.
+extension ViewController: ASWebAuthenticationPresentationContextProviding {
+    func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
+        return view.window ?? ASPresentationAnchor()
+    }
+
+    func startAuthSession(url: URL, webView: WKWebView) {
+        // Read the redirect_uri from the OIDC authorize URL. Better Auth sets
+        // it to https://www.peterplate.com/api/auth/callback/icssc.
+        let authComponents = URLComponents(url: url, resolvingAgainstBaseURL: false)
+        let redirectUri = authComponents?
+            .queryItems?
+            .first(where: { $0.name == "redirect_uri" })?
+            .value
+            .flatMap { URL(string: $0) }
+
+        let callbackHost = redirectUri?.host ?? "www.peterplate.com"
+        let callbackPath = redirectUri?.path ?? "/api/auth/callback/icssc"
+
+        let callback: ASWebAuthenticationSession.Callback = .https(
+            host: callbackHost,
+            path: callbackPath
+        )
+
+        let session = ASWebAuthenticationSession(
+            url: url,
+            callback: callback
+        ) { [weak self, weak webView] callbackURL, error in
+            self?.currentAuthSession = nil
+
+            if let error = error {
+                let nsError = error as NSError
+                if nsError.domain == ASWebAuthenticationSessionError.errorDomain &&
+                    nsError.code == ASWebAuthenticationSessionError.canceledLogin.rawValue {
+                    return
+                }
+                print("ASWebAuthenticationSession error: \(error)")
+                return
+            }
+
+            guard let callbackURL = callbackURL else { return }
+
+            // Load the callback URL in the WKWebView. Better Auth will process
+            // the code exchange, set the session cookie, and redirect to /.
+            webView?.load(URLRequest(url: callbackURL))
+        }
+        session.presentationContextProvider = self
+        // Share Safari cookies + iCloud Keychain passkeys so Google SSO, UCI
+        // Shib/Duo, and any cross-session credentials reuse cleanly.
+        session.prefersEphemeralWebBrowserSession = false
+        self.currentAuthSession = session
+        session.start()
+    }
 }

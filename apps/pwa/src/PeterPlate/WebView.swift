@@ -122,24 +122,23 @@ extension ViewController: WKUIDelegate, WKDownloadDelegate {
         if let requestUrl = navigationAction.request.url{
             if let requestHost = requestUrl.host {
                 // NOTE: Match auth origin first, because host origin may be a subset of auth origin and may therefore always match
-                let matchingAuthOrigin = authOrigins.first(where: { requestHost.range(of: $0) != nil })
-                if (matchingAuthOrigin != nil) {
+                let handOffOidc = authOrigins.contains(where: { requestHost.range(of: $0) != nil })
+                    && shouldHandOffOidcToASWebAuthenticationSession(requestUrl)
+                if handOffOidc {
+                    decisionHandler(.cancel)
+                    self.startAuthSession(url: requestUrl, webView: webView)
+                    return
+                }
+
+                // Remaining IdP URLs (e.g. /logout with post_logout_redirect_uri) load in the webview
+                if authOrigins.contains(where: { requestHost.range(of: $0) != nil }) {
                     decisionHandler(.allow)
-                    if (toolbarView.isHidden) {
-                        toolbarView.isHidden = false
-                        webView.frame = calcWebviewFrame(webviewView: webviewView, toolbarView: toolbarView)
-                    }
                     return
                 }
 
                 let matchingHostOrigin = allowedOrigins.first(where: { requestHost.range(of: $0) != nil })
                 if (matchingHostOrigin != nil) {
-                    // Open in main webview
                     decisionHandler(.allow)
-                    if (!toolbarView.isHidden) {
-                        toolbarView.isHidden = true
-                        webView.frame = calcWebviewFrame(webviewView: webviewView, toolbarView: nil)
-                    }
                     return
                 }
                 if (navigationAction.navigationType == .other &&
