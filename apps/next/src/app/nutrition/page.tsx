@@ -377,7 +377,7 @@ export default function MealTracker() {
           </Typography>
           {countedMeals.length === 0 ? (
             <Typography variant="body2" color="text.secondary" className="mt-2">
-              No counted foods.
+              No logged meals yet for this day.
             </Typography>
           ) : (
             <div className="flex flex-wrap gap-4 mt-4">
