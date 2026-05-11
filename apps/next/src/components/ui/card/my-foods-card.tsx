@@ -8,7 +8,7 @@ import {
   StarBorder,
 } from "@mui/icons-material";
 import { Card, CardContent, Dialog, Drawer, Typography } from "@mui/material";
-import type { DishInfo } from "@peterplate/api";
+import type { DishWithRating } from "@peterplate/validators";
 import Image from "next/image";
 import React from "react";
 import { useUserStore } from "@/context/useUserStore";
@@ -73,11 +73,16 @@ function UserRatingDisplay({
 }
 
 interface MyFoodsCardProps {
-  dish: DishInfo;
+  dish: DishWithRating;
   isFavorited: boolean;
+  restaurant: "anteatery" | "brandywine";
   stationName?: string;
   favoriteDisabled?: boolean;
-  onToggleFavorite?: (dishId: string, currentlyFavorite: boolean) => void;
+  onToggleFavorite?: (
+    dishId: string,
+    currentlyFavorite: boolean,
+    restaurant: "brandywine" | "anteatery",
+  ) => void;
   className?: string;
 }
 
@@ -89,6 +94,7 @@ const MyFoodsCardContent = React.forwardRef<
     {
       dish,
       isFavorited,
+      restaurant,
       stationName,
       favoriteDisabled,
       onToggleFavorite,
@@ -102,8 +108,8 @@ const MyFoodsCardContent = React.forwardRef<
     const IconComponent = getFoodIcon(dish.name);
     const [imageError, setImageError] = React.useState(false);
     const showImage =
-      typeof dish.image_url === "string" &&
-      dish.image_url.trim() !== "" &&
+      typeof dish.imageUrl === "string" &&
+      dish.imageUrl.trim() !== "" &&
       !imageError;
 
     const { data: ratingData } = trpc.dish.getAverageRating.useQuery(
@@ -121,7 +127,11 @@ const MyFoodsCardContent = React.forwardRef<
         return;
       }
       if (favoriteDisabled || !onToggleFavorite) return;
-      onToggleFavorite(dish.id, Boolean(isFavorited));
+      onToggleFavorite(
+        dish.id,
+        Boolean(isFavorited),
+        restaurant as "brandywine" | "anteatery",
+      );
     };
 
     return (
@@ -140,9 +150,9 @@ const MyFoodsCardContent = React.forwardRef<
               <div className="flex items-start gap-3 p-4 pb-3">
                 {/* Thumbnail */}
                 <div className="flex-shrink-0 w-[96px] h-[96px] rounded-lg overflow-hidden bg-slate-100 dark:bg-zinc-700 flex items-center justify-center">
-                  {showImage ? (
+                  {showImage && dish.imageUrl ? (
                     <Image
-                      src={dish.image_url}
+                      src={dish.imageUrl}
                       alt={formatFoodName(dish.name)}
                       width={96}
                       height={96}
@@ -198,7 +208,7 @@ const MyFoodsCardContent = React.forwardRef<
                     >
                       {dish.nutritionInfo.calories == null
                         ? "-"
-                        : `${Math.round(parseFloat(dish.nutritionInfo.calories))} cal`}
+                        : `${Math.round(dish.nutritionInfo.calories)} cal`}
                     </Typography>
                     <div className="flex items-center gap-0.5 text-zinc-500 dark:text-zinc-400">
                       <StarBorder
@@ -232,7 +242,7 @@ const MyFoodsCardContent = React.forwardRef<
                 <div className="flex items-center gap-1 text-gray-500 dark:text-zinc-400 text-sm min-w-0">
                   <LocationOn className="w-5 h-5 flex-shrink-0" />
                   <span>
-                    {toTitleCase(dish.restaurant)}
+                    {toTitleCase(restaurant)}
                     {stationName ? ` • ${toTitleCase(stationName)}` : ""}
                   </span>
                 </div>
@@ -255,6 +265,7 @@ MyFoodsCardContent.displayName = "MyFoodsCardContent";
 export default function MyFoodsCard({
   dish,
   isFavorited,
+  restaurant,
   stationName,
   favoriteDisabled,
   onToggleFavorite,
@@ -313,6 +324,7 @@ export default function MyFoodsCard({
       <MyFoodsCardContent
         dish={dish}
         isFavorited={isFavorited}
+        restaurant={restaurant}
         stationName={stationName}
         favoriteDisabled={favoriteDisabled}
         onToggleFavorite={onToggleFavorite}
@@ -331,6 +343,7 @@ export default function MyFoodsCard({
             dish={dish}
             onAddToMealTracker={handleAddToMealTracker}
             isAddingToMealTracker={logMealMutation.isPending}
+            restaurant={restaurant}
           />
         </Dialog>
       ) : (
@@ -344,6 +357,7 @@ export default function MyFoodsCard({
             dish={dish}
             onAddToMealTracker={handleAddToMealTracker}
             isAddingToMealTracker={logMealMutation.isPending}
+            restaurant={restaurant}
           />
         </Drawer>
       )}

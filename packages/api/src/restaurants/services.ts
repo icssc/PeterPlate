@@ -1,136 +1,119 @@
-import { upsert } from "@api/utils";
-import type {
-  Drizzle,
-  InsertRestaurant,
-  SelectDietRestriction,
-  SelectDish,
-  SelectEvent,
-  SelectMenu,
-  SelectNutritionInfo,
-  SelectPeriod,
-  SelectRestaurant,
-  SelectStation,
-} from "@peterplate/db";
-import { restaurants } from "@peterplate/db";
+import { getDishes } from "@api/dishes/services";
+import type { Drizzle, RestaurantId } from "@peterplate/db";
+import type { DishWithRating } from "@peterplate/validators";
+import {
+  getDateRangeOfAvailableDiningDataResponseSchema,
+  getRestaurantsResponseSchema,
+  getStateForRestaurantOnDayResponseSchema,
+} from "@peterplate/validators";
 import { TRPCError } from "@trpc/server";
-import { formatInTimeZone } from "date-fns-tz";
+import type { FormattedRestaurantInfo } from "..";
+import { AAPI_DINING_ROUTE } from "..";
 
-export const upsertRestaurant = async (
-  db: Drizzle,
-  restaurant: InsertRestaurant,
-) =>
-  await upsert(db, restaurants, restaurant, {
-    target: restaurants.id,
-    set: restaurant,
-  });
+export async function getAvailableDateRange() {
+  const req = await fetch(`${AAPI_DINING_ROUTE}/dateRange`);
 
-/** Restaurant information for a given date. */
-export interface RestaurantInfo extends SelectRestaurant {
-  /** Events that are happening today or later. */
-  events: SelectEvent[];
-  /** List of menus for each period. */
-  menus: (SelectMenu & {
-    period: SelectPeriod;
-    stations: (SelectStation & {
-      dishes: (SelectDish & {
-        menuId: SelectMenu["id"]; // derived from menu context (dishes_to_menus), not dishes.menu_id
-        restaurant: SelectRestaurant["name"];
-        dietRestriction: SelectDietRestriction;
-        nutritionInfo: SelectNutritionInfo;
-      })[];
-    })[];
-  })[];
+  if (!req.ok)
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "Could not reach dateRange endpoint.",
+    });
+
+  const parsedData = getDateRangeOfAvailableDiningDataResponseSchema.safeParse(
+    await req.json(),
+  );
+
+  if (!parsedData.success)
+    throw new TRPCError({
+      code: "PARSE_ERROR",
+      message: `Could not parse dateRange response: ${parsedData.error}`,
+    });
+
+  return parsedData.data.data;
 }
 
-/** Data object to be given to the client. */
-interface PeterPlateData {
-  anteatery: RestaurantInfo;
-  brandywine: RestaurantInfo;
-}
-
-/**
- * Get menus and events for each restaurant. Fetches menus that correspond to the
- * given date and events that are happening today or later.
- */
-export async function getRestaurantsByDate(
+export async function getRestaurantByDate(
+  restaurant: RestaurantId,
   db: Drizzle,
   date: Date,
-): Promise<PeterPlateData> {
-  const restaurants = await db.query.restaurants.findMany({
-    with: {
-      /** Get menus that correspond to the given date. */
-      menus: {
-        where: (menus, { eq }) =>
-          eq(
-            menus.date,
-            formatInTimeZone(date, "America/Los_Angeles", "yyyy-MM-dd"),
-          ),
-        with: {
-          period: true,
-          dishesToMenus: {
-            with: {
-              dish: {
-                with: {
-                  dietRestriction: true,
-                  nutritionInfo: true,
-                },
-              },
-            },
-          },
-        },
-      },
-      /** Get events that are happening today or later. */
-      events: {
-        where: (events, { gte }) => gte(events.end, new Date()),
-      },
-      stations: true,
-    },
-  });
+): Promise<FormattedRestaurantInfo> {
+  const restarauntReq = await fetch(
+    `${AAPI_DINING_ROUTE}/restaurants?id=${restaurant}`,
+  );
 
-  // Transform data to the expected format
-  const [firstRestaurant, secondRestaurant] = restaurants.map(
-    ({ menus, events, stations, ...restaurant }) => ({
-      ...restaurant,
-      menus: menus
-        .map(({ period, dishesToMenus, ...menu }) => ({
-          ...menu,
-          /** Only include stations that have dishes */
-          stations: stations
-            .map((station) => ({
-              ...station,
-              dishes: dishesToMenus
-                .map((dishToMenu) => ({
-                  ...dishToMenu.dish,
-                  image_url: dishToMenu.dish.image_url ?? null,
-                  menuId: menu.id, // derived from menu we’re iterating, not from dish row
-                  restaurant: restaurant.name,
-                }))
-                .filter((dish) => dish.stationId === station.id),
-            }))
-            .filter((station) => station.dishes.length),
-          // ? include this if we want a flat list of dishes
-          // dishes: dishesToMenus.map((dishToMenu) => dishToMenu.dish),
-          period,
-        }))
-        .sort((a, b) => a.period.startTime.localeCompare(b.period.startTime)),
-      events,
-      stations,
+  const dateString = date.toLocaleDateString("en-CA");
+  const dishReq = await fetch(
+    `${AAPI_DINING_ROUTE}/restaurantToday?id=${restaurant}&date=${dateString}`,
+  );
+
+  console.log(
+    `${AAPI_DINING_ROUTE}/restaurantToday?id=${restaurant}&date=${dateString}`,
+  );
+  if (!(restarauntReq.ok && dishReq.ok))
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: `Could not reach restaurants endpoint: ${!restarauntReq.ok ? restarauntReq.statusText : " "}${dishReq.statusText}`,
+    });
+
+  const restaurantParsed = getRestaurantsResponseSchema.safeParse(
+    await restarauntReq.json(),
+  );
+  const dishParsed = getStateForRestaurantOnDayResponseSchema.safeParse(
+    await dishReq.json(),
+  );
+
+  if (!(restaurantParsed.success && dishParsed.success))
+    throw new TRPCError({
+      code: "PARSE_ERROR",
+      message: `Could not parse restaurants response: ${restaurantParsed.error ?? dishParsed.error}`,
+    });
+
+  const restaurantData = restaurantParsed.data.data;
+  const dishData = dishParsed.data.data;
+
+  const validPeriods = Object.values(dishData.periods).filter(
+    (period) => period.startTime && period.endTime,
+  );
+
+  const stationIdToName = new Map(
+    restaurantData.flatMap((restaurant) =>
+      restaurant.stations.map((station) => [station.id, station.name]),
+    ),
+  );
+
+  const periods = await Promise.all(
+    validPeriods.map(async (period) => {
+      // 1. Collect all unique IDs for the entire period first
+      const allDishIdsInPeriod = [
+        ...new Set(Object.values(period.stationToDishes).flat()),
+      ];
+
+      // 2. Single batch fetch for the whole period
+      const allDishesInPeriod = await getDishes(allDishIdsInPeriod, db);
+
+      // 3. Map them back to their stations
+      const dishesLookup = new Map(allDishesInPeriod.map((d) => [d.id, d]));
+
+      const stations = Object.entries(period.stationToDishes).map(
+        ([sId, dIds]) => ({
+          name: stationIdToName.get(Number.parseInt(sId, 10)) ?? "UNKNOWN",
+          dishes: dIds
+            .map((id) => dishesLookup.get(id))
+            .filter(Boolean) as DishWithRating[],
+        }),
+      );
+
+      return {
+        name: period.name,
+        startTime: period.startTime ?? "",
+        endTime: period.endTime ?? "",
+        stations,
+      };
     }),
   );
 
-  if (!firstRestaurant || !secondRestaurant)
-    throw new TRPCError({
-      code: "INTERNAL_SERVER_ERROR",
-      message: "Restaurants not found, there should always be two restaurants",
-    });
-
-  return firstRestaurant.name === "anteatery"
-    ? {
-        anteatery: firstRestaurant,
-        brandywine: secondRestaurant,
-      }
-    : {
-        anteatery: secondRestaurant,
-        brandywine: firstRestaurant,
-      };
+  return {
+    name: restaurant,
+    periods,
+  } satisfies FormattedRestaurantInfo;
 }

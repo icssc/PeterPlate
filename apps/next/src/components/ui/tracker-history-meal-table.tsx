@@ -3,8 +3,12 @@
 import type { LoggedMealJoinedWithNutrition } from "./nutrition-breakdown";
 import { compileMealData } from "./nutrition-breakdown";
 
+type TrackerHistoryMeal = LoggedMealJoinedWithNutrition & {
+  dishName?: string;
+};
+
 interface Props {
-  mealsEaten: LoggedMealJoinedWithNutrition[];
+  mealsEaten: TrackerHistoryMeal[];
 }
 
 export default function TrackerHistoryMealTable({ mealsEaten }: Props) {

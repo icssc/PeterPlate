@@ -11,13 +11,39 @@ import {
   ToggleButton,
   Tooltip,
 } from "@mui/material";
+import type { UserAllergy, UserDietaryPreference } from "@peterplate/db";
 import { useEffect, useRef, useState } from "react";
 import { useSession } from "@/utils/auth-client";
 import { trpc } from "@/utils/trpc";
-import {
-  AllergenKeys,
-  PreferenceKeys,
-} from "../../../../../packages/validators/src/adobe-ecommerce";
+
+const ALLERGY_LABELS: Record<UserAllergy, string> = {
+  eggs: "Eggs",
+  fish: "Fish",
+  milk: "Milk",
+  peanuts: "Peanuts",
+  sesame: "Sesame",
+  shellfish: "Shellfish",
+  soy: "Soy",
+  treeNuts: "Tree Nuts",
+  wheat: "Wheat",
+};
+
+const PREFERENCE_LABELS: Record<UserDietaryPreference, string> = {
+  glutenFree: "Gluten-Free",
+  halal: "Halal",
+  kosher: "Kosher",
+  locallyGrown: "Locally Grown",
+  organic: "Organic",
+  vegan: "Vegan",
+  vegetarian: "Vegetarian",
+};
+
+const ALLERGY_KEYS = Object.keys(
+  ALLERGY_LABELS,
+) as (keyof typeof ALLERGY_LABELS)[];
+const PREFERENCE_KEYS = Object.keys(
+  PREFERENCE_LABELS,
+) as (keyof typeof PREFERENCE_LABELS)[];
 
 type EditPreferencesContentProps = {
   onSaved?: () => void;
@@ -35,11 +61,9 @@ export default function EditPreferencesContent({
   const isMounted = useRef(true);
 
   const [formData, setFormData] = useState({
-    allergies: [] as string[],
-    preferences: [] as string[],
+    allergies: [] as UserAllergy[],
+    preferences: [] as UserDietaryPreference[],
   });
-  const [customAllergies, setCustomAllergies] = useState<string[]>([]);
-  const [customAllergyInput, setCustomAllergyInput] = useState("");
 
   const utils = trpc.useUtils();
   const isGuest = !session?.user;
@@ -64,29 +88,17 @@ export default function EditPreferencesContent({
 
   useEffect(() => {
     if (existingAllergies !== undefined || existingPreferences !== undefined) {
-      const allergies = existingAllergies ?? [];
-      const knownAllergies = allergies.filter((a) =>
-        (AllergenKeys as readonly string[]).includes(a),
-      );
-      const custom = allergies.filter(
-        (a) => !(AllergenKeys as readonly string[]).includes(a),
-      );
       setFormData((prev) => ({
         ...prev,
-        allergies:
-          existingAllergies !== undefined ? knownAllergies : prev.allergies,
+        allergies: existingAllergies ?? prev.allergies,
         preferences: existingPreferences ?? prev.preferences,
       }));
-      if (existingAllergies !== undefined) {
-        setCustomAllergies(custom);
-        onExpandChange?.(custom.length > 0);
-      }
     }
-  }, [existingAllergies, existingPreferences, onExpandChange]);
+  }, [existingAllergies, existingPreferences]);
 
   useEffect(() => {
-    onExpandChange?.(customAllergies.length > 0);
-  }, [customAllergies.length, onExpandChange]);
+    onExpandChange?.(false);
+  }, [onExpandChange]);
 
   const addAllergies = trpc.allergy.addAllergies.useMutation();
   const addPreferences = trpc.preference.addDietaryPreferences.useMutation();
@@ -100,21 +112,22 @@ export default function EditPreferencesContent({
     }));
   };
 
-  const trimmedCustomInput = customAllergyInput.trim();
-  const isAddCustomDisabled = !trimmedCustomInput || isGuest;
+  // const trimmedCustomInput = customAllergyInput.trim();
+  // const isAddCustomDisabled = !trimmedCustomInput || isGuest;
 
-  const handleAddCustomAllergy = () => {
-    if (isAddCustomDisabled) return;
-    const value = trimmedCustomInput;
-    setCustomAllergies((prev) =>
-      prev.includes(value) ? prev : [...prev, value],
-    );
-    setCustomAllergyInput("");
-  };
+  // TODO: When we add custom allergy functionality, add this back.
+  // const handleAddCustomAllergy = () => {
+  //   if (isAddCustomDisabled) return;
+  //   const value = trimmedCustomInput;
+  //   setCustomAllergies((prev) =>
+  //     prev.includes(value) ? prev : [...prev, value],
+  //   );
+  //   setCustomAllergyInput("");
+  // };
 
-  const handleRemoveCustomAllergy = (index: number) => {
-    setCustomAllergies((prev) => prev.filter((_, i) => i !== index));
-  };
+  // const handleRemoveCustomAllergy = (index: number) => {
+  //   setCustomAllergies((prev) => prev.filter((_, i) => i !== index));
+  // };
 
   const handleSubmit = async () => {
     if (!session?.user?.id || isSubmitting) return;
@@ -123,7 +136,7 @@ export default function EditPreferencesContent({
     try {
       const userId = session.user.id;
 
-      const allAllergies = [...formData.allergies, ...customAllergies];
+      const allAllergies = formData.allergies;
       const allergiesToDelete =
         existingAllergies?.filter((x) => !allAllergies.includes(x)) ?? [];
 
@@ -218,7 +231,7 @@ export default function EditPreferencesContent({
             </p>
             <Tooltip title={isGuest ? "Log in to edit preferences" : ""} arrow>
               <div className="grid grid-cols-2 md:grid-cols-3 md:grid-rows-3 gap-[7px] w-full max-w-[464px] md:h-[161px] min-w-0">
-                {AllergenKeys.map((opt) => {
+                {ALLERGY_KEYS.map((opt) => {
                   const selected = formData.allergies.includes(opt);
                   return (
                     <ToggleButton
@@ -234,7 +247,7 @@ export default function EditPreferencesContent({
                       }}
                       className={`${optionButtonBase} ${optionButtonUnselected} [&.Mui-selected]:!border-[#0069A8] [&.Mui-selected]:!bg-[rgba(0,105,168,0.20)] [&.Mui-selected]:!text-[#0069A8] [&.Mui-selected]:!rounded-[8px] dark:[&.Mui-selected]:!border-[1px] dark:[&.Mui-selected]:!border-[#8EC5FF] dark:[&.Mui-selected]:!bg-[rgba(142,197,255,0.20)] dark:[&.Mui-selected]:!text-[#8EC5FF] !h-[49px] !w-full !min-w-0 !flex !items-center !justify-center !gap-2`}
                     >
-                      <span className="truncate">{opt}</span>
+                      <span className="truncate">{ALLERGY_LABELS[opt]}</span>
                       {selected ? (
                         <CheckIcon
                           className="flex-shrink-0 text-[#0069A8] dark:text-[#8EC5FF]"
@@ -248,7 +261,7 @@ export default function EditPreferencesContent({
             </Tooltip>
 
             {/* Custom allergy input row */}
-            <div className="mt-4 flex h-10 items-start gap-2 self-stretch">
+            {/* <div className="mt-4 flex h-10 items-start gap-2 self-stretch">
               <Input
                 disableUnderline
                 value={customAllergyInput}
@@ -284,7 +297,7 @@ export default function EditPreferencesContent({
             </div>
 
             {/* Custom allergies list */}
-            {customAllergies.length > 0 && (
+            {/* {customAllergies.length > 0 && (
               <div className="mt-[7.5px] flex w-full max-w-[346px] flex-col items-start gap-2">
                 <div className="flex items-center self-stretch">
                   <span className="font-poppins text-[13px] font-normal leading-[19.5px] tracking-[-0.076px] text-[#6A7282] dark:text-gray-400">
@@ -317,7 +330,7 @@ export default function EditPreferencesContent({
                   ))}
                 </div>
               </div>
-            )}
+            )} */}
           </>
         ) : (
           <>
@@ -327,7 +340,7 @@ export default function EditPreferencesContent({
             </p>
             <Tooltip title={isGuest ? "Log in to edit preferences" : ""} arrow>
               <div className="grid grid-cols-2 md:grid-cols-3 md:grid-rows-3 gap-[7px] w-full max-w-[464px] md:h-[161px] min-w-0">
-                {PreferenceKeys.map((opt) => {
+                {PREFERENCE_KEYS.map((opt) => {
                   const selected = formData.preferences.includes(opt);
                   return (
                     <ToggleButton
@@ -343,7 +356,7 @@ export default function EditPreferencesContent({
                       }}
                       className={`${optionButtonBase} ${optionButtonUnselected} [&.Mui-selected]:!border-[#0069A8] [&.Mui-selected]:!bg-[rgba(0,105,168,0.20)] [&.Mui-selected]:!text-[#0069A8] [&.Mui-selected]:!rounded-[8px] dark:[&.Mui-selected]:!border-[1px] dark:[&.Mui-selected]:!border-[#8EC5FF] dark:[&.Mui-selected]:!bg-[rgba(142,197,255,0.20)] dark:[&.Mui-selected]:!text-[#8EC5FF] !min-h-[49px] !w-full !min-w-0`}
                     >
-                      {opt}
+                      {PREFERENCE_LABELS[opt]}
                     </ToggleButton>
                   );
                 })}

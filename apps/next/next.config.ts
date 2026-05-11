@@ -2,6 +2,11 @@ import type { NextConfig } from "next";
 import withPWA from "next-pwa";
 
 const nextConfig: NextConfig = {
+  transpilePackages: [
+    "@peterplate/api",
+    "@peterplate/db",
+    "@peterplate/validators",
+  ],
   typescript: {
     ignoreBuildErrors: true,
   },

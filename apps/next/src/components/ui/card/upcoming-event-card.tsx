@@ -1,61 +1,23 @@
 import { AccessTime, CalendarMonth, LocationOn } from "@mui/icons-material";
 import { Box, Card, Dialog, Typography } from "@mui/material";
+import type { Event } from "@peterplate/validators";
 import { useState } from "react";
 import { classifyEvent } from "@/utils/classifyEvent";
 import { timeToString, toTitleCase } from "@/utils/funcs";
-import { HallEnum, numToMonth } from "@/utils/types";
+import { numToMonth } from "@/utils/types";
 import EventDialogContent from "../event-dialog-content";
 import EventTypeBadge from "../event-type-badge";
-import type { EventInfo } from "./event-card";
 
 /** A compact card for an upcoming event in the horizontal scroll row */
 export default function UpcomingEventCard({
   event,
   compact = false,
 }: {
-  event: {
-    title: string;
-    image?: string | null;
-    shortDescription?: string | null;
-    longDescription?: string | null;
-    start?: Date | null;
-    end?: Date | null;
-    restaurantId: string;
-  };
+  event: Event;
   compact?: boolean;
 }) {
   const [open, setOpen] = useState(false);
-  const startDate = event.start ? new Date(event.start) : null;
-  const endDate = event.end ? new Date(event.end) : null;
-  const eventType = classifyEvent(
-    event.title,
-    `${event.shortDescription ?? ""} ${event.longDescription ?? ""}`,
-  );
-  /*
-
-    Seems to be an error where HallEnum is not properly getting the info
-
-  */
-  // Map DB event to EventInfo shape for the dialog component
-  const hallEnum =
-    event.restaurantId.toLowerCase() === "anteatery"
-      ? HallEnum.ANTEATERY
-      : HallEnum.BRANDYWINE;
-
-  const eventInfo: EventInfo = {
-    name: event.title,
-    shortDesc: event.shortDescription ?? "",
-    longDesc: event.longDescription ?? "",
-    imgSrc: event.image ?? "/zm-card-header.webp",
-    alt: `${event.title} event image`,
-    startTime: startDate ?? new Date(),
-    endTime: endDate ?? new Date(),
-    location: hallEnum,
-    isOngoing: startDate
-      ? startDate <= new Date() && (endDate ? endDate >= new Date() : false)
-      : false,
-    eventType,
-  };
+  const eventType = classifyEvent(event.title, event.description);
 
   // alternative sizing depending on mobile/desktop
   const titleSize = compact ? "text-sm" : "text-base";
@@ -81,20 +43,20 @@ export default function UpcomingEventCard({
           </h3>
         </div>
         <div className={spacing}>
-          {startDate && (
+          {event.start && (
             <>
               <Box className="flex items-center gap-1.5">
                 <CalendarMonth style={{ fontSize: iconSize }} />
                 <Typography variant="caption" color="text.secondary">
-                  {numToMonth[startDate.getMonth()]} {startDate.getDate()},{" "}
-                  {startDate.getFullYear()}
+                  {numToMonth[event.start.getMonth()]} {event.start.getDate()},{" "}
+                  {event.start.getFullYear()}
                 </Typography>
               </Box>
               <Box className="flex items-center gap-1.5">
                 <AccessTime style={{ fontSize: iconSize }} />
                 <Typography variant="caption" color="text.secondary">
-                  {timeToString(startDate)}
-                  {endDate ? ` - ${timeToString(endDate)}` : ""}
+                  {timeToString(event.end)}
+                  {event.end ? ` - ${timeToString(event.end)}` : ""}
                 </Typography>
               </Box>
             </>
@@ -124,7 +86,7 @@ export default function UpcomingEventCard({
           },
         }}
       >
-        <EventDialogContent {...eventInfo} />
+        <EventDialogContent {...event} />
       </Dialog>
     </>
   );
