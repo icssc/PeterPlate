@@ -12,30 +12,19 @@ interface RestaurantControlsProps {
   hall: HallEnum;
   isDesktop: boolean;
   derivedHallStatus: HallStatusEnum;
+  // Period list & times — derived from hall data, not user state
   periods: string[];
   availablePeriodTimes: Record<string, [Date, Date] | null> | undefined;
-  selectedPeriod: string;
-  setSelectedPeriod: (period: string) => void;
+  // Date selection — owned by date-context, not the UI store
   selectedDate: Date | undefined;
   handleDateSelect: (date: Date | undefined) => void;
   calendarRange: CalendarRange | null;
-  isDatePickerOpen: boolean;
-  setIsDatePickerOpen: (isOpen: boolean) => void;
+  // Loading / data for conditional rendering
   isLoading: boolean;
   isError: boolean;
   dishes: DishWithRating[];
   stations: Station[];
-  menuAnchor: HTMLElement | null;
-  setMenuAnchor: (el: HTMLElement | null) => void;
-  scheduleAnchor: HTMLElement | null;
-  setScheduleAnchor: (el: HTMLElement | null) => void;
   hallEvents: Event[];
-  isCompactView: boolean;
-  setIsCompactView: (isCompact: boolean) => void;
-  selectedStation: string;
-  setSelectedStation: (station: string) => void;
-  showPreferencesOnly: boolean;
-  setShowPreferencesOnly: (isSet: boolean) => void;
 }
 
 export function RestaurantControls({
@@ -44,33 +33,19 @@ export function RestaurantControls({
   derivedHallStatus,
   periods,
   availablePeriodTimes,
-  selectedPeriod,
-  setSelectedPeriod,
   selectedDate,
   handleDateSelect,
   calendarRange,
-  isDatePickerOpen,
-  setIsDatePickerOpen,
   isLoading,
   isError,
   dishes,
   stations,
-  menuAnchor,
-  setMenuAnchor,
-  scheduleAnchor,
-  setScheduleAnchor,
   hallEvents,
-  isCompactView,
-  setIsCompactView,
-  selectedStation,
-  setSelectedStation,
-  showPreferencesOnly,
-  setShowPreferencesOnly,
 }: RestaurantControlsProps) {
   return (
     <>
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2 mb-2 flex-wrap md:flex-nowrap">
-        {/* Desktop title & status */}
+        {/* Desktop title */}
         <RestaurantHeader isDesktop={isDesktop} hall={hall} />
 
         <div className="flex flex-col gap-3 w-full md:w-auto md:flex-row md:items-center md:justify-end">
@@ -81,51 +56,45 @@ export function RestaurantControls({
             </div>
           )}
 
-          {/* Meal & date selectors */}
+          {/*
+            Meal & date selectors.
+            selectedPeriod / setSelectedPeriod / showPreferencesOnly /
+            isDatePickerOpen are read from useRestaurantUIStore inside.
+          */}
           <RestaurantFilters
             isDesktop={isDesktop}
             periods={periods}
             availablePeriodTimes={availablePeriodTimes}
-            selectedPeriod={selectedPeriod}
-            setSelectedPeriod={setSelectedPeriod}
             selectedDate={selectedDate}
             handleDateSelect={handleDateSelect}
             calendarRange={calendarRange}
-            isDatePickerOpen={isDatePickerOpen}
-            setIsDatePickerOpen={setIsDatePickerOpen}
-            showPreferencesOnly={showPreferencesOnly}
-            setShowPreferencesOnly={setShowPreferencesOnly}
           />
 
-          {/* Menu / schedule popovers & view-toggle (mobile only) */}
+          {/*
+            Menu / schedule popovers & view-toggle (mobile only).
+            isCompactView / menuAnchor / scheduleAnchor are read from
+            useRestaurantUIStore inside.
+          */}
           <MobileActions
             isDesktop={isDesktop}
             isLoading={isLoading}
             isError={isError}
             dishes={dishes}
             stations={stations}
-            menuAnchor={menuAnchor}
-            setMenuAnchor={setMenuAnchor}
-            scheduleAnchor={scheduleAnchor}
-            setScheduleAnchor={setScheduleAnchor}
             hallEvents={hallEvents}
-            isCompactView={isCompactView}
-            setIsCompactView={setIsCompactView}
-            setSelectedStation={setSelectedStation}
           />
         </div>
       </div>
 
-      {/* Station tabs & card/compact view toggles (desktop only) */}
+      {/*
+        Station tabs & card/compact view toggles (desktop only).
+        selectedStation / isCompactView are read from useRestaurantUIStore inside.
+      */}
       <DesktopTabs
         isDesktop={isDesktop}
         isLoading={isLoading}
         isError={isError}
         stations={stations}
-        selectedStation={selectedStation}
-        setSelectedStation={setSelectedStation}
-        isCompactView={isCompactView}
-        setIsCompactView={setIsCompactView}
       />
     </>
   );

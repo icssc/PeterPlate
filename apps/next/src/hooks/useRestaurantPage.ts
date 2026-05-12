@@ -9,6 +9,7 @@ import {
   useHallDerived,
   useRestaurantStore,
 } from "@/context/useRestaurantStore";
+import { useRestaurantUIStore } from "@/context/useRestaurantUIStore";
 import { isSameDay } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
 import type { HallStatusEnum } from "@/utils/types";
@@ -32,81 +33,55 @@ function getCurrentPeriod(
   return Object.keys(periods)[0];
 }
 
-/** All derived state and data needed to render the restaurant page. */
+/**
+ * Layout-level data returned to RestaurantPage.
+ * UI state (period/station selection, toggles, anchors) is no longer threaded
+ * through here — components read it directly from useRestaurantUIStore.
+ */
 export interface UseRestaurantPageResult {
-  // Data / loading
   hallData: FormattedRestaurantInfo | undefined;
   isLoading: boolean;
   isError: boolean;
   error: unknown;
   hallEvents: Event[];
-
-  // Period / station selection
   periods: string[];
-  selectedPeriod: string;
-  setSelectedPeriod: (period: string) => void;
-  selectedStation: string;
-  setSelectedStation: (station: string) => void;
   activeStation: Station | undefined;
   stations: Station[];
   dishes: DishWithRating[];
-
-  // View toggles
-  isCompactView: boolean;
-  setIsCompactView: (isCompact: boolean) => void;
-  showPreferencesOnly: boolean;
-  setShowPreferencesOnly: (show: boolean) => void;
-
-  // Date
-  selectedDate: Date | undefined;
-  handleDateSelect: (date: Date | undefined) => void;
   calendarRange: CalendarRange | null;
-  isDatePickerOpen: boolean;
-  setIsDatePickerOpen: (isOpen: boolean) => void;
   displayDate: Date;
-
-  // Popover anchors
-  menuAnchor: HTMLElement | null;
-  setMenuAnchor: (el: HTMLElement | null) => void;
-  scheduleAnchor: HTMLElement | null;
-  setScheduleAnchor: (el: HTMLElement | null) => void;
-
-  // Derived hall status
   derivedHallStatus: HallStatusEnum;
   openTime: Date | null | undefined;
   closeTime: Date | null | undefined;
   availablePeriodTimes: Record<string, [Date, Date] | null> | undefined;
+  selectedDate: Date | undefined;
+  handleDateSelect: (date: Date | undefined) => void;
 }
 
 /**
- * Encapsulates all state, data-fetching, and derived values for the restaurant
- * page so that `RestaurantPage` can remain a pure layout component.
+ * Handles data fetching, period/station auto-selection, and store syncing.
+ * UI state lives in `useRestaurantUIStore` and is consumed directly by
+ * sub-components — nothing is prop-drilled through RestaurantControls.
  */
 export function useRestaurantPage(hall: HallEnum): UseRestaurantPageResult {
   const { selectedDate, setSelectedDate } = useDate();
   const today = useRestaurantStore((s) => s.today);
   const setHallInputs = useRestaurantStore((s) => s.setInputs);
 
-  // --- UI state ---
-  const [showPreferencesOnly, setShowPreferencesOnly] = useState(false);
+  // Read period/station from the shared UI store (written by auto-selection
+  // effects below; also written directly by sub-components on user interaction)
+  const selectedPeriod = useRestaurantUIStore((s) => s.selectedPeriod);
+  const setSelectedPeriod = useRestaurantUIStore((s) => s.setSelectedPeriod);
+  const selectedStation = useRestaurantUIStore((s) => s.selectedStation);
+  const setSelectedStation = useRestaurantUIStore((s) => s.setSelectedStation);
+
+  // calendarRange is query-derived config, not user state — kept local
   const [calendarRange, setCalendarRange] = useState<CalendarRange | null>(
     null,
   );
-  const [selectedPeriod, setSelectedPeriod] = useState("");
-  const [selectedStation, setSelectedStation] = useState("");
-  const [isCompactView, setIsCompactView] = useState(false);
-  const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
-  const [scheduleAnchor, setScheduleAnchor] = useState<HTMLElement | null>(
-    null,
-  );
-  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
-
-  // --- Calendar range ---
   const { data: dateRes } = trpc.pickableDates.useQuery();
   useEffect(() => {
-    if (dateRes) {
-      setCalendarRange(dateRes);
-    }
+    if (dateRes) setCalendarRange(dateRes);
   }, [dateRes]);
 
   const handleDateSelect = (newDateFromPicker: Date | undefined) => {
@@ -133,11 +108,9 @@ export function useRestaurantPage(hall: HallEnum): UseRestaurantPageResult {
     { staleTime: 2 * 60 * 60 * 1000 },
   );
 
-  // Normalise to undefined when loading or errored
   const hallData: FormattedRestaurantInfo | undefined =
     !isLoading && !isError ? data : undefined;
 
-  // --- Sync hall inputs to store ---
   useEffect(() => {
     if (hallData && selectedDate) {
       setHallInputs({ hallData, selectedDate, restaurant: restaurantId });
@@ -178,9 +151,7 @@ export function useRestaurantPage(hall: HallEnum): UseRestaurantPageResult {
   // --- Auto-select period ---
   useEffect(() => {
     if (!selectedDate || periods.length === 0) {
-      if (selectedPeriod !== "") {
-        setSelectedPeriod("");
-      }
+      if (selectedPeriod !== "") setSelectedPeriod("");
       return;
     }
 
@@ -196,11 +167,16 @@ export function useRestaurantPage(hall: HallEnum): UseRestaurantPageResult {
         selectedDate,
         (availablePeriodTimes ?? {}) as Record<string, [Date, Date]>,
       );
-      if (current !== selectedPeriod) {
-        setSelectedPeriod(current);
-      }
+      if (current !== selectedPeriod) setSelectedPeriod(current);
     }
-  }, [availablePeriodTimes, periods, selectedDate, selectedPeriod, today]);
+  }, [
+    availablePeriodTimes,
+    periods,
+    selectedDate,
+    selectedPeriod,
+    today,
+    setSelectedPeriod,
+  ]);
 
   // --- Derived menu / stations / dishes ---
   const currentMenu = useMemo(
@@ -216,19 +192,16 @@ export function useRestaurantPage(hall: HallEnum): UseRestaurantPageResult {
   // --- Auto-select station ---
   useEffect(() => {
     if (stations.length === 0) {
-      if (selectedStation !== "") {
-        setSelectedStation("");
-      }
+      if (selectedStation !== "") setSelectedStation("");
       return;
     }
 
-    const firstStation = stations[0].name.toLowerCase();
     const isValid = stations.some(
       (s) => s.name.toLowerCase() === selectedStation,
     );
 
-    if (!isValid) setSelectedStation(firstStation);
-  }, [selectedStation, stations]);
+    if (!isValid) setSelectedStation(stations[0].name.toLowerCase());
+  }, [selectedStation, stations, setSelectedStation]);
 
   const activeStation =
     stations.find((s) => s.name.toLowerCase() === selectedStation) ??
@@ -243,30 +216,16 @@ export function useRestaurantPage(hall: HallEnum): UseRestaurantPageResult {
     error,
     hallEvents,
     periods,
-    selectedPeriod,
-    setSelectedPeriod,
-    selectedStation,
-    setSelectedStation,
     activeStation,
     stations,
     dishes,
-    isCompactView,
-    setIsCompactView,
-    showPreferencesOnly,
-    setShowPreferencesOnly,
-    selectedDate,
-    handleDateSelect,
     calendarRange,
-    isDatePickerOpen,
-    setIsDatePickerOpen,
     displayDate: selectedDate ?? today,
-    menuAnchor,
-    setMenuAnchor,
-    scheduleAnchor,
-    setScheduleAnchor,
     derivedHallStatus,
     openTime,
     closeTime,
     availablePeriodTimes,
+    selectedDate,
+    handleDateSelect,
   };
 }

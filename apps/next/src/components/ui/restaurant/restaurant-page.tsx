@@ -33,31 +33,17 @@ export function RestaurantPage({
     error,
     hallEvents,
     periods,
-    selectedPeriod,
-    setSelectedPeriod,
-    selectedStation,
-    setSelectedStation,
     activeStation,
     stations,
     dishes,
-    isCompactView,
-    setIsCompactView,
-    showPreferencesOnly,
-    setShowPreferencesOnly,
-    selectedDate,
-    handleDateSelect,
     calendarRange,
-    isDatePickerOpen,
-    setIsDatePickerOpen,
     displayDate,
-    menuAnchor,
-    setMenuAnchor,
-    scheduleAnchor,
-    setScheduleAnchor,
-    derivedHallStatus,
     openTime,
     closeTime,
+    derivedHallStatus,
     availablePeriodTimes,
+    selectedDate,
+    handleDateSelect,
   } = useRestaurantPage(hall);
 
   const hero =
@@ -132,46 +118,35 @@ export function RestaurantPage({
         <div className="flex flex-col md:flex-row items-start gap-3">
           {/* Left column: menu controls & dishes */}
           <div className="w-full flex-1 md:min-h-[740px] min-w-0">
+            {/*
+              RestaurantControls reads UI state (period, station, toggles,
+              anchors) directly from useRestaurantUIStore — no prop drilling.
+              Only query-derived data that components can't self-fetch is passed.
+            */}
             <RestaurantControls
               hall={hall}
               isDesktop={isDesktop}
               derivedHallStatus={derivedHallStatus}
               periods={periods}
               availablePeriodTimes={availablePeriodTimes}
-              selectedPeriod={selectedPeriod}
-              setSelectedPeriod={setSelectedPeriod}
               selectedDate={selectedDate}
               handleDateSelect={handleDateSelect}
               calendarRange={calendarRange}
-              isDatePickerOpen={isDatePickerOpen}
-              setIsDatePickerOpen={setIsDatePickerOpen}
               isLoading={isLoading}
               isError={isError}
               dishes={dishes}
               stations={stations}
-              menuAnchor={menuAnchor}
-              setMenuAnchor={setMenuAnchor}
-              scheduleAnchor={scheduleAnchor}
-              setScheduleAnchor={setScheduleAnchor}
               hallEvents={hallEvents}
-              isCompactView={isCompactView}
-              setIsCompactView={setIsCompactView}
-              selectedStation={selectedStation}
-              setSelectedStation={setSelectedStation}
-              showPreferencesOnly={showPreferencesOnly}
-              setShowPreferencesOnly={setShowPreferencesOnly}
             />
 
             <div className="w-full">
               <DishesView
-                isCompactView={isCompactView}
                 stations={stations}
                 activeStation={activeStation}
                 isLoading={isLoading}
                 isError={isError}
                 error={error as TRPCClientErrorLike<AppRouter> | null}
                 hallData={hallData}
-                showPreferencesOnly={showPreferencesOnly}
               />
             </div>
           </div>

@@ -3,43 +3,37 @@ import { Typography } from "@mui/material";
 import type { DishWithRating } from "@peterplate/validators";
 import type { TRPCClientErrorLike } from "@trpc/client";
 import DishesInfo from "@/components/ui/dishes-info";
+import { useRestaurantUIStore } from "@/context/useRestaurantUIStore";
 import { useUserStore } from "@/context/useUserStore";
 import { getDietaryConflicts } from "@/utils/dietary";
 import { toTitleCase } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
 
 interface DishesViewProps {
-  isCompactView: boolean;
   stations: Station[];
   activeStation: Station | undefined;
   isLoading: boolean;
   isError: boolean;
   error: TRPCClientErrorLike<AppRouter> | null;
   hallData: FormattedRestaurantInfo | undefined;
-  showPreferencesOnly: boolean;
 }
 
 export function DishesView({
-  isCompactView,
   stations,
   activeStation,
   isLoading,
   isError,
   error,
   hallData,
-  showPreferencesOnly,
 }: DishesViewProps) {
-  // Helper to extract error message logic
-  const getErrorMessage = () => {
-    return (
-      error?.message ??
-      (!isLoading && !hallData
-        ? "Data not available for this hall."
-        : undefined)
-    );
-  };
+  const isCompactView = useRestaurantUIStore((s) => s.isCompactView);
+  const showPreferencesOnly = useRestaurantUIStore(
+    (s) => s.showPreferencesOnly,
+  );
 
-  const errorMessage = getErrorMessage();
+  const errorMessage =
+    error?.message ??
+    (!isLoading && !hallData ? "Data not available for this hall." : undefined);
 
   const userId = useUserStore((s) => s.userId);
   const { data: preferences } = trpc.preference.getDietaryPreferences.useQuery({
@@ -88,7 +82,7 @@ export function DishesView({
               />
             </div>
           ))
-        : // Normal View: Render active station logic
+        : // Normal View: Render active station
           activeStation && (
             <div className="[&_#food-scroll]:h-auto [&_#food-scroll]:overflow-y-visible">
               <div className="mb-4">

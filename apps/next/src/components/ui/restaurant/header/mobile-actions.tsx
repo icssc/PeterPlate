@@ -17,6 +17,7 @@ import {
   Typography,
 } from "@mui/material";
 import type { DishWithRating, Event } from "@peterplate/validators";
+import { useRestaurantUIStore } from "@/context/useRestaurantUIStore";
 import { toTitleCase } from "@/utils/funcs";
 
 interface MobileActionsProps {
@@ -25,14 +26,7 @@ interface MobileActionsProps {
   isError: boolean;
   dishes: DishWithRating[];
   stations: Station[];
-  menuAnchor: HTMLElement | null;
-  setMenuAnchor: (el: HTMLElement | null) => void;
-  scheduleAnchor: HTMLElement | null;
-  setScheduleAnchor: (el: HTMLElement | null) => void;
   hallEvents: Event[];
-  isCompactView: boolean;
-  setIsCompactView: (isCompact: boolean) => void;
-  setSelectedStation: (station: string) => void;
 }
 
 export function MobileActions({
@@ -41,15 +35,16 @@ export function MobileActions({
   isError,
   dishes,
   stations,
-  menuAnchor,
-  setMenuAnchor,
-  scheduleAnchor,
-  setScheduleAnchor,
   hallEvents,
-  isCompactView,
-  setIsCompactView,
-  setSelectedStation,
 }: MobileActionsProps) {
+  const menuAnchor = useRestaurantUIStore((s) => s.menuAnchor);
+  const setMenuAnchor = useRestaurantUIStore((s) => s.setMenuAnchor);
+  const scheduleAnchor = useRestaurantUIStore((s) => s.scheduleAnchor);
+  const setScheduleAnchor = useRestaurantUIStore((s) => s.setScheduleAnchor);
+  const isCompactView = useRestaurantUIStore((s) => s.isCompactView);
+  const setIsCompactView = useRestaurantUIStore((s) => s.setIsCompactView);
+  const setSelectedStation = useRestaurantUIStore((s) => s.setSelectedStation);
+
   if (isDesktop) return null;
 
   return (
@@ -103,10 +98,8 @@ export function MobileActions({
                             block: "start",
                           });
                         }
-                        setSelectedStation(val);
-                      } else {
-                        setSelectedStation(val);
                       }
+                      setSelectedStation(val);
                       setMenuAnchor(null);
                     }}
                   >
