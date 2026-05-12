@@ -3,9 +3,11 @@
 import { Add } from "@mui/icons-material";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import { Box, Button, Typography } from "@mui/material";
-import type { DishInfo } from "@peterplate/api";
+import type { RestaurantId } from "@peterplate/db";
+import type { DishWithRating } from "@peterplate/validators";
 import Image from "next/image";
 import { useState } from "react";
+import { useDietaryConflicts } from "@/hooks/useDietaryConflicts";
 import {
   enhanceDescription,
   formatFoodName,
@@ -18,33 +20,31 @@ import { nutrientToUnit } from "@/utils/types";
 import IngredientsDialog from "../ingredients-dialog";
 import { AllergenBadge } from "./allergen-badge";
 import type { OnAddToMealTracker } from "./card/food-card";
-import InteractiveStarRating from "./rating";
+import Rating from "./rating";
 
 export default function FoodDrawerContent({
   dish,
+  restaurant,
   onAddToMealTracker,
   isAddingToMealTracker = false,
-  doesNotMeetPreferences,
-  violations,
 }: {
-  dish: DishInfo;
+  dish: DishWithRating;
+  restaurant?: RestaurantId;
   onAddToMealTracker?: OnAddToMealTracker;
   isAddingToMealTracker?: boolean;
-  doesNotMeetPreferences: boolean;
-  violations: string[];
 }) {
+  const violations = useDietaryConflicts(dish.dietRestriction);
   const [imageError, setImageError] = useState(false);
   const showImage =
-    typeof dish.image_url === "string" &&
-    dish.image_url.trim() !== "" &&
+    typeof dish.imageUrl === "string" &&
+    dish.imageUrl.trim() !== "" &&
     !imageError;
 
   const ingredientsAvailable: boolean =
     dish.ingredients != null && dish.ingredients.length > 0;
 
   const caloricInformationAvailable: boolean =
-    dish.nutritionInfo.calories != null &&
-    dish.nutritionInfo.calories.length > 0;
+    dish.nutritionInfo.calories != null;
 
   // State to control nutrient visibility
   const [showAllNutrients, setShowAllNutrients] = useState(false);
@@ -69,7 +69,7 @@ export default function FoodDrawerContent({
       <Box className="pb-4 shrink-0">
         {showImage ? (
           <Image
-            src={dish.image_url as string}
+            src={dish.imageUrl as string}
             alt={formatFoodName(dish.name)}
             width={800}
             height={128}
@@ -102,10 +102,10 @@ export default function FoodDrawerContent({
 
           <div className="flex flex-wrap items-center gap-2 text-zinc-500 dark:text-zinc-400">
             <span className="whitespace-nowrap">
-              {toTitleCase(dish.restaurant)} •{" "}
+              {restaurant ? `${toTitleCase(restaurant)} • ` : ""}
               {!caloricInformationAvailable
                 ? "-"
-                : `${Math.round(parseFloat(dish.nutritionInfo.calories ?? "0"))} cal`}
+                : `${Math.round(dish.nutritionInfo.calories ?? 0)} cal`}
             </span>
             <div className="flex items-center gap-2 flex-wrap">
               {dish.dietRestriction.isVegetarian && (
@@ -120,7 +120,7 @@ export default function FoodDrawerContent({
               {dish.dietRestriction.isKosher && (
                 <AllergenBadge variant={"kosher"} />
               )}
-              {doesNotMeetPreferences &&
+              {violations &&
                 violations.length > 0 &&
                 violations.map((v) => (
                   <AllergenBadge
@@ -138,9 +138,11 @@ export default function FoodDrawerContent({
           </div>
 
           {/* Interactive rating stars */}
-          <div className="flex gap-2 pt-0.5">
-            <InteractiveStarRating dishId={dish.id} />
-          </div>
+          {restaurant && (
+            <div className="flex gap-2 pt-0.5">
+              <Rating dishId={dish.id} restaurant={restaurant} />
+            </div>
+          )}
 
           <Typography color="text.primary" className="leading-relaxed">
             {enhanceDescription(dish.name, dish.description)}
@@ -168,7 +170,10 @@ export default function FoodDrawerContent({
                 // Assert that 'nutrient' is a valid key of nutritionInfo
                 const nutrientKey = nutrient as keyof typeof dish.nutritionInfo;
                 const value = dish.nutritionInfo[nutrientKey]; // Now correctly typed
-                const formattedValue = formatNutrientValue(nutrientKey, value);
+                const formattedValue = formatNutrientValue(
+                  nutrientKey,
+                  value?.toString() ?? "",
+                );
                 const isInitial = initialNutrients.includes(nutrientKey); // Use nutrientKey here too for consistency
                 return (
                   <div

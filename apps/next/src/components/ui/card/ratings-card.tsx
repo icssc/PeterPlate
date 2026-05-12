@@ -1,8 +1,5 @@
-/** biome-ignore-all lint/a11y/useKeyWithClickEvents: Will fix when using MUI.*/
-/** biome-ignore-all lint/a11y/noStaticElementInteractions: Will fix when using MUI. */
-/** biome-ignore-all lint/a11y/useSemanticElements: Will fix when using MUI. */
-/** biome-ignore-all lint/a11y/useFocusableInteractive: Will fix when using MUI. */
-
+/** biome-ignore-all lint/a11y/noStaticElementInteractions: Requires investigation. */
+/** biome-ignore-all lint/a11y/useKeyWithClickEvents: Requires investigation. */
 "use client";
 
 import { Delete, Restaurant } from "@mui/icons-material";
@@ -13,7 +10,7 @@ import {
   IconButton,
   Typography,
 } from "@mui/material";
-import type { DishInfo } from "@peterplate/api";
+import type { DishWithRating } from "@peterplate/validators";
 import React from "react";
 import { useUserStore } from "@/context/useUserStore";
 import { formatFoodName, getFoodIcon } from "@/utils/funcs";
@@ -23,9 +20,10 @@ import FoodDialogContent from "../food-dialog-content";
 import InteractiveStarRating from "../rating";
 
 interface RatingsCardProps {
-  food: DishInfo & {
+  food: DishWithRating & {
     rating: number;
     ratedAt: string | Date;
+    restaurant: "anteatery" | "brandywine";
   };
 }
 
@@ -62,7 +60,10 @@ const RatingsCardContent = React.forwardRef<
               className="flex flex-row items-center ml-4 gap-4"
               onClick={(e) => e.stopPropagation()}
             >
-              <InteractiveStarRating dishId={food.id} />
+              <InteractiveStarRating
+                dishId={food.id}
+                restaurant={food.restaurant}
+              />
               <IconButton
                 onClick={handleDelete}
                 disabled={deleteLoading}
@@ -153,7 +154,7 @@ export default function RatingsCard({ food }: RatingsCardProps) {
           },
         }}
       >
-        <FoodDialogContent dish={food} />
+        <FoodDialogContent dish={food} restaurant={food.restaurant} />
       </Dialog>
     </>
   );

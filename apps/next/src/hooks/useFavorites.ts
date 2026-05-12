@@ -108,7 +108,11 @@ export function useFavorites(userId: string = DEFAULT_USER_ID) {
   );
 
   const toggleFavorite = useCallback(
-    (dishId: string, currentlyFavorite: boolean) => {
+    (
+      dishId: string,
+      currentlyFavorite: boolean,
+      restaurant: "anteatery" | "brandywine",
+    ) => {
       if (currentlyFavorite) {
         deleteFavoriteMutation.mutate({
           userId,
@@ -118,6 +122,7 @@ export function useFavorites(userId: string = DEFAULT_USER_ID) {
         addFavoriteMutation.mutate({
           userId,
           dishId,
+          restaurant,
         });
       }
     },
