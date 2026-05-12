@@ -48,7 +48,7 @@ export function DishesView({
     return dishes.filter(
       (dish) =>
         getDietaryConflicts(dish.dietRestriction, preferences, allergies)
-          .length > 0,
+          .length === 0,
     );
   };
 
