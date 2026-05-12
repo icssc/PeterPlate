@@ -11,22 +11,7 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
   skipTrailingSlashRedirect: true,
-  async rewrites() {
-    return [
-      {
-        source: "/app-data/static/:path*",
-        destination: "https://us-assets.i.posthog.com/static/:path*",
-      },
-      {
-        source: "/app-data/array/:path*",
-        destination: "https://us-assets.i.posthog.com/array/:path*",
-      },
-      {
-        source: "/app-data/:path*",
-        destination: "https://us.i.posthog.com/:path*",
-      },
-    ];
-  },
+
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "uci.campusdish.com" },
