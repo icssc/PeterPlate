@@ -91,9 +91,26 @@ export default function RatingsCard({ food }: RatingsCardProps) {
   const utils = trpc.useUtils();
 
   const deleteRatingMutation = trpc.dish.deleteRating.useMutation({
-    onSuccess: () => {
-      utils.dish.rated.invalidate();
-      utils.dish.getAverageRating.invalidate({ dishId: food.id });
+    onMutate: async ({ userId: uid, dishId }) => {
+      await utils.dish.rated.cancel({ userId: uid });
+
+      const prevRated = utils.dish.rated.getData({ userId: uid });
+
+      utils.dish.rated.setData({ userId: uid }, (old) =>
+        old ? old.filter((entry) => entry.id !== dishId) : old,
+      );
+
+      return { prevRated };
+    },
+    onError: (_err, { userId: uid }, ctx) => {
+      if (ctx?.prevRated !== undefined) {
+        utils.dish.rated.setData({ userId: uid }, ctx.prevRated);
+      }
+    },
+    onSettled: (_data, _err, { userId: uid, dishId }) => {
+      utils.dish.rated.invalidate({ userId: uid });
+      utils.dish.getAverageRating.invalidate({ dishId });
+      utils.user.getUserRating.invalidate({ userId: uid, dishId });
     },
   });
 

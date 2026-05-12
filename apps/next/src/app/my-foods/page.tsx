@@ -56,6 +56,7 @@ export default function MyFoodsPage() {
 
   const {
     favorites,
+    isFavorited,
     isLoadingFavorites,
     favoritesError,
     toggleFavorite,

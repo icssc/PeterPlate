@@ -229,12 +229,31 @@ export default function TrackedMealCard({
   }, [meal.servings]);
 
   const updateServings = trpc.nutrition.updateLoggedMeal.useMutation({
-    onSuccess: async () => {
-      await utils.nutrition.invalidate();
+    onMutate: async ({ id, servings }) => {
+      await utils.nutrition.getMealsInLastWeek.cancel({ userId: meal.userId });
+      const prev = utils.nutrition.getMealsInLastWeek.getData({
+        userId: meal.userId,
+      });
+      utils.nutrition.getMealsInLastWeek.setData(
+        { userId: meal.userId },
+        (old) => old?.map((m) => (m.id === id ? { ...m, servings } : m)) ?? old,
+      );
+      return { prev };
     },
-    onError: (err) => {
+    onError: (err, _vars, ctx) => {
       console.error(err.message);
       setServingsDraft(meal.servings);
+      if (ctx?.prev !== undefined) {
+        utils.nutrition.getMealsInLastWeek.setData(
+          { userId: meal.userId },
+          ctx.prev,
+        );
+      }
+    },
+    onSettled: async () => {
+      await utils.nutrition.getMealsInLastWeek.invalidate({
+        userId: meal.userId,
+      });
     },
   });
 
@@ -245,11 +264,30 @@ export default function TrackedMealCard({
 
   /* Handle Delete Button */
   const deleteLoggedMeal = trpc.nutrition.deleteLoggedMeal.useMutation({
-    onSuccess: async () => {
-      await utils.nutrition.invalidate();
+    onMutate: async ({ id }) => {
+      await utils.nutrition.getMealsInLastWeek.cancel({ userId: meal.userId });
+      const prev = utils.nutrition.getMealsInLastWeek.getData({
+        userId: meal.userId,
+      });
+      utils.nutrition.getMealsInLastWeek.setData(
+        { userId: meal.userId },
+        (old) => old?.filter((m) => m.id !== id) ?? old,
+      );
+      return { prev };
     },
-    onError: (err) => {
+    onError: (err, _vars, ctx) => {
       console.error(err.message);
+      if (ctx?.prev !== undefined) {
+        utils.nutrition.getMealsInLastWeek.setData(
+          { userId: meal.userId },
+          ctx.prev,
+        );
+      }
+    },
+    onSettled: async () => {
+      await utils.nutrition.getMealsInLastWeek.invalidate({
+        userId: meal.userId,
+      });
     },
   });
 
