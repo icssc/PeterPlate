@@ -118,11 +118,6 @@ export function RestaurantPage({
         <div className="flex flex-col md:flex-row items-start gap-3">
           {/* Left column: menu controls & dishes */}
           <div className="w-full flex-1 md:min-h-[740px] min-w-0">
-            {/*
-              RestaurantControls reads UI state (period, station, toggles,
-              anchors) directly from useRestaurantUIStore — no prop drilling.
-              Only query-derived data that components can't self-fetch is passed.
-            */}
             <RestaurantControls
               hall={hall}
               isDesktop={isDesktop}

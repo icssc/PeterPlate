@@ -12,7 +12,6 @@ interface RestaurantControlsProps {
   hall: HallEnum;
   isDesktop: boolean;
   derivedHallStatus: HallStatusEnum;
-  // Period list & times — derived from hall data, not user state
   periods: string[];
   availablePeriodTimes: Record<string, [Date, Date] | null> | undefined;
   // Date selection — owned by date-context, not the UI store
@@ -56,11 +55,7 @@ export function RestaurantControls({
             </div>
           )}
 
-          {/*
-            Meal & date selectors.
-            selectedPeriod / setSelectedPeriod / showPreferencesOnly /
-            isDatePickerOpen are read from useRestaurantUIStore inside.
-          */}
+          {/* Meal & date selectors */}
           <RestaurantFilters
             isDesktop={isDesktop}
             periods={periods}
@@ -70,11 +65,7 @@ export function RestaurantControls({
             calendarRange={calendarRange}
           />
 
-          {/*
-            Menu / schedule popovers & view-toggle (mobile only).
-            isCompactView / menuAnchor / scheduleAnchor are read from
-            useRestaurantUIStore inside.
-          */}
+          {/* Menu / schedule popovers & view-toggle (mobile only) */}
           <MobileActions
             isDesktop={isDesktop}
             isLoading={isLoading}
@@ -86,10 +77,7 @@ export function RestaurantControls({
         </div>
       </div>
 
-      {/*
-        Station tabs & card/compact view toggles (desktop only).
-        selectedStation / isCompactView are read from useRestaurantUIStore inside.
-      */}
+      {/* Station tabs & card/compact view toggles (desktop only) */}
       <DesktopTabs
         isDesktop={isDesktop}
         isLoading={isLoading}

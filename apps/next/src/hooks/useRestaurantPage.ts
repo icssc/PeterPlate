@@ -33,11 +33,7 @@ function getCurrentPeriod(
   return Object.keys(periods)[0];
 }
 
-/**
- * Layout-level data returned to RestaurantPage.
- * UI state (period/station selection, toggles, anchors) is no longer threaded
- * through here — components read it directly from useRestaurantUIStore.
- */
+/** All derived state and data needed to render the restaurant page. */
 export interface UseRestaurantPageResult {
   hallData: FormattedRestaurantInfo | undefined;
   isLoading: boolean;
@@ -59,9 +55,8 @@ export interface UseRestaurantPageResult {
 }
 
 /**
- * Handles data fetching, period/station auto-selection, and store syncing.
- * UI state lives in `useRestaurantUIStore` and is consumed directly by
- * sub-components — nothing is prop-drilled through RestaurantControls.
+ * Encapsulates all state, data-fetching, and derived values for the restaurant
+ * page so that `RestaurantPage` can remain a pure layout component.
  */
 export function useRestaurantPage(hall: HallEnum): UseRestaurantPageResult {
   const { selectedDate, setSelectedDate } = useDate();
