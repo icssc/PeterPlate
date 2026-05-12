@@ -227,6 +227,9 @@ importers:
       '@peterplate/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@peterplate/validators':
+        specifier: workspace:*
+        version: link:../../packages/validators
       '@radix-ui/react-aspect-ratio':
         specifier: ^1.1.2
         version: 1.1.2(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)

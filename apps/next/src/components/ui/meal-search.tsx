@@ -34,7 +34,7 @@ export interface AvailableDish {
   protein: number;
   carbs: number;
   fat: number;
-  image_url?: string | null;
+  imageUrl?: string | null;
 }
 
 export interface SuggestedMeal {
@@ -106,6 +106,11 @@ function MealList({
                   fat: dish.fat,
                   userId: "",
                   eatenAt: new Date(),
+                }}
+                dish={{
+                  id: dish.id,
+                  name: dish.name,
+                  imageUrl: dish.imageUrl,
                 }}
                 onAdd={(meal, servings) =>
                   onAdd(meal.dishId ?? "", meal.dishName ?? "", servings)

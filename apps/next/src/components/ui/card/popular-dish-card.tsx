@@ -1,6 +1,6 @@
-import type { DishInfo } from "@api/index";
 import { Star } from "@mui/icons-material";
 import { Box, Card, Dialog, Drawer, Typography } from "@mui/material";
+import type { DishWithRating } from "@peterplate/validators";
 import Image from "next/image";
 import React, { useState } from "react";
 import { useSnackbarStore } from "@/context/useSnackbar";
@@ -13,23 +13,19 @@ import FoodDrawerContent from "../food-drawer-content";
 
 interface PopularDishCardContentProps
   extends React.HTMLAttributes<HTMLDivElement> {
-  // The dish information to display.
-  dish: DishInfo;
-  // The dining hall where the dish is served.
-  hallName: string;
-  // The station where the dish is served.
+  dish: DishWithRating;
   stationName: string;
-  // Whether to render a compact version of the card.
-  isCompact?: boolean;
+  compact?: boolean;
+  restaurant: "anteatery" | "brandywine";
 }
 
 const PopularDishCardContent = React.forwardRef<
   HTMLDivElement,
   PopularDishCardContentProps
->(({ dish, hallName, stationName, isCompact = false, onClick }, ref) => {
+>(({ dish, restaurant, stationName, compact = false, onClick }, ref) => {
   const IconComponent = getFoodIcon(dish.name);
-  const iconSize = isCompact ? 16 : 24;
-  const descSize = isCompact ? "text-[8px]" : "text-[10px]";
+  const iconSize = compact ? 16 : 24;
+  const descSize = compact ? "text-[8px]" : "text-[10px]";
 
   const { data: ratingData } = trpc.dish.getAverageRating.useQuery(
     { dishId: dish.id },
@@ -38,60 +34,59 @@ const PopularDishCardContent = React.forwardRef<
   const averageRating = ratingData?.averageRating ?? 0;
 
   return (
-    <>
-      <Card
-        className="w-full h-full min-h-[210px] flex flex-col rounded-xl border border-neutral-200 dark:border-neutral-700 overflow-hidden shadow-sm hover:shadow-md transition cursor-pointer text-left bg-transparent p-0"
-        onClick={onClick}
+    <Card
+      className="w-full h-full min-h-[210px] flex flex-col rounded-xl border border-neutral-200 dark:border-neutral-700 overflow-hidden shadow-sm hover:shadow-md transition cursor-pointer text-left bg-transparent p-0"
+      onClick={onClick}
+      ref={ref}
+    >
+      {/* Dish image */}
+      <Box
+        className="relative w-full aspect-[16/9] flex-shrink-0"
+        sx={{ bgcolor: "background.paper" }}
       >
-        {/* Dish image */}
-        <Box
-          className="relative w-full aspect-[16/9] flex-shrink-0"
-          sx={{ bgcolor: "background.paper" }}
+        {dish.imageUrl ? (
+          <Image
+            src={dish.imageUrl}
+            alt={dish.name}
+            fill
+            className="object-cover"
+            sizes="20vw"
+          />
+        ) : (
+          <div className="flex items-center justify-center w-full h-full">
+            <IconComponent style={{ fontSize: 48 }} color="primary" />
+          </div>
+        )}
+      </Box>
+      <Box className="flex flex-col flex-1 p-4">
+        <Typography
+          className="text-sm font-semibold leading-tight line-clamp-2 mb-1"
+          color="primary"
         >
-          {dish.image_url ? (
-            <Image
-              src={dish.image_url}
-              alt={dish.name}
-              fill
-              className="object-cover"
-              sizes="20vw"
-            />
-          ) : (
-            <div className="flex items-center justify-center w-full h-full">
-              <IconComponent style={{ fontSize: 48 }} color="primary" />
-            </div>
-          )}
-        </Box>
-        <Box className="flex flex-col flex-1 p-4">
-          <Typography
-            className="text-sm font-semibold leading-tight line-clamp-2 mb-1"
-            color="primary"
-          >
-            {formatFoodName(dish.name)}
+          {formatFoodName(dish.name)}
+        </Typography>
+        <Typography className={`${descSize} mb-1`} color="text.secondary">
+          {toTitleCase(restaurant)} • {toTitleCase(stationName)}
+        </Typography>
+        <Box
+          className="flex items-center gap-1 mt-auto"
+          sx={{ color: "text.secondary" }}
+        >
+          <Star style={{ fontSize: iconSize }} />
+          <Typography variant="caption">
+            {averageRating > 0 ? averageRating.toFixed(1) : "—"}
           </Typography>
-          <Typography className={`${descSize} mb-1`} color="text.secondary">
-            {hallName} • {toTitleCase(stationName)}
-          </Typography>
-          <Box
-            className="flex items-center gap-1 mt-auto"
-            sx={{ color: "text.secondary" }}
-          >
-            <Star style={{ fontSize: iconSize }} />
-            <Typography variant="caption">
-              {averageRating > 0 ? averageRating.toFixed(1) : "—"}
-            </Typography>
-          </Box>
         </Box>
-      </Card>
-    </>
+      </Box>
+    </Card>
   );
 });
 
 export default function PopularDishCard({
   dish,
-  hallName,
+  restaurant,
   stationName,
-  isCompact = false,
+  compact = false,
   onClick,
 }: PopularDishCardContentProps): React.JSX.Element {
   const isDesktop = useMediaQuery("(min-width: 768px)");
@@ -131,11 +126,9 @@ export default function PopularDishCard({
   if (isDesktop) {
     return (
       <>
+        {/* ...When you could do this! */}
         <PopularDishCardContent
-          dish={dish}
-          hallName={hallName}
-          stationName={stationName}
-          isCompact={isCompact}
+          {...{ dish, restaurant, stationName, compact }}
           onClick={handleOpen}
         />
         <Dialog
@@ -167,10 +160,7 @@ export default function PopularDishCard({
     return (
       <>
         <PopularDishCardContent
-          dish={dish}
-          hallName={hallName}
-          stationName={stationName}
-          isCompact={isCompact}
+          {...{ dish, restaurant, compact, stationName }}
           onClick={handleOpen}
         />
         <Drawer

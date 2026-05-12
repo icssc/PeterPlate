@@ -1,7 +1,7 @@
 "use client";
 
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
+import type { RouterOutputs } from "@api/index";
+import { Box, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import posthog from "posthog-js";
 import { useEffect, useMemo, useState } from "react";
@@ -19,6 +19,20 @@ import { useSnackbarStore } from "@/context/useSnackbar";
 import { useUserStore } from "@/context/useUserStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { trpc } from "@/utils/trpc";
+
+type LoggedMealWithNutrition =
+  RouterOutputs["nutrition"]["getMealsInLastWeek"][number];
+type DisplayDish = {
+  id: string;
+  name: string;
+  imageUrl?: string | null;
+  nutritionInfo?: {
+    calories?: number | null;
+    proteinG?: number | null;
+    totalCarbsG?: number | null;
+    totalFatG?: number | null;
+  } | null;
+};
 
 export default function MealTracker() {
   const utils = trpc.useUtils();
@@ -69,7 +83,7 @@ export default function MealTracker() {
 
   const mealsGroupedByDay = useMemo(() => {
     if (!meals) return [];
-    const groups: Record<string, typeof meals> = {};
+    const groups: Record<string, LoggedMealWithNutrition[]> = {};
 
     meals.forEach((meal) => {
       const dateKey = new Date(meal.eatenAt).toDateString();
@@ -90,7 +104,7 @@ export default function MealTracker() {
   const selectedDay =
     activeDayIndex !== null ? mealsGroupedByDay[activeDayIndex] : null;
 
-  const toNum = (v: string | null) => {
+  const toNum = (v: number | string | null | undefined) => {
     const n = v == null ? 0 : Number(v);
     return Number.isFinite(n) ? n : 0;
   };
@@ -102,18 +116,29 @@ export default function MealTracker() {
     ].map((d) => new Date(d));
   }, [meals]);
 
-  // Checks dish availability
-  const { data: hallData } = trpc.peterplate.useQuery(
-    { date: selectedDay?.rawDate ?? new Date() },
+  const selectedDate = selectedDay?.rawDate ?? new Date();
+  const { data: anteateryData } = trpc.restaurant.useQuery(
+    { date: selectedDate, restaurant: "anteatery" },
     { enabled: Boolean(selectedDay) },
+  );
+  const { data: brandywineData } = trpc.restaurant.useQuery(
+    { date: selectedDate, restaurant: "brandywine" },
+    { enabled: Boolean(selectedDay) },
+  );
+
+  const halls = useMemo(
+    () =>
+      [anteateryData, brandywineData].filter(
+        (hall): hall is NonNullable<typeof anteateryData> => Boolean(hall),
+      ),
+    [anteateryData, brandywineData],
   );
 
   const availableDishIds = useMemo(() => {
     const set = new Set<string>();
-    const halls = [hallData?.anteatery, hallData?.brandywine].filter(Boolean);
     for (const hall of halls) {
-      for (const menu of hall?.menus ?? []) {
-        for (const station of menu.stations ?? []) {
+      for (const period of hall?.periods ?? []) {
+        for (const station of period.stations ?? []) {
           for (const dish of station.dishes ?? []) {
             set.add(dish.id);
           }
@@ -121,54 +146,44 @@ export default function MealTracker() {
       }
     }
     return set;
-  }, [hallData]);
+  }, [halls]);
 
   const isUnavailable = (dishId: string) =>
-    Boolean(hallData) && !availableDishIds.has(dishId);
+    halls.length > 0 && !availableDishIds.has(dishId);
 
-  // Flatten today's dishes for search
-  const availableDishes = useMemo(() => {
-    const dishes: {
-      id: string;
-      name: string;
-      calories: number;
-      protein: number;
-      carbs: number;
-      fat: number;
-      image_url?: string | null;
-    }[] = [];
-
-    const halls = [hallData?.anteatery, hallData?.brandywine].filter(Boolean);
-    const seen = new Set<string>();
-
+  const availableDishMap = useMemo(() => {
+    const dishes = new Map<string, DisplayDish>();
     for (const hall of halls) {
-      for (const menu of hall?.menus ?? []) {
-        for (const station of menu.stations ?? []) {
+      for (const period of hall.periods) {
+        for (const station of period.stations ?? []) {
           for (const dish of station.dishes ?? []) {
-            if (seen.has(dish.id)) continue;
-            seen.add(dish.id);
-            dishes.push({
-              id: dish.id,
-              name: dish.name,
-              calories: Number(dish.nutritionInfo?.calories ?? 0),
-              protein: Number(dish.nutritionInfo?.proteinG ?? 0),
-              carbs: Number(dish.nutritionInfo?.totalCarbsG ?? 0),
-              fat: Number(dish.nutritionInfo?.totalFatG ?? 0),
-              image_url: dish.image_url,
-            });
+            if (!dishes.has(dish.id)) dishes.set(dish.id, dish);
           }
         }
       }
     }
-
     return dishes;
-  }, [hallData]);
+  }, [halls]);
+
+  const availableDishes = useMemo(
+    () =>
+      Array.from(availableDishMap.values()).map((dish) => ({
+        id: dish.id,
+        name: dish.name,
+        calories: Number(dish.nutritionInfo?.calories ?? 0),
+        protein: Number(dish.nutritionInfo?.proteinG ?? 0),
+        carbs: Number(dish.nutritionInfo?.totalCarbsG ?? 0),
+        fat: Number(dish.nutritionInfo?.totalFatG ?? 0),
+        imageUrl: dish.imageUrl,
+      })),
+    [availableDishMap],
+  );
 
   // suggested meals memo
   const suggestedMeals = useMemo(() => {
     if (!meals) return [];
     const servingCounts: Record<string, number> = {};
-    const latestByDish: Record<string, (typeof meals)[0]> = {};
+    const latestByDish: Record<string, LoggedMealWithNutrition> = {};
 
     for (const meal of meals) {
       if (!meal.dishId) continue;
@@ -181,7 +196,7 @@ export default function MealTracker() {
       .filter(([, total]) => total >= 1)
       .sort(([, a], [, b]) => b - a)
       .map(([dishId]) => {
-        const meal = latestByDish[dishId]!;
+        const meal = latestByDish[dishId];
         return {
           ...meal,
           calories: Number(meal.calories ?? 0),
@@ -192,6 +207,57 @@ export default function MealTracker() {
         };
       });
   }, [meals]);
+
+  const visibleMeals = selectedDay?.items ?? [];
+  const countedMeals = visibleMeals.filter(
+    (m) => (m.servings ?? 0) > 0 && !isUnavailable(m.dishId),
+  );
+
+  const fallbackDishIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const meal of [...visibleMeals, ...suggestedMeals]) {
+      if (meal.dishId && !availableDishMap.has(meal.dishId)) {
+        ids.add(meal.dishId);
+      }
+    }
+    return [...ids];
+  }, [availableDishMap, suggestedMeals, visibleMeals]);
+
+  const { data: fallbackDishes = [] } = trpc.dish.get.useQuery(
+    { ids: fallbackDishIds },
+    { enabled: fallbackDishIds.length > 0 },
+  );
+
+  const dishDisplayMap = useMemo(() => {
+    const map = new Map<
+      string,
+      {
+        id: string;
+        name: string;
+        imageUrl?: string | null;
+      }
+    >();
+
+    for (const dish of availableDishMap.values()) {
+      map.set(dish.id, {
+        id: dish.id,
+        name: dish.name,
+        imageUrl: dish.imageUrl ?? null,
+      });
+    }
+
+    for (const dish of fallbackDishes) {
+      if (!map.has(dish.id)) {
+        map.set(dish.id, {
+          id: dish.id,
+          name: dish.name,
+          imageUrl: dish.imageUrl ?? null,
+        });
+      }
+    }
+
+    return map;
+  }, [availableDishMap, fallbackDishes]);
 
   // logmeal mutation
   const logMeal = trpc.nutrition.logMeal.useMutation({
@@ -207,11 +273,6 @@ export default function MealTracker() {
       console.error(err.message);
     },
   });
-
-  const visibleMeals = selectedDay?.items ?? [];
-  const countedMeals = visibleMeals.filter(
-    (m) => (m.servings ?? 0) > 0 && !isUnavailable(m.dishId),
-  );
 
   const isMobile = useMediaQuery("(max-width: 768px)");
 
@@ -391,6 +452,7 @@ export default function MealTracker() {
                 <TrackedMealCard
                   key={meal.id}
                   isUnavailable={isUnavailable(meal.dishId)}
+                  dish={dishDisplayMap.get(meal.dishId)}
                   meal={{
                     ...meal,
                     calories: toNum(meal.calories),
@@ -422,13 +484,17 @@ export default function MealTracker() {
               suggestedMeals.map((meal) => (
                 <SearchMealCard
                   key={meal.dishId}
+                  dish={dishDisplayMap.get(meal.dishId)}
                   meal={meal}
                   isUnavailable={isUnavailable(meal.dishId)}
                   onAdd={(meal, servings) =>
                     logMeal.mutate({
                       userId: userId ?? "",
                       dishId: meal.dishId ?? "",
-                      dishName: meal.dishName ?? "",
+                      dishName:
+                        "dishName" in meal && typeof meal.dishName === "string"
+                          ? meal.dishName
+                          : "",
                       servings,
                       eatenAt: new Date(),
                     })

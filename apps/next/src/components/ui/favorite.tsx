@@ -6,13 +6,19 @@ import { cn } from "@/utils/tw";
 
 interface FavoriteProps {
   dishId: string;
+  restaurant: "anteatery" | "brandywine";
   isFavorited?: boolean;
   favoriteDisabled?: boolean;
-  onToggleFavorite?: (dishId: string, currentlyFavorite: boolean) => void;
+  onToggleFavorite?: (
+    dishId: string,
+    currentlyFavorite: boolean,
+    restaurant: "anteatery" | "brandywine",
+  ) => void;
 }
 
 export default function Favorite({
   dishId,
+  restaurant,
   isFavorited,
   favoriteDisabled,
   onToggleFavorite,
@@ -29,7 +35,7 @@ export default function Favorite({
     posthog.capture(isFavorited ? "dish_unfavorited" : "dish_favorited", {
       dish_id: dishId,
     });
-    onToggleFavorite(dishId, Boolean(isFavorited));
+    onToggleFavorite(dishId, Boolean(isFavorited), restaurant);
   };
 
   return (
