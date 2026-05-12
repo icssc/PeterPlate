@@ -57,6 +57,15 @@ async function handleProxy(
     const responseHeaders = new Headers(response.headers);
     responseHeaders.set("Access-Control-Allow-Origin", "*");
 
+    // Node.js fetch automatically decompresses the response body, but the
+    // upstream Content-Encoding header (gzip/br) is still forwarded. If we
+    // pass it through, the browser will try to decompress an already-decoded
+    // body and produce garbled binary. Strip these hop-by-hop headers so the
+    // browser treats the body as plain text/JS.
+    responseHeaders.delete("content-encoding");
+    responseHeaders.delete("transfer-encoding");
+    responseHeaders.delete("content-length");
+
     return new NextResponse(response.body, {
       status: response.status,
       headers: responseHeaders,
