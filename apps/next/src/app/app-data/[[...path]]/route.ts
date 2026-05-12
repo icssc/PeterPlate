@@ -23,10 +23,7 @@ async function handleProxy(
 
   // Forward the IP address if possible
   const ip =
-    req.headers.get("x-forwarded-for") ||
-    req.headers.get("x-real-ip") ||
-    req.ip ||
-    "";
+    req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "";
   if (ip) {
     requestHeaders.set("x-forwarded-for", ip);
   }
@@ -42,7 +39,6 @@ async function handleProxy(
     redirect: "manual",
   };
 
-  // Only POST/PUT methods can have a body
   if (
     req.method !== "GET" &&
     req.method !== "HEAD" &&
