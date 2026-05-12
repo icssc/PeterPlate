@@ -99,9 +99,9 @@ export default function MealTracker() {
     return result.sort((a, b) => b.rawDate.getTime() - a.rawDate.getTime());
   }, [meals]);
 
-  const activeDayIndex = mealsGroupedByDay.length > 0 ? 0 : null;
+  const todayKey = new Date().toDateString();
   const selectedDay =
-    activeDayIndex !== null ? mealsGroupedByDay[activeDayIndex] : null;
+    mealsGroupedByDay.find((g) => g.dateLabel === todayKey) ?? null;
 
   const toNum = (v: number | string | null | undefined) => {
     const n = v == null ? 0 : Number(v);
@@ -438,7 +438,7 @@ export default function MealTracker() {
           </Typography>
           {countedMeals.length === 0 ? (
             <Typography variant="body2" color="text.secondary" className="mt-2">
-              No counted foods.
+              No logged meals yet for this day.
             </Typography>
           ) : (
             <div className="flex flex-wrap gap-4 mt-4">
