@@ -1,3 +1,4 @@
+import type { Station } from "@api/index";
 import {
   ExpandMore,
   GridView,
@@ -15,19 +16,20 @@ import {
   ToggleButtonGroup,
   Typography,
 } from "@mui/material";
+import type { DishWithRating, Event } from "@peterplate/validators";
 import { toTitleCase } from "@/utils/funcs";
 
 interface MobileActionsProps {
   isDesktop: boolean;
   isLoading: boolean;
   isError: boolean;
-  dishes: any[];
-  stations: any[];
+  dishes: DishWithRating[];
+  stations: Station[];
   menuAnchor: HTMLElement | null;
   setMenuAnchor: (el: HTMLElement | null) => void;
   scheduleAnchor: HTMLElement | null;
   setScheduleAnchor: (el: HTMLElement | null) => void;
-  hallEvents: any[];
+  hallEvents: Event[];
   isCompactView: boolean;
   setIsCompactView: (isCompact: boolean) => void;
   setSelectedStation: (station: string) => void;
@@ -209,7 +211,7 @@ export function MobileActions({
                         </AccordionSummary>
                         <AccordionDetails className="pt-0 pb-2">
                           <Typography variant="body2" color="text.secondary">
-                            {event.shortDescription ?? dateRange}
+                            {event.description ?? dateRange}
                           </Typography>
                         </AccordionDetails>
                       </Accordion>

@@ -1,4 +1,5 @@
-import type { DishWithRating } from "@peterplate/validators";
+import type { Station } from "@api/index";
+import type { DishWithRating, Event } from "@peterplate/validators";
 import { DiningHallStatus } from "@/components/ui/status";
 import type { CalendarRange } from "@/components/ui/toolbar";
 import type { HallEnum, HallStatusEnum } from "@/utils/types";
@@ -23,12 +24,12 @@ interface RestaurantControlsProps {
   isLoading: boolean;
   isError: boolean;
   dishes: DishWithRating[];
-  stations: any[];
+  stations: Station[];
   menuAnchor: HTMLElement | null;
   setMenuAnchor: (el: HTMLElement | null) => void;
   scheduleAnchor: HTMLElement | null;
   setScheduleAnchor: (el: HTMLElement | null) => void;
-  hallEvents: any[];
+  hallEvents: Event[];
   isCompactView: boolean;
   setIsCompactView: (isCompact: boolean) => void;
   selectedStation: string;
@@ -69,21 +70,20 @@ export function RestaurantControls({
   return (
     <>
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2 mb-2 flex-wrap md:flex-nowrap">
-        {/* Desktop title & status (Header) */}
+        {/* Desktop title & status */}
         <RestaurantHeader isDesktop={isDesktop} hall={hall} />
 
         <div className="flex flex-col gap-3 w-full md:w-auto md:flex-row md:items-center md:justify-end">
-          {/* Desktop Status - now next to selectors */}
+          {/* Status badge — desktop only, shown next to filters */}
           {isDesktop && (
             <div>
               <DiningHallStatus status={derivedHallStatus} />
             </div>
           )}
 
-          {/* Meal & date selectors (Filters) */}
+          {/* Meal & date selectors */}
           <RestaurantFilters
             isDesktop={isDesktop}
-            // ... filters props
             periods={periods}
             availablePeriodTimes={availablePeriodTimes}
             selectedPeriod={selectedPeriod}
@@ -97,9 +97,8 @@ export function RestaurantControls({
             setShowPreferencesOnly={setShowPreferencesOnly}
           />
 
-          {/* Mobile Actions */}
+          {/* Menu / schedule popovers & view-toggle (mobile only) */}
           <MobileActions
-            // ... mobile actions props
             isDesktop={isDesktop}
             isLoading={isLoading}
             isError={isError}
@@ -117,7 +116,7 @@ export function RestaurantControls({
         </div>
       </div>
 
-      {/* Desktop Tabs */}
+      {/* Station tabs & card/compact view toggles (desktop only) */}
       <DesktopTabs
         isDesktop={isDesktop}
         isLoading={isLoading}

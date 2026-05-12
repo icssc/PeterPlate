@@ -1,19 +1,12 @@
 "use client";
 
+import type { AppRouter } from "@api/index";
 import { LocationOn } from "@mui/icons-material";
 import { Box, Container, Link, Typography } from "@mui/material";
-import type { FormattedRestaurantInfo } from "@peterplate/api";
+import type { TRPCClientErrorLike } from "@trpc/client";
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
-import type { CalendarRange } from "@/components/ui/toolbar";
-import { useDate } from "@/context/date-context";
-import {
-  useHallDerived,
-  useRestaurantStore,
-} from "@/context/useRestaurantStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-import { isSameDay } from "@/utils/funcs";
-import { trpc } from "@/utils/trpc";
+import { useRestaurantPage } from "@/hooks/useRestaurantPage";
 import {
   ANTEATERY_MAP_LINK_URL,
   BRANDYWINE_MAP_LINK_URL,
@@ -33,156 +26,44 @@ export function RestaurantPage({
 }: RestaurantPageProps): React.JSX.Element {
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
-  const { selectedDate, setSelectedDate } = useDate();
-  const today = useRestaurantStore((s) => s.today);
-  const setHallInputs = useRestaurantStore((s) => s.setInputs);
-
-  const [showPreferencesOnly, setShowPreferencesOnly] = useState(false);
-
-  const [calendarRange, setCalendarRange] = useState<CalendarRange | null>(
-    null,
-  );
-
-  const { data: dateRes } = trpc.pickableDates.useQuery();
-
-  useEffect(() => {
-    if (dateRes) {
-      setCalendarRange(dateRes);
-    }
-  }, [dateRes]);
-
-  const handleDateSelect = (newDateFromPicker: Date | undefined) => {
-    if (newDateFromPicker) {
-      const todayLocal = new Date();
-      if (
-        newDateFromPicker.getFullYear() === todayLocal.getFullYear() &&
-        newDateFromPicker.getMonth() === todayLocal.getMonth() &&
-        newDateFromPicker.getDate() === todayLocal.getDate()
-      ) {
-        setSelectedDate(new Date());
-      } else {
-        setSelectedDate(newDateFromPicker);
-      }
-    } else {
-      setSelectedDate(undefined);
-    }
-  };
-
-  const restaurantId = hall === HallEnum.ANTEATERY ? "anteatery" : "brandywine";
-  const { data, isLoading, isError, error } = trpc.restaurant.useQuery(
-    { date: selectedDate ?? today, restaurant: restaurantId },
-    { staleTime: 2 * 60 * 60 * 1000 },
-  );
-
-  const { data: upcomingEvents = [] } = trpc.event.upcoming.useQuery();
-  const hallEvents = useMemo(
-    () =>
-      [...upcomingEvents]
-        .filter((e) => e.restaurantId === restaurantId)
-        .sort(
-          (a, b) =>
-            (a.start ? new Date(a.start).getTime() : 0) -
-            (b.start ? new Date(b.start).getTime() : 0),
-        ),
-    [upcomingEvents, restaurantId],
-  );
-
-  const hallData: FormattedRestaurantInfo | undefined = useMemo(() => {
-    if (isLoading || isError || !data) return undefined;
-    return data;
-  }, [data, isError, isLoading]);
-
-  useEffect(() => {
-    if (hallData && selectedDate) {
-      setHallInputs({ hallData, selectedDate, restaurant: restaurantId });
-    }
-  }, [hallData, selectedDate, setHallInputs, restaurantId]);
-
-  const { availablePeriodTimes, derivedHallStatus, openTime, closeTime } =
-    useHallDerived();
-
-  const periods = useMemo(() => {
-    const times = availablePeriodTimes ?? {};
-    return Object.keys(times).sort((a, b) => {
-      const startA = times[a]?.[0];
-      const startB = times[b]?.[0];
-      if (startA == null && startB == null) return 0;
-      if (startA == null) return 1;
-      if (startB == null) return -1;
-      return startA <= startB ? -1 : 1;
-    });
-  }, [availablePeriodTimes]);
-
-  const [selectedPeriod, setSelectedPeriod] = useState("");
-  const [selectedStation, setSelectedStation] = useState("");
-  const [isCompactView, setIsCompactView] = useState(false);
-  const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
-  const [scheduleAnchor, setScheduleAnchor] = useState<HTMLElement | null>(
-    null,
-  );
-  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
-
-  useEffect(() => {
-    if (!selectedDate || periods.length === 0) {
-      if (selectedPeriod !== "") {
-        setSelectedPeriod("");
-      }
-      return;
-    }
-
-    const isValid = periods.includes(selectedPeriod);
-
-    if (!isSameDay(selectedDate, today) && !selectedPeriod) {
-      setSelectedPeriod(periods[0]);
-      return;
-    }
-
-    if (!isValid) {
-      const current = getCurrentPeriod(selectedDate, availablePeriodTimes);
-      if (current !== selectedPeriod) {
-        setSelectedPeriod(current);
-      }
-    }
-  }, [availablePeriodTimes, periods, selectedDate, selectedPeriod, today]);
-
-  const currentMenu = useMemo(
-    () =>
-      hallData?.periods.find(
-        (period) => period.name.toLowerCase() === selectedPeriod.toLowerCase(),
-      ) ?? null,
-    [hallData, selectedPeriod],
-  );
-
-  const stations = currentMenu?.stations ?? [];
-
-  useEffect(() => {
-    if (stations.length === 0) {
-      if (selectedStation !== "") {
-        setSelectedStation("");
-      }
-      return;
-    }
-
-    const firstStation = stations[0].name.toLowerCase();
-    const isValid = stations.some(
-      (s) => s.name.toLowerCase() === selectedStation,
-    );
-
-    if (!isValid) setSelectedStation(firstStation);
-  }, [selectedStation, stations]);
-
-  const activeStation =
-    stations.find((s) => s.name.toLowerCase() === selectedStation) ??
-    stations[0];
-
-  const dishes = activeStation?.dishes ?? [];
+  const {
+    hallData,
+    isLoading,
+    isError,
+    error,
+    hallEvents,
+    periods,
+    selectedPeriod,
+    setSelectedPeriod,
+    selectedStation,
+    setSelectedStation,
+    activeStation,
+    stations,
+    dishes,
+    isCompactView,
+    setIsCompactView,
+    showPreferencesOnly,
+    setShowPreferencesOnly,
+    selectedDate,
+    handleDateSelect,
+    calendarRange,
+    isDatePickerOpen,
+    setIsDatePickerOpen,
+    displayDate,
+    menuAnchor,
+    setMenuAnchor,
+    scheduleAnchor,
+    setScheduleAnchor,
+    derivedHallStatus,
+    openTime,
+    closeTime,
+    availablePeriodTimes,
+  } = useRestaurantPage(hall);
 
   const hero =
     hall === HallEnum.ANTEATERY
       ? { src: "/anteatery.webp", alt: "Anteatery dining hall" }
       : { src: "/brandywine.webp", alt: "Brandywine dining hall" };
-
-  const displayDate = selectedDate ?? today;
 
   return (
     <Box sx={{ bgcolor: "background.default", minHeight: "100vh" }}>
@@ -196,6 +77,7 @@ export function RestaurantPage({
           className="object-cover object-bottom"
         />
         <div className="absolute inset-0 bg-gradient-to-tr from-black/80 via-black/20 to-transparent" />
+
         {/* Mobile Header Overlay */}
         {!isDesktop && (
           <div className="absolute bottom-0 left-0 p-4 w-full text-white">
@@ -287,7 +169,7 @@ export function RestaurantPage({
                 activeStation={activeStation}
                 isLoading={isLoading}
                 isError={isError}
-                error={error}
+                error={error as TRPCClientErrorLike<AppRouter> | null}
                 hallData={hallData}
                 showPreferencesOnly={showPreferencesOnly}
               />
@@ -308,18 +190,4 @@ export function RestaurantPage({
       </Container>
     </Box>
   );
-}
-
-function getCurrentPeriod(
-  selectedDate: Date,
-  periods: { [periodName: string]: [Date, Date] },
-): string {
-  for (const key in periods) {
-    const periodBegin: Date = periods[key][0];
-    const periodEnd: Date = periods[key][1];
-
-    if (selectedDate >= periodBegin && selectedDate <= periodEnd) return key;
-  }
-
-  return Object.keys(periods)[0];
 }

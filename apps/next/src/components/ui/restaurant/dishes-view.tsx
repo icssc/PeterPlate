@@ -11,7 +11,7 @@ import { trpc } from "@/utils/trpc";
 interface DishesViewProps {
   isCompactView: boolean;
   stations: Station[];
-  activeStation: Station;
+  activeStation: Station | undefined;
   isLoading: boolean;
   isError: boolean;
   error: TRPCClientErrorLike<AppRouter> | null;

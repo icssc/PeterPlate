@@ -1,3 +1,4 @@
+import type { Station } from "@api/index";
 import { GridView, Menu as MenuIcon } from "@mui/icons-material";
 import { Button, Tab, Tabs } from "@mui/material";
 import { toTitleCase } from "@/utils/funcs";
@@ -6,7 +7,7 @@ interface DesktopTabsProps {
   isDesktop: boolean;
   isLoading: boolean;
   isError: boolean;
-  stations: any[];
+  stations: Station[];
   selectedStation: string;
   setSelectedStation: (station: string) => void;
   isCompactView: boolean;
