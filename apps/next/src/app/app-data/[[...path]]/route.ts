@@ -16,23 +16,24 @@ async function handleProxy(
   const url = new URL(req.url);
   const targetUrl = `${targetHost}/${path}${url.search}`;
 
-  const requestHeaders = new Headers(req.headers);
-  // Ensure the correct host header is set for PostHog's load balancer
-  requestHeaders.set("host", new URL(targetHost).host);
-
-  // Remove headers that could cause proxying issues
-  requestHeaders.delete("x-middleware-invoke");
-  requestHeaders.delete("x-invoke-path");
-  requestHeaders.delete("x-invoke-query");
-  requestHeaders.delete("connection");
-  requestHeaders.delete("content-length");
-  requestHeaders.delete("transfer-encoding");
+  const requestHeaders = new Headers();
+  if (req.headers.has("content-type")) {
+    requestHeaders.set("content-type", req.headers.get("content-type")!);
+  }
 
   // Forward the IP address if possible
   const ip =
-    req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "";
+    req.headers.get("x-forwarded-for") ||
+    req.headers.get("x-real-ip") ||
+    req.ip ||
+    "";
   if (ip) {
     requestHeaders.set("x-forwarded-for", ip);
+  }
+
+  // Forward User-Agent for correct device tracking
+  if (req.headers.has("user-agent")) {
+    requestHeaders.set("user-agent", req.headers.get("user-agent")!);
   }
 
   const options: RequestInit = {
