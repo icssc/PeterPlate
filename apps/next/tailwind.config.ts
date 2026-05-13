@@ -44,6 +44,12 @@ export default {
   			border: 'hsl(var(--border))',
   			input: 'hsl(var(--input))',
   			ring: 'hsl(var(--ring))',
+  			'surface-elevated': 'var(--surface-elevated)',
+  			'surface-modal': 'var(--surface-modal)',
+  			'button-primary-bg': 'var(--button-primary-bg)',
+  			'button-primary-fg': 'var(--button-primary-fg)',
+  			'button-disabled-bg': 'var(--button-disabled-bg)',
+  			'button-disabled-fg': 'var(--button-disabled-fg)',
   			chart: {
   				'1': 'hsl(var(--chart-1))',
   				'2': 'hsl(var(--chart-2))',

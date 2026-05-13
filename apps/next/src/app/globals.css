@@ -50,6 +50,12 @@ body {
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
+    --surface-elevated: #ffffff;
+    --surface-modal: #ffffff;
+    --button-primary-bg: #0069A8;
+    --button-primary-fg: #ffffff;
+    --button-disabled-bg: rgba(0, 0, 0, 0.12);
+    --button-disabled-fg: rgba(0, 0, 0, 0.26);
     --donut-inner: white;
     --donut-outer: white;
     --donut-track: #ffffff;
@@ -84,6 +90,12 @@ body {
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+    --surface-elevated: #323235;
+    --surface-modal: #303035;
+    --button-primary-bg: #93C5FD;
+    --button-primary-fg: #111827;
+    --button-disabled-bg: #3F3F47;
+    --button-disabled-fg: #71717A;
     --donut-inner: #27272A;
     --donut-outer: #31373F;
     --donut-track: #27272A;
@@ -189,7 +201,7 @@ body {
 }
 /* Date picker dialog dark mode (mobile) */
 .dark .MuiDialog-paper {
-  background-color: #323235 !important;
+  background-color: var(--surface-elevated) !important;
   background-image: none !important;
 }
 

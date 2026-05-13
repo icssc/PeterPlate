@@ -117,7 +117,9 @@ export default function SidebarContent({
               preferences.map((pref) => (
                 <span
                   key={pref}
-                  className="rounded-md border border-sky-700 bg-sky-100 px-2.5 py-0.5 text-xs text-sky-700 dark:border-blue-300 dark:text-blue-300 dark:bg-blue-300/20"
+                  className={`rounded-md border border-sky-700 bg-sky-100 px-2.5
+                    py-0.5 text-xs text-sky-700 dark:border-blue-300 
+                    dark:text-blue-300 dark:bg-blue-300/20`}
                 >
                   {formatDietaryKey(pref)}
                 </span>
@@ -141,7 +143,10 @@ export default function SidebarContent({
               allergies.map((allergy) => (
                 <span
                   key={allergy}
-                  className="rounded-md border border-sky-700 bg-sky-100 px-2.5 py-0.5 text-xs text-sky-700 dark:border-blue-300 dark:text-blue-300 dark:bg-blue-300/20"
+                  className={`rounded-md border border-sky-700 bg-sky-100 
+                    px-2.5 py-0.5 text-xs text-sky-700 dark:border-blue-300 
+                    dark:text-blue-300 dark:bg-blue-300/20
+                  `}
                 >
                   {formatDietaryKey(allergy)}
                 </span>
