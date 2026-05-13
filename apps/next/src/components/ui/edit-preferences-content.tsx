@@ -12,6 +12,7 @@ import {
   Tooltip,
 } from "@mui/material";
 import type { UserAllergy, UserDietaryPreference } from "@peterplate/db";
+import posthog from "posthog-js";
 import { useEffect, useRef, useState } from "react";
 import { useSession } from "@/utils/auth-client";
 import { trpc } from "@/utils/trpc";
@@ -166,11 +167,20 @@ export default function EditPreferencesContent({
         utils.preference.getDietaryPreferences.invalidate(),
       ]);
 
+      posthog.capture("preferences_updated", {
+        allergies: [...formData.allergies, ...customAllergies],
+        preferences: formData.preferences,
+        allergies_count: formData.allergies.length + customAllergies.length,
+        preferences_count: formData.preferences.length,
+        custom_allergies_count: customAllergies.length,
+      });
+
       if (onSaved) {
         onSaved();
       }
     } catch (error) {
       console.error("Save failed", error);
+      posthog.captureException(error);
       if (isMounted.current) {
         setIsSubmitting(false);
       }

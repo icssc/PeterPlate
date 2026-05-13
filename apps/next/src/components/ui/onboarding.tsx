@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import type { UserAllergy } from "@peterplate/db";
 import { AllergenKeys, PreferenceKeys } from "@peterplate/validators";
+import posthog from "posthog-js";
 import React, { useEffect, useState } from "react";
 import { useUserStore } from "@/context/useUserStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
@@ -280,9 +281,17 @@ const OnboardingContent = React.forwardRef<
         id: session?.user.id,
       });
 
+      posthog.capture("onboarding_completed", {
+        allergies: formData.allergies,
+        preferences: formData.preferences,
+        allergies_count: formData.allergies.length,
+        preferences_count: formData.preferences.length,
+      });
+
       handleClose();
     } catch (error) {
       console.error("Onboarding failed:", error);
+      posthog.captureException(error);
     } finally {
       setIsSubmitting(false);
     }
