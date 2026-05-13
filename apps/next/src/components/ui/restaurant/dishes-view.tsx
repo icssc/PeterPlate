@@ -1,7 +1,7 @@
 import type { AppRouter, FormattedRestaurantInfo, Station } from "@api/index";
 import { Typography } from "@mui/material";
-import type { DishWithRating } from "@peterplate/validators";
 import type { TRPCClientErrorLike } from "@trpc/client";
+import { useMemo } from "react";
 import DishesInfo from "@/components/ui/dishes-info";
 import { useRestaurantUIStore } from "@/context/useRestaurantUIStore";
 import { useUserStore } from "@/context/useUserStore";
@@ -43,14 +43,26 @@ export function DishesView({
     userId: userId ?? "",
   });
 
-  const getFilteredDishes = (dishes: DishWithRating[]) => {
-    if (!showPreferencesOnly || !allergies || !preferences) return dishes;
-    return dishes.filter(
-      (dish) =>
-        getDietaryConflicts(dish.dietRestriction, preferences, allergies)
-          .length === 0,
+  // Pre-compute filtered dishes for every station so toggling isCompactView
+  // (which switches from single-station to all-stations) doesn't recompute
+  // getDietaryConflicts for every dish on each render.
+  const filteredDishesMap = useMemo(() => {
+    return new Map(
+      stations.map((station) => [
+        station.name,
+        showPreferencesOnly && allergies && preferences
+          ? station.dishes.filter(
+              (dish) =>
+                getDietaryConflicts(
+                  dish.dietRestriction,
+                  preferences,
+                  allergies,
+                ).length === 0,
+            )
+          : station.dishes,
+      ]),
     );
-  };
+  }, [stations, showPreferencesOnly, preferences, allergies]);
 
   return (
     <div className="w-full">
@@ -73,7 +85,7 @@ export function DishesView({
                 </Typography>
               </div>
               <DishesInfo
-                dishes={getFilteredDishes(station.dishes)}
+                dishes={filteredDishesMap.get(station.name) ?? station.dishes}
                 isLoading={isLoading}
                 isError={isError || (!isLoading && !hallData)}
                 errorMessage={errorMessage}
@@ -96,7 +108,10 @@ export function DishesView({
                 </Typography>
               </div>
               <DishesInfo
-                dishes={getFilteredDishes(activeStation?.dishes ?? [])}
+                dishes={
+                  filteredDishesMap.get(activeStation.name) ??
+                  activeStation.dishes
+                }
                 isLoading={isLoading}
                 isError={isError || (!isLoading && !hallData)}
                 errorMessage={errorMessage}
