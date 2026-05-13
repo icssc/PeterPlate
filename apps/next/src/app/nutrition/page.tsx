@@ -23,7 +23,10 @@ import { trpc } from "@/utils/trpc";
 export default function MealTracker() {
   const utils = trpc.useUtils();
   const router = useRouter();
-  const { userId, isInitialized } = useUserStore();
+  const {
+    userId,
+    isInitialized /*, hasUserOnboardedMealTracker, setHasUserOnboardedMealTracker */,
+  } = useUserStore();
   const { showSnackbar } = useSnackbarStore();
 
   useEffect(() => {
@@ -193,14 +196,50 @@ export default function MealTracker() {
       });
 
     // If user has history, show it
+    // TODO: Remove, or return only when we're not onboarding
     if (calculated.length > 0) return calculated;
+
+    // We safely use 3 hardcoded dummy meals so Joyride spotlight doesn't break when history is empty
+    const dummyMeals = [
+      {
+        id: "dummy-1",
+        name: "Chicken Teriyaki",
+        calories: 300,
+        protein: 25,
+        carbs: 20,
+        fat: 10,
+      },
+      {
+        id: "dummy-2",
+        name: "White Rice",
+        calories: 200,
+        protein: 4,
+        carbs: 45,
+        fat: 0.5,
+      },
+      {
+        id: "dummy-3",
+        name: "Steamed Broccoli",
+        calories: 50,
+        protein: 3,
+        carbs: 10,
+        fat: 0.5,
+      },
+    ];
+
+    // TODO: Track when the user enters the onboarding procedure, and only return
+    // this when the user is in the onboarding.
+    // useuserstore to retrieve the hasonboardedmealtracker
+    // only return dummy meals when we have not onboarded the meal tracker
+    // when we complete onboarding, just set the userstore to true for hasonboardedmealtracker
 
     // Instead of using getPopularDishes which requires rating data,
     // we safely grab 3 dishes from the already-calculated availableDishes
-    const fallbackDishes = availableDishes.slice(0, 3);
-    console.log(fallbackDishes.length, "fallback dishes found");
+    // const fallbackDishes = availableDishes.slice(0, 3);
+    // console.log(fallbackDishes.length, "fallback dishes found");
 
-    return fallbackDishes.map((d) => ({
+    // TODO: Return suggestedMeals when history exists/ onboarding complete
+    return dummyMeals.map((d) => ({
       id: `fallback-${d.id}`,
       dishId: d.id,
       dishName: d.name,
@@ -213,7 +252,7 @@ export default function MealTracker() {
       userId: userId ?? "",
       createdAt: new Date(),
     }));
-  }, [meals, userId, availableDishes]); // <-- Changed dependency to availableDishes
+  }, [meals, userId]);
 
   // logmeal mutation
   const logMeal = trpc.nutrition.logMeal.useMutation({
@@ -241,7 +280,7 @@ export default function MealTracker() {
       className="p-2 md:p-8 mt-2 md:mt-12"
     >
       <div className="px-2 md:px-8">
-        {!isMobile && <TrackerOnboarding />}
+        {/* !hasUserOnboardedMealTracker && */ <TrackerOnboarding />}
         <Typography
           variant="h5"
           fontWeight={700}
