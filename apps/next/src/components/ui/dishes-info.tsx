@@ -1,5 +1,4 @@
 "use client";
-"use client";
 
 import { Typography } from "@mui/material";
 import type { DishInfo } from "@peterplate/api";
@@ -110,7 +109,7 @@ export default function DishesInfo({
             ))}
           </div>
         ) : (
-          <div className="flex flex-wrap gap-4">
+          <div className="grid grid-cols-1 min-[960px]:grid-cols-2 gap-4">
             {dishes.map((dish) => (
               <FoodCard
                 key={dish.id}

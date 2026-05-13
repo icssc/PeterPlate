@@ -141,7 +141,7 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
               )}
               <div
                 className={cn(
-                  "flex flex-col gap-1 w-3/5",
+                  "flex flex-col flex-1 min-w-0 gap-1",
                   isCompact && "w-3/4",
                   !isCompact && "md:w-full",
                 )}
