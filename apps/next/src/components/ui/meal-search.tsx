@@ -11,6 +11,7 @@ import {
   InputAdornment,
   TextField,
 } from "@mui/material";
+import posthog from "posthog-js";
 import { useMemo, useState } from "react";
 import SearchMealCard from "@/components/ui/card/search-meal-card";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
@@ -33,7 +34,7 @@ export interface AvailableDish {
   protein: number;
   carbs: number;
   fat: number;
-  image_url?: string | null;
+  imageUrl?: string | null;
 }
 
 export interface SuggestedMeal {
@@ -105,6 +106,11 @@ function MealList({
                   fat: dish.fat,
                   userId: "",
                   eatenAt: new Date(),
+                }}
+                dish={{
+                  id: dish.id,
+                  name: dish.name,
+                  imageUrl: dish.imageUrl,
                 }}
                 onAdd={(meal, servings) =>
                   onAdd(meal.dishId ?? "", meal.dishName ?? "", servings)
@@ -331,13 +337,27 @@ export default function MealSearchDialog(props: MealSearchDialogProps) {
   const [open, setOpen] = useState(false);
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
+  const handleOpen = () => {
+    setOpen(true);
+    posthog.capture("meal_search_opened");
+  };
+
+  const wrappedOnAdd = (dishId: string, dishName: string, servings: number) => {
+    posthog.capture("meal_search_result_added", {
+      dish_id: dishId,
+      dish_name: dishName,
+      servings,
+    });
+    props.onAdd(dishId, dishName, servings);
+  };
+
   return (
     <>
       <Fab
         id="tour-fab-search-btn"
         size="large"
         aria-label="Search meals"
-        onClick={() => setOpen(true)}
+        onClick={handleOpen}
         sx={{
           position: "fixed",
           bottom: 80,
@@ -356,12 +376,14 @@ export default function MealSearchDialog(props: MealSearchDialogProps) {
       {isDesktop ? (
         <DesktopMealSearchDialog
           {...props}
+          onAdd={wrappedOnAdd}
           open={open}
           onClose={() => setOpen(false)}
         />
       ) : (
         <MobileMealSearchDrawer
           {...props}
+          onAdd={wrappedOnAdd}
           open={open}
           onClose={() => setOpen(false)}
         />

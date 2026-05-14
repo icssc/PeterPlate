@@ -11,47 +11,40 @@ import type { SelectLoggedMeal } from "@peterplate/db";
 import Image from "next/image";
 import React from "react";
 import { getFoodIcon } from "@/utils/funcs";
-import { trpc } from "@/utils/trpc";
 import { cn } from "@/utils/tw";
 
 type LoggedMealJoinedWithNutrition = SelectLoggedMeal & {
+  dishName?: string;
   calories: number;
   protein: number;
   carbs: number;
   fat: number;
 };
 
+interface DishDisplayInfo {
+  id: string;
+  name: string;
+  imageUrl?: string | null;
+}
+
 interface Props {
   meal: LoggedMealJoinedWithNutrition;
+  dish?: DishDisplayInfo;
   isUnavailable?: boolean;
   /** Called when the user clicks "+". Receives the meal*/
   onAdd?: (meal: LoggedMealJoinedWithNutrition, servings: number) => void;
 }
 
-export default function SearchMealCard({ meal, isUnavailable, onAdd }: Props) {
+export default function SearchMealCard({
+  meal,
+  dish,
+  isUnavailable,
+  onAdd,
+}: Props) {
   const [servingsDraft, setServingsDraft] = React.useState(meal.servings ?? 1);
   const [imageError, setImageError] = React.useState(false);
 
-  // fetch dish detail for image URL + icon
-  const { data } = trpc.peterplate.useQuery(
-    { date: new Date(meal.eatenAt) },
-    { enabled: !!meal.dishId },
-  );
-
-  const dish = React.useMemo(() => {
-    const halls = [data?.anteatery, data?.brandywine].filter(Boolean);
-    for (const hall of halls) {
-      for (const menu of hall?.menus ?? []) {
-        for (const station of menu.stations ?? []) {
-          const found = station.dishes?.find((d) => d.id === meal.dishId);
-          if (found) return found;
-        }
-      }
-    }
-    return undefined;
-  }, [data, meal.dishId]);
-
-  const imageUrl = dish?.image_url;
+  const imageUrl = dish?.imageUrl;
   const dishNameForIcon = dish?.name ?? meal.dishName;
   const showImage =
     typeof imageUrl === "string" && imageUrl.trim() !== "" && !imageError;

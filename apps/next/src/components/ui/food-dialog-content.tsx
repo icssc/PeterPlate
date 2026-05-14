@@ -3,10 +3,11 @@
 import { Add, StarBorder } from "@mui/icons-material";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import { Box, Button, DialogContent, Tooltip, Typography } from "@mui/material";
-import type { DishInfo } from "@peterplate/api";
+import type { DishWithRating } from "@peterplate/validators";
 import Image from "next/image";
 import { useState } from "react";
 import { useUserStore } from "@/context/useUserStore";
+import { useDietaryConflicts } from "@/hooks/useDietaryConflicts";
 import {
   enhanceDescription,
   formatFoodName,
@@ -32,29 +33,28 @@ import Rating from "./rating";
  *
  * This component is typically used as the content for a `Dialog` triggered by a {@link FoodCard}.
  *
- * @param {DishInfo} dish - The dish data to display. See {@link DishInfo} (from `@peterplate/api`) for detailed property descriptions.
+ * @param {DishWithRating} dish - The dish data to display. See {@link DishWithRating} (from `@peterplate/api`) for detailed property descriptions.
  * @param {OnAddToMealTracker} onAddToMealTracker - Called when the user clicks "Add to Meal Tracker"
  * @param {boolean} isAddingToMealTracker - Whether the add-to-tracker mutation is pending.
  * @returns {JSX.Element} The rendered content for the food item dialog.
  */
 export default function FoodDialogContent({
   dish,
+  restaurant,
   onAddToMealTracker,
   isAddingToMealTracker = false,
-  doesNotMeetPreferences,
-  violations,
 }: {
-  dish: DishInfo;
+  dish: DishWithRating;
+  restaurant?: "brandywine" | "anteatery";
   onAddToMealTracker?: OnAddToMealTracker;
   isAddingToMealTracker?: boolean;
-  doesNotMeetPreferences: boolean;
-  violations: string[];
 }) {
+  const violations = useDietaryConflicts(dish.dietRestriction);
   const [showAllNutrients, setShowAllNutrients] = useState(false);
   const [imageError, setImageError] = useState(false);
   const showImage =
-    typeof dish.image_url === "string" &&
-    dish.image_url.trim() !== "" &&
+    typeof dish.imageUrl === "string" &&
+    dish.imageUrl.trim() !== "" &&
     !imageError;
   const initialNutrients = [
     "calories",
@@ -75,8 +75,7 @@ export default function FoodDialogContent({
   const ingredientsAvailable: boolean =
     dish.ingredients != null && dish.ingredients.length > 0;
   const caloricInformationAvailable: boolean =
-    dish.nutritionInfo.calories != null &&
-    dish.nutritionInfo.calories.length > 0;
+    dish.nutritionInfo.calories != null;
 
   const { data: ratingData } = trpc.dish.getAverageRating.useQuery(
     { dishId: dish.id },
@@ -89,7 +88,7 @@ export default function FoodDialogContent({
     <div className="font-poppins flex flex-col max-h-[90vh] dark:bg-[#303035]">
       {showImage ? (
         <Image
-          src={dish.image_url as string}
+          src={dish.imageUrl as string}
           alt={formatFoodName(dish.name)}
           width={800}
           height={160}
@@ -135,7 +134,9 @@ export default function FoodDialogContent({
                     {formatFoodName(dish.name)}
                   </Typography>
                 </div>
-                <Rating dishId={dish.id} />
+                {restaurant && (
+                  <Rating dishId={dish.id} restaurant={restaurant} />
+                )}
               </div>
               <Box className="px-4 flex flex-wrap items-center gap-2 text-zinc-500 dark:text-zinc-400">
                 <span className="whitespace-nowrap flex items-center gap-1">
@@ -143,10 +144,11 @@ export default function FoodDialogContent({
                     className="w-4 h-4 stroke-zinc-400"
                     strokeWidth={1.5}
                   />
-                  {averageRating.toFixed(1)} • {toTitleCase(dish.restaurant)} •{" "}
+                  {averageRating.toFixed(1)}
+                  {restaurant ? ` • ${toTitleCase(restaurant)}` : ""} •{" "}
                   {!caloricInformationAvailable
                     ? "-"
-                    : `${Math.round(parseFloat(dish.nutritionInfo.calories ?? "0"))} cal`}
+                    : `${Math.round(dish.nutritionInfo.calories ?? 0)} cal`}
                 </span>
                 <div className="flex items-center gap-2 flex-wrap">
                   {dish.dietRestriction.isVegetarian && (
@@ -161,7 +163,7 @@ export default function FoodDialogContent({
                   {dish.dietRestriction.isKosher && (
                     <AllergenBadge variant={"kosher"} />
                   )}
-                  {doesNotMeetPreferences &&
+                  {violations &&
                     violations.length > 0 &&
                     violations.map((v) => (
                       <AllergenBadge
@@ -203,7 +205,7 @@ export default function FoodDialogContent({
                         const value = dish.nutritionInfo[nutrientKey]; // Now correctly typed
                         const formattedValue = formatNutrientValue(
                           nutrientKey,
-                          value,
+                          value?.toString() ?? "0",
                         );
                         const isInitial =
                           initialNutrients.includes(nutrientKey); // Use nutrientKey here too for consistency

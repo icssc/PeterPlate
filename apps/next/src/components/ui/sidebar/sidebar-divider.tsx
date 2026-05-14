@@ -1,3 +1,5 @@
+import type { JSX } from "react";
+
 /**
  * Props for the {@link SidebarDivider} component.
  */
