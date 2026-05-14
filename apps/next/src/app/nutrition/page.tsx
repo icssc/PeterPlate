@@ -23,10 +23,7 @@ import { trpc } from "@/utils/trpc";
 export default function MealTracker() {
   const utils = trpc.useUtils();
   const router = useRouter();
-  const {
-    userId,
-    isInitialized /*, hasUserOnboardedMealTracker, setHasUserOnboardedMealTracker */,
-  } = useUserStore();
+  const { userId, isInitialized, hasOnboardedMealTracker } = useUserStore();
   const { showSnackbar } = useSnackbarStore();
 
   useEffect(() => {
@@ -197,7 +194,8 @@ export default function MealTracker() {
 
     // If user has history, show it
     // TODO: Remove, or return only when we're not onboarding
-    if (calculated.length > 0) return calculated;
+    //let hasOnboardedMealTracker = false; // --- IGNORE --- force onboarding for now
+    if (hasOnboardedMealTracker && calculated.length > 0) return calculated;
 
     // We safely use 3 hardcoded dummy meals so Joyride spotlight doesn't break when history is empty
     const dummyMeals = [
@@ -239,21 +237,25 @@ export default function MealTracker() {
     // console.log(fallbackDishes.length, "fallback dishes found");
 
     // TODO: Return suggestedMeals when history exists/ onboarding complete
-    return dummyMeals.map((d) => ({
-      id: `fallback-${d.id}`,
-      dishId: d.id,
-      dishName: d.name,
-      servings: 1,
-      calories: d.calories,
-      protein: d.protein,
-      carbs: d.carbs,
-      fat: d.fat,
-      eatenAt: new Date(),
-      userId: userId ?? "",
-      createdAt: new Date(),
-    }));
-  }, [meals, userId]);
+    if (!hasOnboardedMealTracker) {
+      return dummyMeals.map((d) => ({
+        id: `fallback-${d.id}`,
+        dishId: d.id,
+        dishName: d.name,
+        servings: 1,
+        calories: d.calories,
+        protein: d.protein,
+        carbs: d.carbs,
+        fat: d.fat,
+        eatenAt: new Date(),
+        userId: userId ?? "",
+        createdAt: new Date(),
+      }));
+    }
 
+    return [];
+  }, [hasOnboardedMealTracker, meals, userId]);
+  console.log(hasOnboardedMealTracker, "hasOnboardedMealTracker");
   // logmeal mutation
   const logMeal = trpc.nutrition.logMeal.useMutation({
     onSuccess: async () => {

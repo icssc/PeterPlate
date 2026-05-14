@@ -9,6 +9,7 @@ import {
   type Step,
   type TooltipRenderProps,
 } from "react-joyride";
+import { useUserStore } from "../../context/useUserStore";
 
 const steps: Step[] = [
   {
@@ -109,8 +110,8 @@ export default function TrackerOnboarding() {
 
   useEffect(() => {
     // DEBUG: Always run tour for debugging. Revert to localStorage check later.
-    // const hasSeenTour = localStorage.getItem("hasSeenTrackerTour");
-    const hasSeenTour = false; // forced false to always trigger
+    const hasSeenTour = localStorage.getItem("hasSeenTrackerTour");
+    //const hasSeenTour = false; // forced false to always trigger
 
     if (!hasSeenTour) {
       // Add a slight delay so DOM renders before tour starts
@@ -129,6 +130,8 @@ export default function TrackerOnboarding() {
 
       if (target.closest(".react-joyride__overlay")) {
         setRun(false);
+        useUserStore.getState().setHasOnboardedMealTracker(true); // mark onboarding complete if user clicks outside
+        localStorage.setItem("hasSeenTrackerTour", "true"); // FIXED: Save to localstorage so it doesn't reappear
       }
     };
 
@@ -147,7 +150,8 @@ export default function TrackerOnboarding() {
 
     if (finishedStatuses.includes(status)) {
       setRun(false);
-      // localStorage.setItem("hasSeenTrackerTour", "true");
+      useUserStore.getState().setHasOnboardedMealTracker(true); // mark onboarding complete when tour finishes or is skipped
+      localStorage.setItem("hasSeenTrackerTour", "true");
     }
   };
 
@@ -159,7 +163,7 @@ export default function TrackerOnboarding() {
       run={run}
       continuous
       scrollToFirstStep={false}
-      disableOverlayClose={true} // must be true tells Joyride to stop fighting the custom click listener
+      disableOverlayClose={false} // must be true tells Joyride to stop fighting the custom click listener
       showProgress={false}
       showSkipButton={true}
       callback={handleJoyrideCallback}
