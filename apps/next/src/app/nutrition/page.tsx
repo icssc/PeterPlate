@@ -350,7 +350,7 @@ export default function MealTracker() {
       className="p-2 md:p-8 mt-2 md:mt-12"
     >
       <div className="px-2 md:px-8">
-        {/* !hasUserOnboardedMealTracker && */ <TrackerOnboarding />}
+        {!hasOnboardedMealTracker && <TrackerOnboarding />}
         <Typography
           variant="h5"
           fontWeight={700}
