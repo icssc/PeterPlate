@@ -14,6 +14,7 @@ import {
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { isSameDay } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
+import { cn } from "@/utils/tw";
 import {
   ANTEATERY_MAP_LINK_URL,
   BRANDYWINE_MAP_LINK_URL,
@@ -193,7 +194,10 @@ export function RestaurantPage({
           alt={hero.alt}
           fill
           priority
-          className="object-cover object-bottom"
+          className={cn(
+            "object-cover",
+            hall === HallEnum.BRANDYWINE && "object-bottom",
+          )}
         />
         <div className="absolute inset-0 bg-gradient-to-tr from-black/80 via-black/20 to-transparent" />
         {/* Mobile Header Overlay */}
