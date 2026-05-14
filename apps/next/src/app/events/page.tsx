@@ -6,48 +6,54 @@ import { Typography } from "@mui/material";
 import Button from "@mui/material/Button";
 import { useState } from "react";
 import { trpc } from "@/utils/trpc";
-// @ts-expect-error
+// @ts-expect-error: big-calendar import error always, for some reason
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import { addMonths, endOfMonth, startOfMonth, subMonths } from "date-fns";
+import type { Event } from "@peterplate/validators";
+import { addMonths, subMonths } from "date-fns";
 import CalendarView from "@/components/ui/calendar-view";
-import EventCard, { type EventInfo } from "@/components/ui/card/event-card";
+import EventCard from "@/components/ui/card/event-card";
 import EventCardSkeleton from "@/components/ui/skeleton/event-card-skeleton";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-import { getEventType } from "@/utils/funcs";
-import { HallEnum } from "@/utils/types";
+import {
+  classifyEvent,
+  EVENT_CATEGORIES,
+  type EventCategory,
+} from "@/utils/classifyEvent";
 
 const Events = () => {
   const [selectedDiningHall, setSelectedDiningHall] = useState<
     "both" | "anteatery" | "brandywine"
   >("both");
   const [selectedEventType, setSelectedEventType] = useState<
-    "both" | "special" | "celebration"
+    "both" | EventCategory
   >("both");
   const [viewMode, setViewMode] = useState<"grid" | "calendar">("grid");
-  const [selectedEventData, setSelectedEventData] = useState<EventInfo | null>(
+  const [selectedEventData, setSelectedEventData] = useState<Event | null>(
     null,
   );
   const [currentDate, setCurrentDate] = useState(new Date());
-  const now = new Date();
 
-  const {
-    data: events,
-    isLoading,
-    error,
-  } = trpc.event.inBetween.useQuery({
-    after: startOfMonth(currentDate),
-    before: endOfMonth(currentDate),
-  });
+  const { data: events, isLoading, error } = trpc.event.upcoming.useQuery();
+  // TODO: Add inBetween here when route is complete
+  // } = trpc.event.inBetween.useQuery({
+  //   after: startOfMonth(currentDate),
+  //   before: endOfMonth(currentDate),
+  // });
 
   const sortedEvents =
-    (events?.length ?? 0) > 0
-      ? [...(events ?? [])].sort(
-          (a: any, b: any) =>
-            new Date(a.start).getTime() - new Date(b.start).getTime(),
+    (events?.length ?? -1 > 0)
+      ? events?.sort(
+          (a, b) => new Date(a.start).getTime() - new Date(b.start).getTime(),
         )
       : [];
 
-  const filteredEvents = sortedEvents.filter((event: any) => {
+  const eventsWithType =
+    sortedEvents?.map((event) => ({
+      ...event,
+      eventType: classifyEvent(event.title, event.description),
+    })) ?? [];
+
+  const filteredEvents = eventsWithType.filter((event) => {
     const matchesDiningHall =
       selectedDiningHall === "both" ||
       (selectedDiningHall === "anteatery" &&
@@ -55,12 +61,11 @@ const Events = () => {
       (selectedDiningHall === "brandywine" &&
         event.restaurantId === "brandywine");
     const matchesEventType =
-      selectedEventType === "both" ||
-      getEventType(event.title) === selectedEventType;
+      selectedEventType === "both" || event.eventType === selectedEventType;
     return matchesDiningHall && matchesEventType;
   });
 
-  const calendarEvents = filteredEvents.map((event: any) => ({
+  const calendarEvents = filteredEvents?.map((event) => ({
     title: event.title,
     start: new Date(event.start),
     end: new Date(event.end),
@@ -73,18 +78,7 @@ const Events = () => {
   const handleSelectEvent = (calendarEvent: any) => {
     const resource = calendarEvent.resource;
     setSelectedEventData({
-      name: resource.title,
-      shortDesc: resource.shortDescription,
-      longDesc: resource.longDescription,
-      imgSrc: resource.image,
-      alt: resource.title + " promotion image",
-      startTime: resource.start,
-      endTime: resource.end,
-      location:
-        resource.restaurantId === "anteatery"
-          ? HallEnum.ANTEATERY
-          : HallEnum.BRANDYWINE,
-      isOngoing: resource.start <= now && resource.end >= now,
+      ...resource,
     });
   };
 
@@ -156,7 +150,7 @@ const Events = () => {
                 <span className="text-sm font-medium text-slate-900 dark:text-white">
                   Event Type
                 </span>
-                <div className="flex gap-3">
+                <div className="flex flex-wrap gap-3">
                   <Button
                     variant="outlined"
                     size="small"
@@ -169,37 +163,32 @@ const Events = () => {
                   >
                     All Events
                   </Button>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={() => setSelectedEventType("special")}
-                    className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
-                      selectedEventType === "special"
-                        ? "!bg-sky-700 !text-white !border-sky-700 hover:!bg-sky-800 dark:!bg-blue-300 dark:!text-gray-900 dark:!border-blue-300 dark:hover:!bg-blue-400"
-                        : "!bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50 dark:!bg-transparent dark:!border-blue-300 dark:!text-white dark:hover:!bg-zinc-700"
-                    }`}
-                  >
-                    Special Meals
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={() => setSelectedEventType("celebration")}
-                    className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
-                      selectedEventType === "celebration"
-                        ? "!bg-sky-700 !text-white !border-sky-700 hover:!bg-sky-800 dark:!bg-blue-300 dark:!text-gray-900 dark:!border-blue-300 dark:hover:!bg-blue-400"
-                        : "!bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50 dark:!bg-transparent dark:!border-blue-300 dark:!text-white dark:hover:!bg-zinc-700"
-                    }`}
-                  >
-                    Celebration
-                  </Button>
+                  {EVENT_CATEGORIES.map((category) => {
+                    const isSelected = selectedEventType === category;
+
+                    return (
+                      <Button
+                        key={category}
+                        variant="outlined"
+                        size="small"
+                        onClick={() => setSelectedEventType(category)}
+                        className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
+                          isSelected
+                            ? "!bg-sky-700 dark:!bg-sky-400 !text-white !border-sky-700 dark:!border-sky-400 hover:!bg-sky-800 dark:hover:!bg-sky-500"
+                            : "!bg-white dark:!bg-zinc-800 !border-sky-700 dark:!border-sky-400 !text-slate-900 dark:!text-zinc-100 hover:!bg-sky-50 dark:hover:!bg-zinc-700"
+                        }`}
+                      >
+                        {category}
+                      </Button>
+                    );
+                  })}
                 </div>
               </div>
               <div className="flex flex-col gap-3">
                 <span className="text-sm font-medium text-slate-900 dark:text-white">
                   Location
                 </span>
-                <div className="flex gap-3">
+                <div className="flex flex-wrap gap-3">
                   <Button
                     variant="outlined"
                     size="small"
@@ -263,22 +252,10 @@ const Events = () => {
               </Typography>
 
               <div className="flex sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12 overflow-x-auto sm:overflow-visible pb-2 sm:pb-0">
-                {filteredEvents.map((event: any): any => (
+                {filteredEvents?.map((event) => (
                   <EventCard
                     key={`${event.title}-${event.start}-${event.restaurantId}`}
-                    name={event.title}
-                    imgSrc={event.image}
-                    alt={`${event.title} promotion image.`}
-                    startTime={event.start}
-                    endTime={event.end}
-                    location={
-                      event.restaurantId === "anteatery"
-                        ? HallEnum.ANTEATERY
-                        : HallEnum.BRANDYWINE
-                    }
-                    shortDesc={event.shortDescription}
-                    longDesc={event.longDescription}
-                    isOngoing={event.start <= now && event.end >= now}
+                    {...event}
                   />
                 ))}
               </div>
@@ -302,7 +279,7 @@ const Events = () => {
               isLoading={isLoading}
               error={error}
               currentDate={currentDate}
-              calendarEvents={calendarEvents}
+              calendarEvents={calendarEvents ?? []}
               selectedEventData={selectedEventData}
               onPreviousMonth={viewPreviousMonthsEvents}
               onNextMonth={viewNextMonthsEvents}

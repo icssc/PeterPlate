@@ -26,7 +26,6 @@ export const loggedMeals = pgTable(
       .references(() => dishes.id, {
         onDelete: "cascade",
       }),
-    dishName: text("dish_name").notNull(),
     servings: real("servings").default(1).notNull(),
     eatenAt: timestamp("eaten_at").defaultNow().notNull(),
   },

@@ -1,11 +1,18 @@
 "use client";
 
 import { Rating as MUIRating, Tooltip } from "@mui/material";
+import posthog from "posthog-js";
 import { useUserStore } from "@/context/useUserStore";
 import { useRatings } from "@/hooks/useRatings";
 import { trpc } from "@/utils/trpc";
 
-export default function Rating({ dishId }: { dishId: string }) {
+export default function Rating({
+  dishId,
+  restaurant,
+}: {
+  dishId: string;
+  restaurant: "anteatery" | "brandywine";
+}) {
   const userId = useUserStore((s) => s.userId);
 
   const { rateDish } = useRatings(userId ?? "");
@@ -47,7 +54,11 @@ export default function Rating({ dishId }: { dishId: string }) {
       size="large"
       onChange={(_, value) => {
         if (value == null) return;
-        rateDish(dishId, value);
+        rateDish(dishId, value, restaurant);
+        posthog.capture("dish_rated", {
+          dish_id: dishId,
+          rating: value,
+        });
       }}
       value={userRating ?? 0}
     />
