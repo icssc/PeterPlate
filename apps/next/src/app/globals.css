@@ -138,16 +138,16 @@ body {
 
 /* Light mode calendar borders */
 .events-calendar-wrapper .rbc-month-view,
-.events-calendar-wrapper .rbc-day-bg + .rbc-day-bg,
-.events-calendar-wrapper .rbc-month-row + .rbc-month-row,
+.events-calendar-wrapper .rbc-day-bg+.rbc-day-bg,
+.events-calendar-wrapper .rbc-month-row+.rbc-month-row,
 .events-calendar-wrapper .rbc-header {
   border-color: #0369a1 !important;
 }
 
 /* Dark mode calendar borders */
 .dark .events-calendar-wrapper .rbc-month-view,
-.dark .events-calendar-wrapper .rbc-day-bg + .rbc-day-bg,
-.dark .events-calendar-wrapper .rbc-month-row + .rbc-month-row,
+.dark .events-calendar-wrapper .rbc-day-bg+.rbc-day-bg,
+.dark .events-calendar-wrapper .rbc-month-row+.rbc-month-row,
 .dark .events-calendar-wrapper .rbc-header {
   border-color: #93c5fd !important;
 }
@@ -165,16 +165,20 @@ body {
 .MuiPickersDay-root {
   color: #111827 !important;
 }
+
 .MuiPickersDay-root.Mui-selected {
   background-color: #0369a1 !important;
   color: white !important;
 }
+
 .MuiDayCalendar-weekDayLabel {
   color: #111827 !important;
 }
+
 .MuiPickersCalendarHeader-label {
   color: #111827 !important;
 }
+
 .MuiPickersArrowSwitcher-button {
   color: #111827 !important;
 }
@@ -183,25 +187,30 @@ body {
 .dark .MuiPickersDay-root {
   color: white !important;
 }
+
 .dark .MuiPickersDay-root.Mui-selected {
   background-color: #93C5FD !important;
   color: #111827 !important;
 }
+
 .dark .MuiPickersDay-today {
   border-color: #93C5FD !important;
 }
+
 .dark .MuiDayCalendar-weekDayLabel {
   color: white !important;
 }
+
 .dark .MuiPickersCalendarHeader-label {
   color: white !important;
 }
+
 .dark .MuiPickersArrowSwitcher-button {
   color: white !important;
 }
+
 /* Date picker dialog dark mode (mobile) */
 .dark .MuiDialog-paper {
   background-color: var(--surface-elevated) !important;
   background-image: none !important;
 }
-
