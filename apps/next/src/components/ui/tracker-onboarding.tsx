@@ -146,10 +146,10 @@ export default function TrackerOnboarding() {
   }, [run, setHasOnboardedMealTracker]);
 
   const handleJoyrideCallback = (data: CallBackProps) => {
-    const { status } = data;
+    const { status, action } = data;
     const finishedStatuses: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
 
-    if (finishedStatuses.includes(status)) {
+    if (finishedStatuses.includes(status) || action === "close") {
       setRun(false);
       setHasOnboardedMealTracker(true); // mark onboarding complete when tour finishes or is skipped
     }
