@@ -70,16 +70,12 @@ export function RestaurantControls({
     <>
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2 mb-2 flex-wrap md:flex-nowrap">
         {/* Desktop title & status (Header) */}
-        <RestaurantHeader isDesktop={isDesktop} hall={hall} />
+        <div className="inline-flex gap-4">
+          <RestaurantHeader isDesktop={isDesktop} hall={hall} />
+          {isDesktop && <DiningHallStatus status={derivedHallStatus} />}
+        </div>
 
-        <div className="flex flex-col gap-3 w-full md:w-auto md:flex-row md:items-center md:justify-end">
-          {/* Desktop Status - now next to selectors */}
-          {isDesktop && (
-            <div>
-              <DiningHallStatus status={derivedHallStatus} />
-            </div>
-          )}
-
+        <div className="flex flex-col gap-3 w-full md:w-auto md:flex-row md:items-center">
           {/* Meal & date selectors (Filters) */}
           <RestaurantFilters
             isDesktop={isDesktop}

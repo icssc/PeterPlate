@@ -21,6 +21,7 @@ import {
   HallEnum,
   HallStatusEnum,
 } from "@/utils/types";
+import { DiningHallStatus } from "../status";
 import { DishesView } from "./dishes-view";
 import { RestaurantControls } from "./restaurant-controls";
 import { Sidebar } from "./sidebar";
@@ -211,20 +212,7 @@ export function RestaurantPage({
               >
                 {hall === HallEnum.ANTEATERY ? "Anteatery" : "Brandywine"}
               </Typography>
-              <div className="flex items-center gap-2 pl-1 text-md font-small text-white">
-                {openTime && closeTime ? (
-                  <>
-                    <div
-                      className={`w-2.5 h-2.5 rounded-full ${derivedHallStatus === HallStatusEnum.OPEN ? "bg-green-500" : "bg-red-500"}`}
-                    />
-                    <span>
-                      {derivedHallStatus === HallStatusEnum.OPEN
-                        ? "Open"
-                        : "Closed"}
-                    </span>
-                  </>
-                ) : null}
-              </div>
+              <DiningHallStatus status={derivedHallStatus} mobile />
             </div>
             <Link
               href={
