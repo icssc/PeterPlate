@@ -107,13 +107,15 @@ const CustomTooltip = ({
 
 export default function TrackerOnboarding() {
   const [run, setRun] = useState(false);
+  const hasOnboardedMealTracker = useUserStore(
+    (state) => state.hasOnboardedMealTracker,
+  );
+  const setHasOnboardedMealTracker = useUserStore(
+    (state) => state.setHasOnboardedMealTracker,
+  );
 
   useEffect(() => {
-    // DEBUG: Always run tour for debugging. Revert to localStorage check later.
-    const hasSeenTour = localStorage.getItem("hasSeenTrackerTour");
-    //const hasSeenTour = false; // forced false to always trigger
-
-    if (!hasSeenTour) {
+    if (!hasOnboardedMealTracker) {
       // Add a slight delay so DOM renders before tour starts
       const timer = setTimeout(() => {
         setRun(true);
@@ -121,7 +123,7 @@ export default function TrackerOnboarding() {
 
       return () => clearTimeout(timer);
     }
-  }, []);
+  }, [hasOnboardedMealTracker]);
 
   // We bypass Joyride and use a native browser listener to catch the gray background click
   useEffect(() => {
@@ -130,8 +132,7 @@ export default function TrackerOnboarding() {
 
       if (target.closest(".react-joyride__overlay")) {
         setRun(false);
-        useUserStore.getState().setHasOnboardedMealTracker(true); // mark onboarding complete if user clicks outside
-        localStorage.setItem("hasSeenTrackerTour", "true"); // FIXED: Save to localstorage so it doesn't reappear
+        setHasOnboardedMealTracker(true); // mark onboarding complete if user clicks outside
       }
     };
 
@@ -142,7 +143,7 @@ export default function TrackerOnboarding() {
 
     return () =>
       document.removeEventListener("click", handleOverlayClick, true);
-  }, [run]);
+  }, [run, setHasOnboardedMealTracker]);
 
   const handleJoyrideCallback = (data: CallBackProps) => {
     const { status } = data;
@@ -150,8 +151,7 @@ export default function TrackerOnboarding() {
 
     if (finishedStatuses.includes(status)) {
       setRun(false);
-      useUserStore.getState().setHasOnboardedMealTracker(true); // mark onboarding complete when tour finishes or is skipped
-      localStorage.setItem("hasSeenTrackerTour", "true");
+      setHasOnboardedMealTracker(true); // mark onboarding complete when tour finishes or is skipped
     }
   };
 
