@@ -119,7 +119,7 @@ function DesktopHome(): React.JSX.Element {
             {/* Brandywine Card */}
             <Link href="/brandywine" className="group">
               <Box
-                className="rounded-xl overflow-hidden shadow-sm hover:shadow-md transition dark:bg-[#323235]"
+                className="rounded-xl overflow-hidden shadow-sm hover:shadow-md transition dark:bg-surface-elevated"
                 sx={{ border: 1, borderColor: "divider" }}
               >
                 <div className="relative w-full h-56">
@@ -162,7 +162,7 @@ function DesktopHome(): React.JSX.Element {
             {/* Anteatery Card */}
             <Link href="/anteatery" className="group">
               <Box
-                className="rounded-xl overflow-hidden shadow-sm hover:shadow-md transition dark:bg-[#323235]"
+                className="rounded-xl overflow-hidden shadow-sm hover:shadow-md transition dark:bg-surface-elevated"
                 sx={{ border: 1, borderColor: "divider" }}
               >
                 <div className="relative w-full h-56">
@@ -338,7 +338,7 @@ function MobileHome(): React.JSX.Element {
             {/* Brandywine Card */}
             <Link href="/brandywine" className="group block">
               <Box
-                className="rounded-xl overflow-hidden shadow-sm hover:shadow-md transition dark:bg-[#323235]"
+                className="rounded-xl overflow-hidden shadow-sm hover:shadow-md transition dark:bg-surface-elevated"
                 sx={{ border: 1, borderColor: "divider" }}
               >
                 <div className="relative w-full h-24">
@@ -385,7 +385,7 @@ function MobileHome(): React.JSX.Element {
             {/* Anteatery Card */}
             <Link href="/anteatery" className="group block">
               <Box
-                className="rounded-xl overflow-hidden shadow-sm hover:shadow-md transition dark:bg-[#323235]"
+                className="rounded-xl overflow-hidden shadow-sm hover:shadow-md transition dark:bg-surface-elevated"
                 sx={{ border: 1, borderColor: "divider" }}
               >
                 <div className="relative w-full h-24">
