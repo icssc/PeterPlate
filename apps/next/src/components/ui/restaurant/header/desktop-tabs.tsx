@@ -1,16 +1,14 @@
+import type { Station } from "@api/index";
 import { GridView, Menu as MenuIcon } from "@mui/icons-material";
 import { Button, Tab, Tabs } from "@mui/material";
+import { useRestaurantUIStore } from "@/context/useRestaurantUIStore";
 import { toTitleCase } from "@/utils/funcs";
 
 interface DesktopTabsProps {
   isDesktop: boolean;
   isLoading: boolean;
   isError: boolean;
-  stations: any[];
-  selectedStation: string;
-  setSelectedStation: (station: string) => void;
-  isCompactView: boolean;
-  setIsCompactView: (isCompact: boolean) => void;
+  stations: Station[];
 }
 
 export function DesktopTabs({
@@ -18,11 +16,12 @@ export function DesktopTabs({
   isLoading,
   isError,
   stations,
-  selectedStation,
-  setSelectedStation,
-  isCompactView,
-  setIsCompactView,
 }: DesktopTabsProps) {
+  const selectedStation = useRestaurantUIStore((s) => s.selectedStation);
+  const setSelectedStation = useRestaurantUIStore((s) => s.setSelectedStation);
+  const isCompactView = useRestaurantUIStore((s) => s.isCompactView);
+  const setIsCompactView = useRestaurantUIStore((s) => s.setIsCompactView);
+
   if (!isDesktop) return null;
 
   return (
@@ -40,10 +39,8 @@ export function DesktopTabs({
                   block: "start",
                 });
               }
-              setSelectedStation(val);
-            } else {
-              setSelectedStation(val);
             }
+            setSelectedStation(val);
           }}
           className="flex w-full overflow-x-auto no-scrollbar !bg-sky-700/40 dark:!bg-[#46566a] !rounded-lg !p-2 [&_.MuiTabs-flexContainer]:justify-between [&_.MuiTabs-flexContainer]:gap-2 [&_.MuiTabs-indicator]:hidden"
           variant="scrollable"
@@ -59,7 +56,7 @@ export function DesktopTabs({
           ))}
         </Tabs>
       )}
-      {/* Card/compact view toggles */}
+      {/* Card / compact view toggles */}
       <div className="flex justify-end mt-2">
         <div className="flex gap-2">
           <Button

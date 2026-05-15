@@ -14,6 +14,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { useTheme } from "next-themes";
 import type { CalendarRange } from "@/components/ui/toolbar";
+import { useRestaurantUIStore } from "@/context/useRestaurantUIStore";
 import { useUserStore } from "@/context/useUserStore";
 import { formatOpenCloseTime, toTitleCase } from "@/utils/funcs";
 import { cn } from "@/utils/tw";
@@ -22,33 +23,36 @@ interface RestaurantFiltersProps {
   isDesktop: boolean;
   periods: string[];
   availablePeriodTimes: Record<string, [Date, Date] | null> | undefined;
-  selectedPeriod: string;
-  setSelectedPeriod: (period: string) => void;
+  // Date selection is owned by date-context, not the UI store
   selectedDate: Date | undefined;
   handleDateSelect: (date: Date | undefined) => void;
   calendarRange: CalendarRange | null;
-  isDatePickerOpen: boolean;
-  setIsDatePickerOpen: (isOpen: boolean) => void;
-  showPreferencesOnly: boolean;
-  setShowPreferencesOnly: (isSet: boolean) => void;
 }
 
 export function RestaurantFilters({
   isDesktop,
   periods,
   availablePeriodTimes,
-  selectedPeriod,
-  setSelectedPeriod,
   selectedDate,
   handleDateSelect,
   calendarRange,
-  isDatePickerOpen,
-  setIsDatePickerOpen,
-  showPreferencesOnly,
-  setShowPreferencesOnly,
 }: RestaurantFiltersProps) {
   const { resolvedTheme } = useTheme();
   const { userId } = useUserStore();
+
+  const selectedPeriod = useRestaurantUIStore((s) => s.selectedPeriod);
+  const setSelectedPeriod = useRestaurantUIStore((s) => s.setSelectedPeriod);
+  const isDatePickerOpen = useRestaurantUIStore((s) => s.isDatePickerOpen);
+  const setIsDatePickerOpen = useRestaurantUIStore(
+    (s) => s.setIsDatePickerOpen,
+  );
+  const showPreferencesOnly = useRestaurantUIStore(
+    (s) => s.showPreferencesOnly,
+  );
+  const setShowPreferencesOnly = useRestaurantUIStore(
+    (s) => s.setShowPreferencesOnly,
+  );
+
   const ShowPrefsButton = (
     <button
       type="button"
