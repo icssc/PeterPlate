@@ -5,8 +5,17 @@ import { authClient } from "@/utils/auth-client";
 import { Button } from "../ui/shadcn/button";
 
 function isNativeIosApp(): boolean {
-  if (typeof document === "undefined") return false;
-  return document.cookie.includes("app-platform=iOS");
+  if (typeof navigator !== "undefined" && navigator.userAgent.includes("PWAShell")) {
+    // WKWebView shell sets this in `apps/pwa/src/PeterPlate/WebView.swift`. Prefer it over
+    // `document.cookie`: cookies injected via WKHTTPCookieStore often are not visible to JS,
+    // so the old check could miss the shell and route OAuth through `icssc` instead of
+    // `icssc-native` — breaking ASWebAuthenticationSession + `/auth/native` flow.
+    return true;
+  }
+  if (typeof document !== "undefined" && document.cookie.includes("app-platform=iOS")) {
+    return true;
+  }
+  return false;
 }
 
 export function GoogleSignInButton() {
