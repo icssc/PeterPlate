@@ -295,17 +295,21 @@ extension ViewController: WKScriptMessageHandler {
 //   2. Passkeys / WebAuthn bound to a third-party RP ID (e.g. google.com) only
 //      work in top-level Safari context, not in a WKWebView.
 //
-// The callback uses a Universal Link via ASWebAuthenticationSession's HTTPS-
-// callback initializer. The AASA file served at
-// https://www.peterplate.com/.well-known/apple-app-site-association lists the
-// callback path, so the callback can only be delivered to our AASA-verified app.
+// The callback uses a Universal Link (`https://www.peterplate.com/auth/native`)
+// via ASWebAuthenticationSession's HTTPS-callback initializer. The AASA file
+// at `https://www.peterplate.com/.well-known/apple-app-site-association` lists
+// this path, so the callback can only be delivered to our AASA-verified app.
+// Listing `/auth/native` (instead of the default callback path) prevents iOS
+// from hijacking normal Safari logins via Universal Links.
 //
-// On callback, we load the OAuth callback URL in the WKWebView so Better Auth's
-// server-side handler can validate the PKCE exchange, set the session cookie in
-// the WebView's cookie jar, and redirect to the app.
+// Better Auth's genericOAuth config sets `redirectURI` to /auth/native so the
+// authorize URL already carries `redirect_uri=.../auth/native`. On callback,
+// we load the URL in the WKWebView; the Next.js /auth/native route handler
+// proxies to Better Auth's internal callback handler, which validates the
+// PKCE exchange, sets the session cookie in the WebView's jar, and redirects.
 //
-// IMPORTANT: Better Auth stores PKCE state in the database (verification table),
-// not cookies — so the code exchange works even though ASWebAuthenticationSession
+// Better Auth stores PKCE state in the database (verification table), not
+// cookies — so the code exchange works even though ASWebAuthenticationSession
 // runs in a separate browser context from the WKWebView.
 extension ViewController: ASWebAuthenticationPresentationContextProviding {
     func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
@@ -314,7 +318,8 @@ extension ViewController: ASWebAuthenticationPresentationContextProviding {
 
     func startAuthSession(url: URL, webView: WKWebView) {
         // Read the redirect_uri from the OIDC authorize URL. Better Auth sets
-        // it to https://www.peterplate.com/api/auth/callback/icssc.
+        // it to https://www.peterplate.com/auth/native via the genericOAuth
+        // `redirectURI` config.
         let authComponents = URLComponents(url: url, resolvingAgainstBaseURL: false)
         let redirectUri = authComponents?
             .queryItems?
@@ -323,7 +328,7 @@ extension ViewController: ASWebAuthenticationPresentationContextProviding {
             .flatMap { URL(string: $0) }
 
         let callbackHost = redirectUri?.host ?? "www.peterplate.com"
-        let callbackPath = redirectUri?.path ?? "/api/auth/callback/icssc"
+        let callbackPath = redirectUri?.path ?? "/auth/native"
 
         let callback: ASWebAuthenticationSession.Callback = .https(
             host: callbackHost,
@@ -348,8 +353,9 @@ extension ViewController: ASWebAuthenticationPresentationContextProviding {
 
             guard let callbackURL = callbackURL else { return }
 
-            // Load the callback URL in the WKWebView. Better Auth will process
-            // the code exchange, set the session cookie, and redirect to /.
+            // Load the callback URL in the WKWebView. The /auth/native route
+            // proxies to Better Auth which processes the code exchange, sets
+            // the session cookie, and redirects to /.
             webView?.load(URLRequest(url: callbackURL))
         }
         session.presentationContextProvider = self
