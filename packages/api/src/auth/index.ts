@@ -25,23 +25,36 @@ export const auth = betterAuth({
   },
   plugins: [
     genericOAuth({
-      config: [
-        {
-          providerId: "icssc",
-          clientId: process.env.AUTH_CLIENT_ID || "peterplate-dev",
-          discoveryUrl:
-            "https://auth.icssc.club/.well-known/openid-configuration",
-          scopes: ["openid", "profile", "email"],
-          pkce: true,
-          mapProfileToUser: (profile) => {
-            return {
-              name: profile.name,
-              email: profile.email,
-              image: profile.picture,
-            };
+      config: (() => {
+        const clientId = process.env.AUTH_CLIENT_ID || "peterplate-dev";
+        const discoveryUrl = "https://auth.icssc.club/.well-known/openid-configuration";
+        const scopes = ["openid", "profile", "email"];
+        const mapProfileToUser = (profile: Record<string, string>) => ({
+          name: profile.name,
+          email: profile.email,
+          image: profile.picture,
+        });
+
+        return [
+          {
+            providerId: "icssc",
+            clientId,
+            discoveryUrl,
+            scopes,
+            pkce: true,
+            mapProfileToUser,
           },
-        },
-      ],
+          {
+            providerId: "icssc-native",
+            clientId,
+            discoveryUrl,
+            redirectURI: `${process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000"}/auth/native`,
+            scopes,
+            pkce: true,
+            mapProfileToUser,
+          },
+        ];
+      })(),
     }),
   ],
   database: drizzleAdapter(db, {

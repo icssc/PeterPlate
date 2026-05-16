@@ -16,6 +16,14 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "delivery-p140432-e1469601.adobeaemcloud.com" },
     ],
   },
+  async rewrites() {
+    return [
+      {
+        source: '/.well-known/apple-app-site-association',
+        destination: '/apple-app-site-association',
+      },
+    ];
+  },
   async headers() {
     return [
       {
