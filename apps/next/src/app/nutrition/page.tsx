@@ -15,6 +15,7 @@ import NutritionGoals from "@/components/ui/nutrition-goals";
 import TrackerHistory from "@/components/ui/tracker-history";
 import TrackerHistoryDialog from "@/components/ui/tracker-history-dialog";
 import TrackerHistoryDrawer from "@/components/ui/tracker-history-drawer";
+import TrackerOnboarding from "@/components/ui/tracker-onboarding";
 import { useSnackbarStore } from "@/context/useSnackbar";
 import { useUserStore } from "@/context/useUserStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
@@ -37,7 +38,7 @@ type DisplayDish = {
 export default function MealTracker() {
   const utils = trpc.useUtils();
   const router = useRouter();
-  const { userId, isInitialized } = useUserStore();
+  const { userId, isInitialized, hasOnboardedMealTracker } = useUserStore();
   const { showSnackbar } = useSnackbarStore();
 
   useEffect(() => {
@@ -181,18 +182,19 @@ export default function MealTracker() {
 
   // suggested meals memo
   const suggestedMeals = useMemo(() => {
-    if (!meals) return [];
     const servingCounts: Record<string, number> = {};
     const latestByDish: Record<string, LoggedMealWithNutrition> = {};
 
-    for (const meal of meals) {
-      if (!meal.dishId) continue;
-      servingCounts[meal.dishId] =
-        (servingCounts[meal.dishId] ?? 0) + (meal.servings ?? 1);
-      if (!latestByDish[meal.dishId]) latestByDish[meal.dishId] = meal;
+    if (meals) {
+      for (const meal of meals) {
+        if (!meal.dishId) continue;
+        servingCounts[meal.dishId] =
+          (servingCounts[meal.dishId] ?? 0) + (meal.servings ?? 1);
+        if (!latestByDish[meal.dishId]) latestByDish[meal.dishId] = meal;
+      }
     }
 
-    return Object.entries(servingCounts)
+    const calculated = Object.entries(servingCounts)
       .filter(([, total]) => total >= 1)
       .sort(([, a], [, b]) => b - a)
       .map(([dishId]) => {
@@ -206,8 +208,71 @@ export default function MealTracker() {
           servings: 1,
         };
       });
-  }, [meals]);
 
+    // If user has history, show it
+    // TODO: Remove, or return only when we're not onboarding
+    //let hasOnboardedMealTracker = false; // --- IGNORE --- force onboarding for now
+    if (hasOnboardedMealTracker && calculated.length > 0) return calculated;
+
+    // We safely use 3 hardcoded dummy meals so Joyride spotlight doesn't break when history is empty
+    const dummyMeals = [
+      {
+        id: "dummy-1",
+        name: "Chicken Teriyaki",
+        calories: 300,
+        protein: 25,
+        carbs: 20,
+        fat: 10,
+      },
+      {
+        id: "dummy-2",
+        name: "White Rice",
+        calories: 200,
+        protein: 4,
+        carbs: 45,
+        fat: 0.5,
+      },
+      {
+        id: "dummy-3",
+        name: "Steamed Broccoli",
+        calories: 50,
+        protein: 3,
+        carbs: 10,
+        fat: 0.5,
+      },
+    ];
+
+    // TODO: Track when the user enters the onboarding procedure, and only return
+    // this when the user is in the onboarding.
+    // useuserstore to retrieve the hasonboardedmealtracker
+    // only return dummy meals when we have not onboarded the meal tracker
+    // when we complete onboarding, just set the userstore to true for hasonboardedmealtracker
+
+    // Instead of using getPopularDishes which requires rating data,
+    // we safely grab 3 dishes from the already-calculated availableDishes
+    // const fallbackDishes = availableDishes.slice(0, 3);
+    // console.log(fallbackDishes.length, "fallback dishes found");
+
+    // TODO: Return suggestedMeals when history exists/ onboarding complete
+    if (!hasOnboardedMealTracker) {
+      return dummyMeals.map((d) => ({
+        id: `fallback-${d.id}`,
+        dishId: d.id,
+        dishName: d.name,
+        servings: 1,
+        calories: d.calories,
+        protein: d.protein,
+        carbs: d.carbs,
+        fat: d.fat,
+        eatenAt: new Date(),
+        userId: userId ?? "",
+        createdAt: new Date(),
+      }));
+    }
+
+    return [];
+  }, [hasOnboardedMealTracker, meals, userId]);
+  console.log(hasOnboardedMealTracker, "hasOnboardedMealTracker");
   const visibleMeals = selectedDay?.items ?? [];
   const countedMeals = visibleMeals.filter(
     (m) => (m.servings ?? 0) > 0 && !isUnavailable(m.dishId),
@@ -285,6 +350,7 @@ export default function MealTracker() {
       className="p-2 md:p-8 mt-2 md:mt-12"
     >
       <div className="px-2 md:px-8">
+        {!hasOnboardedMealTracker && <TrackerOnboarding />}
         <Typography
           variant="h5"
           fontWeight={700}
@@ -327,6 +393,7 @@ export default function MealTracker() {
           </Typography>
           {userId && (
             <TrackerHistory
+              tourId="tour-history-btn"
               onDateSelect={() => {}}
               onDayClick={(date) => {
                 setHistoryDate(date);
@@ -339,23 +406,19 @@ export default function MealTracker() {
 
         {/* Desktop: NutritionBreakdown */}
         <div className="hidden md:flex items-start gap-4">
-          {mealsGroupedByDay.length === 0 ? (
-            <div>No meals logged recently.</div>
-          ) : (
-            <NutritionBreakdown
-              mealsEaten={countedMeals.map((m) => ({
-                ...m,
-                calories: toNum(m.calories),
-                protein: toNum(m.protein),
-                carbs: toNum(m.carbs),
-                fat: toNum(m.fat),
-              }))}
-              calorieGoal={goals?.calorieGoal ?? 2000}
-              proteinGoal={goals?.proteinGoal ?? 75}
-              carbGoal={goals?.carbGoal ?? 250}
-              fatGoal={goals?.fatGoal ?? 50}
-            />
-          )}
+          <NutritionBreakdown
+            mealsEaten={countedMeals.map((m) => ({
+              ...m,
+              calories: toNum(m.calories),
+              protein: toNum(m.protein),
+              carbs: toNum(m.carbs),
+              fat: toNum(m.fat),
+            }))}
+            calorieGoal={goals?.calorieGoal ?? 2000}
+            proteinGoal={goals?.proteinGoal ?? 75}
+            carbGoal={goals?.carbGoal ?? 250}
+            fatGoal={goals?.fatGoal ?? 50}
+          />
           <div className="relative mt-4 ml-auto">
             {userId && (
               <NutritionGoals
@@ -466,7 +529,7 @@ export default function MealTracker() {
           )}
         </div>
 
-        {/* Suggested Foods */}
+        {/* Suggested Foods (UPDATED JSX FOR TOUR) */}
         <div className="mt-6">
           <Typography variant="h6" fontWeight={600} color="text.primary">
             Suggested Foods
@@ -476,30 +539,33 @@ export default function MealTracker() {
               <Typography
                 variant="body2"
                 color="text.secondary"
-                className="mt-2"
+                className="mt-2 tour-suggested-card:first-of-type"
               >
                 Dishes from the past week logged 5+ times will appear here.
+                Start logging to see them!
               </Typography>
             ) : (
               suggestedMeals.map((meal) => (
-                <SearchMealCard
-                  key={meal.dishId}
-                  dish={dishDisplayMap.get(meal.dishId)}
-                  meal={meal}
-                  isUnavailable={isUnavailable(meal.dishId)}
-                  onAdd={(meal, servings) =>
-                    logMeal.mutate({
-                      userId: userId ?? "",
-                      dishId: meal.dishId ?? "",
-                      dishName:
-                        "dishName" in meal && typeof meal.dishName === "string"
-                          ? meal.dishName
-                          : "",
-                      servings,
-                      eatenAt: new Date(),
-                    })
-                  }
-                />
+                <div key={meal.dishId} className="tour-suggested-card">
+                  <SearchMealCard
+                    dish={dishDisplayMap.get(meal.dishId)}
+                    meal={meal}
+                    isUnavailable={isUnavailable(meal.dishId)}
+                    onAdd={(meal, servings) =>
+                      logMeal.mutate({
+                        userId: userId ?? "",
+                        dishId: meal.dishId ?? "",
+                        dishName:
+                          "dishName" in meal &&
+                          typeof meal.dishName === "string"
+                            ? meal.dishName
+                            : "",
+                        servings,
+                        eatenAt: new Date(),
+                      })
+                    }
+                  />
+                </div>
               ))
             )}
           </div>
