@@ -14,16 +14,16 @@ import { auth } from "@peterplate/api/auth";
  * this URL in the WKWebView.
  *
  * This handler forwards the request to Better Auth's internal handler by
- * rewriting the path to /api/auth/callback/icssc-native.
+ * rewriting the path to /api/auth/oauth2/callback/icssc-native.
  */
 export async function GET(req: Request) {
-    const url = new URL(req.url);
-    url.pathname = "/api/auth/callback/icssc-native";
+  const url = new URL(req.url);
+  url.pathname = "/api/auth/oauth2/callback/icssc-native";
 
-    const rewritten = new Request(url.toString(), {
-        headers: req.headers,
-        method: req.method,
-    });
+  const rewritten = new Request(url.toString(), {
+    headers: req.headers,
+    method: req.method,
+  });
 
-    return auth.handler(rewritten);
+  return auth.handler(rewritten);
 }
