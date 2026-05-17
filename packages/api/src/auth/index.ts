@@ -22,6 +22,18 @@ export const auth = betterAuth({
   debug: process.env.NODE_ENV !== "production",
   secret: authSecret,
   baseURL: process.env.NEXT_PUBLIC_BASE_URL ?? "https://www.peterplate.com",
+  // The iOS PWA shell (WKWebView) always sends Origin: https://www.peterplate.com
+  // because Settings.swift hardcodes rootUrl to that domain.  Better Auth builds
+  // its trusted-origins list from baseURL alone, so if NEXT_PUBLIC_BASE_URL is
+  // unset or points to a different host (e.g. the Vercel deploy URL), the
+  // origin check rejects every request that carries a cookie — which in the
+  // WKWebView is every request, because Swift injects the app-platform cookie
+  // via WKHTTPCookieStore.  Listing the production origin explicitly makes the
+  // iOS auth flow immune to baseURL misconfiguration.
+  trustedOrigins: [
+    "https://www.peterplate.com",
+    ...(process.env.NEXT_PUBLIC_BASE_URL ? [process.env.NEXT_PUBLIC_BASE_URL] : []),
+  ],
   user: {
     additionalFields: {
       hasOnboarded: {
