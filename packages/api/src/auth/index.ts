@@ -10,10 +10,18 @@ config({ path: join(process.cwd(), ".env") });
 
 if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL is not set");
 
+// BETTER_AUTH_SECRET must never carry the NEXT_PUBLIC_ prefix — Next.js inlines
+// NEXT_PUBLIC_* variables into the client bundle at build time, which would
+// expose the signing secret to every visitor. Use BETTER_AUTH_SECRET instead.
+// NEXT_PUBLIC_BETTER_AUTH_SECRET is kept as a legacy alias for existing deploys.
+const authSecret =
+  process.env.BETTER_AUTH_SECRET ?? process.env.NEXT_PUBLIC_BETTER_AUTH_SECRET;
+if (!authSecret) throw new Error("BETTER_AUTH_SECRET is not set");
+
 export const auth = betterAuth({
-  debug: true,
-  secret: process.env.NEXT_PUBLIC_BETTER_AUTH_SECRET,
-  baseURL: process.env.NEXT_PUBLIC_BASE_URL,
+  debug: process.env.NODE_ENV !== "production",
+  secret: authSecret,
+  baseURL: process.env.NEXT_PUBLIC_BASE_URL ?? "https://www.peterplate.com",
   user: {
     additionalFields: {
       hasOnboarded: {
@@ -27,7 +35,8 @@ export const auth = betterAuth({
     genericOAuth({
       config: (() => {
         const clientId = process.env.AUTH_CLIENT_ID || "peterplate-dev";
-        const discoveryUrl = "https://auth.icssc.club/.well-known/openid-configuration";
+        const discoveryUrl =
+          "https://auth.icssc.club/.well-known/openid-configuration";
         const scopes = ["openid", "profile", "email"];
         const mapProfileToUser = (profile: Record<string, string>) => ({
           name: profile.name,
@@ -48,7 +57,13 @@ export const auth = betterAuth({
             providerId: "icssc-native",
             clientId,
             discoveryUrl,
-            redirectURI: `${process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000"}/auth/native`,
+            // Never fall back to localhost — if NEXT_PUBLIC_BASE_URL is unset the
+            // redirect_uri would be http://localhost:3000/auth/native, which
+            // (a) isn't registered with auth.icssc.club and
+            // (b) causes Swift's ASWebAuthenticationSession.start() to silently
+            //     return false because "localhost" doesn't match the Associated
+            //     Domains entitlement (applinks:www.peterplate.com).
+            redirectURI: `${process.env.NEXT_PUBLIC_BASE_URL ?? "https://www.peterplate.com"}/auth/native`,
             scopes,
             pkce: true,
             mapProfileToUser,

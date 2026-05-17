@@ -39,10 +39,16 @@ export function GoogleSignInButton() {
     const providerId = isNativeIosApp() ? "icssc-native" : "icssc";
 
     try {
-      await authClient.signIn.oauth2({
+      // authClient methods resolve with { data, error } — they do NOT throw on
+      // server errors (4xx/5xx). If we only `await` without checking the return
+      // value, a server-side failure silently swallows the error: the
+      // redirectPlugin.onSuccess hook never fires, window.location.href is
+      // never set, decidePolicyFor never fires, and the auth sheet never appears.
+      const { error } = await authClient.signIn.oauth2({
         providerId,
         callbackURL: "/",
       });
+      if (error) throw new Error(error.message ?? "Sign-in request failed.");
     } catch (error) {
       console.error("Sign in error:", error);
       const message =

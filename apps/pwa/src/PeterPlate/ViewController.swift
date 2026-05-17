@@ -317,9 +317,11 @@ extension ViewController: ASWebAuthenticationPresentationContextProviding {
     }
 
     func startAuthSession(url: URL, webView: WKWebView) {
-        // Read the redirect_uri from the OIDC authorize URL. Better Auth sets
-        // it to https://www.peterplate.com/auth/native via the genericOAuth
-        // `redirectURI` config.
+        // Extract redirect_uri from the OIDC authorize URL.  Better Auth sets it to
+        // https://www.peterplate.com/auth/native via the genericOAuth `redirectURI`
+        // config.  We derive the ASWebAuthenticationSession callback from this value
+        // so that the session callback matches the redirect_uri we told the IdP to
+        // use, which is what makes the AASA validation succeed.
         let authComponents = URLComponents(url: url, resolvingAgainstBaseURL: false)
         let redirectUri = authComponents?
             .queryItems?
@@ -328,7 +330,9 @@ extension ViewController: ASWebAuthenticationPresentationContextProviding {
             .flatMap { URL(string: $0) }
 
         let callbackHost = redirectUri?.host ?? "www.peterplate.com"
-        let callbackPath = redirectUri?.path ?? "/auth/native"
+        // Use the path only if it's non-empty; a bare https://host URL has path "".
+        let rawPath = redirectUri?.path ?? ""
+        let callbackPath = rawPath.isEmpty ? "/auth/native" : rawPath
 
         let callback: ASWebAuthenticationSession.Callback = .https(
             host: callbackHost,
@@ -363,6 +367,12 @@ extension ViewController: ASWebAuthenticationPresentationContextProviding {
         // Shib/Duo, and any cross-session credentials reuse cleanly.
         session.prefersEphemeralWebBrowserSession = false
         self.currentAuthSession = session
-        session.start()
+        let started = session.start()
+        if !started {
+            print("[PeterPlate] ⚠️ ASWebAuthenticationSession.start() returned false. " +
+                  "Check that applinks:www.peterplate.com is in the entitlements and " +
+                  "that the AASA at https://www.peterplate.com/.well-known/apple-app-site-association " +
+                  "lists the com.peterplate bundle ID with path /auth/native.")
+        }
     }
 }
