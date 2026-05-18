@@ -1,0 +1,378 @@
+import UIKit
+import WebKit
+import AuthenticationServices
+
+var webView: WKWebView! = nil
+
+class ViewController: UIViewController, WKNavigationDelegate, UIDocumentInteractionControllerDelegate {
+    enum LoadingMode {
+        case defaultCachePolicy
+        case forceCache
+    }
+
+    var documentController: UIDocumentInteractionController?
+    func documentInteractionControllerViewControllerForPreview(_ controller: UIDocumentInteractionController) -> UIViewController {
+        return self
+    }
+    
+    @IBOutlet weak var loadingView: UIView!
+    @IBOutlet weak var progressView: UIProgressView!
+    @IBOutlet weak var connectionProblemView: UIImageView!
+    @IBOutlet weak var webviewView: UIView!
+    var toolbarView: UIToolbar!
+
+    // Held strongly so ARC doesn't drop the session mid-flow.
+    var currentAuthSession: ASWebAuthenticationSession?
+    
+    var htmlIsLoaded = false;
+    private var loadingMode = LoadingMode.defaultCachePolicy
+    
+    private var themeObservation: NSKeyValueObservation?
+    var currentWebViewTheme: UIUserInterfaceStyle = .unspecified
+    override var preferredStatusBarStyle : UIStatusBarStyle {
+        if #available(iOS 13, *), overrideStatusBar{
+            if #available(iOS 15, *) {
+                return .default
+            } else {
+                return statusBarTheme == "dark" ? .lightContent : .darkContent
+            }
+        }
+        return .default
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        initWebView()
+        initToolbarView()
+        loadRootUrl()
+    
+        NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide(_:)), name: UIResponder.keyboardWillHideNotification , object: nil)
+        
+    }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        PeterPlate.webView.frame = calcWebviewFrame(webviewView: webviewView, toolbarView: nil)
+    }
+    
+    @objc func keyboardWillHide(_ notification: NSNotification) {
+        PeterPlate.webView.setNeedsLayout()
+    }
+    
+    func initWebView() {
+        PeterPlate.webView = createWebView(container: webviewView, WKSMH: self, WKND: self, NSO: self, VC: self)
+        webviewView.addSubview(PeterPlate.webView);
+        
+        PeterPlate.webView.uiDelegate = self;
+        
+        PeterPlate.webView.addObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress), options: .new, context: nil)
+
+        if(pullToRefresh){
+            let refreshControl = UIRefreshControl()
+            refreshControl.addTarget(self, action: #selector(refreshWebView(_:)), for: UIControl.Event.valueChanged)
+            PeterPlate.webView.scrollView.addSubview(refreshControl)
+            PeterPlate.webView.scrollView.bounces = true
+        }
+
+        if #available(iOS 15.0, *), adaptiveUIStyle {
+            themeObservation = PeterPlate.webView.observe(\.themeColor) { [unowned self] webView, _ in
+                let backgroundColor = PeterPlate.webView.underPageBackgroundColor;
+                let themeColor = PeterPlate.webView.themeColor;
+                currentWebViewTheme = themeColor?.isLight() ?? backgroundColor?.isLight() ?? true ? .light : .dark
+                self.overrideUIStyle()
+                view.backgroundColor = themeColor ?? backgroundColor;
+            }
+        }
+    }
+
+    @objc func refreshWebView(_ sender: UIRefreshControl) {
+        PeterPlate.webView?.reload()
+        sender.endRefreshing()
+    }
+
+    func createToolbarView() -> UIToolbar{
+        let winScene = UIApplication.shared.connectedScenes.first
+        let windowScene = winScene as! UIWindowScene
+        var statusBarHeight = windowScene.statusBarManager?.statusBarFrame.height ?? 60
+        
+        #if targetEnvironment(macCatalyst)
+        if (statusBarHeight == 0){
+            statusBarHeight = 30
+        }
+        #endif
+        
+        let toolbarView = UIToolbar(frame: CGRect(x: 0, y: 0, width: webviewView.frame.width, height: 0))
+        toolbarView.sizeToFit()
+        toolbarView.frame = CGRect(x: 0, y: 0, width: webviewView.frame.width, height: toolbarView.frame.height + statusBarHeight)
+//        toolbarView.autoresizingMask = [.flexibleTopMargin, .flexibleRightMargin, .flexibleWidth]
+        
+        let flex = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+        let close = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(loadRootUrl))
+        toolbarView.setItems([close,flex], animated: true)
+        
+        toolbarView.isHidden = true
+        
+        return toolbarView
+    }
+    
+    func overrideUIStyle(toDefault: Bool = false) {
+        if #available(iOS 15.0, *), adaptiveUIStyle {
+            if (((htmlIsLoaded && !PeterPlate.webView.isHidden) || toDefault) && self.currentWebViewTheme != .unspecified) {
+                UIApplication
+                    .shared
+                    .connectedScenes
+                    .flatMap { ($0 as? UIWindowScene)?.windows ?? [] }
+                    .first { $0.isKeyWindow }?.overrideUserInterfaceStyle = toDefault ? .unspecified : self.currentWebViewTheme;
+            }
+        }
+    }
+    
+    func initToolbarView() {
+        toolbarView =  createToolbarView()
+        
+        webviewView.addSubview(toolbarView)
+    }
+    
+    @objc func loadRootUrl(cachePolicy: NSURLRequest.CachePolicy = .useProtocolCachePolicy) {
+        PeterPlate.webView.load(URLRequest(url: SceneDelegate.universalLinkToLaunch ?? SceneDelegate.shortcutLinkToLaunch ?? rootUrl, cachePolicy: cachePolicy))
+    }
+    
+    func reloadWebview(
+        loadingMode: LoadingMode = LoadingMode.defaultCachePolicy
+    ) {
+        switch loadingMode {
+        case LoadingMode.defaultCachePolicy:
+            loadRootUrl(cachePolicy: .useProtocolCachePolicy);
+
+        case LoadingMode.forceCache:
+            loadRootUrl(cachePolicy: .useProtocolCachePolicy);
+        }
+
+        self.loadingMode = loadingMode
+    }
+    
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!){
+        htmlIsLoaded = true
+        
+        self.setProgress(1.0, true)
+        self.animateConnectionProblem(false)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+            PeterPlate.webView.isHidden = false
+            self.loadingView.isHidden = true
+           
+            self.setProgress(0.0, false)
+            
+            self.overrideUIStyle()
+        }
+    }
+    
+    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        htmlIsLoaded = false;
+
+        // WKWebView reports cancels in two domains:
+        //   - NSURLErrorDomain / NSURLErrorCancelled (-999): request-level cancel
+        //   - WebKitErrorDomain / 102 (frameLoadInterruptedByPolicyChange):
+        //     fired when we call decisionHandler(.cancel) to hand off to
+        //     ASWebAuthenticationSession.
+        let nsError = error as NSError
+        if nsError.domain == NSURLErrorDomain && nsError.code == NSURLErrorCancelled { return }
+        if nsError.domain == "WebKitErrorDomain" && nsError.code == 102 { return }
+        
+        self.overrideUIStyle(toDefault: true);
+        webView.isHidden = true;
+        loadingView.isHidden = false;
+
+        if loadingMode == LoadingMode.defaultCachePolicy {
+            DispatchQueue.main.async {
+                self.reloadWebview(loadingMode: LoadingMode.forceCache)
+            }
+        } else {
+            animateConnectionProblem(true);
+            setProgress(0.05, true);
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                self.setProgress(0.1, true);
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                    self.reloadWebview()
+                }
+            }
+        }
+    }
+    
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+
+        if (keyPath == #keyPath(WKWebView.estimatedProgress) &&
+                PeterPlate.webView.isLoading &&
+                !self.loadingView.isHidden &&
+                !self.htmlIsLoaded) {
+                    var progress = Float(PeterPlate.webView.estimatedProgress);
+                    
+                    if (progress >= 0.8) { progress = 1.0; };
+                    if (progress >= 0.3) { self.animateConnectionProblem(false); }
+                    
+                    self.setProgress(progress, true);
+        }
+    }
+    
+    func setProgress(_ progress: Float, _ animated: Bool) {
+        self.progressView.setProgress(progress, animated: animated);
+    }
+    
+    
+    func animateConnectionProblem(_ show: Bool) {
+        if (show) {
+            self.connectionProblemView.isHidden = false;
+            self.connectionProblemView.alpha = 0
+            UIView.animate(withDuration: 0.7, delay: 0, options: [.repeat, .autoreverse], animations: {
+                self.connectionProblemView.alpha = 1
+            })
+        }
+        else {
+            UIView.animate(withDuration: 0.3, delay: 0, options: [], animations: {
+                self.connectionProblemView.alpha = 0 // Here you will get the animation you want
+            }, completion: { _ in
+                self.connectionProblemView.isHidden = true;
+                self.connectionProblemView.layer.removeAllAnimations();
+            })
+        }
+    }
+        
+    deinit {
+        PeterPlate.webView.removeObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress))
+    }
+}
+
+extension UIColor {
+    // Check if the color is light or dark, as defined by the injected lightness threshold.
+    // Some people report that 0.7 is best. I suggest to find out for yourself.
+    // A nil value is returned if the lightness couldn't be determined.
+    func isLight(threshold: Float = 0.5) -> Bool? {
+        let originalCGColor = self.cgColor
+
+        // Now we need to convert it to the RGB colorspace. UIColor.white / UIColor.black are greyscale and not RGB.
+        // If you don't do this then you will crash when accessing components index 2 below when evaluating greyscale colors.
+        let RGBCGColor = originalCGColor.converted(to: CGColorSpaceCreateDeviceRGB(), intent: .defaultIntent, options: nil)
+        guard let components = RGBCGColor?.components else {
+            return nil
+        }
+        guard components.count >= 3 else {
+            return nil
+        }
+
+        let brightness = Float(((components[0] * 299) + (components[1] * 587) + (components[2] * 114)) / 1000)
+        return (brightness > threshold)
+    }
+}
+
+extension ViewController: WKScriptMessageHandler {
+  func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        if message.name == "print" {
+            printView(webView: PeterPlate.webView)
+        }
+        if message.name == "push-subscribe" {
+            handleSubscribeTouch(message: message)
+        }
+        if message.name == "push-permission-request" {
+            handlePushPermission()
+        }
+        if message.name == "push-permission-state" {
+            handlePushState()
+        }
+        if message.name == "push-token" {
+            handleFCMToken()
+        }
+  }
+}
+
+// MARK: - ASWebAuthenticationSession handoff
+//
+// When the WKWebView tries to navigate to auth.icssc.club/authorize (the ICSSC
+// OIDC issuer), we cancel the navigation and re-run the flow inside an
+// ASWebAuthenticationSession. Reasons:
+//   1. Google rejects OAuth inside embedded webviews with `disallowed_useragent`
+//      since 2021-09-30 (Google Developers Blog).
+//   2. Passkeys / WebAuthn bound to a third-party RP ID (e.g. google.com) only
+//      work in top-level Safari context, not in a WKWebView.
+//
+// The callback uses a Universal Link (`https://www.peterplate.com/auth/native`)
+// via ASWebAuthenticationSession's HTTPS-callback initializer. The AASA file
+// at `https://www.peterplate.com/.well-known/apple-app-site-association` lists
+// this path, so the callback can only be delivered to our AASA-verified app.
+// Listing `/auth/native` (instead of the default callback path) prevents iOS
+// from hijacking normal Safari logins via Universal Links.
+//
+// Better Auth's genericOAuth config sets `redirectURI` to /auth/native so the
+// authorize URL already carries `redirect_uri=.../auth/native`. On callback,
+// we load the URL in the WKWebView; the Next.js /auth/native route handler
+// proxies to Better Auth's internal callback handler, which validates the
+// PKCE exchange, sets the session cookie in the WebView's jar, and redirects.
+//
+// Better Auth stores PKCE state in the database (verification table), not
+// cookies — so the code exchange works even though ASWebAuthenticationSession
+// runs in a separate browser context from the WKWebView.
+extension ViewController: ASWebAuthenticationPresentationContextProviding {
+    func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
+        return view.window ?? ASPresentationAnchor()
+    }
+
+    func startAuthSession(url: URL, webView: WKWebView) {
+        // Extract redirect_uri from the OIDC authorize URL.  Better Auth sets it to
+        // https://www.peterplate.com/auth/native via the genericOAuth `redirectURI`
+        // config.  We derive the ASWebAuthenticationSession callback from this value
+        // so that the session callback matches the redirect_uri we told the IdP to
+        // use, which is what makes the AASA validation succeed.
+        let authComponents = URLComponents(url: url, resolvingAgainstBaseURL: false)
+        let redirectUri = authComponents?
+            .queryItems?
+            .first(where: { $0.name == "redirect_uri" })?
+            .value
+            .flatMap { URL(string: $0) }
+
+        let callbackHost = redirectUri?.host ?? "www.peterplate.com"
+        // Use the path only if it's non-empty; a bare https://host URL has path "".
+        let rawPath = redirectUri?.path ?? ""
+        let callbackPath = rawPath.isEmpty ? "/auth/native" : rawPath
+
+        let callback: ASWebAuthenticationSession.Callback = .https(
+            host: callbackHost,
+            path: callbackPath
+        )
+
+        let session = ASWebAuthenticationSession(
+            url: url,
+            callback: callback
+        ) { [weak self, weak webView] callbackURL, error in
+            self?.currentAuthSession = nil
+
+            if let error = error {
+                let nsError = error as NSError
+                if nsError.domain == ASWebAuthenticationSessionError.errorDomain &&
+                    nsError.code == ASWebAuthenticationSessionError.canceledLogin.rawValue {
+                    return
+                }
+                print("ASWebAuthenticationSession error: \(error)")
+                return
+            }
+
+            guard let callbackURL = callbackURL else { return }
+
+            // Load the callback URL in the WKWebView. The /auth/native route
+            // proxies to Better Auth which processes the code exchange, sets
+            // the session cookie, and redirects to /.
+            webView?.load(URLRequest(url: callbackURL))
+        }
+        session.presentationContextProvider = self
+        // Share Safari cookies + iCloud Keychain passkeys so Google SSO, UCI
+        // Shib/Duo, and any cross-session credentials reuse cleanly.
+        session.prefersEphemeralWebBrowserSession = false
+        self.currentAuthSession = session
+        let started = session.start()
+        if !started {
+            print("[PeterPlate] ⚠️ ASWebAuthenticationSession.start() returned false. " +
+                  "Check that applinks:www.peterplate.com is in the entitlements and " +
+                  "that the AASA at https://www.peterplate.com/.well-known/apple-app-site-association " +
+                  "lists the com.peterplate bundle ID with path /auth/native.")
+        }
+    }
+}
