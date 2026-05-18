@@ -6,6 +6,7 @@ import {
   DesktopWindows as DesktopWindowsIcon,
   Edit as EditIcon,
   Feedback as FeedbackIcon,
+  HelpOutlineOutlined as HelpIcon,
   Info as InfoIcon,
   LightMode as LightModeIcon,
   Logout as LogoutIcon,
@@ -49,8 +50,6 @@ export default function SidebarContent({
     { enabled: !!userId },
   );
 
-  if (!mounted) return null;
-
   const handleSignOut = async () => {
     const savedTheme = localStorage.getItem("theme");
     await signOut();
@@ -61,10 +60,7 @@ export default function SidebarContent({
   };
 
   return (
-    <Box
-      className="w-full h-full rounded-2xl bg-white dark:bg-[#323235] shadow-xl flex flex-col"
-      sx={{ border: 1, borderColor: "divider" }}
-    >
+    <div className="w-full h-full rounded-2xl bg-white dark:bg-[#313136] shadow-xl flex flex-col">
       {/* Header */}
       <div className="flex items-start justify-between px-5 pt-5">
         <div className="flex items-center gap-3">
@@ -94,21 +90,17 @@ export default function SidebarContent({
         </button>
       </div>
 
+      <hr className="border-t border-gray-200 dark:border-gray-700 mx-5 mt-4" />
+
       {/* Content */}
       <div className="flex-1 px-5 pt-4 space-y-5">
         {/* Dietary Preferences */}
         <div>
-          <Typography variant="body2" fontWeight={600} color="primary" mb={1}>
+          <h3 className="text-sm font-bold text-sky-700 dark:text-accent-primary mb-2">
             Dietary Preferences
           </Typography>
 
-          <Typography
-            variant="caption"
-            fontWeight={600}
-            color="text.secondary"
-            display="block"
-            mb={0.5}
-          >
+          <p className="text-xs font-semibold text-gray-500 dark:text-zinc-300 mb-1">
             Restrictions:
           </Typography>
 
@@ -117,23 +109,19 @@ export default function SidebarContent({
               preferences.map((pref) => (
                 <span
                   key={pref}
-                  className="rounded-md border border-sky-700 bg-sky-100 px-2.5 py-0.5 text-xs text-sky-700 dark:border-blue-300 dark:text-blue-300 dark:bg-blue-300/20"
+                  className="rounded-md border border-sky-700 px-2.5 py-0.5 text-xs text-sky-700 bg-sky-100 dark:text-accent-primary dark:border-accent-primary dark:bg-zinc-700"
                 >
                   {formatDietaryKey(pref)}
                 </span>
               ))
             ) : (
-              <span className="text-xs text-gray-400">None</span>
+              <span className="text-xs text-gray-400 dark:text-zinc-300">
+                None
+              </span>
             )}
           </div>
 
-          <Typography
-            variant="caption"
-            fontWeight={600}
-            color="text.secondary"
-            display="block"
-            mb={0.5}
-          >
+          <p className="text-xs font-semibold text-gray-500 dark:text-zinc-300 mb-1">
             Allergies:
           </Typography>
           <div className="flex flex-wrap gap-1.5">
@@ -141,38 +129,42 @@ export default function SidebarContent({
               allergies.map((allergy) => (
                 <span
                   key={allergy}
-                  className="rounded-md border border-sky-700 bg-sky-100 px-2.5 py-0.5 text-xs text-sky-700 dark:border-blue-300 dark:text-blue-300 dark:bg-blue-300/20"
+                  className="rounded-md border border-sky-700 px-2.5 py-0.5 text-xs text-sky-700 bg-sky-100 dark:text-accent-primary dark:border-accent-primary dark:bg-zinc-700"
                 >
                   {formatDietaryKey(allergy)}
                 </span>
               ))
             ) : (
-              <span className="text-xs text-gray-400">None</span>
+              <span className="text-xs text-gray-400 dark:text-zinc-300">
+                None
+              </span>
             )}
           </div>
         </div>
 
         {/* Appearance */}
         <div>
-          <Typography variant="body2" fontWeight={600} color="primary" mb={1}>
+          <h3 className="text-sm font-bold text-sky-700 dark:text-accent-primary mb-2">
             Appearance
           </Typography>
 
-          <div className="flex rounded-lg border border-sky-700 dark:border-blue-300 overflow-hidden">
+          <div className="flex w-fit rounded-lg border border-sky-700 overflow-hidden">
             <ThemeButton
-              active={theme === "light"}
+              active={mounted && theme === "light"}
               onClick={() => setTheme("light")}
               icon={<LightModeIcon fontSize="small" />}
               label="Light"
             />
+            <div className="w-px self-stretch border-l border-sky-700 relative z-10" />
             <ThemeButton
-              active={theme === "system"}
+              active={mounted && theme === "system"}
               onClick={() => setTheme("system")}
               icon={<DesktopWindowsIcon fontSize="small" />}
               label="Device"
             />
+            <div className="w-px self-stretch border-l border-sky-700 relative z-10" />
             <ThemeButton
-              active={theme === "dark"}
+              active={mounted && theme === "dark"}
               onClick={() => setTheme("dark")}
               icon={<DarkModeIcon fontSize="small" />}
               label="Dark"
@@ -193,16 +185,11 @@ export default function SidebarContent({
                 }}
                 className="w-full flex items-center gap-3 rounded-lg px-4 py-2 text-sm text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:dark:hover:bg-transparent"
               >
-                <Box sx={{ color: "primary.main" }}>
-                  <EditIcon fontSize="small" />
-                </Box>
-                <Typography
-                  variant="body2"
-                  fontWeight={500}
-                  color="text.primary"
-                >
-                  Edit Preferences
-                </Typography>
+                <EditIcon
+                  fontSize="small"
+                  sx={{ color: "hsl(var(--accent-primary))" }}
+                />
+                <span className="font-medium">Edit Preferences</span>
               </button>
             </span>
           </Tooltip>
@@ -210,7 +197,12 @@ export default function SidebarContent({
           <MenuLink
             href="/feedback"
             onClick={onClose}
-            icon={<FeedbackIcon fontSize="small" />}
+            icon={
+              <FeedbackIcon
+                fontSize="small"
+                sx={{ color: "hsl(var(--accent-primary))" }}
+              />
+            }
           >
             Feedback
           </MenuLink>
@@ -218,26 +210,46 @@ export default function SidebarContent({
           <MenuLink
             href="/about"
             onClick={onClose}
-            icon={<InfoIcon fontSize="small" />}
+            icon={
+              <InfoIcon
+                fontSize="small"
+                sx={{ color: "hsl(var(--accent-primary))" }}
+              />
+            }
           >
             About PeterPlate
+          </MenuLink>
+
+          <MenuLink
+            href="/about"
+            onClick={onClose}
+            icon={
+              <HelpIcon
+                fontSize="small"
+                sx={{ color: "hsl(var(--accent-primary))" }}
+              />
+            }
+          >
+            Onboarding Tutorial
           </MenuLink>
         </div>
       </div>
 
       {/* Sign out */}
 
-      <div className="px-5 pb-5 pt-3">
+      <hr className="border-t border-gray-200 dark:border-gray-700 mx-5 mt-4" />
+
+      <div className="px-5 pb-5 pt-5 flex justify-center">
         {user ? (
           <button
             type="button"
             onClick={handleSignOut}
-            className="w-full rounded-lg bg-sky-700 py-2.5 text-sm font-medium text-white hover:bg-sky-800 dark:bg-blue-300 dark:text-gray-900 dark:hover:bg-blue-400 flex items-center justify-center"
+            className="w-28 rounded-lg bg-sky-700 hover:bg-sky-800 text-white
+  dark:bg-accent-primary dark:hover:bg-accent-primary/85 dark:text-black
+  py-2.5 px-6 text-sm font-semibold inline-flex items-center justify-center gap-2"
           >
-            <span className="inline-flex items-center gap-2">
-              <LogoutIcon fontSize="small" />
-              Sign Out
-            </span>
+            <LogoutIcon fontSize="small" />
+            Sign Out
           </button>
         ) : (
           <GoogleSignInButton />
@@ -262,10 +274,10 @@ function ThemeButton({
     <button
       type="button"
       onClick={onClick}
-      className={`flex-1 flex items-center justify-center gap-1 py-2 text-xs font-medium transition-colors ${
+      className={`w-24 flex items-center justify-center gap-1 py-2 text-xs font-medium transition-colors ${
         active
-          ? "bg-sky-700 text-white dark:bg-blue-300 dark:text-gray-900"
-          : "text-gray-700 hover:bg-sky-100 dark:text-white dark:hover:bg-zinc-700"
+          ? "bg-sky-700 text-white"
+          : "text-black dark:text-white hover:bg-sky-700/50 hover:text-white"
       }`}
     >
       {icon}
