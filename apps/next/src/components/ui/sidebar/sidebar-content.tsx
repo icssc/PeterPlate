@@ -6,6 +6,7 @@ import {
   DesktopWindows as DesktopWindowsIcon,
   Edit as EditIcon,
   Feedback as FeedbackIcon,
+  HelpOutlineOutlined as HelpIcon,
   Info as InfoIcon,
   LightMode as LightModeIcon,
   Logout as LogoutIcon,
@@ -83,6 +84,8 @@ export default function SidebarContent({
         </button>
       </div>
 
+      <hr className="border-t border-gray-200 dark:border-gray-700 mx-5 mt-4" />
+
       {/* Content */}
       <div className="flex-1 px-5 pt-4 space-y-5">
         {/* Dietary Preferences */}
@@ -139,19 +142,21 @@ export default function SidebarContent({
             Appearance
           </h3>
 
-          <div className="flex rounded-lg border border-sky-700 overflow-hidden">
+          <div className="flex w-fit rounded-lg border border-sky-700 overflow-hidden">
             <ThemeButton
               active={mounted && theme === "light"}
               onClick={() => setTheme("light")}
               icon={<LightModeIcon fontSize="small" />}
               label="Light"
             />
+            <div className="w-px self-stretch border-l border-sky-700 relative z-10" />
             <ThemeButton
               active={mounted && theme === "system"}
               onClick={() => setTheme("system")}
               icon={<DesktopWindowsIcon fontSize="small" />}
               label="Device"
             />
+            <div className="w-px self-stretch border-l border-sky-700 relative z-10" />
             <ThemeButton
               active={mounted && theme === "dark"}
               onClick={() => setTheme("dark")}
@@ -208,24 +213,37 @@ export default function SidebarContent({
           >
             About PeterPlate
           </MenuLink>
+
+          <MenuLink
+            href="/about"
+            onClick={onClose}
+            icon={
+              <HelpIcon
+                fontSize="small"
+                sx={{ color: "hsl(var(--accent-primary))" }}
+              />
+            }
+          >
+            Onboarding Tutorial
+          </MenuLink>
         </div>
       </div>
 
       {/* Sign out */}
 
-      <div className="px-5 pb-5 pt-3">
+      <hr className="border-t border-gray-200 dark:border-gray-700 mx-5 mt-4" />
+
+      <div className="px-5 pb-5 pt-5 flex justify-center">
         {user ? (
           <button
             type="button"
             onClick={handleSignOut}
-            className="w-full rounded-lg bg-sky-700 hover:bg-sky-800 text-white
-            dark:bg-accent-primary dark:hover:bg-accent-primary/85 dark:text-black
-            py-2.5 text-sm font-semibold flex items-center justify-center"
+            className="w-28 rounded-lg bg-sky-700 hover:bg-sky-800 text-white
+  dark:bg-accent-primary dark:hover:bg-accent-primary/85 dark:text-black
+  py-2.5 px-6 text-sm font-semibold inline-flex items-center justify-center gap-2"
           >
-            <span className="inline-flex items-centr gap-2">
-              <LogoutIcon fontSize="small" />
-              Sign Out
-            </span>
+            <LogoutIcon fontSize="small" />
+            Sign Out
           </button>
         ) : (
           <GoogleSignInButton />
@@ -250,10 +268,10 @@ function ThemeButton({
     <button
       type="button"
       onClick={onClick}
-      className={`flex-1 flex items-center justify-center gap-1 py-2 text-xs font-medium transition-colors ${
+      className={`w-24 flex items-center justify-center gap-1 py-2 text-xs font-medium transition-colors ${
         active
-          ? "bg-accent-primary text-white"
-          : "text-black dark:text-white hover:bg-accent-primary/85 hover:text-white"
+          ? "bg-sky-700 text-white"
+          : "text-black dark:text-white hover:bg-sky-700/50 hover:text-white"
       }`}
     >
       {icon}
