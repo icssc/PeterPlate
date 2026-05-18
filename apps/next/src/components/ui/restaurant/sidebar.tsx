@@ -35,11 +35,15 @@ export function Sidebar({
   return (
     <div className="w-full md:basis-[325px] md:max-w-[325px] md:min-h-[740px]">
       {/* Hours of operation card */}
-      <Paper elevation={1} className="mb-4 overflow-hidden">
-        <div className="bg-sky-500/20 px-4 py-3 border-b-2 border-sky-700">
+      <Paper
+        elevation={0}
+        className="mb-4 overflow-hidden dark:bg-[#303035]"
+        sx={{ border: 1, borderColor: "divider" }}
+      >
+        <div className="bg-sky-500/20 dark:bg-blue-300/10 px-4 py-3 border-b-2 border-sky-700 dark:border-blue-300">
           <Typography
             variant="h6"
-            className="!text-sky-700 !font-bold !text-center"
+            className="!font-bold !text-center !text-sky-700 dark:!text-blue-300"
           >
             Hours of Operation
           </Typography>
@@ -92,11 +96,15 @@ export function Sidebar({
       </Paper>
 
       {/* Location card */}
-      <Paper elevation={1} className="mb-4 overflow-hidden">
-        <div className="bg-sky-500/20 px-4 py-3 border-b-2 border-sky-600">
+      <Paper
+        elevation={0}
+        className="mb-4 overflow-hidden dark:bg-[#303035]"
+        sx={{ border: 1, borderColor: "divider" }}
+      >
+        <div className="bg-sky-500/20 dark:bg-blue-300/10 px-4 py-3 border-b-2 border-sky-600 dark:border-blue-300">
           <Typography
             variant="h6"
-            className="!text-sky-700 !font-bold !text-center"
+            className="!font-bold !text-center !text-sky-700 dark:!text-blue-300"
           >
             Location
           </Typography>
@@ -140,11 +148,15 @@ export function Sidebar({
       </Paper>
 
       {/* Special Schedules card */}
-      <Paper elevation={1} className="overflow-hidden">
-        <div className="bg-sky-500/20 px-4 py-3 border-b-2 border-sky-600">
+      <Paper
+        elevation={0}
+        className="overflow-hidden dark:bg-[#303035]"
+        sx={{ border: 1, borderColor: "divider" }}
+      >
+        <div className="bg-sky-500/20 dark:bg-blue-300/10 px-4 py-3 border-b-2 border-sky-600 dark:border-blue-300">
           <Typography
             variant="h6"
-            className="!text-sky-700 !font-bold !text-center"
+            className="!font-bold !text-center !text-sky-700 dark:!text-blue-300"
           >
             Special Schedules
           </Typography>
@@ -173,17 +185,19 @@ export function Sidebar({
                 return (
                   <Accordion
                     key={`${event.title}-${String(event.start)}-${event.restaurantId}`}
-                    className="!border !border-sky-200 !rounded-lg !shadow-none before:!hidden"
+                    className="!border !border-sky-200 dark:!border-blue-300/30 !rounded-lg !shadow-none before:!hidden dark:!bg-transparent"
                   >
                     <AccordionSummary
-                      expandIcon={<ExpandMore className="!text-sky-600" />}
-                      className="!min-h-0 !py-2"
+                      expandIcon={
+                        <ExpandMore className="!text-sky-600 dark:!text-blue-300" />
+                      }
+                      className="!min-h-0 !py-2 dark:!bg-transparent"
                     >
                       <div className="flex flex-col w-full pr-2">
                         <div className="flex justify-between items-center w-full gap-2">
                           <Typography
                             variant="body2"
-                            className="!text-sky-700 !font-semibold"
+                            className="!text-sky-700 dark:!text-blue-300 !font-semibold"
                           >
                             {event.title}
                           </Typography>
@@ -191,7 +205,7 @@ export function Sidebar({
                             <Chip
                               label="ACTIVE"
                               size="small"
-                              className="!h-5 !text-[0.65rem] !font-bold !bg-sky-600 !text-white !rounded-full"
+                              className="!h-5 !text-[0.65rem] !font-bold !bg-sky-600 dark:!bg-blue-300 dark:!text-gray-900 !text-white !rounded-full"
                             />
                           )}
                         </div>

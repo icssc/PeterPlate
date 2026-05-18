@@ -1,103 +1,72 @@
 import { AccessTime, CalendarMonth, LocationOn } from "@mui/icons-material";
-import { Card, Dialog } from "@mui/material";
+import { Box, Card, Dialog, Typography } from "@mui/material";
+import type { Event } from "@peterplate/validators";
 import { useState } from "react";
+import { classifyEvent } from "@/utils/classifyEvent";
 import { timeToString, toTitleCase } from "@/utils/funcs";
-import { HallEnum, numToMonth } from "@/utils/types";
+import { numToMonth } from "@/utils/types";
 import EventDialogContent from "../event-dialog-content";
-import type { EventInfo } from "./event-card";
+import EventTypeBadge from "../event-type-badge";
 
 /** A compact card for an upcoming event in the horizontal scroll row */
 export default function UpcomingEventCard({
   event,
   compact = false,
 }: {
-  event: {
-    title: string;
-    image?: string | null;
-    shortDescription?: string | null;
-    longDescription?: string | null;
-    start?: Date | null;
-    end?: Date | null;
-    restaurantId: string;
-  };
+  event: Event;
   compact?: boolean;
 }) {
   const [open, setOpen] = useState(false);
-  const startDate = event.start ? new Date(event.start) : null;
-  const endDate = event.end ? new Date(event.end) : null;
-
-  /*
-
-    Seems to be an error where HallEnum is not properly getting the info
-
-  */
-  // Map DB event to EventInfo shape for the dialog component
-  const hallEnum =
-    event.restaurantId.toLowerCase() === "anteatery"
-      ? HallEnum.ANTEATERY
-      : HallEnum.BRANDYWINE;
-
-  const eventInfo: EventInfo = {
-    name: event.title,
-    shortDesc: event.shortDescription ?? "",
-    longDesc: event.longDescription ?? "",
-    imgSrc: event.image ?? "/zm-card-header.webp",
-    alt: `${event.title} event image`,
-    startTime: startDate ?? new Date(),
-    endTime: endDate ?? new Date(),
-    location: hallEnum,
-    isOngoing: startDate
-      ? startDate <= new Date() && (endDate ? endDate >= new Date() : false)
-      : false,
-  };
+  const eventType = classifyEvent(event.title, event.description);
 
   // alternative sizing depending on mobile/desktop
   const titleSize = compact ? "text-sm" : "text-base";
   const iconSize = compact ? 16 : 24;
-  const tagSize = compact ? "text-[8px]" : "text-[10px]";
   const spacing = compact ? "space-y-1" : "space-y-2";
 
   return (
     <>
       <Card
-        className="w-full rounded-xl border border-neutral-200 dark:border-neutral-700 p-5 shadow-sm hover:shadow-md transition cursor-pointer text-left bg-transparent"
+        className="relative w-full rounded-xl border border-neutral-200 dark:border-neutral-700 p-5 shadow-sm hover:shadow-md transition cursor-pointer text-left bg-transparent"
         onClick={() => setOpen(true)}
       >
-        <div className="mb-3 flex items-start gap-2 min-w-0">
+        <div className="absolute top-2 right-0 h-14 w-48 scale-75 origin-top-right">
+          <div className="hidden md:block [&>span]:!bg-sky-100 [&>span]:!text-sky-700 [&>span]:!shadow-sm">
+            <EventTypeBadge type={eventType} />
+          </div>
+        </div>
+        <div className="mb-3 flex items-start gap-2 min-w-0 pr-0 md:pr-28">
           <h3
-            className={`${titleSize} line-clamp-2 min-w-0 flex-1 whitespace-normal break-normal font-bold leading-tight text-sky-700`}
+            className={`${titleSize} line-clamp-2 min-w-0 flex-1 whitespace-normal break-words font-bold leading-tight text-sky-700`}
           >
             {event.title}
           </h3>
-          {/*           <span
-            className={`flex-shrink-0 ${tagSize} font-semibold uppercase tracking-wider bg-sky-100 text-sky-700 dark:bg-sky-900 dark:text-sky-300 px-2 py-0.5 rounded-full`}
-          >
-            Celebration
-          </span> */}
         </div>
         <div className={spacing}>
-          {startDate && (
+          {event.start && (
             <>
-              <div className="flex items-center gap-1.5 text-xs text-neutral-500 dark:text-neutral-400">
+              <Box className="flex items-center gap-1.5">
                 <CalendarMonth style={{ fontSize: iconSize }} />
-                <span>
-                  {numToMonth[startDate.getMonth()]} {startDate.getDate()},{" "}
-                  {startDate.getFullYear()}
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5 text-xs text-neutral-500 dark:text-neutral-400">
+                <Typography variant="caption" color="text.secondary">
+                  {numToMonth[event.start.getMonth()]} {event.start.getDate()},{" "}
+                  {event.start.getFullYear()}
+                </Typography>
+              </Box>
+              <Box className="flex items-center gap-1.5">
                 <AccessTime style={{ fontSize: iconSize }} />
-                <span>
-                  {timeToString(startDate)}
-                  {endDate ? ` - ${timeToString(endDate)}` : ""}
-                </span>
-              </div>
+                <Typography variant="caption" color="text.secondary">
+                  {timeToString(event.end)}
+                  {event.end ? ` - ${timeToString(event.end)}` : ""}
+                </Typography>
+              </Box>
             </>
           )}
-          <div className="flex items-center gap-1.5 text-xs text-neutral-500 dark:text-neutral-400">
+          <Box className="flex items-center gap-1.5">
             <LocationOn style={{ fontSize: iconSize }} />
-            <span>{toTitleCase(event.restaurantId)}</span>
-          </div>
+            <Typography variant="caption" color="text.secondary">
+              {toTitleCase(event.restaurantId)}
+            </Typography>
+          </Box>
         </div>
       </Card>
       <Dialog
@@ -117,7 +86,7 @@ export default function UpcomingEventCard({
           },
         }}
       >
-        <EventDialogContent {...eventInfo} />
+        <EventDialogContent {...event} />
       </Dialog>
     </>
   );

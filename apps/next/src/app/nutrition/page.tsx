@@ -1,20 +1,47 @@
 "use client";
 
+import type { RouterOutputs } from "@api/index";
+import { Box, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
+import posthog from "posthog-js";
 import { useEffect, useMemo, useState } from "react";
+import SearchMealCard from "@/components/ui/card/search-meal-card";
+import TrackedMealCard from "@/components/ui/card/tracked-meal-card";
+import MealSearchDialog from "@/components/ui/meal-search";
+import MobileCalorieCard from "@/components/ui/mobile-calorie-card";
+import MobileNutritionBars from "@/components/ui/mobile-nutrition-bars";
 import NutritionBreakdown from "@/components/ui/nutrition-breakdown";
+import NutritionGoals from "@/components/ui/nutrition-goals";
+import TrackerHistory from "@/components/ui/tracker-history";
+import TrackerHistoryDialog from "@/components/ui/tracker-history-dialog";
+import TrackerHistoryDrawer from "@/components/ui/tracker-history-drawer";
 import { useSnackbarStore } from "@/context/useSnackbar";
 import { useUserStore } from "@/context/useUserStore";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { trpc } from "@/utils/trpc";
 
+type LoggedMealWithNutrition =
+  RouterOutputs["nutrition"]["getMealsInLastWeek"][number];
+type DisplayDish = {
+  id: string;
+  name: string;
+  imageUrl?: string | null;
+  nutritionInfo?: {
+    calories?: number | null;
+    proteinG?: number | null;
+    totalCarbsG?: number | null;
+    totalFatG?: number | null;
+  } | null;
+};
+
 export default function MealTracker() {
+  const utils = trpc.useUtils();
   const router = useRouter();
   const { userId, isInitialized } = useUserStore();
   const { showSnackbar } = useSnackbarStore();
 
   useEffect(() => {
     if (!isInitialized) return;
-
     if (!userId) {
       showSnackbar("Login to track meals!", "error");
       router.push("/");
@@ -29,11 +56,34 @@ export default function MealTracker() {
     { userId: userId ?? "" },
     { enabled: !!userId },
   );
-  const [activeDayIndex, setActiveDayIndex] = useState<number | null>(null);
+
+  const today = new Date().toISOString().split("T")[0];
+
+  const { data: defaultGoals } = trpc.nutrition.getGoals.useQuery({
+    userId: userId ?? "",
+  });
+  const { data: dayGoals } = trpc.nutrition.getGoalsByDay.useQuery(
+    { userId: userId ?? "", date: today },
+    { enabled: !!userId },
+  );
+  const goals = dayGoals ?? defaultGoals;
+
+  const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
+  const [historyDate, setHistoryDate] = useState<Date | null>(null);
+
+  const historyDateStr = historyDate
+    ? historyDate.toISOString().split("T")[0]
+    : today;
+
+  const { data: historyDayGoals } = trpc.nutrition.getGoalsByDay.useQuery(
+    { userId: userId ?? "", date: historyDateStr },
+    { enabled: !!userId && !!historyDate },
+  );
+  const historyGoals = historyDayGoals ?? defaultGoals;
 
   const mealsGroupedByDay = useMemo(() => {
     if (!meals) return [];
-    const groups: Record<string, typeof meals> = {};
+    const groups: Record<string, LoggedMealWithNutrition[]> = {};
 
     meals.forEach((meal) => {
       const dateKey = new Date(meal.eatenAt).toDateString();
@@ -50,53 +100,426 @@ export default function MealTracker() {
     return result.sort((a, b) => b.rawDate.getTime() - a.rawDate.getTime());
   }, [meals]);
 
-  useEffect(() => {
-    if (mealsGroupedByDay.length > 0 && activeDayIndex === null) {
-      setActiveDayIndex(0);
-    }
-  }, [mealsGroupedByDay, activeDayIndex]);
-
-  if (isLoading) return <div>Loading meals...</div>;
-  if (error) return <div>Error loading meals</div>;
-
+  const todayKey = new Date().toDateString();
   const selectedDay =
-    activeDayIndex !== null ? mealsGroupedByDay[activeDayIndex] : null;
+    mealsGroupedByDay.find((g) => g.dateLabel === todayKey) ?? null;
 
-  const toNum = (v: string | null) => {
+  const toNum = (v: number | string | null | undefined) => {
     const n = v == null ? 0 : Number(v);
     return Number.isFinite(n) ? n : 0;
   };
 
-  return (
-    <div className="cols-container min-h-screen flex">
-      <div className="mt-12 w-[300px] border-r p-4 flex flex-col gap-2">
-        {mealsGroupedByDay.map((day, index) => (
-          <button
-            type="button"
-            key={day.dateLabel}
-            onClick={() => setActiveDayIndex(index)}
-            className={`text-left p-2 hover:bg-gray-100 ${activeDayIndex === index ? "font-bold bg-gray-200" : ""}`}
-          >
-            {day.dateLabel}
-          </button>
-        ))}
-        {mealsGroupedByDay.length === 0 && <div>No meals logged recently.</div>}
-      </div>
+  const loggedDates = useMemo(() => {
+    if (!meals) return [];
+    return [
+      ...new Set(meals.map((m) => new Date(m.eatenAt).toDateString())),
+    ].map((d) => new Date(d));
+  }, [meals]);
 
-      <div className="mt-12 p-4">
-        {selectedDay && (
-          <NutritionBreakdown
-            dateString={selectedDay.dateLabel}
-            mealsEaten={selectedDay.items.map((m) => ({
+  const selectedDate = selectedDay?.rawDate ?? new Date();
+  const { data: anteateryData } = trpc.restaurant.useQuery(
+    { date: selectedDate, restaurant: "anteatery" },
+    { enabled: Boolean(selectedDay) },
+  );
+  const { data: brandywineData } = trpc.restaurant.useQuery(
+    { date: selectedDate, restaurant: "brandywine" },
+    { enabled: Boolean(selectedDay) },
+  );
+
+  const halls = useMemo(
+    () =>
+      [anteateryData, brandywineData].filter(
+        (hall): hall is NonNullable<typeof anteateryData> => Boolean(hall),
+      ),
+    [anteateryData, brandywineData],
+  );
+
+  const availableDishIds = useMemo(() => {
+    const set = new Set<string>();
+    for (const hall of halls) {
+      for (const period of hall?.periods ?? []) {
+        for (const station of period.stations ?? []) {
+          for (const dish of station.dishes ?? []) {
+            set.add(dish.id);
+          }
+        }
+      }
+    }
+    return set;
+  }, [halls]);
+
+  const isUnavailable = (dishId: string) =>
+    halls.length > 0 && !availableDishIds.has(dishId);
+
+  const availableDishMap = useMemo(() => {
+    const dishes = new Map<string, DisplayDish>();
+    for (const hall of halls) {
+      for (const period of hall.periods) {
+        for (const station of period.stations ?? []) {
+          for (const dish of station.dishes ?? []) {
+            if (!dishes.has(dish.id)) dishes.set(dish.id, dish);
+          }
+        }
+      }
+    }
+    return dishes;
+  }, [halls]);
+
+  const availableDishes = useMemo(
+    () =>
+      Array.from(availableDishMap.values()).map((dish) => ({
+        id: dish.id,
+        name: dish.name,
+        calories: Number(dish.nutritionInfo?.calories ?? 0),
+        protein: Number(dish.nutritionInfo?.proteinG ?? 0),
+        carbs: Number(dish.nutritionInfo?.totalCarbsG ?? 0),
+        fat: Number(dish.nutritionInfo?.totalFatG ?? 0),
+        imageUrl: dish.imageUrl,
+      })),
+    [availableDishMap],
+  );
+
+  // suggested meals memo
+  const suggestedMeals = useMemo(() => {
+    if (!meals) return [];
+    const servingCounts: Record<string, number> = {};
+    const latestByDish: Record<string, LoggedMealWithNutrition> = {};
+
+    for (const meal of meals) {
+      if (!meal.dishId) continue;
+      servingCounts[meal.dishId] =
+        (servingCounts[meal.dishId] ?? 0) + (meal.servings ?? 1);
+      if (!latestByDish[meal.dishId]) latestByDish[meal.dishId] = meal;
+    }
+
+    return Object.entries(servingCounts)
+      .filter(([, total]) => total >= 1)
+      .sort(([, a], [, b]) => b - a)
+      .map(([dishId]) => {
+        const meal = latestByDish[dishId];
+        return {
+          ...meal,
+          calories: Number(meal.calories ?? 0),
+          protein: Number(meal.protein ?? 0),
+          carbs: Number(meal.carbs ?? 0),
+          fat: Number(meal.fat ?? 0),
+          servings: 1,
+        };
+      });
+  }, [meals]);
+
+  const visibleMeals = selectedDay?.items ?? [];
+  const countedMeals = visibleMeals.filter(
+    (m) => (m.servings ?? 0) > 0 && !isUnavailable(m.dishId),
+  );
+
+  const fallbackDishIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const meal of [...visibleMeals, ...suggestedMeals]) {
+      if (meal.dishId && !availableDishMap.has(meal.dishId)) {
+        ids.add(meal.dishId);
+      }
+    }
+    return [...ids];
+  }, [availableDishMap, suggestedMeals, visibleMeals]);
+
+  const { data: fallbackDishes = [] } = trpc.dish.get.useQuery(
+    { ids: fallbackDishIds },
+    { enabled: fallbackDishIds.length > 0 },
+  );
+
+  const dishDisplayMap = useMemo(() => {
+    const map = new Map<
+      string,
+      {
+        id: string;
+        name: string;
+        imageUrl?: string | null;
+      }
+    >();
+
+    for (const dish of availableDishMap.values()) {
+      map.set(dish.id, {
+        id: dish.id,
+        name: dish.name,
+        imageUrl: dish.imageUrl ?? null,
+      });
+    }
+
+    for (const dish of fallbackDishes) {
+      if (!map.has(dish.id)) {
+        map.set(dish.id, {
+          id: dish.id,
+          name: dish.name,
+          imageUrl: dish.imageUrl ?? null,
+        });
+      }
+    }
+
+    return map;
+  }, [availableDishMap, fallbackDishes]);
+
+  // logmeal mutation
+  const logMeal = trpc.nutrition.logMeal.useMutation({
+    onSuccess: async (_, variables) => {
+      posthog.capture("meal_logged", {
+        dish_id: variables.dishId,
+        dish_name: variables.dishName,
+        servings: variables.servings,
+      });
+      await utils.nutrition.invalidate();
+    },
+    onError: (err) => {
+      console.error(err.message);
+    },
+  });
+
+  const isMobile = useMediaQuery("(max-width: 768px)");
+
+  if (isLoading) return <div>Loading meals...</div>;
+  if (error) return <div>Error loading meals</div>;
+
+  return (
+    <Box
+      sx={{ bgcolor: "background.default", minHeight: "100vh" }}
+      className="p-2 md:p-8 mt-2 md:mt-12"
+    >
+      <div className="px-2 md:px-8">
+        <Typography
+          variant="h5"
+          fontWeight={700}
+          color="primary"
+          className="text-2xl md:text-3xl flex items-center justify-between"
+        >
+          <span className="flex items-center gap-2 flex-nowrap whitespace-nowrap">
+            Tracker
+            {selectedDay && (
+              <span className="font-semibold">
+                -{" "}
+                {selectedDay.rawDate.toLocaleDateString("en-US", {
+                  month: "numeric",
+                  day: "numeric",
+                  year: "2-digit",
+                })}
+              </span>
+            )}
+          </span>
+          {/* History button - mobile only */}
+          <div className="flex md:hidden">
+            {userId && (
+              <TrackerHistory
+                onDateSelect={() => {}}
+                onDayClick={(date) => {
+                  setHistoryDate(date);
+                  setHistoryDialogOpen(true);
+                }}
+                loggedDates={loggedDates}
+              />
+            )}
+          </div>
+        </Typography>
+
+        {/* Subheading + History - desktop only */}
+        <div className="hidden md:flex items-center justify-between mt-1">
+          <Typography variant="body1" color="text.primary">
+            Keep track of your eating using our Nutrition Tracker! Add dishes to
+            count them towards your totals!
+          </Typography>
+          {userId && (
+            <TrackerHistory
+              onDateSelect={() => {}}
+              onDayClick={(date) => {
+                setHistoryDate(date);
+                setHistoryDialogOpen(true);
+              }}
+              loggedDates={loggedDates}
+            />
+          )}
+        </div>
+
+        {/* Desktop: NutritionBreakdown */}
+        <div className="hidden md:flex items-start gap-4">
+          {mealsGroupedByDay.length === 0 ? (
+            <div>No meals logged recently.</div>
+          ) : (
+            <NutritionBreakdown
+              mealsEaten={countedMeals.map((m) => ({
+                ...m,
+                calories: toNum(m.calories),
+                protein: toNum(m.protein),
+                carbs: toNum(m.carbs),
+                fat: toNum(m.fat),
+              }))}
+              calorieGoal={goals?.calorieGoal ?? 2000}
+              proteinGoal={goals?.proteinGoal ?? 75}
+              carbGoal={goals?.carbGoal ?? 250}
+              fatGoal={goals?.fatGoal ?? 50}
+            />
+          )}
+          <div className="relative mt-4 ml-auto">
+            {userId && (
+              <NutritionGoals
+                userId={userId}
+                date={new Date().toISOString().split("T")[0]}
+              />
+            )}
+          </div>
+        </div>
+
+        {/* Mobile: MobileCalorieCard + MobileNutritionBars */}
+        <div className="flex md:hidden flex-col gap-4 mt-4 w-full">
+          <MobileCalorieCard
+            mealsEaten={countedMeals.map((m) => ({
               ...m,
               calories: toNum(m.calories),
               protein: toNum(m.protein),
               carbs: toNum(m.carbs),
               fat: toNum(m.fat),
             }))}
+            calorieGoal={goals?.calorieGoal ?? 2000}
+            userId={userId ?? ""}
+            date={new Date().toISOString().split("T")[0]}
+          />
+          <MobileNutritionBars
+            mealsEaten={countedMeals.map((m) => ({
+              ...m,
+              calories: toNum(m.calories),
+              protein: toNum(m.protein),
+              carbs: toNum(m.carbs),
+              fat: toNum(m.fat),
+            }))}
+            proteinGoal={goals?.proteinGoal ?? 75}
+            carbGoal={goals?.carbGoal ?? 250}
+            fatGoal={goals?.fatGoal ?? 50}
+          />
+        </div>
+
+        {/* History dialog/drawer */}
+        {isMobile ? (
+          <TrackerHistoryDrawer
+            open={historyDialogOpen}
+            onClose={() => setHistoryDialogOpen(false)}
+            selectedDate={historyDate}
+            allMeals={
+              meals?.map((m) => ({
+                ...m,
+                calories: toNum(m.calories),
+                protein: toNum(m.protein),
+                carbs: toNum(m.carbs),
+                fat: toNum(m.fat),
+              })) ?? []
+            }
+            calorieGoal={historyGoals?.calorieGoal ?? 2000}
+            proteinGoal={historyGoals?.proteinGoal ?? 100}
+            carbGoal={historyGoals?.carbGoal ?? 250}
+            fatGoal={historyGoals?.fatGoal ?? 50}
+            userId={userId ?? ""}
+          />
+        ) : (
+          <TrackerHistoryDialog
+            open={historyDialogOpen}
+            onClose={() => setHistoryDialogOpen(false)}
+            selectedDate={historyDate}
+            allMeals={
+              meals?.map((m) => ({
+                ...m,
+                calories: toNum(m.calories),
+                protein: toNum(m.protein),
+                carbs: toNum(m.carbs),
+                fat: toNum(m.fat),
+              })) ?? []
+            }
+            calorieGoal={historyGoals?.calorieGoal ?? 2000}
+            proteinGoal={historyGoals?.proteinGoal ?? 100}
+            carbGoal={historyGoals?.carbGoal ?? 250}
+            fatGoal={historyGoals?.fatGoal ?? 50}
+            userId={userId ?? ""}
           />
         )}
+
+        {/* Counted Foods */}
+        <div className="mt-6">
+          <Typography variant="h6" fontWeight={600} color="text.primary">
+            Counted Foods
+          </Typography>
+          {countedMeals.length === 0 ? (
+            <Typography variant="body2" color="text.secondary" className="mt-2">
+              No logged meals yet for this day.
+            </Typography>
+          ) : (
+            <div className="flex flex-wrap gap-4 mt-4">
+              {countedMeals.map((meal) => (
+                <TrackedMealCard
+                  key={meal.id}
+                  isUnavailable={isUnavailable(meal.dishId)}
+                  dish={dishDisplayMap.get(meal.dishId)}
+                  meal={{
+                    ...meal,
+                    calories: toNum(meal.calories),
+                    protein: toNum(meal.protein),
+                    carbs: toNum(meal.carbs),
+                    fat: toNum(meal.fat),
+                  }}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Suggested Foods */}
+        <div className="mt-6">
+          <Typography variant="h6" fontWeight={600} color="text.primary">
+            Suggested Foods
+          </Typography>
+          <div className="flex flex-wrap gap-4 mt-4">
+            {suggestedMeals.length === 0 ? (
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                className="mt-2"
+              >
+                Dishes from the past week logged 5+ times will appear here.
+              </Typography>
+            ) : (
+              suggestedMeals.map((meal) => (
+                <SearchMealCard
+                  key={meal.dishId}
+                  dish={dishDisplayMap.get(meal.dishId)}
+                  meal={meal}
+                  isUnavailable={isUnavailable(meal.dishId)}
+                  onAdd={(meal, servings) =>
+                    logMeal.mutate({
+                      userId: userId ?? "",
+                      dishId: meal.dishId ?? "",
+                      dishName:
+                        "dishName" in meal && typeof meal.dishName === "string"
+                          ? meal.dishName
+                          : "",
+                      servings,
+                      eatenAt: new Date(),
+                    })
+                  }
+                />
+              ))
+            )}
+          </div>
+        </div>
       </div>
-    </div>
+
+      {/* Floating search button + dialog/drawer */}
+      <MealSearchDialog
+        availableDishes={availableDishes}
+        suggestedMeals={suggestedMeals}
+        onAdd={(dishId, dishName, servings) =>
+          logMeal.mutate({
+            userId: userId ?? "",
+            dishId,
+            dishName,
+            servings,
+            eatenAt: new Date(),
+          })
+        }
+      />
+    </Box>
   );
 }

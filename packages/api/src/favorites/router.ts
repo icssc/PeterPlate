@@ -12,7 +12,7 @@ const getFavoritesProcedure = publicProcedure
       console.error(e);
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
-        message: "error getting favorites",
+        message: "Could not retrieve user favorites.",
       });
     });
   });
@@ -22,10 +22,16 @@ const addFavoriteProcedure = publicProcedure
     z.object({
       userId: z.string(),
       dishId: z.string(),
+      restaurant: z.enum(["anteatery", "brandywine"]),
     }),
   )
   .mutation(async ({ ctx: { db }, input }) => {
-    return await addFavorite(db, input.userId, input.dishId).catch((e) => {
+    return await addFavorite(
+      db,
+      input.userId,
+      input.dishId,
+      input.restaurant,
+    ).catch((e) => {
       if (e instanceof TRPCError) throw e;
       console.error(e);
       throw new TRPCError({

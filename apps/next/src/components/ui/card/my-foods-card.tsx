@@ -7,8 +7,8 @@ import {
   Star,
   StarBorder,
 } from "@mui/icons-material";
-import { Card, CardContent, Dialog, Drawer } from "@mui/material";
-import type { DishInfo } from "@peterplate/api";
+import { Card, CardContent, Dialog, Drawer, Typography } from "@mui/material";
+import type { DishWithRating } from "@peterplate/validators";
 import Image from "next/image";
 import React from "react";
 import { useUserStore } from "@/context/useUserStore";
@@ -42,7 +42,7 @@ function UserRatingDisplay({
     }
 
     return (
-      <span className="text-sm whitespace-nowrap text-gray-500">
+      <span className="text-sm whitespace-nowrap text-gray-500 dark:text-zinc-400">
         Not rated yet
       </span>
     );
@@ -51,7 +51,13 @@ function UserRatingDisplay({
   return (
     <div className="flex items-center gap-1.5 flex-shrink-0">
       {showLabel && (
-        <span className="text-sm whitespace-nowrap">Your rating:</span>
+        <Typography
+          variant="body2"
+          color="text.primary"
+          className="whitespace-nowrap"
+        >
+          Your rating:
+        </Typography>
       )}
       <div className="flex gap-0.5 items-center">
         {[1, 2, 3, 4, 5].map((n) =>
@@ -67,11 +73,16 @@ function UserRatingDisplay({
 }
 
 interface MyFoodsCardProps {
-  dish: DishInfo;
+  dish: DishWithRating;
   isFavorited: boolean;
+  restaurant: "anteatery" | "brandywine";
   stationName?: string;
   favoriteDisabled?: boolean;
-  onToggleFavorite?: (dishId: string, currentlyFavorite: boolean) => void;
+  onToggleFavorite?: (
+    dishId: string,
+    currentlyFavorite: boolean,
+    restaurant: "brandywine" | "anteatery",
+  ) => void;
   className?: string;
 }
 
@@ -83,6 +94,7 @@ const MyFoodsCardContent = React.forwardRef<
     {
       dish,
       isFavorited,
+      restaurant,
       stationName,
       favoriteDisabled,
       onToggleFavorite,
@@ -96,8 +108,8 @@ const MyFoodsCardContent = React.forwardRef<
     const IconComponent = getFoodIcon(dish.name);
     const [imageError, setImageError] = React.useState(false);
     const showImage =
-      typeof dish.image_url === "string" &&
-      dish.image_url.trim() !== "" &&
+      typeof dish.imageUrl === "string" &&
+      dish.imageUrl.trim() !== "" &&
       !imageError;
 
     const { data: ratingData } = trpc.dish.getAverageRating.useQuery(
@@ -115,23 +127,32 @@ const MyFoodsCardContent = React.forwardRef<
         return;
       }
       if (favoriteDisabled || !onToggleFavorite) return;
-      onToggleFavorite(dish.id, Boolean(isFavorited));
+      onToggleFavorite(
+        dish.id,
+        Boolean(isFavorited),
+        restaurant as "brandywine" | "anteatery",
+      );
     };
 
     return (
       <div ref={ref} {...divProps} className={cn("w-full", className)}>
         <Card
-          className="cursor-pointer hover:shadow-lg transition w-full border"
-          sx={{ borderRadius: "16px" }}
+          className="cursor-pointer hover:shadow-lg transition w-full dark:bg-[#323235]"
+          sx={{
+            borderRadius: "16px",
+            border: 1,
+            borderColor: "divider",
+            backgroundImage: "none",
+          }}
         >
           <CardContent sx={{ padding: "0 !important" }}>
             <div className="flex flex-col">
               <div className="flex items-start gap-3 p-4 pb-3">
                 {/* Thumbnail */}
-                <div className="flex-shrink-0 w-[96px] h-[96px] rounded-lg overflow-hidden bg-slate-100 flex items-center justify-center">
-                  {showImage ? (
+                <div className="flex-shrink-0 w-[96px] h-[96px] rounded-lg overflow-hidden bg-slate-100 dark:bg-zinc-700 flex items-center justify-center">
+                  {showImage && dish.imageUrl ? (
                     <Image
-                      src={dish.image_url}
+                      src={dish.imageUrl}
                       alt={formatFoodName(dish.name)}
                       width={96}
                       height={96}
@@ -139,7 +160,7 @@ const MyFoodsCardContent = React.forwardRef<
                       onError={() => setImageError(true)}
                     />
                   ) : IconComponent ? (
-                    <IconComponent className="w-10 h-10 text-slate-700" />
+                    <IconComponent className="w-10 h-10 text-slate-700 dark:text-blue-300" />
                   ) : (
                     <div className="w-10 h-10 bg-slate-200 rounded" />
                   )}
@@ -149,9 +170,12 @@ const MyFoodsCardContent = React.forwardRef<
                 <div className="flex-1 min-w-0 flex flex-col gap-1">
                   {/* Name row and heart */}
                   <div className="flex items-start justify-between gap-2">
-                    <span className="font-bold text-base text-sky-700 leading-snug">
+                    <Typography
+                      color="primary"
+                      className="font-bold text-base leading-snug"
+                    >
                       {formatFoodName(dish.name)}
-                    </span>
+                    </Typography>
                     <button
                       type="button"
                       aria-label={
@@ -177,14 +201,18 @@ const MyFoodsCardContent = React.forwardRef<
 
                   {/* Calories and average rating */}
                   <div className="flex items-center gap-2 text-sm flex-wrap">
-                    <span className="text-slate-900 font-normal">
+                    <Typography
+                      variant="body2"
+                      color="text.primary"
+                      className="font-normal"
+                    >
                       {dish.nutritionInfo.calories == null
                         ? "-"
-                        : `${Math.round(parseFloat(dish.nutritionInfo.calories))} cal`}
-                    </span>
-                    <div className="flex items-center gap-0.5 text-zinc-500">
+                        : `${Math.round(dish.nutritionInfo.calories)} cal`}
+                    </Typography>
+                    <div className="flex items-center gap-0.5 text-zinc-500 dark:text-zinc-400">
                       <StarBorder
-                        className="w-3.5 h-3.5 stroke-zinc-500"
+                        className="w-3.5 h-3.5 stroke-zinc-500 dark:stroke-zinc-400"
                         strokeWidth={0.15}
                       />
                       <span>
@@ -195,22 +223,26 @@ const MyFoodsCardContent = React.forwardRef<
 
                   {/* Description */}
                   {dish.description && (
-                    <p className="text-slate-700 text-sm line-clamp-2 leading-snug">
+                    <Typography
+                      variant="body2"
+                      color="text.primary"
+                      className="line-clamp-2 leading-snug"
+                    >
                       {dish.description}
-                    </p>
+                    </Typography>
                   )}
                 </div>
               </div>
 
               {/* Divider */}
-              <div className="h-px bg-sky-700 mx-4" />
+              <div className="h-px bg-sky-700 dark:bg-blue-300 mx-4" />
 
               {/* Location and user rating */}
               <div className="flex items-center justify-between px-4 py-4 gap-2">
-                <div className="flex items-center gap-1 text-gray-500 text-sm min-w-0">
+                <div className="flex items-center gap-1 text-gray-500 dark:text-zinc-400 text-sm min-w-0">
                   <LocationOn className="w-5 h-5 flex-shrink-0" />
                   <span>
-                    {toTitleCase(dish.restaurant)}
+                    {toTitleCase(restaurant)}
                     {stationName ? ` • ${toTitleCase(stationName)}` : ""}
                   </span>
                 </div>
@@ -233,6 +265,7 @@ MyFoodsCardContent.displayName = "MyFoodsCardContent";
 export default function MyFoodsCard({
   dish,
   isFavorited,
+  restaurant,
   stationName,
   favoriteDisabled,
   onToggleFavorite,
@@ -291,6 +324,7 @@ export default function MyFoodsCard({
       <MyFoodsCardContent
         dish={dish}
         isFavorited={isFavorited}
+        restaurant={restaurant}
         stationName={stationName}
         favoriteDisabled={favoriteDisabled}
         onToggleFavorite={onToggleFavorite}
@@ -309,6 +343,7 @@ export default function MyFoodsCard({
             dish={dish}
             onAddToMealTracker={handleAddToMealTracker}
             isAddingToMealTracker={logMealMutation.isPending}
+            restaurant={restaurant}
           />
         </Dialog>
       ) : (
@@ -322,6 +357,7 @@ export default function MyFoodsCard({
             dish={dish}
             onAddToMealTracker={handleAddToMealTracker}
             isAddingToMealTracker={logMealMutation.isPending}
+            restaurant={restaurant}
           />
         </Drawer>
       )}

@@ -11,14 +11,16 @@ import {
   LightMode as LightModeIcon,
   Logout as LogoutIcon,
 } from "@mui/icons-material";
-import { Tooltip } from "@mui/material";
+import { Box, Tooltip, Typography } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
 import { useTheme } from "next-themes";
+import type React from "react";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in";
 import { signOut, useSession } from "@/utils/auth-client";
+import { formatDietaryKey } from "@/utils/dietary";
 import { trpc } from "@/utils/trpc";
 
 interface ProfileMenuContentProps {
@@ -29,7 +31,7 @@ interface ProfileMenuContentProps {
 export default function SidebarContent({
   onClose,
   onEditPreferencesClick,
-}: ProfileMenuContentProps) {
+}: ProfileMenuContentProps): React.JSX.Element | null {
   const { data: session } = useSession();
   const user = session?.user;
   const userId = user?.id;
@@ -49,7 +51,11 @@ export default function SidebarContent({
   );
 
   const handleSignOut = async () => {
+    const savedTheme = localStorage.getItem("theme");
     await signOut();
+    if (savedTheme) {
+      localStorage.setItem("theme", savedTheme);
+    }
     window.location.href = "/";
   };
 
@@ -66,21 +72,21 @@ export default function SidebarContent({
             className="rounded-full object-cover"
           />
           <div>
-            <h2 className="text-sm font-semibold text-gray-900 dark:text-white">
+            <Typography variant="body2" fontWeight={600} color="text.primary">
               {user?.name || "Peter Anteater"}
-            </h2>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
               {user?.email || "panteater@uci.edu"}
-            </p>
+            </Typography>
           </div>
         </div>
 
         <button
           type="button"
           onClick={onClose}
-          className="rounded-full p-1.5 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
+          className="rounded-full p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700"
         >
-          <CloseIcon fontSize="small" />
+          <CloseIcon sx={{ fontSize: 18, color: "text.primary" }} />
         </button>
       </div>
 
@@ -92,11 +98,11 @@ export default function SidebarContent({
         <div>
           <h3 className="text-sm font-bold text-sky-700 dark:text-accent-primary mb-2">
             Dietary Preferences
-          </h3>
+          </Typography>
 
           <p className="text-xs font-semibold text-gray-500 dark:text-zinc-300 mb-1">
             Restrictions:
-          </p>
+          </Typography>
 
           <div className="flex flex-wrap gap-1.5 mb-3">
             {preferences?.length ? (
@@ -105,7 +111,7 @@ export default function SidebarContent({
                   key={pref}
                   className="rounded-md border border-sky-700 px-2.5 py-0.5 text-xs text-sky-700 bg-sky-100 dark:text-accent-primary dark:border-accent-primary dark:bg-zinc-700"
                 >
-                  {pref}
+                  {formatDietaryKey(pref)}
                 </span>
               ))
             ) : (
@@ -117,7 +123,7 @@ export default function SidebarContent({
 
           <p className="text-xs font-semibold text-gray-500 dark:text-zinc-300 mb-1">
             Allergies:
-          </p>
+          </Typography>
           <div className="flex flex-wrap gap-1.5">
             {allergies?.length ? (
               allergies.map((allergy) => (
@@ -125,7 +131,7 @@ export default function SidebarContent({
                   key={allergy}
                   className="rounded-md border border-sky-700 px-2.5 py-0.5 text-xs text-sky-700 bg-sky-100 dark:text-accent-primary dark:border-accent-primary dark:bg-zinc-700"
                 >
-                  {allergy}
+                  {formatDietaryKey(allergy)}
                 </span>
               ))
             ) : (
@@ -140,7 +146,7 @@ export default function SidebarContent({
         <div>
           <h3 className="text-sm font-bold text-sky-700 dark:text-accent-primary mb-2">
             Appearance
-          </h3>
+          </Typography>
 
           <div className="flex w-fit rounded-lg border border-sky-700 overflow-hidden">
             <ThemeButton
@@ -249,7 +255,7 @@ export default function SidebarContent({
           <GoogleSignInButton />
         )}
       </div>
-    </div>
+    </Box>
   );
 }
 
@@ -295,10 +301,12 @@ function MenuLink({
     <Link
       href={href}
       onClick={onClick}
-      className="flex items-center gap-3 rounded-lg px-4 py-2 text-sm text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
+      className="flex items-center gap-3 rounded-lg px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
     >
-      {icon}
-      <span className="font-medium">{children}</span>
+      <Box sx={{ color: "primary.main" }}>{icon}</Box>
+      <Typography variant="body2" fontWeight={500} color="text.primary">
+        {children}
+      </Typography>
     </Link>
   );
 }

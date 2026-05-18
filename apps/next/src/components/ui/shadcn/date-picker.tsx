@@ -1,12 +1,12 @@
 "use client";
 
 import { CalendarToday } from "@mui/icons-material";
+import type { PickableDatesPayload } from "@peterplate/api";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/shadcn/button";
 import { Calendar } from "@/components/ui/shadcn/calendar";
 import { isSameDay } from "@/utils/funcs";
 import { cn } from "@/utils/tw";
-import type { DateList } from "../../../../../../packages/db/src/schema";
 import type { CalendarRange } from "../toolbar";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 
@@ -17,7 +17,7 @@ export function DatePicker({
   onSelect,
 }: {
   date: Date | undefined;
-  enabledDates: DateList;
+  enabledDates: PickableDatesPayload;
   range: CalendarRange;
   onSelect: (newDateFromPicker: Date | undefined) => void;
 }) {
@@ -45,7 +45,7 @@ export function DatePicker({
           toDate={range.latest}
           disabled={(d) =>
             (date ? isSameDay(d, date) : true) ||
-            !enabledDates?.some((ed) => isSameDay(ed, d))
+            !enabledDates?.some((ed: Date) => isSameDay(ed, d))
           }
         />
       </PopoverContent>

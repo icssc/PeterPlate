@@ -99,18 +99,6 @@ export default $config({
       },
     });
 
-    const dailyCron = new sst.aws.Cron("Daily", {
-      schedule: "cron(0 0 * * ? *)", // Run daily at 00:00 UTC
-      job: {
-        handler: "apps/server/src/functions/cron/daily.main",
-        timeout: "10 minutes",
-        environment: {
-          DATABASE_URL: process.env.DATABASE_URL!,
-          NODE_ENV: process.env.NODE_ENV || "development",
-        },
-      },
-    });
-
     const weeklyCron = new sst.aws.Cron("Weekly", {
       schedule: "cron(0 0 ? * 1 *)", // Run at 00:00 on Sunday
       job: {
@@ -147,33 +135,6 @@ export default $config({
       functionName: weeklyCron.nodes.function.name,
       input: JSON.stringify({}),
     });
-
-    // ! TODO @KevinWu098: figure out the router
-    // Redirect peterplate.com and www.peterplate.com to peterplate.com
-    // if ($app.stage === "production") {
-    //   new sst.aws.Router("PeterplateRedirect", {
-    //     domain: {
-    //       name: "peterplate.com",
-    //       redirects: ["www.peterplate.com"],
-    //       dns: sst.aws.dns({
-    //         zone: "Z05683903NC7KZ5HQGFOI",
-    //       }),
-    //     },
-    //     edge: {
-    //       viewerRequest: {
-    //         injection: `
-    //           return {
-    //             statusCode: 301,
-    //             statusDescription: 'Moved Permanently',
-    //             headers: {
-    //               'location': { value: 'https://peterplate.com' + event.request.uri }
-    //             }
-    //           };
-    //         `,
-    //       },
-    //     },
-    //   });
-    // }
 
     return {
       api: api.url,
