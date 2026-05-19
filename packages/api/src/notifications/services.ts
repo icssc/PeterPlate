@@ -4,7 +4,7 @@ import {
   pushTokens,
   savedNotifications,
 } from "@peterplate/db";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import type {
   ExpoPushErrorReceipt,
   ExpoPushMessage,
@@ -147,17 +147,23 @@ export async function subscribeUser(
   db: Drizzle,
   subscription: InsertPushSubscription,
 ): Promise<void> {
-  await db
-    .insert(pushSubscriptions)
-    .values(subscription)
-    .onConflictDoUpdate({
-      target: pushSubscriptions.userId,
-      set: {
-        endpoint: subscription.endpoint,
-        p256dh: subscription.p256dh,
-        auth: subscription.auth,
-      },
-    });
+  const updateSet: Record<string, unknown> = {
+    endpoint: subscription.endpoint,
+    p256dh: subscription.p256dh,
+    auth: subscription.auth,
+  };
+  if (subscription.isSubscribedFoodFavorites !== undefined) {
+    updateSet.isSubscribedFoodFavorites =
+      subscription.isSubscribedFoodFavorites;
+  }
+  if (subscription.isSubscribedEvents !== undefined) {
+    updateSet.isSubscribedEvents = subscription.isSubscribedEvents;
+  }
+
+  await db.insert(pushSubscriptions).values(subscription).onConflictDoUpdate({
+    target: pushSubscriptions.userId,
+    set: updateSet,
+  });
 }
 
 export async function unsubscribeUser(
@@ -194,4 +200,19 @@ export async function getSavedNotifications(db: Drizzle, userId: string) {
     .from(savedNotifications)
     .where(eq(savedNotifications.userId, userId))
     .orderBy(savedNotifications.createdAt);
+}
+
+export async function markAllNotificationsRead(
+  db: Drizzle,
+  userId: string,
+): Promise<void> {
+  await db
+    .update(savedNotifications)
+    .set({ isRead: true })
+    .where(
+      and(
+        eq(savedNotifications.userId, userId),
+        eq(savedNotifications.isRead, false),
+      ),
+    );
 }

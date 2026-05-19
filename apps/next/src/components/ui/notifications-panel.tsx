@@ -5,14 +5,78 @@ import {
   Close as CloseIcon,
   Notifications as NotificationsIcon,
 } from "@mui/icons-material";
-import { Box, Switch, Typography } from "@mui/material";
-import { useState } from "react";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Switch,
+  Typography,
+} from "@mui/material";
+import { useEffect, useRef, useState } from "react";
 import { useSession } from "@/utils/auth-client";
 import { trpc } from "@/utils/trpc";
+
+const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY as string;
+
+function urlBase64ToUint8Array(base64String: string): Uint8Array {
+  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}
+
+function isPushSupported(): boolean {
+  if (typeof window === "undefined" || typeof navigator === "undefined") {
+    return false;
+  }
+  return (
+    "serviceWorker" in navigator &&
+    "PushManager" in window &&
+    "Notification" in window
+  );
+}
+
+async function ensurePushSubscription(): Promise<{
+  endpoint: string;
+  p256dh: string;
+  auth: string;
+}> {
+  const registration = await navigator.serviceWorker.ready;
+  let sub = await registration.pushManager.getSubscription();
+  if (!sub) {
+    sub = await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(
+        VAPID_PUBLIC_KEY,
+      ) as BufferSource,
+    });
+  }
+  const json = sub.toJSON();
+  if (!json.endpoint || !json.keys?.p256dh || !json.keys?.auth) {
+    throw new Error("Invalid push subscription keys generated.");
+  }
+  return {
+    endpoint: json.endpoint,
+    p256dh: json.keys.p256dh,
+    auth: json.keys.auth,
+  };
+}
+
+type ToggleKind = "food" | "event";
 
 export default function NotificationsPanel({ onBack }: { onBack: () => void }) {
   const { data: session } = useSession();
   const userId = session?.user?.id ?? "";
+
+  const utils = trpc.useUtils();
 
   const { data: notifications } =
     trpc.notification.getSavedNotifications.useQuery(
@@ -20,20 +84,124 @@ export default function NotificationsPanel({ onBack }: { onBack: () => void }) {
       { enabled: !!userId },
     );
 
-  const { data: subscription } = trpc.notification.getSubscription.useQuery(
-    { userId },
-    { enabled: !!userId },
-  );
+  const { data: subscription, isLoading: subLoading } =
+    trpc.notification.getSubscription.useQuery(
+      { userId },
+      { enabled: !!userId },
+    );
 
+  const subscribeMutation = trpc.notification.subscribe.useMutation();
   const updateSubscriptionMutation =
     trpc.notification.updateSubscription.useMutation();
+  const markAllReadMutation = trpc.notification.markAllRead.useMutation();
 
-  const [dishNotifs, setDishNotifs] = useState(
-    subscription?.isSubscribedFoodFavorites ?? false,
-  );
-  const [eventNotifs, setEventNotifs] = useState(
-    subscription?.isSubscribedEvents ?? false,
-  );
+  const [dishNotifs, setDishNotifs] = useState(false);
+  const [eventNotifs, setEventNotifs] = useState(false);
+  const [isBusy, setIsBusy] = useState(false);
+  const [dialog, setDialog] = useState<{
+    open: boolean;
+    title: string;
+    message: string;
+  }>({ open: false, title: "", message: "" });
+
+  useEffect(() => {
+    setDishNotifs(subscription?.isSubscribedFoodFavorites ?? false);
+    setEventNotifs(subscription?.isSubscribedEvents ?? false);
+  }, [subscription]);
+
+  const hasMarkedReadRef = useRef(false);
+  useEffect(() => {
+    if (!userId || hasMarkedReadRef.current) return;
+    hasMarkedReadRef.current = true;
+
+    utils.notification.getSavedNotifications.setData({ userId }, (prev) =>
+      prev?.map((n) => ({ ...n, isRead: true })),
+    );
+
+    markAllReadMutation.mutate(
+      { userId },
+      {
+        onSettled: () => {
+          void utils.notification.getSavedNotifications.invalidate({ userId });
+        },
+      },
+    );
+  }, [userId, utils, markAllReadMutation]);
+
+  const showDialog = (title: string, message: string) =>
+    setDialog({ open: true, title, message });
+
+  const handleToggle = async (kind: ToggleKind, nextValue: boolean) => {
+    if (!userId) {
+      showDialog(
+        "Sign In Required",
+        "You must be logged in to manage notifications.",
+      );
+      return;
+    }
+    if (isBusy) return;
+
+    const prevDish = dishNotifs;
+    const prevEvent = eventNotifs;
+    const revert = () => {
+      setDishNotifs(prevDish);
+      setEventNotifs(prevEvent);
+    };
+
+    if (kind === "food") setDishNotifs(nextValue);
+    else setEventNotifs(nextValue);
+
+    const nextDish = kind === "food" ? nextValue : prevDish;
+    const nextEvent = kind === "event" ? nextValue : prevEvent;
+
+    setIsBusy(true);
+    try {
+      if (nextValue) {
+        if (!isPushSupported()) {
+          showDialog(
+            "Not Supported",
+            "Push notifications are not supported in this browser.",
+          );
+          revert();
+          return;
+        }
+
+        const permission = await Notification.requestPermission();
+        if (permission !== "granted") {
+          showDialog(
+            "Permission Denied",
+            "Reset notification permissions in your browser's address bar and try again.",
+          );
+          revert();
+          return;
+        }
+
+        const subData = await ensurePushSubscription();
+        await subscribeMutation.mutateAsync({
+          userId,
+          endpoint: subData.endpoint,
+          p256dh: subData.p256dh,
+          auth: subData.auth,
+          isSubscribedFoodFavorites: nextDish,
+          isSubscribedEvents: nextEvent,
+        });
+      } else {
+        await updateSubscriptionMutation.mutateAsync({
+          userId,
+          isSubscribedFoodFavorites: nextDish,
+          isSubscribedEvents: nextEvent,
+        });
+      }
+
+      await utils.notification.getSubscription.invalidate({ userId });
+    } catch (err) {
+      console.error("Notification toggle failed:", err);
+      showDialog("Something Went Wrong", "Action failed. Please try again.");
+      revert();
+    } finally {
+      setIsBusy(false);
+    }
+  };
 
   return (
     <Box
@@ -109,7 +277,7 @@ export default function NotificationsPanel({ onBack }: { onBack: () => void }) {
         )}
       </div>
 
-      {/* Toggles — wired to push_subscriptions.isSubscribedFoodFavorites / isSubscribedEvents */}
+      {/* Toggles — drive push_subscriptions row + isSubscribedFoodFavorites / isSubscribedEvents */}
       <div className="px-5 pb-5 pt-3 space-y-1 border-t border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
           <Typography variant="body2" fontWeight={600} color="text.primary">
@@ -117,13 +285,8 @@ export default function NotificationsPanel({ onBack }: { onBack: () => void }) {
           </Typography>
           <Switch
             checked={dishNotifs}
-            onChange={(e) => {
-              setDishNotifs(e.target.checked);
-              updateSubscriptionMutation.mutate({
-                userId,
-                isSubscribedFoodFavorites: e.target.checked,
-              });
-            }}
+            disabled={isBusy || subLoading || !userId}
+            onChange={(e) => handleToggle("food", e.target.checked)}
             size="small"
           />
         </div>
@@ -133,17 +296,45 @@ export default function NotificationsPanel({ onBack }: { onBack: () => void }) {
           </Typography>
           <Switch
             checked={eventNotifs}
-            onChange={(e) => {
-              setEventNotifs(e.target.checked);
-              updateSubscriptionMutation.mutate({
-                userId,
-                isSubscribedEvents: e.target.checked,
-              });
-            }}
+            disabled={isBusy || subLoading || !userId}
+            onChange={(e) => handleToggle("event", e.target.checked)}
             size="small"
           />
         </div>
       </div>
+
+      <Dialog
+        open={dialog.open}
+        onClose={() => setDialog((d) => ({ ...d, open: false }))}
+        slotProps={{
+          paper: {
+            sx: {
+              borderRadius: "16px",
+              backgroundImage: "none",
+              ".dark &": {
+                backgroundColor: "#303035",
+                backgroundImage: "none",
+              },
+            },
+          },
+        }}
+      >
+        <DialogTitle>
+          <Typography fontWeight={600} color="primary">
+            {dialog.title}
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText component="div">
+            <Typography color="text.primary">{dialog.message}</Typography>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDialog((d) => ({ ...d, open: false }))}>
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

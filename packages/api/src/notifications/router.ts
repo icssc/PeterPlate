@@ -10,6 +10,7 @@ import { z } from "zod";
 import {
   getSavedNotifications,
   getSubscription,
+  markAllNotificationsRead,
   subscribeUser,
   unsubscribeUser,
   updateSubscription,
@@ -72,5 +73,12 @@ export const notificationRouter = createTRPCRouter({
     .input(z.object({ userId: z.string() }))
     .query(async ({ ctx: { db }, input }) => {
       return await getSavedNotifications(db, input.userId);
+    }),
+
+  // Mark all of a user's notifications as read.
+  markAllRead: publicProcedure
+    .input(z.object({ userId: z.string() }))
+    .mutation(async ({ ctx: { db }, input }) => {
+      await markAllNotificationsRead(db, input.userId);
     }),
 });
