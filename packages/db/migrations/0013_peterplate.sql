@@ -1,3 +1,5 @@
+DROP TABLE IF EXISTS "push_subscriptions";
+
 CREATE TABLE "push_subscriptions" (
 	"user_id" text PRIMARY KEY NOT NULL,
 	"endpoint" text NOT NULL,
