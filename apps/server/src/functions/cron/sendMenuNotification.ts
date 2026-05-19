@@ -2,14 +2,14 @@ import webpush from "web-push";
 import { eq } from "drizzle-orm";
 import { formatInTimeZone } from "date-fns-tz";
 
+import { createCaller, createTRPCContext } from "@peterplate/api";
 import {
   createDrizzle,
-  dishes,
-  dishesToMenus,
   favorites,
-  menus,
   pool,
   pushSubscriptions,
+  type RestaurantId,
+  savedNotifications,
 } from "@peterplate/db";
 
 import { logger } from "../../../logger";
@@ -30,72 +30,130 @@ export const main = async (_event, _context) => {
     logger.info("Starting menu push notification job...");
     const db = createDrizzle({ connectionString });
 
-    const today = formatInTimeZone(new Date(), TIMEZONE, "yyyy-MM-dd");
+    const ctx = createTRPCContext({
+      headers: new Headers({ "x-trpc-source": "cron" }),
+      connectionString,
+    });
+    const trpc = createCaller(ctx);
 
-    const matches = await db
+    // Build a Date at noon UTC on the current Pacific calendar day so that
+    // AAPI's local-date formatting (toLocaleDateString) lands on the right day
+    // regardless of the server's timezone.
+    const todayStr = formatInTimeZone(new Date(), TIMEZONE, "yyyy-MM-dd");
+    const [y, m, d] = todayStr.split("-").map(Number) as [number, number, number];
+    const today = new Date(Date.UTC(y, m - 1, d, 12));
+
+    const rows = await db
       .select({
+        userId: pushSubscriptions.userId,
         endpoint: pushSubscriptions.endpoint,
         p256dh: pushSubscriptions.p256dh,
         auth: pushSubscriptions.auth,
-        dishName: dishes.name,
+        dishId: favorites.dishId,
+        restaurant: favorites.restaurant,
       })
       .from(pushSubscriptions)
       .innerJoin(favorites, eq(pushSubscriptions.userId, favorites.userId))
-      .innerJoin(dishesToMenus, eq(favorites.dishId, dishesToMenus.dishId))
-      .innerJoin(menus, eq(dishesToMenus.menuId, menus.id))
-      .innerJoin(dishes, eq(favorites.dishId, dishes.id))
-      .where(eq(menus.date, today));
+      .where(eq(pushSubscriptions.isSubscribedFoodFavorites, true));
 
-    if (matches.length === 0) {
-      logger.info("No users have favorited dishes serving today.");
+    if (rows.length === 0) {
+      logger.info("No subscribed users have favorited dishes.");
       return;
     }
 
-    // Group by endpoint so each device gets one notification listing all matching favorites
+    // Fetch today's served dishes only for restaurants we need.
+    const neededRestaurants = Array.from(
+      new Set(rows.map((r) => r.restaurant)),
+    ) as RestaurantId[];
+
+    const servedByRestaurant = new Map<RestaurantId, Map<string, string>>();
+    for (const restaurant of neededRestaurants) {
+      try {
+        const data = await trpc.restaurant({ date: today, restaurant });
+        const dishMap = new Map<string, string>();
+        for (const period of data.periods) {
+          for (const station of period.stations) {
+            for (const dish of station.dishes) {
+              dishMap.set(dish.id, dish.name);
+            }
+          }
+        }
+        servedByRestaurant.set(restaurant, dishMap);
+      } catch (err) {
+        logger.error(
+          err,
+          `Failed to fetch today's menu for restaurant ${restaurant}`,
+        );
+      }
+    }
+
+    // Group matches by endpoint so each device gets one combined notification.
     const notificationMap = new Map<
       string,
-      { keys: { p256dh: string; auth: string }; dishNames: string[] }
+      {
+        userId: string;
+        keys: { p256dh: string; auth: string };
+        dishNames: string[];
+      }
     >();
 
-    for (const match of matches) {
-      if (!notificationMap.has(match.endpoint)) {
-        notificationMap.set(match.endpoint, {
-          keys: { p256dh: match.p256dh, auth: match.auth },
+    for (const row of rows) {
+      const servedDishes = servedByRestaurant.get(row.restaurant);
+      const dishName = servedDishes?.get(row.dishId);
+      if (!dishName) continue;
+
+      if (!notificationMap.has(row.endpoint)) {
+        notificationMap.set(row.endpoint, {
+          userId: row.userId,
+          keys: { p256dh: row.p256dh, auth: row.auth },
           dishNames: [],
         });
       }
-      notificationMap.get(match.endpoint)!.dishNames.push(match.dishName);
+      notificationMap.get(row.endpoint)!.dishNames.push(dishName);
+    }
+
+    if (notificationMap.size === 0) {
+      logger.info("No subscribed users have favorited dishes serving today.");
+      return;
     }
 
     logger.info(`Sending notifications to ${notificationMap.size} device(s)...`);
 
     const results = await Promise.allSettled(
-      Array.from(notificationMap.entries()).map(async ([endpoint, { keys, dishNames }]) => {
-        const uniqueDishes = [...new Set(dishNames)];
-        const body =
-          uniqueDishes.length === 1
-            ? `${uniqueDishes[0]} is serving today!`
-            : `Your favorites are serving today: ${uniqueDishes.join(", ")}`;
+      Array.from(notificationMap.entries()).map(
+        async ([endpoint, { userId, keys, dishNames }]) => {
+          const uniqueDishes = [...new Set(dishNames)];
+          const body =
+            uniqueDishes.length === 1
+              ? `${uniqueDishes[0]} is serving today!`
+              : `Your favorites are serving today: ${uniqueDishes.join(", ")}`;
 
-        const payload = JSON.stringify({
-          title: "Favorite Dish Alert!",
-          body,
-          icon: "/icons/icon-192x192.png",
-          data: { url: "/my-favorites" },
-        });
+          const payload = JSON.stringify({
+            title: "Favorite Dish Alert!",
+            body,
+            icon: "/icons/icon-192x192.png",
+            data: { url: "/my-favorites" },
+          });
 
-        try {
-          await webpush.sendNotification({ endpoint, keys }, payload);
-        } catch (error: any) {
-          // 410 Gone / 404 means the user revoked the subscription in their browser
-          if (error.statusCode === 410 || error.statusCode === 404) {
-            logger.info({ endpoint }, "Subscription expired, removing from DB...");
-            await db.delete(pushSubscriptions).where(eq(pushSubscriptions.endpoint, endpoint));
-          } else {
-            throw error;
+          await db.insert(savedNotifications).values({
+            userId,
+            message: body,
+            type: "food",
+          });
+
+          try {
+            await webpush.sendNotification({ endpoint, keys }, payload);
+          } catch (error: any) {
+            // 410 Gone / 404 means the user revoked the subscription in their browser
+            if (error.statusCode === 410 || error.statusCode === 404) {
+              logger.info({ endpoint }, "Subscription expired, removing from DB...");
+              await db.delete(pushSubscriptions).where(eq(pushSubscriptions.endpoint, endpoint));
+            } else {
+              throw error;
+            }
           }
-        }
-      }),
+        },
+      ),
     );
 
     results

@@ -6,7 +6,10 @@
     "clean": "rm -rf .turbo node_modules",
     "test:daily": "tsx -e \"import('./src/functions/cron/daily.ts').then(m => m.main())\"",
     "test:weekly": "tsx -e \"import('./src/functions/cron/weekly.ts').then(m => m.main())\"",
-    "test:menu-notifications": "tsx -e \"import('./src/functions/cron/sendMenuNotification.ts').then(m => m.main())\""
+    "test:menu-notifications": "tsx -e \"import('./src/functions/cron/sendMenuNotification.ts').then(m => m.main())\"",
+    "test:event-notifications": "tsx -e \"import('./src/functions/cron/sendEventNotifications.ts').then(m => m.main())\"",
+    "test:fake-event-notification": "tsx -e \"import('./src/functions/cron/testFakeEventNotification.ts').then(m => m.main())\"",
+    "test:notifications": "pnpm test:menu-notifications && pnpm test:event-notifications"
   },
   "license": "MIT",
   "dependencies": {
