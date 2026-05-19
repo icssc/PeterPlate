@@ -40,7 +40,7 @@ export function Sidebar({
         className="mb-4 overflow-hidden dark:bg-[#303035]"
         sx={{ border: 1, borderColor: "divider" }}
       >
-        <div className="bg-sky-500/20 dark:bg-blue-300/10 px-4 py-3 border-b-2 border-sky-700 dark:border-blue-300">
+        <div className="bg-primary-accent dark:bg-blue-300/10 px-4 py-3 border-b-2 border-sky-700 dark:border-blue-300">
           <Typography
             variant="h6"
             className="!font-bold !text-center !text-sky-700 dark:!text-blue-300"

@@ -57,6 +57,7 @@ body {
     --surface-elevated: #ffffff;
     --surface-modal: #ffffff;
     --button-primary-bg: #0069A8;
+    --primary-accent: rgba(0, 105, 168, 0.2);
     --button-primary-fg: #ffffff;
     --button-disabled-bg: rgba(0, 0, 0, 0.12);
     --button-disabled-fg: rgba(0, 0, 0, 0.26);
@@ -97,6 +98,7 @@ body {
     --surface-elevated: #323235;
     --surface-modal: #303035;
     --button-primary-bg: #93C5FD;
+    --button-primary-bg-transparent: rgba(147, 197, 253, 0.2);
     --button-primary-fg: #111827;
     --button-disabled-bg: #3F3F47;
     --button-disabled-fg: #71717A;

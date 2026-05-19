@@ -91,12 +91,13 @@ export function DishesView({
         : // Normal View: Render active station logic
           activeStation && (
             <div className="[&_#food-scroll]:h-auto [&_#food-scroll]:overflow-y-visible">
-              <div className="mb-4">
+              <div className="my-4">
                 <Typography
                   variant="h5"
                   fontWeight={700}
                   color="text.primary"
                   sx={{ fontSize: "1.875rem" }}
+                  className="w-full bg-primary-accent pl-4 py-2 rounded-xl text-sky-700 dark:text-black"
                 >
                   {toTitleCase(activeStation.name)}
                 </Typography>
