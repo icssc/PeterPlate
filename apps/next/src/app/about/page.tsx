@@ -31,7 +31,9 @@ export default function About() {
           <div className="flex gap-4 items-center mb-2" id="about-header">
             <h1 className="text-3xl font-bold" id="about-title">
               About{" "}
-              <span className="text-sky-700 dark:text-sky-400">PeterPlate</span>
+              <span className="text-sky-700 dark:text-blue-300">
+                PeterPlate
+              </span>
             </h1>
           </div>
           <div id="about-paragraph" className="grid gap-4 max-w-100">
@@ -45,7 +47,7 @@ export default function About() {
             <p>
               This project is proudly developed and maintained by&nbsp;
               <a
-                className="underline text-sky-600 dark:text-sky-400"
+                className="underline text-sky-600 dark:text-blue-300"
                 href="https://studentcouncil.ics.uci.edu/"
                 rel="noreferrer"
                 target="_blank"
@@ -90,7 +92,7 @@ export default function About() {
               Want to contribute? PeterPlate is open-source, and we welcome
               contributions on our&nbsp;
               <a
-                className="underline text-sky-600 dark:text-sky-400"
+                className="underline text-sky-600 dark:text-blue-300"
                 href="https://github.com/icssc/PeterPlate"
                 rel="noreferrer"
                 target="_blank"
@@ -99,7 +101,7 @@ export default function About() {
               </a>
               ! Have questions or ideas? Join the conversation on our&nbsp;
               <a
-                className="underline text-sky-600 dark:text-sky-400"
+                className="underline text-sky-600 dark:text-blue-300"
                 href="https://discord.gg/GzF76D7UhY"
                 rel="noreferrer"
                 target="_blank"
@@ -110,7 +112,7 @@ export default function About() {
             </p>
             <div className="flex align-items gap-4">
               <Button
-                className="bg-sky-700 dark:bg-sky-600 dark:hover:bg-sky-500 dark:text-white"
+                className="bg-sky-700 dark:bg-blue-300 dark:hover:bg-blue-400 dark:text-white"
                 onClick={() =>
                   window.open(
                     "https://github.com/icssc/PeterPlate/",
@@ -122,7 +124,7 @@ export default function About() {
                 <GitHub /> GitHub
               </Button>
               <Button
-                className="bg-sky-700 dark:bg-sky-600 dark:hover:bg-sky-500 dark:text-white"
+                className="bg-sky-700 dark:bg-blue-300 dark:hover:bg-blue-400 dark:text-white"
                 onClick={() =>
                   window.open(
                     "https://studentcouncil.ics.uci.edu/",
