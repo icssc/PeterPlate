@@ -105,90 +105,57 @@ self.addEventListener('fetch', (event) => {
   // POST/PUT/DELETE must always hit the network (mutations).
   if (request.method !== 'GET' || url.origin !== self.location.origin) return;
 
-  // ---- 1. NEVER CACHE — auth, tRPC, and user-specific API routes ----
-  // Caching auth responses risks serving stale session state or leaking
-  // one user's data to another on a shared device.
-  // All application data queries go through /api/trpc so we exclude the
-  // entire prefix; selective tRPC caching would require inspecting procedure
-  // names in the URL which is fragile.
-  // ---- 1. NEVER CACHE — auth + user (keep this) ----
-if (
-  url.pathname.startsWith('/api/auth') ||
-  url.pathname.startsWith('/api/user')
-) {
-  return;
-}
+  // ---- tRPC handling — fine-grained per-procedure caching ----
+  if (url.pathname.startsWith('/api/trpc')) {
+    const pathParam = url.searchParams.get('path');
+    const procedures = pathParam ? pathParam.split(',') : [];
 
-// ---- 2. tRPC handling (fine-grained instead of blanket exclusion) ----
-if (url.pathname.startsWith('/api/trpc')) {
-  const pathParam = url.searchParams.get('path');
-  const procedures = pathParam ? pathParam.split(',') : [];
+    const hasProc = (prefixes) =>
+      procedures.some((p) => prefixes.some((pref) => p.startsWith(pref)));
 
-  const hasProc = (prefixes) =>
-    procedures.some((p) => prefixes.some((pref) => p.startsWith(pref)));
+    // NEVER CACHE — mutations and all user-specific data.
+    // Caching these risks leaking one user's data to another on a shared device,
+    // or showing stale personal state after login/logout.
+    if (
+      request.method !== 'GET' ||
+      hasProc([
+        'user.',
+        'preference.',
+        'favorite.',
+        'allergy.',
+        'nutrition.',
+        'dish.rated',
+      ])
+    ) {
+      return;
+    }
 
-  // NEVER CACHE (auth-like or mutations)
-  if (
-    hasProc(['auth.', 'user.', 'preferences.', 'preference.', 'favorite.']) ||
-    request.method !== 'GET'
-  ) {
-    return;
-  }
+    // NETWORK FIRST — aggregate/public data that changes often.
+    // Fresh from network when online; cached fallback when offline.
+    if (
+      hasProc([
+        'dish.getAverageRating',
+        'event.',
+        'peterplate',
+        'pickableDates',
+        'peterplate_contributors',
+      ])
+    ) {
+      event.respondWith(
+        fetchAndCache(request, CACHE_NAME).catch(() => caches.match(request)),
+      );
+      return;
+    }
 
-  // CACHE FIRST (nutrition / ingredients)
-  if (hasProc(['nutrition.', 'ingredients.'])) {
+    // DEFAULT — unknown tRPC procedures (network-first with cache fallback).
     event.respondWith(
-      caches.match(request).then((cached) => {
-        if (cached && isCacheFresh(cached, CACHE_FIRST_MAX_AGE_SECONDS)) {
-          return cached;
-        }
-        return fetchAndCache(request, CACHE_NAME).catch(() => cached);
-      })
+      fetchAndCache(request, CACHE_NAME).catch(() => caches.match(request)),
     );
     return;
   }
 
-  // NETWORK FIRST (ratings / events / status)
-  if (hasProc(['ratings.', 'events.', 'status.'])) {
-    event.respondWith(
-      fetchAndCache(request, CACHE_NAME).catch(() =>
-        caches.match(request)
-      )
-    );
-    return;
-  }
-
-  // STALE-WHILE-REVALIDATE (restaurants / dishes)
-  if (hasProc(['restaurants.', 'dishes.'])) {
-    event.respondWith(
-      caches.open(CACHE_NAME).then((cache) =>
-        cache.match(request).then((cached) => {
-          const networkFetch = fetch(request)
-            .then((res) => {
-              if (res.ok) cache.put(request, res.clone()).catch(() => {});
-              return res;
-            })
-            .catch(() => null);
-
-          return cached || networkFetch;
-        })
-      )
-    );
-    return;
-  }
-
-  // DEFAULT fallback for unknown procedures
-  event.respondWith(
-    fetchAndCache(request, CACHE_NAME).catch(() =>
-      caches.match(request)
-    )
-  );
-  return;
-}
-
-  // ---- 2. CACHE FIRST — static assets (images, icons, fonts) ----
-  // These are content-addressed or versioned by filename so staleness is
-  // not a concern. Serve from cache instantly; populate cache on first miss.
+  // ---- CACHE FIRST — static assets (images, icons, fonts, CSS) ----
+  // Content-addressed or versioned by filename, so staleness is not a concern.
   if (
     url.pathname.startsWith('/_next/static/') ||
     url.pathname.startsWith('/icons/') ||
@@ -218,7 +185,7 @@ if (url.pathname.startsWith('/api/trpc')) {
     return;
   }
 
-  // ---- 7. DEFAULT — all other pages (network first + offline fallback) ----
+  // ---- DEFAULT — all other pages (network first + offline fallback) ----
   // Covers the home page, about, pwa-test, etc.
   // Cache a copy on each successful load so the page is available offline.
   event.respondWith(
