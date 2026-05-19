@@ -1,9 +1,10 @@
 "use client";
 
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import FavoriteBorder from "@mui/icons-material/FavoriteBorder";
+import FeedbackIcon from "@mui/icons-material/Feedback";
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
+import InfoIcon from "@mui/icons-material/Info";
 import InsertInvitation from "@mui/icons-material/InsertInvitation";
 import ListAltRoundedIcon from "@mui/icons-material/ListAltRounded";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -181,6 +182,102 @@ function ToolbarDropdown({
   );
 }
 
+function GuestToolbarMenu({
+  isTransparent,
+  disabled = false,
+  buttonClassName = "",
+}: {
+  isTransparent: boolean;
+  disabled?: boolean;
+  buttonClassName?: string;
+}) {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+
+  const handleOpen = (event: MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  return (
+    <>
+      <IconButton
+        type="button"
+        onClick={handleOpen}
+        disabled={disabled}
+        aria-label="Open menu"
+        className={`${
+          isTransparent ? "!text-white" : "!text-[#1f2937] dark:!text-white"
+        } ${buttonClassName}`}
+      >
+        <MenuIcon
+          sx={{
+            color: disabled
+              ? "action.disabled"
+              : isTransparent
+                ? "white"
+                : "text.primary",
+          }}
+        />
+      </IconButton>
+      <Menu
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "right",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "right",
+        }}
+        PaperProps={{
+          className:
+            "mt-1 w-[280px] rounded-xl border border-gray-200 bg-white shadow-xl dark:border-zinc-700 dark:bg-[#323235]",
+          sx: {
+            backgroundImage: "none",
+          },
+        }}
+        MenuListProps={{
+          className: "p-2",
+        }}
+      >
+        <MenuItem
+          component={Link}
+          href="/about"
+          onClick={handleClose}
+          className="!rounded-lg !px-3 !py-2"
+        >
+          <InfoIcon
+            fontSize="small"
+            className="mr-3 text-sky-700 dark:text-blue-300"
+          />
+          About PeterPlate
+        </MenuItem>
+        <MenuItem
+          component={Link}
+          href="/feedback"
+          onClick={handleClose}
+          className="!rounded-lg !px-3 !py-2"
+        >
+          <FeedbackIcon
+            fontSize="small"
+            className="mr-3 text-sky-700 dark:text-blue-300"
+          />
+          Feedback Form
+        </MenuItem>
+        <li className="mt-2 list-none border-t border-gray-200 p-2 dark:border-zinc-700">
+          <GoogleSignInButton />
+        </li>
+      </Menu>
+    </>
+  );
+}
+
 export function DesktopToolbar(): React.JSX.Element {
   const { resolvedTheme } = useTheme();
   const pathname = usePathname();
@@ -288,18 +385,7 @@ export function DesktopToolbar(): React.JSX.Element {
           <div className="flex-none flex items-center gap-4">
             <div className="flex-none flex items-center gap-4">
               {isPending ? (
-                <>
-                  <div className="w-24 h-5" />
-                  <IconButton
-                    className="!text-[#1f2937] hover:!bg-[rgba(0, 0, 0, 0.04)]"
-                    aria-label="Open sidebar"
-                    disabled
-                  >
-                    <MenuIcon
-                      sx={{ color: isTransparent ? "white" : "text.primary" }}
-                    />
-                  </IconButton>
-                </>
+                <GuestToolbarMenu {...{ isTransparent }} disabled />
               ) : user ? (
                 <IconButton
                   onClick={handleProfileOpen}
@@ -315,7 +401,7 @@ export function DesktopToolbar(): React.JSX.Element {
                   />
                 </IconButton>
               ) : (
-                <GoogleSignInButton />
+                <GuestToolbarMenu {...{ isTransparent }} />
               )}
             </div>
           </div>
@@ -479,14 +565,11 @@ function MobileToolbar(): React.JSX.Element {
         </span>
         <div className="flex-shrink-0 min-h-[44px] flex items-center justify-center gap-2">
           {!isMounted || isPending ? (
-            <IconButton
-              type="button"
-              className="!p-0 !min-w-[44px] !min-h-[44px]"
-              aria-label="Open profile menu"
+            <GuestToolbarMenu
+              {...{ isTransparent }}
               disabled
-            >
-              <AccountCircleIcon style={{ fontSize: 36, color: "#bdbdbd" }} />
-            </IconButton>
+              buttonClassName="!min-w-[44px] !min-h-[44px]"
+            />
           ) : user ? (
             <IconButton
               type="button"
@@ -503,7 +586,10 @@ function MobileToolbar(): React.JSX.Element {
               />
             </IconButton>
           ) : (
-            <GoogleSignInButton />
+            <GuestToolbarMenu
+              {...{ isTransparent }}
+              buttonClassName="!min-w-[44px] !min-h-[44px]"
+            />
           )}
         </div>
       </div>
