@@ -3,7 +3,7 @@
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { format, isSameDay, startOfDay } from "date-fns";
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import type { EventInfo } from "./card/event-card";
 import MobileListEventRow from "./mobile-list-event-row";
 
@@ -27,11 +27,20 @@ interface MonthGroup {
 }
 
 const MobileListView = ({
+  currentDate,
   filteredEvents,
   onOpenMonthPicker,
   onSelectEvent,
 }: MobileListViewProps) => {
   const monthRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  useEffect(() => {
+    const key = format(currentDate, "yyyy-MM");
+    monthRefs.current[key]?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }, [currentDate]);
 
   const monthGroups = useMemo<MonthGroup[]>(() => {
     const sorted = [...filteredEvents].sort(

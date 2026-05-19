@@ -22,6 +22,7 @@ interface MobileCalendarViewProps {
   filteredEvents: EventInfo[];
   onSelectEventDay: (date: Date, events: EventInfo[]) => void;
   onOpenMonthPicker: () => void;
+  availableMonths: { year: number; monthIndex: number }[];
 }
 
 const MobileCalendarView = ({
@@ -30,7 +31,31 @@ const MobileCalendarView = ({
   filteredEvents,
   onSelectEventDay,
   onOpenMonthPicker,
+  availableMonths,
 }: MobileCalendarViewProps) => {
+  const currentYear = currentDate.getFullYear();
+  const currentMonthIndex = currentDate.getMonth();
+  const firstMonth = availableMonths[0];
+  const lastMonth = availableMonths[availableMonths.length - 1];
+  const atFirstMonth =
+    !firstMonth ||
+    currentYear < firstMonth.year ||
+    (currentYear === firstMonth.year &&
+      currentMonthIndex <= firstMonth.monthIndex);
+  const atLastMonth =
+    !lastMonth ||
+    currentYear > lastMonth.year ||
+    (currentYear === lastMonth.year &&
+      currentMonthIndex >= lastMonth.monthIndex);
+
+  const goPrev = () => {
+    if (atFirstMonth) return;
+    onDateChange(subMonths(currentDate, 1));
+  };
+  const goNext = () => {
+    if (atLastMonth) return;
+    onDateChange(addMonths(currentDate, 1));
+  };
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
 
@@ -53,10 +78,10 @@ const MobileCalendarView = ({
     const isRightSwipe = distance < -minSwipeDistance;
 
     if (isLeftSwipe) {
-      onDateChange(addMonths(currentDate, 1));
+      goNext();
     }
     if (isRightSwipe) {
-      onDateChange(subMonths(currentDate, 1));
+      goPrev();
     }
   };
 
@@ -102,14 +127,20 @@ const MobileCalendarView = ({
           </button>
           <div className="flex items-center gap-5">
             <ArrowBackIosIcon
-              className="cursor-pointer text-slate-500 dark:text-zinc-400"
+              className={`text-slate-500 dark:text-zinc-400 ${
+                atFirstMonth
+                  ? "opacity-30 cursor-not-allowed"
+                  : "cursor-pointer"
+              }`}
               fontSize="small"
-              onClick={() => onDateChange(subMonths(currentDate, 1))}
+              onClick={goPrev}
             />
             <ArrowForwardIosIcon
-              className="cursor-pointer text-slate-500 dark:text-zinc-400"
+              className={`text-slate-500 dark:text-zinc-400 ${
+                atLastMonth ? "opacity-30 cursor-not-allowed" : "cursor-pointer"
+              }`}
               fontSize="small"
-              onClick={() => onDateChange(addMonths(currentDate, 1))}
+              onClick={goNext}
             />
           </div>
         </div>

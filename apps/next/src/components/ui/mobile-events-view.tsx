@@ -130,6 +130,7 @@ const MobileEventsView = ({
             currentDate={currentDate}
             onDateChange={setCurrentDate}
             filteredEvents={filteredEvents}
+            availableMonths={availableMonths}
             onSelectEventDay={(_date, eventsForDay) => {
               if (eventsForDay.length > 0) {
                 const now = new Date();
