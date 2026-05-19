@@ -11,7 +11,6 @@ import {
 import type { DishWithRating } from "@peterplate/validators";
 import { useTheme } from "next-themes";
 import { useMemo, useState } from "react";
-import PushSubscriptionButton from "@/components/PushSubscriptionButton";
 import MyFoodsCard from "@/components/ui/card/my-foods-card";
 import FoodCardSkeleton from "@/components/ui/skeleton/food-card-skeleton";
 import { useUserStore } from "@/context/useUserStore";
@@ -156,7 +155,6 @@ export default function MyFoodsPage() {
       <header className="space-y-1">
         <Typography color="primary" fontWeight={700} className="text-4xl mb-4">
           My Foods
-          <PushSubscriptionButton />
         </Typography>
         <Typography
           variant="body2"
