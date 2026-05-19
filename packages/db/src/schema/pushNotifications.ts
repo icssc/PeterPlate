@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { pgTable, text } from "drizzle-orm/pg-core";
+import { boolean, pgTable, text } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { users } from "./users";
 
@@ -13,6 +13,10 @@ export const pushSubscriptions = pgTable("push_subscriptions", {
   endpoint: text("endpoint").notNull().unique(),
   p256dh: text("p256dh").notNull(),
   auth: text("auth").notNull(),
+  isSubscribedFoodFavorites: boolean("is_subscribed_food_favorites")
+    .notNull()
+    .default(false),
+  isSubscribedEvents: boolean("is_subscribed_events").notNull().default(false),
 });
 
 export const pushSubscriptionsRelations = relations(

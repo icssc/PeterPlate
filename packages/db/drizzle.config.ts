@@ -25,6 +25,7 @@ export default defineConfig({
     "./src/schema/pushNotifications.ts",
     "./src/schema/ratings.ts",
     "./src/schema/restaurants.ts",
+    "./src/schema/savedNotifications.ts",
     "./src/schema/stations.ts",
     "./src/schema/users.ts",
     "./src/schema/auth-schema.ts",

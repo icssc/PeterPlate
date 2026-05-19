@@ -8,6 +8,7 @@ export * from "./loggedMeals";
 export * from "./pushNotifications";
 export * from "./pushTokens";
 export * from "./ratings";
+export * from "./savedNotifications";
 export * from "./userAllergies";
 export * from "./userDietaryPreferences";
 export * from "./userGoals";
