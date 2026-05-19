@@ -7,13 +7,33 @@ import {
 } from "@mui/icons-material";
 import { Box, Switch, Typography } from "@mui/material";
 import { useState } from "react";
+import { useSession } from "@/utils/auth-client";
+import { trpc } from "@/utils/trpc";
 
 export default function NotificationsPanel({ onBack }: { onBack: () => void }) {
-  // TODO: Add userId prop when wiring to DB
-  // TODO: Replace with trpc.notification.getSavedNotifications.useQuery({ userId })
-  // TODO: Replace with trpc.notification.getSubscription.useQuery({ userId }) for toggle initial values
-  const [dishNotifs, setDishNotifs] = useState(false);
-  const [eventNotifs, setEventNotifs] = useState(false);
+  const { data: session } = useSession();
+  const userId = session?.user?.id ?? "";
+
+  const { data: notifications } =
+    trpc.notification.getSavedNotifications.useQuery(
+      { userId },
+      { enabled: !!userId },
+    );
+
+  const { data: subscription } = trpc.notification.getSubscription.useQuery(
+    { userId },
+    { enabled: !!userId },
+  );
+
+  const updateSubscriptionMutation =
+    trpc.notification.updateSubscription.useMutation();
+
+  const [dishNotifs, setDishNotifs] = useState(
+    subscription?.isSubscribedFoodFavorites ?? false,
+  );
+  const [eventNotifs, setEventNotifs] = useState(
+    subscription?.isSubscribedEvents ?? false,
+  );
 
   return (
     <Box
@@ -37,12 +57,11 @@ export default function NotificationsPanel({ onBack }: { onBack: () => void }) {
             <Typography variant="body1" fontWeight={600} color="text.primary">
               Notifications
             </Typography>
-            {/* TODO: Replace 0 with unreadCount from query */}
             <Typography
               variant="caption"
               className="text-zinc-500 dark:text-zinc-400"
             >
-              0 Unread
+              {notifications?.filter((n) => !n.isRead).length ?? 0} Unread
             </Typography>
           </div>
         </div>
@@ -55,69 +74,56 @@ export default function NotificationsPanel({ onBack }: { onBack: () => void }) {
         </button>
       </div>
 
-      {/* Placeholder list — replace with real data from saved_notifications table */}
-      {/* Each item: { id, message, createdAt, isRead, type } */}
-      {/* On click: trpc.notification.markAsRead.mutate({ id }) */}
+      {/* Notification list from saved_notifications table */}
       <div className="flex-1 overflow-y-auto divide-y divide-gray-200 dark:divide-gray-700">
-        {[
-          {
-            id: "1",
-            text: "Chicken Teriyaki is being served in Brandywine today at Lunch!",
-            date: "Today",
-            unread: true,
-          },
-          {
-            id: "2",
-            text: "Chicken Teriyaki is being served in Brandywine today at Lunch!",
-            date: "Thursday",
-            unread: true,
-          },
-          {
-            id: "3",
-            text: "Friendsgiving is happening in Anteatery today from 11:00 AM - 3:00 PM!",
-            date: "January 30",
-            unread: true,
-          },
-          {
-            id: "4",
-            text: "Chicken Teriyaki is being served in Brandywine today at Lunch!",
-            date: "January 14",
-            unread: false,
-          },
-          {
-            id: "5",
-            text: "Chicken Teriyaki is being served in Brandywine today at Lunch!",
-            date: "January 10",
-            unread: false,
-          },
-        ].map((n) => (
-          <div key={n.id} className="flex items-start gap-3 px-5 py-3">
-            <div
-              className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${n.unread ? "bg-red-500" : "bg-transparent"}`}
-            />
-            <Typography variant="body2" color="text.primary" className="flex-1">
-              {n.text}
-            </Typography>
+        {notifications?.length ? (
+          notifications.map((n) => (
+            <div key={n.id} className="flex items-start gap-3 px-5 py-3">
+              <div
+                className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${!n.isRead ? "bg-red-500" : "bg-transparent"}`}
+              />
+              <Typography
+                variant="body2"
+                color="text.primary"
+                className="flex-1"
+              >
+                {n.message}
+              </Typography>
+              <Typography
+                variant="caption"
+                className="shrink-0 ml-2 text-zinc-500 dark:text-zinc-400"
+              >
+                {new Date(n.createdAt).toLocaleDateString()}
+              </Typography>
+            </div>
+          ))
+        ) : (
+          <div className="px-5 py-4">
             <Typography
               variant="caption"
-              className="shrink-0 ml-2 text-zinc-500 dark:text-zinc-400"
+              className="text-zinc-500 dark:text-zinc-400"
             >
-              {n.date}
+              No notifications yet.
             </Typography>
           </div>
-        ))}
+        )}
       </div>
 
-      {/* Toggles — wire to push_subscriptions.isSubscribedFoodFavorites / isSubscribedEvents */}
+      {/* Toggles — wired to push_subscriptions.isSubscribedFoodFavorites / isSubscribedEvents */}
       <div className="px-5 pb-5 pt-3 space-y-1 border-t border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
           <Typography variant="body2" fontWeight={600} color="text.primary">
             Dish Notifications
           </Typography>
-          {/* TODO: trpc.notification.updateSubscription.mutate({ userId, isSubscribedFoodFavorites }) */}
           <Switch
             checked={dishNotifs}
-            onChange={(e) => setDishNotifs(e.target.checked)}
+            onChange={(e) => {
+              setDishNotifs(e.target.checked);
+              updateSubscriptionMutation.mutate({
+                userId,
+                isSubscribedFoodFavorites: e.target.checked,
+              });
+            }}
             size="small"
           />
         </div>
@@ -125,10 +131,15 @@ export default function NotificationsPanel({ onBack }: { onBack: () => void }) {
           <Typography variant="body2" fontWeight={600} color="text.primary">
             Event Notifications
           </Typography>
-          {/* TODO: trpc.notification.updateSubscription.mutate({ userId, isSubscribedEvents }) */}
           <Switch
             checked={eventNotifs}
-            onChange={(e) => setEventNotifs(e.target.checked)}
+            onChange={(e) => {
+              setEventNotifs(e.target.checked);
+              updateSubscriptionMutation.mutate({
+                userId,
+                isSubscribedEvents: e.target.checked,
+              });
+            }}
             size="small"
           />
         </div>

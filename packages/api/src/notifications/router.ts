@@ -7,7 +7,13 @@ import {
 import { TRPCError } from "@trpc/server";
 import { Expo } from "expo-server-sdk";
 import { z } from "zod";
-import { getSubscription, subscribeUser, unsubscribeUser } from "./services";
+import {
+  getSavedNotifications,
+  getSubscription,
+  subscribeUser,
+  unsubscribeUser,
+  updateSubscription,
+} from "./services";
 
 const registerPushToken = publicProcedure
   .input(PushTokenSchema)
@@ -45,5 +51,26 @@ export const notificationRouter = createTRPCRouter({
     .input(z.object({ userId: z.string() }))
     .query(async ({ ctx: { db }, input }) => {
       return await getSubscription(db, input.userId);
+    }),
+
+  // Update food/event subscription toggles.
+  updateSubscription: publicProcedure
+    .input(
+      z.object({
+        userId: z.string(),
+        isSubscribedFoodFavorites: z.boolean().optional(),
+        isSubscribedEvents: z.boolean().optional(),
+      }),
+    )
+    .mutation(async ({ ctx: { db }, input }) => {
+      const { userId, ...data } = input;
+      await updateSubscription(db, userId, data);
+    }),
+
+  // Get saved notifications for a user.
+  getSavedNotifications: publicProcedure
+    .input(z.object({ userId: z.string() }))
+    .query(async ({ ctx: { db }, input }) => {
+      return await getSavedNotifications(db, input.userId);
     }),
 });

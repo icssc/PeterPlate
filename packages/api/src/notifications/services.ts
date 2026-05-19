@@ -1,5 +1,9 @@
 import type { Drizzle, InsertPushSubscription } from "@peterplate/db";
-import { pushSubscriptions, pushTokens } from "@peterplate/db";
+import {
+  pushSubscriptions,
+  pushTokens,
+  savedNotifications,
+} from "@peterplate/db";
 import { eq } from "drizzle-orm";
 import type {
   ExpoPushErrorReceipt,
@@ -171,4 +175,23 @@ export async function getSubscription(db: Drizzle, userId: string) {
     .from(pushSubscriptions)
     .where(eq(pushSubscriptions.userId, userId));
   return result[0] ?? null;
+}
+
+export async function updateSubscription(
+  db: Drizzle,
+  userId: string,
+  data: { isSubscribedFoodFavorites?: boolean; isSubscribedEvents?: boolean },
+): Promise<void> {
+  await db
+    .update(pushSubscriptions)
+    .set(data)
+    .where(eq(pushSubscriptions.userId, userId));
+}
+
+export async function getSavedNotifications(db: Drizzle, userId: string) {
+  return await db
+    .select()
+    .from(savedNotifications)
+    .where(eq(savedNotifications.userId, userId))
+    .orderBy(savedNotifications.createdAt);
 }
