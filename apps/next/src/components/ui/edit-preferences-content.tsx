@@ -168,11 +168,15 @@ export default function EditPreferencesContent({
       ]);
 
       posthog.capture("preferences_updated", {
-        allergies: [...formData.allergies, ...customAllergies],
+        // allergies: [...formData.allergies, ...customAllergies],
+        // preferences: formData.preferences,
+        // allergies_count: formData.allergies.length + customAllergies.length,
+        // preferences_count: formData.preferences.length,
+        // custom_allergies_count: customAllergies.length,
+        allergies: formData.allergies,
         preferences: formData.preferences,
-        allergies_count: formData.allergies.length + customAllergies.length,
+        allergies_count: formData.allergies.length,
         preferences_count: formData.preferences.length,
-        custom_allergies_count: customAllergies.length,
       });
 
       if (onSaved) {
