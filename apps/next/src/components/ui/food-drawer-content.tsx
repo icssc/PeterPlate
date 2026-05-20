@@ -2,10 +2,12 @@
 
 import { Add } from "@mui/icons-material";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
-import { Box, Button } from "@mui/material";
-import type { DishInfo } from "@peterplate/api";
+import { Box, Button, Typography } from "@mui/material";
+import type { RestaurantId } from "@peterplate/db";
+import type { DishWithRating } from "@peterplate/validators";
 import Image from "next/image";
 import { useState } from "react";
+import { useDietaryConflicts } from "@/hooks/useDietaryConflicts";
 import {
   enhanceDescription,
   formatFoodName,
@@ -18,33 +20,31 @@ import { nutrientToUnit } from "@/utils/types";
 import IngredientsDialog from "../ingredients-dialog";
 import { AllergenBadge } from "./allergen-badge";
 import type { OnAddToMealTracker } from "./card/food-card";
-import InteractiveStarRating from "./rating";
+import Rating from "./rating";
 
 export default function FoodDrawerContent({
   dish,
+  restaurant,
   onAddToMealTracker,
   isAddingToMealTracker = false,
-  doesNotMeetPreferences,
-  violations,
 }: {
-  dish: DishInfo;
+  dish: DishWithRating;
+  restaurant?: RestaurantId;
   onAddToMealTracker?: OnAddToMealTracker;
   isAddingToMealTracker?: boolean;
-  doesNotMeetPreferences: boolean;
-  violations: string[];
 }) {
+  const violations = useDietaryConflicts(dish.dietRestriction);
   const [imageError, setImageError] = useState(false);
   const showImage =
-    typeof dish.image_url === "string" &&
-    dish.image_url.trim() !== "" &&
+    typeof dish.imageUrl === "string" &&
+    dish.imageUrl.trim() !== "" &&
     !imageError;
 
   const ingredientsAvailable: boolean =
     dish.ingredients != null && dish.ingredients.length > 0;
 
   const caloricInformationAvailable: boolean =
-    dish.nutritionInfo.calories != null &&
-    dish.nutritionInfo.calories.length > 0;
+    dish.nutritionInfo.calories != null;
 
   // State to control nutrient visibility
   const [showAllNutrients, setShowAllNutrients] = useState(false);
@@ -65,11 +65,11 @@ export default function FoodDrawerContent({
   ]);
 
   return (
-    <Box className="h-full max-h-[85vh] flex flex-col font-poppins min-h-0">
+    <Box className="h-full max-h-[85vh] flex flex-col font-poppins min-h-0 dark:bg-[#303035]">
       <Box className="pb-4 shrink-0">
         {showImage ? (
           <Image
-            src={dish.image_url as string}
+            src={dish.imageUrl as string}
             alt={formatFoodName(dish.name)}
             width={800}
             height={128}
@@ -87,24 +87,25 @@ export default function FoodDrawerContent({
         )}
         <Box className="px-4 pt-4 flex flex-col gap-2">
           <div className="flex items-center justify-between">
-            <h2
+            <Typography
+              fontWeight={700}
+              color="primary"
               className={cn(
-                "text-3xl font-bold leading-tight tracking-normal",
-                "text-sky-700 dark:text-sky-600",
+                "text-3xl leading-tight tracking-normal",
                 dish.name.length > 10 && "text-2xl",
                 dish.name.length > 30 && "text-md",
               )}
             >
               {formatFoodName(dish.name)}
-            </h2>
+            </Typography>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 text-zinc-500">
+          <div className="flex flex-wrap items-center gap-2 text-zinc-500 dark:text-zinc-400">
             <span className="whitespace-nowrap">
-              {toTitleCase(dish.restaurant)} •{" "}
+              {restaurant ? `${toTitleCase(restaurant)} • ` : ""}
               {!caloricInformationAvailable
                 ? "-"
-                : `${Math.round(parseFloat(dish.nutritionInfo.calories ?? "0"))} cal`}
+                : `${Math.round(dish.nutritionInfo.calories ?? 0)} cal`}
             </span>
             <div className="flex items-center gap-2 flex-wrap">
               {dish.dietRestriction.isVegetarian && (
@@ -119,7 +120,7 @@ export default function FoodDrawerContent({
               {dish.dietRestriction.isKosher && (
                 <AllergenBadge variant={"kosher"} />
               )}
-              {doesNotMeetPreferences &&
+              {violations &&
                 violations.length > 0 &&
                 violations.map((v) => (
                   <AllergenBadge
@@ -137,21 +138,30 @@ export default function FoodDrawerContent({
           </div>
 
           {/* Interactive rating stars */}
-          <div className="flex gap-2 pt-0.5">
-            <InteractiveStarRating dishId={dish.id} />
-          </div>
+          {restaurant && (
+            <div className="flex gap-2 pt-0.5">
+              <Rating dishId={dish.id} restaurant={restaurant} />
+            </div>
+          )}
 
-          <p className="text-black leading-relaxed">
+          <Typography color="text.primary" className="leading-relaxed">
             {enhanceDescription(dish.name, dish.description)}
-          </p>
+          </Typography>
         </Box>
       </Box>
 
       <Box className="flex-1 min-h-0 overflow-y-auto flex flex-col px-4">
-        <h1 className="text-2xl text-left font-bold mb-2">Nutrients</h1>
-        <div
-          className="grid grid-cols-2 gap-x-4 w-full px-2 text-black mb-4 auto-rows-max"
+        <Typography
+          fontWeight={700}
+          color="text.primary"
+          className="text-2xl mb-2"
+        >
+          Nutrients
+        </Typography>
+        <Box
+          className="grid grid-cols-2 gap-x-4 w-full px-2 mb-4 auto-rows-max"
           id="nutrient-content"
+          sx={{ color: "text.primary" }}
         >
           {caloricInformationAvailable &&
             Object.keys(dish.nutritionInfo)
@@ -160,7 +170,10 @@ export default function FoodDrawerContent({
                 // Assert that 'nutrient' is a valid key of nutritionInfo
                 const nutrientKey = nutrient as keyof typeof dish.nutritionInfo;
                 const value = dish.nutritionInfo[nutrientKey]; // Now correctly typed
-                const formattedValue = formatNutrientValue(nutrientKey, value);
+                const formattedValue = formatNutrientValue(
+                  nutrientKey,
+                  value?.toString() ?? "",
+                );
                 const isInitial = initialNutrients.includes(nutrientKey); // Use nutrientKey here too for consistency
                 return (
                   <div
@@ -177,7 +190,7 @@ export default function FoodDrawerContent({
                         "col-span-1 text-left",
                         (nutrientKey === "transFatG" ||
                           nutrientKey === "saturatedFatG") &&
-                          "text-gray-500 pl-4",
+                          "text-gray-500 dark:text-zinc-400 pl-4",
                       )}
                     >
                       {formatNutrientLabel(nutrientKey)}
@@ -187,7 +200,7 @@ export default function FoodDrawerContent({
                         "col-span-1 text-right",
                         (nutrientKey === "transFatG" ||
                           nutrientKey === "saturatedFatG") &&
-                          "text-gray-500",
+                          "text-gray-500 dark:text-zinc-400",
                       )}
                     >
                       {value == null
@@ -197,7 +210,7 @@ export default function FoodDrawerContent({
                   </div>
                 );
               })}
-        </div>
+        </Box>
         {!caloricInformationAvailable && (
           <h2 className="text-center w-full text-sm text-zinc-600">
             Nutritional information not available.
@@ -247,7 +260,7 @@ export default function FoodDrawerContent({
             type="button"
             onClick={onAddToMealTracker}
             disabled={isAddingToMealTracker}
-            className="w-full inline-flex h-[30px] justify-center items-center gap-0.5 rounded-md border border-gray-300 bg-white text-[12px] font-normal leading-[18px] text-zinc-500 hover:bg-zinc-50 disabled:opacity-60"
+            className="w-full inline-flex h-[30px] justify-center items-center gap-0.5 rounded-md border border-gray-300 dark:border-zinc-600 bg-white dark:bg-transparent text-[12px] font-normal leading-[18px] text-zinc-500 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700 disabled:opacity-60"
             style={{ fontFamily: "Poppins, sans-serif" }}
           >
             <Add sx={{ fontSize: 18, width: 18, height: 18 }} />

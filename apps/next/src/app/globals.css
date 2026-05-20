@@ -50,33 +50,47 @@ body {
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
+    --donut-inner: white;
+    --donut-outer: white;
+    --donut-track: #ffffff;
+    --donut-progress: #0084D1;
+    --donut-calories-value: #0369a1;
+    --donut-calories-track: #0084D1;
+    --donut-calories-progress: #00BCFF;
   }
 
   .dark {
-    --background: 240 10% 3.9%;
+    --background: 240 4% 16%;
     --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
+    --card: 240 6% 26%;
+    --card-foreground: 0 0% 100%;
+    --popover: 240 6% 26%;
     --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
+    --primary: 211 100% 78%;
     --primary-foreground: 240 5.9% 10%;
     --secondary: 240 3.7% 15.9%;
     --secondary-foreground: 0 0% 98%;
     --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
+    --muted-foreground: 240 5.5% 64.3%;
     --accent: 240 3.7% 15.9%;
     --accent-foreground: 0 0% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
+    --border: 240 5.9% 26.3%;
+    --input: 240 5.9% 26.3%;
+    --ring: 211 100% 78%;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+    --donut-inner: #27272A;
+    --donut-outer: #31373F;
+    --donut-track: #27272A;
+    --donut-progress: var(--mui-palette-primary-main);
+    --donut-calories-value: #7CB9FF;
+    --donut-calories-track: #74D4FF;
+    --donut-calories-progress: #20336C;
   }
 }
 
@@ -99,3 +113,83 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* Calendar event colors */
+.dark .events-calendar-wrapper .rbc-event {
+  background-color: #93c5fd !important;
+  color: #111827 !important;
+}
+
+.dark .events-calendar-wrapper .rbc-off-range-bg {
+  background-color: #303035 !important;
+}
+
+/* Light mode calendar borders */
+.events-calendar-wrapper .rbc-month-view,
+.events-calendar-wrapper .rbc-day-bg + .rbc-day-bg,
+.events-calendar-wrapper .rbc-month-row + .rbc-month-row,
+.events-calendar-wrapper .rbc-header {
+  border-color: #0369a1 !important;
+}
+
+/* Dark mode calendar borders */
+.dark .events-calendar-wrapper .rbc-month-view,
+.dark .events-calendar-wrapper .rbc-day-bg + .rbc-day-bg,
+.dark .events-calendar-wrapper .rbc-month-row + .rbc-month-row,
+.dark .events-calendar-wrapper .rbc-header {
+  border-color: #93c5fd !important;
+}
+
+/* Today's date highlight */
+.events-calendar-wrapper .rbc-today {
+  background-color: #cce1ee !important;
+}
+
+.dark .events-calendar-wrapper .rbc-day-bg.rbc-today {
+  background-color: #434e5d !important;
+}
+
+/* Date picker light mode */
+.MuiPickersDay-root {
+  color: #111827 !important;
+}
+.MuiPickersDay-root.Mui-selected {
+  background-color: #0369a1 !important;
+  color: white !important;
+}
+.MuiDayCalendar-weekDayLabel {
+  color: #111827 !important;
+}
+.MuiPickersCalendarHeader-label {
+  color: #111827 !important;
+}
+.MuiPickersArrowSwitcher-button {
+  color: #111827 !important;
+}
+
+/* Date picker dark mode */
+.dark .MuiPickersDay-root {
+  color: white !important;
+}
+.dark .MuiPickersDay-root.Mui-selected {
+  background-color: #93C5FD !important;
+  color: #111827 !important;
+}
+.dark .MuiPickersDay-today {
+  border-color: #93C5FD !important;
+}
+.dark .MuiDayCalendar-weekDayLabel {
+  color: white !important;
+}
+.dark .MuiPickersCalendarHeader-label {
+  color: white !important;
+}
+.dark .MuiPickersArrowSwitcher-button {
+  color: white !important;
+}
+/* Date picker dialog dark mode (mobile) */
+.dark .MuiDialog-paper {
+  background-color: #323235 !important;
+  background-image: none !important;
+}
+

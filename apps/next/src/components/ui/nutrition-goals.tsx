@@ -82,7 +82,7 @@ export default function NutritionGoals({ userId, date }: Props) {
 
   const inputs = (
     <>
-      <label className="flex items-center justify-between gap-4 text-sm font-medium text-zinc-900">
+      <label className="flex items-center justify-between gap-4 text-sm font-medium text-zinc-900 dark:text-white">
         Calorie Goal
         <input
           type="number"
@@ -107,10 +107,10 @@ export default function NutritionGoals({ userId, date }: Props) {
           onKeyDown={(e) => {
             if (e.key === "Enter") e.currentTarget.blur();
           }}
-          className="w-24 border-b border-sky-400 bg-sky-100 rounded px-2 py-1 text-sm"
+          className="w-24 border-b border-sky-400 bg-sky-100 dark:border-blue-300 dark:bg-[#8EC5FF33] dark:text-white rounded px-2 py-1 text-sm"
         />
       </label>
-      <label className="flex items-center justify-between gap-4 text-sm font-medium text-zinc-900">
+      <label className="flex items-center justify-between gap-4 text-sm font-medium text-zinc-900 dark:text-white">
         Protein Goal
         <input
           type="number"
@@ -135,10 +135,10 @@ export default function NutritionGoals({ userId, date }: Props) {
           onKeyDown={(e) => {
             if (e.key === "Enter") e.currentTarget.blur();
           }}
-          className="w-24 border-b border-sky-400 bg-sky-100 rounded px-2 py-1 text-sm"
+          className="w-24 border-b border-sky-400 bg-sky-100 dark:border-blue-300 dark:bg-[#8EC5FF33] dark:text-white rounded px-2 py-1 text-sm"
         />
       </label>
-      <label className="flex items-center justify-between gap-4 text-sm font-medium text-zinc-900">
+      <label className="flex items-center justify-between gap-4 text-sm font-medium text-zinc-900 dark:text-white">
         Carb Goal
         <input
           type="number"
@@ -163,10 +163,10 @@ export default function NutritionGoals({ userId, date }: Props) {
           onKeyDown={(e) => {
             if (e.key === "Enter") e.currentTarget.blur();
           }}
-          className="w-24 border-b border-sky-400 bg-sky-100 rounded px-2 py-1 text-sm"
+          className="w-24 border-b border-sky-400 bg-sky-100 dark:border-blue-300 dark:bg-[#8EC5FF33] dark:text-white rounded px-2 py-1 text-sm"
         />
       </label>
-      <label className="flex items-center justify-between gap-4 text-sm font-medium text-zinc-900">
+      <label className="flex items-center justify-between gap-4 text-sm font-medium text-zinc-900 dark:text-white">
         Fat Goal
         <input
           type="number"
@@ -191,7 +191,7 @@ export default function NutritionGoals({ userId, date }: Props) {
           onKeyDown={(e) => {
             if (e.key === "Enter") e.currentTarget.blur();
           }}
-          className="w-24 border-b border-sky-400 bg-sky-100 rounded px-2 py-1 text-sm"
+          className="w-24 border-b border-sky-400 bg-sky-100 dark:border-blue-300 dark:bg-[#8EC5FF33] dark:text-white rounded px-2 py-1 text-sm"
         />
       </label>
     </>
@@ -202,18 +202,28 @@ export default function NutritionGoals({ userId, date }: Props) {
       <Button
         onClick={() => setOpen(!open)}
         variant="contained"
-        className="!bg-sky-700 !text-white hover:!bg-sky-800 !rounded-lg !min-w-0 !p-1 md:!p-2"
+        className="!bg-sky-700 !text-white hover:!bg-sky-800 !rounded-lg !min-w-0 !p-1 md:!p-2 dark:!bg-blue-300 dark:!text-gray-900 dark:hover:!bg-blue-400"
       >
         <EditIcon />
       </Button>
 
       {isMobile ? (
-        <Drawer anchor="bottom" open={open} onClose={() => setOpen(false)}>
+        <Drawer
+          anchor="bottom"
+          open={open}
+          onClose={() => setOpen(false)}
+          sx={{
+            ".dark & .MuiDrawer-paper": {
+              backgroundImage: "none",
+              backgroundColor: "#323235",
+            },
+          }}
+        >
           <div className="p-6 flex flex-col gap-4">{inputs}</div>
         </Drawer>
       ) : (
         open && (
-          <div className="absolute top-0 right-full mr-2 z-50 bg-white rounded-xl border border-sky-700/30 p-6 flex flex-col gap-4 shadow-md w-72">
+          <div className="absolute top-0 right-full mr-2 z-50 bg-white dark:bg-[#323235] rounded-xl border border-sky-700/30 dark:border-blue-300/50 p-6 flex flex-col gap-4 shadow-md w-72">
             {inputs}
           </div>
         )

@@ -6,28 +6,32 @@ import {
   Delete,
   Restaurant,
 } from "@mui/icons-material";
-import { Card, CardContent, Dialog, Drawer } from "@mui/material";
+import { Card, CardContent, Dialog, Drawer, Typography } from "@mui/material";
 import type { SelectLoggedMeal } from "@peterplate/db";
 import Image from "next/image";
 import React from "react";
 import FoodDialogContent from "@/components/ui/food-dialog-content";
 import FoodDrawerContent from "@/components/ui/food-drawer-content";
-import { useDate } from "@/context/date-context";
-import { useHallStore } from "@/context/useHallStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { getFoodIcon } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
 import { cn } from "@/utils/tw";
 
 type LoggedMealJoinedWithNutrition = SelectLoggedMeal & {
+  dishName?: string;
   calories: number;
   protein: number;
   carbs: number;
   fat: number;
 };
 
-interface Props {
+interface TrackedMealCardProps {
   meal: LoggedMealJoinedWithNutrition;
+  dish?: {
+    id: string;
+    name: string;
+    imageUrl?: string | null;
+  };
   isUnavailable?: boolean;
 }
 
@@ -77,9 +81,11 @@ const TrackedMealCardContent = React.forwardRef<
         <Card
           className={cn(
             "cursor-pointer transition w-full border",
-            isUnavailable ? "bg-zinc-200/90" : "bg-white hover:shadow-lg",
+            isUnavailable
+              ? "bg-zinc-200/90 dark:bg-zinc-700"
+              : "bg-white dark:bg-[#303035] hover:shadow-lg",
           )}
-          sx={{ borderRadius: "12px" }}
+          sx={{ borderRadius: "12px", backgroundImage: "none" }}
         >
           <CardContent sx={{ padding: "0 !important" }}>
             <div className="h-auto p-3 md:h-40 md:p-4 flex justify-between gap-3 text-left">
@@ -95,16 +101,20 @@ const TrackedMealCardContent = React.forwardRef<
                       onError={() => setImageError(true)}
                     />
                   ) : (
-                    <IconComponent className="w-12 h-12 text-slate-700 flex-shrink-0" />
+                    <IconComponent className="w-12 h-12 text-slate-700 dark:text-blue-300 flex-shrink-0" />
                   )}
 
                   <div className="min-w-0">
-                    <h3 className="text-sky-700 font-semibold text-lg truncate">
+                    <Typography
+                      color="primary"
+                      fontWeight={600}
+                      className="text-lg truncate"
+                    >
                       {meal.dishName}
-                    </h3>
+                    </Typography>
 
                     {/* Edit Servings/Bowls */}
-                    <div className="flex items-center gap-2 text-xs text-zinc-500">
+                    <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-white">
                       <div className="inline-flex items-stretch rounded-md bg-sky-100 ring-1 ring-sky-200">
                         <div className="w-8 px-2 py-1 text-slate-900 tabular-nums leading-none flex items-center justify-center">
                           {servingsDraft}
@@ -159,7 +169,7 @@ const TrackedMealCardContent = React.forwardRef<
                   </div>
                 </div>
 
-                <div className="flex gap-4 text-sm text-zinc-600">
+                <div className="flex gap-4 text-sm text-zinc-600 dark:text-zinc-400">
                   <span>{Math.round(meal.calories * servingsDraft)} cal</span>
                   <span>
                     {Math.round(meal.protein * servingsDraft)}g protein
@@ -194,34 +204,21 @@ TrackedMealCardContent.displayName = "TrackedMealCardContent";
 
 export default function TrackedMealCard({
   meal,
+  dish: previewDish,
   isUnavailable = false,
-}: Props) {
+}: TrackedMealCardProps) {
   /* Handle Display Food Card Info */
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const { selectedDate } = useDate();
-  const today = useHallStore((s) => s.today);
-
-  const { data, isLoading } = trpc.peterplate.useQuery(
-    { date: selectedDate ?? today },
+  const { data: dishResults, isLoading } = trpc.dish.get.useQuery(
+    { ids: [meal.dishId] },
     { enabled: open },
   );
-
-  const dish = React.useMemo(() => {
-    const halls = [data?.anteatery, data?.brandywine].filter(Boolean);
-    for (const hall of halls) {
-      for (const menu of hall?.menus ?? []) {
-        for (const station of menu.stations ?? []) {
-          const found = station.dishes?.find((d) => d.id === meal.dishId);
-          if (found) return found;
-        }
-      }
-    }
-    return undefined;
-  }, [data, meal.dishId]);
+  const fullDish = dishResults?.[0];
+  const displayDish = fullDish ?? previewDish;
 
   const utils = trpc.useUtils();
 
@@ -232,12 +229,31 @@ export default function TrackedMealCard({
   }, [meal.servings]);
 
   const updateServings = trpc.nutrition.updateLoggedMeal.useMutation({
-    onSuccess: async () => {
-      await utils.nutrition.invalidate();
+    onMutate: async ({ id, servings }) => {
+      await utils.nutrition.getMealsInLastWeek.cancel({ userId: meal.userId });
+      const prev = utils.nutrition.getMealsInLastWeek.getData({
+        userId: meal.userId,
+      });
+      utils.nutrition.getMealsInLastWeek.setData(
+        { userId: meal.userId },
+        (old) => old?.map((m) => (m.id === id ? { ...m, servings } : m)) ?? old,
+      );
+      return { prev };
     },
-    onError: (err) => {
+    onError: (err, _vars, ctx) => {
       console.error(err.message);
       setServingsDraft(meal.servings);
+      if (ctx?.prev !== undefined) {
+        utils.nutrition.getMealsInLastWeek.setData(
+          { userId: meal.userId },
+          ctx.prev,
+        );
+      }
+    },
+    onSettled: async () => {
+      await utils.nutrition.getMealsInLastWeek.invalidate({
+        userId: meal.userId,
+      });
     },
   });
 
@@ -248,11 +264,30 @@ export default function TrackedMealCard({
 
   /* Handle Delete Button */
   const deleteLoggedMeal = trpc.nutrition.deleteLoggedMeal.useMutation({
-    onSuccess: async () => {
-      await utils.nutrition.invalidate();
+    onMutate: async ({ id }) => {
+      await utils.nutrition.getMealsInLastWeek.cancel({ userId: meal.userId });
+      const prev = utils.nutrition.getMealsInLastWeek.getData({
+        userId: meal.userId,
+      });
+      utils.nutrition.getMealsInLastWeek.setData(
+        { userId: meal.userId },
+        (old) => old?.filter((m) => m.id !== id) ?? old,
+      );
+      return { prev };
     },
-    onError: (err) => {
+    onError: (err, _vars, ctx) => {
       console.error(err.message);
+      if (ctx?.prev !== undefined) {
+        utils.nutrition.getMealsInLastWeek.setData(
+          { userId: meal.userId },
+          ctx.prev,
+        );
+      }
+    },
+    onSettled: async () => {
+      await utils.nutrition.getMealsInLastWeek.invalidate({
+        userId: meal.userId,
+      });
     },
   });
 
@@ -262,8 +297,8 @@ export default function TrackedMealCard({
     });
   };
 
-  const imageUrl = dish?.image_url;
-  const dishNameForIcon = dish?.name ?? meal.dishName;
+  const imageUrl = displayDish?.imageUrl;
+  const dishNameForIcon = displayDish?.name ?? meal.dishName;
 
   if (isDesktop)
     return (
@@ -301,8 +336,8 @@ export default function TrackedMealCard({
             },
           }}
         >
-          {dish ? (
-            <FoodDialogContent dish={dish} />
+          {fullDish ? (
+            <FoodDialogContent dish={fullDish} />
           ) : (
             <div className="p-4">
               {isLoading ? "Loading..." : "Dish not found"}
@@ -356,8 +391,8 @@ export default function TrackedMealCard({
           },
         }}
       >
-        {dish ? (
-          <FoodDrawerContent dish={dish} />
+        {fullDish ? (
+          <FoodDrawerContent dish={fullDish} />
         ) : (
           <div className="p-4">
             {isLoading ? "Loading..." : "Dish not found"}

@@ -18,10 +18,12 @@ import {
   MenuItem,
   Toolbar as MuiToolbar,
   Snackbar,
+  Typography,
 } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTheme } from "next-themes";
 import type { MouseEvent } from "react";
 import { useEffect, useState } from "react";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in";
@@ -63,7 +65,6 @@ const DESKTOP_TOOLBAR_ELEMENTS: ToolbarElement[] = [
       },
     ],
   },
-
   {
     title: "Events",
     href: "/events",
@@ -111,9 +112,11 @@ const TRANSPARENT_PAGES = ["/about", "/brandywine", "/anteatery"];
 function ToolbarDropdown({
   element,
   isTransparent,
+  pathname,
 }: {
   element: ToolbarElement;
   isTransparent: boolean;
+  pathname: string;
 }) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -132,9 +135,7 @@ function ToolbarDropdown({
         onClick={handleClick}
         endIcon={<ArrowDropDownIcon fontSize="small" />}
         className={`capitalize text-[16px] !font-medium bg-transparent ${
-          isTransparent
-            ? "text-white/60 group-hover:text-white"
-            : "!text-black dark:!text-white"
+          isTransparent ? "text-white" : "!text-black dark:!text-white"
         }`}
       >
         {element.title}
@@ -145,6 +146,17 @@ function ToolbarDropdown({
         onClose={handleClose}
         className="capitalize text-[16px] font-medium
         group-hover:text-white text-white/60 bg-transparent"
+        slotProps={{
+          paper: {
+            sx: {
+              backgroundImage: "none",
+              bgcolor: "#ffffff",
+              ".dark &": {
+                bgcolor: "#323235",
+              },
+            },
+          },
+        }}
       >
         {element.children?.map((child) => (
           <MenuItem
@@ -152,6 +164,14 @@ function ToolbarDropdown({
             component={Link}
             href={child.href}
             onClick={handleClose}
+            sx={{
+              color: pathname === child.href ? "primary.main" : "text.primary",
+              "&.Mui-selected": { backgroundColor: "transparent" },
+              borderLeft:
+                pathname === child.href ? "3px solid" : "3px solid transparent",
+              borderColor:
+                pathname === child.href ? "primary.main" : "transparent",
+            }}
           >
             {child.title}
           </MenuItem>
@@ -162,6 +182,7 @@ function ToolbarDropdown({
 }
 
 export function DesktopToolbar(): React.JSX.Element {
+  const { resolvedTheme } = useTheme();
   const pathname = usePathname();
   const isTransparent = TRANSPARENT_PAGES.includes(pathname);
   const isDesktop = useMediaQuery("(min-width: 768px)");
@@ -197,12 +218,16 @@ export function DesktopToolbar(): React.JSX.Element {
   return (
     <>
       <AppBar
-        position="absolute"
+        position={isTransparent ? "absolute" : "sticky"}
         className={`shadow-none ${
           isTransparent
             ? "bg-transparent bg-gradient-to-b from-black/50 to-black/0"
-            : "!bg-white dark:!bg-zinc-900 !border-b !border-zinc-200 dark:!border-zinc-700"
+            : "bg-white dark:bg-[#323235]"
         }`}
+        sx={{
+          backgroundImage: "none",
+          ...(!isTransparent && { borderBottom: 1, borderColor: "divider" }),
+        }}
       >
         <MuiToolbar className="justify-between px-4 py-1 group">
           <div className="flex-none flex items-center">
@@ -214,13 +239,18 @@ export function DesktopToolbar(): React.JSX.Element {
                 width={40}
                 height={40}
               />
-              <span
-                className={`font-poppins font-bold text-[28px] leading-[24px] ${
-                  isTransparent ? "text-white" : "text-sky-700 dark:text-white"
-                }`}
+              <Typography
+                className="font-poppins text-[28px] leading-[24px]"
+                fontWeight={700}
+                sx={{
+                  color:
+                    isTransparent && resolvedTheme === "light"
+                      ? "white"
+                      : "primary.main",
+                }}
               >
                 PeterPlate
-              </span>
+              </Typography>
             </Link>
           </div>
 
@@ -232,6 +262,7 @@ export function DesktopToolbar(): React.JSX.Element {
                     key={element.title}
                     element={element}
                     isTransparent={isTransparent}
+                    pathname={pathname}
                   />
                 );
               }
@@ -242,8 +273,10 @@ export function DesktopToolbar(): React.JSX.Element {
                   href={element.href || "#"}
                   className={`normal-case text-[16px] !font-medium ${
                     isTransparent
-                      ? "text-white/60 group-hover:text-white"
-                      : "!text-black dark:!text-white"
+                      ? "text-white"
+                      : pathname === element.href
+                        ? "!text-sky-700 dark:!text-blue-300"
+                        : "!text-black dark:!text-white"
                   }`}
                 >
                   {element.title}
@@ -263,7 +296,7 @@ export function DesktopToolbar(): React.JSX.Element {
                     disabled
                   >
                     <MenuIcon
-                      style={{ color: isTransparent ? "white" : "black" }}
+                      sx={{ color: isTransparent ? "white" : "text.primary" }}
                     />
                   </IconButton>
                 </>
@@ -282,9 +315,7 @@ export function DesktopToolbar(): React.JSX.Element {
                   />
                 </IconButton>
               ) : (
-                <div className="flex items-center gap-2">
-                  <GoogleSignInButton />
-                </div>
+                <GoogleSignInButton />
               )}
             </div>
           </div>
@@ -434,7 +465,7 @@ function MobileToolbar(): React.JSX.Element {
         className={`top-0 z-50 w-full px-4 py-2.5 flex items-center justify-between ${
           isTransparent
             ? "absolute bg-transparent"
-            : "sticky bg-white dark:bg-neutral-950"
+            : "sticky bg-white dark:bg-[#27272A]"
         }`}
       >
         <span
@@ -446,7 +477,7 @@ function MobileToolbar(): React.JSX.Element {
         >
           {greeting}
         </span>
-        <div className="flex-shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center">
+        <div className="flex-shrink-0 min-h-[44px] flex items-center justify-center gap-2">
           {!isMounted || isPending ? (
             <IconButton
               type="button"
@@ -472,14 +503,7 @@ function MobileToolbar(): React.JSX.Element {
               />
             </IconButton>
           ) : (
-            <IconButton
-              type="button"
-              onClick={handleProfileOpen}
-              className="!p-0 !min-w-[44px] !min-h-[44px]"
-              aria-label="Open profile menu"
-            >
-              <AccountCircleIcon style={{ fontSize: 36, color: "#bdbdbd" }} />
-            </IconButton>
+            <GoogleSignInButton />
           )}
         </div>
       </div>
@@ -490,7 +514,7 @@ function MobileToolbar(): React.JSX.Element {
             rounded-[28px]
             px-4 py-3
             shadow-lg
-            bg-gradient-to-b from-sky-700 to-sky-900
+            bg-gradient-to-b from-sky-700 to-sky-900 dark:from-[#8EC5FF] dark:to-[#4281CA]
           "
         >
           <div className="flex items-center justify-between">
@@ -519,13 +543,14 @@ function MobileToolbar(): React.JSX.Element {
                       color: "white",
                       opacity: active ? 1 : 0.9,
                     }}
+                    className={active ? "dark:!text-[#162456]" : ""}
                   >
                     {element.icon}
                   </div>
                   <span
                     className={`
                       text-[12px] leading-none text-white
-                      ${active ? "font-semibold" : "font-medium"}
+                      ${active ? "font-semibold dark:!text-[#162456]" : "font-medium"}
                     `}
                   >
                     {element.title}

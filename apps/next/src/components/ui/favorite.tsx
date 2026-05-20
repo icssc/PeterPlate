@@ -1,17 +1,24 @@
 import { FavoriteBorder, Favorite as FavoriteIcon } from "@mui/icons-material";
 import { Tooltip } from "@mui/material";
+import posthog from "posthog-js";
 import { useUserStore } from "@/context/useUserStore";
 import { cn } from "@/utils/tw";
 
 interface FavoriteProps {
   dishId: string;
+  restaurant: "anteatery" | "brandywine";
   isFavorited?: boolean;
   favoriteDisabled?: boolean;
-  onToggleFavorite?: (dishId: string, currentlyFavorite: boolean) => void;
+  onToggleFavorite?: (
+    dishId: string,
+    currentlyFavorite: boolean,
+    restaurant: "anteatery" | "brandywine",
+  ) => void;
 }
 
 export default function Favorite({
   dishId,
+  restaurant,
   isFavorited,
   favoriteDisabled,
   onToggleFavorite,
@@ -25,7 +32,10 @@ export default function Favorite({
     event.stopPropagation();
 
     if (favoriteDisabled || !onToggleFavorite) return;
-    onToggleFavorite(dishId, Boolean(isFavorited));
+    posthog.capture(isFavorited ? "dish_unfavorited" : "dish_favorited", {
+      dish_id: dishId,
+    });
+    onToggleFavorite(dishId, Boolean(isFavorited), restaurant);
   };
 
   return (

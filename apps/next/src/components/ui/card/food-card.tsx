@@ -3,18 +3,13 @@
 import { Restaurant, StarBorder } from "@mui/icons-material";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import { Card, CardContent, Dialog, Drawer, Typography } from "@mui/material";
-import type { DishInfo } from "@peterplate/api";
+import type { DishWithRating } from "@peterplate/validators";
 import Image from "next/image";
 import React from "react";
 import { useSnackbarStore } from "@/context/useSnackbar";
 import { useUserStore } from "@/context/useUserStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-import {
-  ALLERGY_MAP,
-  type AllergyName,
-  PREFERENCE_MAP,
-  type PreferenceName,
-} from "@/utils/dietary";
+import { getDietaryConflicts } from "@/utils/dietary";
 import { formatFoodName, getFoodIcon } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
 import { cn } from "@/utils/tw";
@@ -32,15 +27,15 @@ interface FoodCardContentProps extends React.HTMLAttributes<HTMLDivElement> {
   /**
    * The dish information to display.
    */
-  dish: DishInfo;
+  dish: DishWithRating;
+  /**
+   * The restaurant at which this dish is present.
+   */
+  restaurant: "brandywine" | "anteatery";
   /**
    * Whether the dish is currently marked as favorite.
    */
   isFavorited?: boolean;
-  /**
-   * Whether the dish meets the current user's dietary & allergen preferences
-   */
-  doesNotMeetPreferences?: boolean;
   /**
    * Whether the favorite toggle button should be disabled.
    */
@@ -48,7 +43,11 @@ interface FoodCardContentProps extends React.HTMLAttributes<HTMLDivElement> {
   /**
    * Handler invoked when a user toggles the favorite button.
    */
-  onToggleFavorite?: (dishId: string, currentlyFavorite: boolean) => void;
+  onToggleFavorite?: (
+    dishId: string,
+    currentlyFavorite: boolean,
+    restaurant: "anteatery" | "brandywine",
+  ) => void;
   /**
    * Handler invoked when a user clicks "Add to meal tracker" (card, dialog, or drawer).
    */
@@ -68,32 +67,48 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
   (
     {
       dish,
+      restaurant,
       isFavorited,
       favoriteDisabled,
       onToggleFavorite,
       onAddToMealTracker,
       isCompact = false,
       className,
-      doesNotMeetPreferences,
       ...divProps
     },
     ref,
   ) => {
+    const { userId } = useUserStore();
     const IconComponent = getFoodIcon(dish.name) ?? Restaurant;
     const [imageError, setImageError] = React.useState(false);
     const showImage =
-      typeof dish.image_url === "string" &&
-      dish.image_url.trim() !== "" &&
+      typeof dish.imageUrl === "string" &&
+      dish.imageUrl.trim() !== "" &&
       !imageError;
 
-    /**
-     * Fetches the average rating and rating count for the dish.
-     */
     const { data: ratingData } = trpc.dish.getAverageRating.useQuery(
       { dishId: dish.id },
       { staleTime: 5 * 60 * 1000 },
     );
 
+    const { data: allergies } = trpc.allergy.getAllergies.useQuery(
+      { userId: userId ?? "" },
+      { staleTime: Infinity },
+    );
+
+    const { data: preferences } =
+      trpc.preference.getDietaryPreferences.useQuery(
+        { userId: userId ?? "" },
+        { staleTime: Infinity },
+      );
+
+    const violations = getDietaryConflicts(
+      dish.dietRestriction,
+      preferences ?? [],
+      allergies ?? [],
+    );
+
+    const conflictsWithUserPrefs = violations.length > 0;
     const averageRating = ratingData?.averageRating ?? 0;
     const ratingCount = ratingData?.ratingCount ?? 0;
 
@@ -102,10 +117,18 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
         ref={ref}
         {...divProps}
         className={cn(
-          "relative cursor-pointer hover:shadow-lg transition w-full border",
-          doesNotMeetPreferences && "opacity-70",
+          "relative cursor-pointer border border-gray-300 hover:shadow-lg transition w-full dark:bg-[#303035]",
+          conflictsWithUserPrefs && "opacity-70",
         )}
-        sx={{ borderRadius: "12px" }}
+        sx={{
+          borderRadius: "12px",
+          border: 1,
+          backgroundImage: "none",
+          boxShadow: "none",
+          "&:hover": {
+            boxShadow: "none",
+          },
+        }}
       >
         <CardContent sx={{ padding: 0, "&:last-child": { paddingBottom: 0 } }}>
           <div className="flex justify-between h-full w-full p-4 gap-4">
@@ -115,9 +138,9 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                 isCompact && "justify-between",
               )}
             >
-              {!isCompact && showImage && dish.image_url && !imageError && (
+              {!isCompact && showImage && dish.imageUrl && !imageError && (
                 <Image
-                  src={dish.image_url}
+                  src={dish.imageUrl}
                   alt=""
                   width={64}
                   height={64}
@@ -126,24 +149,28 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                 />
               )}
               {!isCompact && !showImage && IconComponent && (
-                <IconComponent className="w-12 h-12 text-zinc-700 dark:text-zinc-400 flex-shrink-0" />
+                <IconComponent
+                  className="w-12 h-12 flex-shrink-0"
+                  color="primary"
+                />
               )}
               <div
                 className={cn(
-                  "flex flex-col gap-1 w-3/5",
+                  "flex flex-col flex-1 min-w-0 gap-1",
                   isCompact && "w-3/4",
                   !isCompact && "md:w-full",
                 )}
               >
                 <Typography
+                  color="primary"
                   className={cn(
-                    "font-semibold text-base text-sky-700 dark:text-sky-600",
+                    "font-semibold text-base",
                     isCompact && "font-bold",
                   )}
                   noWrap
                 >
                   {formatFoodName(dish.name)}
-                  {doesNotMeetPreferences && (
+                  {conflictsWithUserPrefs && (
                     <ErrorOutlineIcon
                       fontSize="inherit"
                       className="ml-1 text-red-600 align-[-0.125em]"
@@ -153,11 +180,12 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                 <div className="flex gap-2 items-center text-zinc-700 text-sm w-fit flex-shrink">
                   <Typography
                     noWrap
-                    className="text-zinc-900 dark:text-zinc-300 font-normal"
+                    color="text.primary"
+                    className="font-normal"
                   >
                     {dish.nutritionInfo.calories == null
                       ? "-"
-                      : `${Math.round(parseFloat(dish.nutritionInfo.calories))} cal`}
+                      : `${Math.round(dish.nutritionInfo.calories)} cal`}
                   </Typography>
                   <div className="flex gap-1 items-center text-zinc-500">
                     <StarBorder
@@ -172,9 +200,10 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                 </div>
                 <Typography
                   noWrap
+                  color="text.primary"
                   className={cn(
-                    "text-zinc-900 text-sm font-normal dark:text-zinc-300",
-                    !dish.description && "italic text-zinc-700",
+                    "text-sm font-normal",
+                    !dish.description && "italic",
                   )}
                 >
                   {dish.description
@@ -184,7 +213,12 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
               </div>
               <Favorite
                 dishId={dish.id}
-                {...{ isFavorited, favoriteDisabled, onToggleFavorite }}
+                {...{
+                  isFavorited,
+                  favoriteDisabled,
+                  onToggleFavorite,
+                  restaurant,
+                }}
               />
             </div>
           </div>
@@ -202,27 +236,33 @@ FoodCardContent.displayName = "FoodCardContent";
  * This component combines an `FoodCardContent` (the visual card) with a
  * `Dialog` and {@link FoodDialogContent} (the full dish details dialog).
  *
- * @param {DishInfo} dish - The dish information to display and pass to the dialog.
+ * @param {DishWithRating} dish - The dish information to display and pass to the dialog.
  * @returns {JSX.Element} A React component representing a food card.
  */
-interface FoodCardProps extends DishInfo {
+interface FoodCardProps extends DishWithRating {
   /** Whether this dish is currently favorited. */
   isFavorited?: boolean;
   /** Loading state for favorite toggles. */
   favoriteIsLoading?: boolean;
   /** Handler to toggle the favorite state. */
-  onToggleFavorite?: (dishId: string, currentlyFavorite: boolean) => void;
+  onToggleFavorite?: (
+    dishId: string,
+    currentlyFavorite: boolean,
+    restaurant: "anteatery" | "brandywine",
+  ) => void;
   /** Whether to render a compact version of the card. */
   isCompact?: boolean;
   /** Optional class name for styling. */
-  doesNotMeetPreferences?: boolean;
   className?: string;
+  /** Restaurant */
+  restaurant: "anteatery" | "brandywine";
 }
 
 export default function FoodCard({
   isFavorited = false,
   favoriteIsLoading = false,
   onToggleFavorite,
+  restaurant,
   isCompact = false,
   className,
   ...dish
@@ -230,72 +270,9 @@ export default function FoodCard({
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const [open, setOpen] = React.useState(false);
   const userId = useUserStore((s) => s.userId);
+
   const utils = trpc.useUtils();
   const { showSnackbar } = useSnackbarStore();
-
-  const { data: preferences } = trpc.preference.getDietaryPreferences.useQuery(
-    { userId: userId ?? "" },
-    { enabled: !!userId },
-  );
-
-  const { data: allergies } = trpc.allergy.getAllergies.useQuery(
-    { userId: userId ?? "" },
-    { enabled: !!userId },
-  );
-
-  const dietaryConflict = React.useMemo(() => {
-    if (!preferences || !allergies) {
-      return { hasConflict: false, violations: [] as string[] };
-    }
-
-    const flags = dish.dietRestriction;
-    const violations: string[] = [];
-
-    for (const allergy of allergies) {
-      if (!(allergy in ALLERGY_MAP)) continue;
-      const key = ALLERGY_MAP[allergy as AllergyName];
-      if (flags[key]) {
-        const violated_allergy = key.slice(8);
-        const updated_allergy_str = `Contains ${violated_allergy}`;
-        violations.push(updated_allergy_str);
-      }
-    }
-
-    for (const preference of preferences) {
-      if (!(preference in PREFERENCE_MAP)) continue;
-      const key = PREFERENCE_MAP[preference as PreferenceName];
-      if (!flags[key]) {
-        const violated_pref = key.slice(2);
-        const updated_pref_string = `Not ${violated_pref}`;
-        violations.push(updated_pref_string);
-      }
-    }
-
-    // const violatesAllergy = allergies.some((allergy) => {
-    //   if (!(allergy in ALLERGY_MAP)) return false;
-    //   const key = ALLERGY_MAP[allergy as AllergyName];
-    //   if (flags[key])
-    //   {
-    //     violations.push(key)
-    //   }
-    //   // return flags[key] === true;
-    // });
-
-    // const violatesPreferences = preferences.some((pref) => {
-    //   if (!(pref in PREFERENCE_MAP)) return false;
-    //   const key = PREFERENCE_MAP[pref as PreferenceName];
-    //   if (flags[key])
-    //   {
-    //     violations.push(key)
-    //   }
-    // return flags[key] === false;
-    // });
-
-    return {
-      hasConflict: violations.length > 0,
-      violations,
-    };
-  }, [preferences, allergies, dish.dietRestriction]);
 
   const logMealMutation = trpc.nutrition.logMeal.useMutation({
     onSuccess: () => {
@@ -328,15 +305,17 @@ export default function FoodCard({
     return (
       <>
         <FoodCardContent
-          dish={dish}
-          isFavorited={isFavorited}
+          {...{
+            dish,
+            restaurant,
+            isFavorited,
+            onToggleFavorite,
+            isCompact,
+            className,
+          }}
           favoriteDisabled={favoriteIsLoading}
-          onToggleFavorite={onToggleFavorite}
           onAddToMealTracker={handleAddToMealTracker}
-          isCompact={isCompact}
           onClick={handleOpen}
-          className={className}
-          doesNotMeetPreferences={dietaryConflict.hasConflict}
         />
         <Dialog
           open={open}
@@ -359,11 +338,9 @@ export default function FoodCard({
           }}
         >
           <FoodDialogContent
-            dish={dish}
+            {...{ dish, restaurant }}
             onAddToMealTracker={handleAddToMealTracker}
             isAddingToMealTracker={logMealMutation.isPending}
-            doesNotMeetPreferences={dietaryConflict.hasConflict}
-            violations={dietaryConflict.violations}
           />
         </Dialog>
       </>
@@ -372,15 +349,17 @@ export default function FoodCard({
     return (
       <>
         <FoodCardContent
-          dish={dish}
-          isFavorited={isFavorited}
+          {...{
+            dish,
+            restaurant,
+            isFavorited,
+            onToggleFavorite,
+            isCompact,
+            className,
+          }}
           favoriteDisabled={favoriteIsLoading}
-          onToggleFavorite={onToggleFavorite}
           onAddToMealTracker={handleAddToMealTracker}
-          isCompact={isCompact}
           onClick={handleOpen}
-          className={className}
-          doesNotMeetPreferences={dietaryConflict.hasConflict}
         />
         <Drawer
           anchor="bottom"
@@ -412,11 +391,9 @@ export default function FoodCard({
           }}
         >
           <FoodDrawerContent
-            dish={dish}
+            {...{ dish, restaurant }}
             onAddToMealTracker={handleAddToMealTracker}
             isAddingToMealTracker={logMealMutation.isPending}
-            doesNotMeetPreferences={dietaryConflict.hasConflict}
-            violations={dietaryConflict.violations}
           />
         </Drawer>
       </>

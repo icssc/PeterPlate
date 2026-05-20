@@ -2,9 +2,16 @@ import type { NextConfig } from "next";
 import withPWA from "next-pwa";
 
 const nextConfig: NextConfig = {
+  transpilePackages: [
+    "@peterplate/api",
+    "@peterplate/db",
+    "@peterplate/validators",
+  ],
   typescript: {
     ignoreBuildErrors: true,
   },
+  skipTrailingSlashRedirect: true,
+
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "uci.campusdish.com" },
@@ -74,4 +81,8 @@ const nextConfig: NextConfig = {
 export default withPWA({
   dest: "public",
   disable: process.env.NODE_ENV === "development",
+  // Prevent Workbox from intercepting the PostHog reverse-proxy route.
+  // Without this, the SW intercepts /app-data/* requests and fails because
+  // the proxied PostHog responses are not cacheable in the expected way.
+  buildExcludes: [/app-data/],
 })(nextConfig);

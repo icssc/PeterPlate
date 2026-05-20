@@ -1,5 +1,6 @@
 "use client";
 
+import posthog from "posthog-js";
 import { useCallback, useState } from "react";
 import { authClient } from "@/utils/auth-client";
 import { Button } from "../ui/shadcn/button";
@@ -28,6 +29,7 @@ export function GoogleSignInButton() {
   const [signInError, setSignInError] = useState<string | null>(null);
 
   const handleSignIn = useCallback(async () => {
+    posthog.capture("sign_in_clicked", { provider: "google" });
     setSignInError(null);
     // In the native iOS shell, use the "icssc-native" provider which sets
     // redirect_uri to /auth/native (an AASA-listed Universal Link path).
@@ -51,6 +53,7 @@ export function GoogleSignInButton() {
       if (error) throw new Error(error.message ?? "Sign-in request failed.");
     } catch (error) {
       console.error("Sign in error:", error);
+      posthog.captureException(error);
       const message =
         error instanceof Error ? error.message : "Sign-in request failed.";
       setSignInError(message);
@@ -59,7 +62,10 @@ export function GoogleSignInButton() {
 
   return (
     <div className="flex w-full flex-col gap-2">
-      <Button onClick={handleSignIn} className="w-full">
+      <Button
+        onClick={handleSignIn}
+        className="w-full bg-sky-700 text-white hover:bg-sky-800 dark:bg-blue-300 dark:text-gray-900 dark:hover:bg-blue-400"
+      >
         Sign In with Google
       </Button>
       {signInError ? (

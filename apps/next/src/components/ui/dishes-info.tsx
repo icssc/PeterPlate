@@ -1,6 +1,7 @@
 "use client";
 
-import type { DishInfo } from "@peterplate/api";
+import { Typography } from "@mui/material";
+import type { DishWithRating } from "@peterplate/validators";
 import type React from "react";
 import { useUserStore } from "@/context/useUserStore";
 import { useFavorites } from "@/hooks/useFavorites";
@@ -12,9 +13,9 @@ import FoodCardSkeleton from "./skeleton/food-card-skeleton";
  */
 interface DishesInfoProps {
   /**
-   * An array of `DishInfo` objects to be displayed.
+   * An array of `DishWithPreference` objects to be displayed.
    */
-  dishes: DishInfo[];
+  dishes: DishWithRating[];
   /**
    * A boolean indicating whether the data is currently being loaded.
    * If true, skeleton loaders will be displayed.
@@ -33,9 +34,7 @@ interface DishesInfoProps {
    * Whether to display dishes in compact/simplified view.
    */
   isCompactView?: boolean;
-  /**
-   * Whether to only show dishes that match user preferences
-   */
+  restaurant: "brandywine" | "anteatery";
 }
 
 /**
@@ -49,6 +48,7 @@ export default function DishesInfo({
   dishes,
   isLoading,
   isError,
+  restaurant,
   errorMessage,
   isCompactView = false,
 }: DishesInfoProps): React.JSX.Element {
@@ -84,9 +84,13 @@ export default function DishesInfo({
       {!isLoading &&
         !isError &&
         (dishes.length === 0 ? (
-          <p className="text-center text-gray-500 py-4">
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            className="text-center py-4"
+          >
             No dishes available for this selection.
-          </p>
+          </Typography>
         ) : isCompactView ? (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             {dishes.map((dish) => (
@@ -100,11 +104,12 @@ export default function DishesInfo({
                 }
                 onToggleFavorite={onToggleFavorite}
                 isCompact={isCompactView}
+                restaurant={restaurant}
               />
             ))}
           </div>
         ) : (
-          <div className="flex flex-wrap gap-4">
+          <div className="grid grid-cols-1 min-[960px]:grid-cols-2 gap-4">
             {dishes.map((dish) => (
               <FoodCard
                 key={dish.id}
@@ -115,6 +120,7 @@ export default function DishesInfo({
                 }
                 onToggleFavorite={onToggleFavorite}
                 isCompact={isCompactView}
+                restaurant={restaurant}
               />
             ))}
           </div>

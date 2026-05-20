@@ -24,14 +24,16 @@ interface Props {
    */
   trackColor?: string;
   progressColor?: string;
+  valueColor?: string;
 }
 
 export function ProgressDonut({
   progress_value,
   max_value,
   display_unit,
-  trackColor = "#ffffff",
-  progressColor = "#0084D1",
+  trackColor = "var(--donut-track)",
+  progressColor = "var(--donut-progress)",
+  valueColor,
 }: Props) {
   const value = Math.max(0, Math.min(progress_value, max_value));
   const percent = value / max_value;
@@ -43,9 +45,21 @@ export function ProgressDonut({
         <svg viewBox="0 0 100 100" className="w-full h-full">
           <title>Progress Donut</title>
           {/* outer translucent white circle */}
-          <circle cx="50" cy="50" r="30" fill="white" fillOpacity="0.5" />
+          <circle
+            cx="50"
+            cy="50"
+            r="30"
+            fill="var(--donut-outer)"
+            fillOpacity="0.9"
+          />
           {/* inner white circle */}
-          <circle cx="50" cy="50" r="25" fill="white" fillOpacity="0.9" />
+          <circle
+            cx="50"
+            cy="50"
+            r="25"
+            fill="var(--donut-inner)"
+            fillOpacity="0.9"
+          />
           {/* background arc track - semicircle */}
           <circle
             cx="50"
@@ -73,7 +87,7 @@ export function ProgressDonut({
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-xl font-semibold">
+          <span className="text-xl font-semibold" style={{ color: valueColor }}>
             {progress_value}
             {display_unit}
           </span>
