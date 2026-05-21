@@ -94,7 +94,7 @@ const Events = () => {
 
   return (
     <div className="max-w-full h-screen ">
-      <div className="fixed top-0 left-0 w-full h-16 bg-sky-700/30 dark:bg-sky-900/40 z-0" />
+      <div className="fixed top-0 left-0 w-full h-16 bg-sky-700/30 dark:bg-blue-900/40 z-0" />
       <div className="z-0 flex flex-col h-full overflow-x-hidden">
         <div
           className="flex flex-col gap-4 justify-center w-full p-5 pt-16 sm:px-12 sm:py-8 sm:pt-20"

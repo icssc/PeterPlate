@@ -31,13 +31,13 @@ export default function UpcomingEventCard({
         onClick={() => setOpen(true)}
       >
         <div className="absolute top-2 right-0 h-14 w-48 scale-75 origin-top-right">
-          <div className="hidden md:block [&>span]:!bg-sky-100 [&>span]:!text-sky-700 [&>span]:!shadow-sm">
+          <div className="hidden md:block [&>span]:!bg-sky-100 [&>span]:!text-sky-700 [&>span]:!shadow-sm dark:[&>span]:!bg-blue-300/20 dark:[&>span]:!text-blue-300">
             <EventTypeBadge type={eventType} />
           </div>
         </div>
         <div className="mb-3 flex items-start gap-2 min-w-0 pr-0 md:pr-28">
           <h3
-            className={`${titleSize} line-clamp-2 min-w-0 flex-1 whitespace-normal break-words font-bold leading-tight text-sky-700`}
+            className={`${titleSize} line-clamp-2 min-w-0 flex-1 whitespace-normal break-words font-bold leading-tight text-sky-700 dark:text-blue-300`}
           >
             {event.title}
           </h3>
