@@ -62,6 +62,15 @@ export function useRestaurantPage(hall: HallEnum): UseRestaurantPageResult {
   const { selectedDate, setSelectedDate } = useDate();
   const today = useRestaurantStore((s) => s.today);
   const setHallInputs = useRestaurantStore((s) => s.setInputs);
+  const setNow = useRestaurantStore((s) => s.setNow);
+
+  // Keep a live clock in the store while a restaurant page is mounted so the
+  // derived open/closed status updates on its own when the hall opens or closes,
+  // without the user having to refresh the page (#501).
+  useEffect(() => {
+    const intervalId = setInterval(() => setNow(new Date()), 30_000);
+    return () => clearInterval(intervalId);
+  }, [setNow]);
 
   // Read period/station from the shared UI store (written by auto-selection
   // effects below; also written directly by sub-components on user interaction)

@@ -1,6 +1,6 @@
 import type { FormattedRestaurantInfo } from "@api/index";
 import { create } from "zustand";
-import { militaryToStandard } from "@/utils/funcs";
+import { isSameDay, militaryToStandard } from "@/utils/funcs";
 import { HallStatusEnum } from "@/utils/types";
 
 interface HallStore {
@@ -8,6 +8,13 @@ interface HallStore {
   selectedDate?: Date;
   restaurant?: "anteatery" | "brandywine";
   today: Date;
+  /**
+   * The current wall-clock time. Updated on an interval (see `useRestaurantPage`)
+   * so that the derived open/closed status re-computes while the page is left
+   * open across an open→close transition.
+   */
+  now: Date;
+  setNow: (now: Date) => void;
   setInputs: (input: {
     hallData: FormattedRestaurantInfo;
     selectedDate: Date;
@@ -20,13 +27,15 @@ export const useRestaurantStore = create<HallStore>((set) => ({
   selectedDate: undefined,
   restaurant: undefined,
   today: new Date(),
+  now: new Date(),
+  setNow: (now) => set({ now }),
   setInputs: ({ hallData, selectedDate, restaurant }) =>
     set({ hallData, selectedDate, restaurant }),
 }));
 
 export const useHallDerived = () =>
   useRestaurantStore((state) => {
-    const { hallData, selectedDate, today } = state;
+    const { hallData, selectedDate, today, now } = state;
 
     const availablePeriodTimes: Record<string, [Date, Date]> = {};
     let derivedHallStatus = HallStatusEnum.CLOSED;
@@ -71,10 +80,16 @@ export const useHallDerived = () =>
     openTime = earliestOpen ?? undefined;
     closeTime = latestClose ?? undefined;
 
+    // When the user is viewing today's menu, compare against the live `now` so
+    // the status flips from Open to Closed (and vice versa) as the clock passes
+    // an open/close boundary — even if the page is just left open. For any other
+    // selected day, keep using the selected date so the result is unchanged.
+    const referenceTime = isSameDay(selectedDate, now) ? now : selectedDate;
+
     if (!openTime || !closeTime) derivedHallStatus = HallStatusEnum.ERROR;
     else if (today.getDay() !== openTime?.getDay())
       derivedHallStatus = HallStatusEnum.PREVIEW;
-    else if (selectedDate >= openTime && selectedDate < closeTime)
+    else if (referenceTime >= openTime && referenceTime < closeTime)
       derivedHallStatus = HallStatusEnum.OPEN;
     else derivedHallStatus = HallStatusEnum.CLOSED;
 
