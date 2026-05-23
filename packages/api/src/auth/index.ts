@@ -18,10 +18,19 @@ const authSecret =
   process.env.BETTER_AUTH_SECRET ?? process.env.NEXT_PUBLIC_BETTER_AUTH_SECRET;
 if (!authSecret) throw new Error("BETTER_AUTH_SECRET is not set");
 
+const authBaseURL =
+  process.env.BETTER_AUTH_URL ??
+  process.env.NEXT_PUBLIC_BASE_URL ??
+  "https://www.peterplate.com";
+
+const trustedOrigins = Array.from(
+  new Set(["https://www.peterplate.com", authBaseURL]),
+);
+
 export const auth = betterAuth({
   debug: process.env.NODE_ENV !== "production",
   secret: authSecret,
-  baseURL: process.env.NEXT_PUBLIC_BASE_URL ?? "https://www.peterplate.com",
+  baseURL: authBaseURL,
   // The iOS PWA shell (WKWebView) always sends Origin: https://www.peterplate.com
   // because Settings.swift hardcodes rootUrl to that domain.  Better Auth builds
   // its trusted-origins list from baseURL alone, so if NEXT_PUBLIC_BASE_URL is
@@ -30,12 +39,7 @@ export const auth = betterAuth({
   // WKWebView is every request, because Swift injects the app-platform cookie
   // via WKHTTPCookieStore.  Listing the production origin explicitly makes the
   // iOS auth flow immune to baseURL misconfiguration.
-  trustedOrigins: [
-    "https://www.peterplate.com",
-    ...(process.env.NEXT_PUBLIC_BASE_URL
-      ? [process.env.NEXT_PUBLIC_BASE_URL]
-      : []),
-  ],
+  trustedOrigins,
   user: {
     additionalFields: {
       hasOnboarded: {
@@ -77,7 +81,7 @@ export const auth = betterAuth({
             // (b) causes Swift's ASWebAuthenticationSession.start() to silently
             //     return false because "localhost" doesn't match the Associated
             //     Domains entitlement (applinks:www.peterplate.com).
-            redirectURI: `${process.env.NEXT_PUBLIC_BASE_URL ?? "https://www.peterplate.com"}/auth/native`,
+            redirectURI: `${authBaseURL ?? "https://www.peterplate.com"}/auth/native`,
             scopes,
             pkce: true,
             mapProfileToUser,
