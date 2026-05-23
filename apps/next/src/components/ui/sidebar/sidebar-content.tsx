@@ -60,7 +60,7 @@ export default function SidebarContent({
   };
 
   return (
-    <div className="w-full h-full rounded-2xl bg-white dark:bg-[#313136] shadow-xl flex flex-col">
+    <Box className="w-full h-full rounded-2xl bg-white dark:bg-[#313136] shadow-xl flex flex-col">
       {/* Header */}
       <div className="flex items-start justify-between px-5 pt-5">
         <div className="flex items-center gap-3">
@@ -96,11 +96,11 @@ export default function SidebarContent({
       <div className="flex-1 px-5 pt-4 space-y-5">
         {/* Dietary Preferences */}
         <div>
-          <h3 className="text-sm font-bold text-sky-700 dark:text-accent-primary mb-2">
+          <Typography className="text-sm font-bold text-sky-700 dark:text-accent-primary mb-2">
             Dietary Preferences
           </Typography>
 
-          <p className="text-xs font-semibold text-gray-500 dark:text-zinc-300 mb-1">
+          <Typography className="text-xs font-semibold text-gray-500 dark:text-zinc-300 mb-1">
             Restrictions:
           </Typography>
 
@@ -121,7 +121,7 @@ export default function SidebarContent({
             )}
           </div>
 
-          <p className="text-xs font-semibold text-gray-500 dark:text-zinc-300 mb-1">
+          <Typography className="text-xs font-semibold text-gray-500 dark:text-zinc-300 mb-1">
             Allergies:
           </Typography>
           <div className="flex flex-wrap gap-1.5">
@@ -144,7 +144,7 @@ export default function SidebarContent({
 
         {/* Appearance */}
         <div>
-          <h3 className="text-sm font-bold text-sky-700 dark:text-accent-primary mb-2">
+          <Typography className="text-sm font-bold text-sky-700 dark:text-accent-primary mb-2">
             Appearance
           </Typography>
 
