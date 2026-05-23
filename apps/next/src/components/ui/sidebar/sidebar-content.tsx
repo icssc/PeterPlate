@@ -5,9 +5,9 @@ import {
   DarkMode as DarkModeIcon,
   DesktopWindows as DesktopWindowsIcon,
   Edit as EditIcon,
-  Feedback as FeedbackIcon,
+  ContentPaste as FeedbackIcon,
   HelpOutlineOutlined as HelpIcon,
-  Info as InfoIcon,
+  InfoOutlined as InfoIcon,
   LightMode as LightModeIcon,
   Logout as LogoutIcon,
 } from "@mui/icons-material";
