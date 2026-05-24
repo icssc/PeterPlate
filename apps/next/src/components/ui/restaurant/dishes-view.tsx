@@ -74,12 +74,12 @@ export function DishesView({
               id={station.name.toLowerCase()}
               className="[&_#food-scroll]:h-auto [&_#food-scroll]:overflow-y-visible mb-8 scroll-mt-4"
             >
-              <div className="mb-4">
+              <div className="mt-2 mb-4 !bg-sky-700/20 dark:!bg-[#46566a] !rounded-lg !p-2">
                 <Typography
                   variant="h5"
-                  fontWeight={700}
-                  color="text.primary"
-                  sx={{ fontSize: "1.875rem" }}
+                  fontWeight={650}
+                  color="primary"
+                  sx={{ fontSize: "1.5rem" }}
                 >
                   {toTitleCase(station.name)}
                 </Typography>
@@ -97,12 +97,12 @@ export function DishesView({
         : // Normal View: Render active station
           activeStation && (
             <div className="[&_#food-scroll]:h-auto [&_#food-scroll]:overflow-y-visible">
-              <div className="mb-4">
+              <div className="mt-2 mb-4 !bg-sky-700/20 dark:!bg-[#46566a] !rounded-lg !p-2">
                 <Typography
                   variant="h5"
-                  fontWeight={700}
-                  color="text.primary"
-                  sx={{ fontSize: "1.875rem" }}
+                  fontWeight={650}
+                  color="primary"
+                  sx={{ fontSize: "1.5rem" }}
                 >
                   {toTitleCase(activeStation.name)}
                 </Typography>

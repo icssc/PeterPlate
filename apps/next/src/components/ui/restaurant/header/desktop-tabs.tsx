@@ -42,7 +42,7 @@ export function DesktopTabs({
             }
             setSelectedStation(val);
           }}
-          className="flex w-full overflow-x-auto no-scrollbar !bg-sky-700/40 dark:!bg-[#46566a] !rounded-lg !p-2 [&_.MuiTabs-flexContainer]:justify-between [&_.MuiTabs-flexContainer]:gap-2 [&_.MuiTabs-indicator]:hidden"
+          className="flex w-full overflow-x-auto no-scrollbar !bg-sky-700/20 dark:!bg-[#46566a] !rounded-lg !p-2 [&_.MuiTabs-flexContainer]:justify-between [&_.MuiTabs-flexContainer]:gap-2 [&_.MuiTabs-indicator]:hidden"
           variant="scrollable"
           scrollButtons={false}
         >
@@ -64,20 +64,18 @@ export function DesktopTabs({
             size="small"
             type="button"
             onClick={() => setIsCompactView(false)}
-            className={`!border-sky-700 dark:!border-blue-300 !normal-case ${!isCompactView ? "!bg-sky-700 !text-white hover:!bg-sky-700 dark:!bg-blue-300 dark:!text-gray-900" : "!bg-white !text-sky-700 hover:!bg-sky-50 dark:!bg-transparent dark:!text-white"}`}
-            startIcon={<MenuIcon className="h-4 w-4" />}
+            className={`!min-w-0 !w-10 !h-10 !p-0 !border-sky-700 dark:!border-blue-300 !normal-case ${!isCompactView ? "!bg-sky-700 !text-white hover:!bg-sky-700 dark:!bg-blue-300 dark:!text-gray-900" : "!bg-white !text-sky-700 hover:!bg-sky-50 dark:!bg-transparent dark:!text-white"}`}
           >
-            Card View
+            <MenuIcon className="h-5 w-5" />
           </Button>
           <Button
             variant="outlined"
             size="small"
             type="button"
             onClick={() => setIsCompactView(true)}
-            className={`!border-sky-700 dark:!border-blue-300 !normal-case ${isCompactView ? "!bg-sky-700 !text-white hover:!bg-sky-700 dark:!bg-blue-300 dark:!text-gray-900" : "!bg-white !text-sky-700 hover:!bg-sky-50 dark:!bg-transparent dark:!text-white"}`}
-            startIcon={<GridView className="h-4 w-4" />}
+            className={`!min-w-0 !w-10 !h-10 !p-0 !border-sky-700 dark:!border-blue-300 !normal-case ${isCompactView ? "!bg-sky-700 !text-white hover:!bg-sky-700 dark:!bg-blue-300 dark:!text-gray-900" : "!bg-white !text-sky-700 hover:!bg-sky-50 dark:!bg-transparent dark:!text-white"}`}
           >
-            Compact View
+            <GridView className="h-5 w-5" />
           </Button>
         </div>
       </div>
