@@ -34,6 +34,12 @@ export const auth = betterAuth({
   // auth.icssc.club only allows redirect URIs on the apex domain (peterplate.com),
   // not www — baseURL and trustedOrigins must match deploy + iOS + IdP registration.
   trustedOrigins: [baseURL],
+  session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60,
+    },
+  },
   user: {
     additionalFields: {
       hasOnboarded: {

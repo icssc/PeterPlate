@@ -355,12 +355,21 @@ extension ViewController: ASWebAuthenticationPresentationContextProviding {
                 return
             }
 
-            guard let callbackURL = callbackURL else { return }
+            guard let callbackURL = callbackURL,
+                  var components = URLComponents(url: callbackURL, resolvingAgainstBaseURL: false) else {
+                return
+            }
 
-            // Load the callback URL in the WKWebView. The /auth/native route
-            // proxies to Better Auth which processes the code exchange, sets
-            // the session cookie, and redirects to /.
-            webView?.load(URLRequest(url: callbackURL))
+            // AASA lists /auth/native for ASWebAuthenticationSession only. Load Better
+            // Auth's real callback handler directly — a 307 through /auth/native can
+            // prevent Set-Cookie from landing in the WKWebView cookie jar on iOS.
+            if components.path == "/auth/native" || components.path.hasSuffix("/auth/native") {
+                components.path = "/api/auth/oauth2/callback/icssc-native"
+            }
+
+            if let redirectURL = components.url {
+                webView?.load(URLRequest(url: redirectURL))
+            }
         }
         session.presentationContextProvider = self
         // Share Safari cookies + iCloud Keychain passkeys so Google SSO, UCI
