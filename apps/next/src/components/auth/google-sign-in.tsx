@@ -9,7 +9,7 @@ function isNativeIosApp(): boolean {
     typeof navigator !== "undefined" &&
     navigator.userAgent.includes("PWAShell")
   ) {
-    // WKWebView shell sets this in `apps/pwa/src/PeterPlate/WebView.swift`. Prefer it over
+    // WKWebView shell sets this in `apps/ios/src/PeterPlate/WebView.swift`. Prefer it over
     // `document.cookie`: cookies injected via WKHTTPCookieStore often are not visible to JS,
     // so the old check could miss the shell and route OAuth through `icssc` instead of
     // `icssc-native` — breaking ASWebAuthenticationSession + `/auth/native` flow.

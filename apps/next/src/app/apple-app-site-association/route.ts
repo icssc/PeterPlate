@@ -9,7 +9,7 @@ import { NextResponse } from 'next/server';
  * 1. Authorize the PeterPlate iOS app to claim Universal Links for the
  *    `/auth/native` path — the OAuth redirect URI that the iOS wrapper
  *    hands to `ASWebAuthenticationSession` as its HTTPS callback
- *    (see `apps/pwa/src/PeterPlate/ViewController.swift` startAuthSession).
+ *    (see `apps/ios/src/PeterPlate/ViewController.swift` startAuthSession).
  * 2. Authorize PP for shared web credentials (`webcredentials` entitlement).
  *
  * Both the Team ID and Bundle IDs are public — the AASA file is fetched by
