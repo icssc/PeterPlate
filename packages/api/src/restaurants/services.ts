@@ -96,6 +96,7 @@ export async function getRestaurantByDate(
 
       const stations = Object.entries(period.stationToDishes).map(
         ([sId, dIds]) => ({
+          id: sId,
           name: stationIdToName.get(Number.parseInt(sId, 10)) ?? "UNKNOWN",
           dishes: dIds
             .map((id) => dishesLookup.get(id))

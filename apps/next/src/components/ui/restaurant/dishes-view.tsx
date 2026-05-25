@@ -1,7 +1,7 @@
 import type { AppRouter, FormattedRestaurantInfo, Station } from "@api/index";
 import { Typography } from "@mui/material";
 import type { TRPCClientErrorLike } from "@trpc/client";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import DishesInfo from "@/components/ui/dishes-info";
 import { useRestaurantUIStore } from "@/context/useRestaurantUIStore";
 import { useUserStore } from "@/context/useUserStore";
@@ -12,6 +12,7 @@ import { trpc } from "@/utils/trpc";
 interface DishesViewProps {
   stations: Station[];
   activeStation: Station | undefined;
+  isDesktop: boolean;
   isLoading: boolean;
   isError: boolean;
   error: TRPCClientErrorLike<AppRouter> | null;
@@ -21,15 +22,18 @@ interface DishesViewProps {
 export function DishesView({
   stations,
   activeStation,
+  isDesktop,
   isLoading,
   isError,
   error,
   hallData,
 }: DishesViewProps) {
   const isCompactView = useRestaurantUIStore((s) => s.isCompactView);
+  const setSelectedStation = useRestaurantUIStore((s) => s.setSelectedStation);
   const showPreferencesOnly = useRestaurantUIStore(
     (s) => s.showPreferencesOnly,
   );
+  const showAllStations = isDesktop;
 
   const errorMessage =
     error?.message ??
@@ -43,13 +47,12 @@ export function DishesView({
     userId: userId ?? "",
   });
 
-  // Pre-compute filtered dishes for every station so toggling isCompactView
-  // (which switches from single-station to all-stations) doesn't recompute
-  // getDietaryConflicts for every dish on each render.
+  // Pre-compute filtered dishes for every station so view-mode toggles don't
+  // recompute getDietaryConflicts for every dish on each render.
   const filteredDishesMap = useMemo(() => {
     return new Map(
       stations.map((station) => [
-        station.name,
+        station.id,
         showPreferencesOnly && allergies && preferences
           ? station.dishes.filter(
               (dish) =>
@@ -64,28 +67,56 @@ export function DishesView({
     );
   }, [stations, showPreferencesOnly, preferences, allergies]);
 
+  useEffect(() => {
+    if (!showAllStations || stations.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visibleStation = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]
+          ?.target.getAttribute("data-station");
+
+        if (visibleStation) {
+          setSelectedStation(visibleStation);
+        }
+      },
+      {
+        rootMargin: "-20% 0px -60% 0px",
+        threshold: [0, 0.25, 0.5, 0.75, 1],
+      },
+    );
+
+    for (const station of stations) {
+      const element = document.getElementById(`station-${station.id}`);
+      if (element) observer.observe(element);
+    }
+
+    return () => observer.disconnect();
+  }, [showAllStations, stations, setSelectedStation]);
+
   return (
     <div className="w-full">
-      {isCompactView
-        ? // Compact View: Render ALL stations
+      {showAllStations
+        ? // Desktop view: render all stations in toolbar order.
           stations.map((station) => (
             <div
-              key={station.name}
-              id={station.name.toLowerCase()}
-              className="[&_#food-scroll]:h-auto [&_#food-scroll]:overflow-y-visible mb-8 scroll-mt-4"
+              key={station.id}
+              id={`station-${station.id}`}
+              data-station={station.id}
+              className="mb-4 scroll-mt-14"
             >
-              <div className="mt-2 mb-4 !bg-sky-700/20 dark:!bg-[#46566a] !rounded-lg !p-2">
+              <div className="mb-3 rounded-[6px] bg-[#CDE2F1] px-3 py-1.5 dark:bg-[#46566a]">
                 <Typography
                   variant="h5"
-                  fontWeight={650}
                   color="primary"
-                  sx={{ fontSize: "1.5rem" }}
+                  className="!font-poppins !text-[24px] !font-bold !leading-[30px]"
                 >
                   {toTitleCase(station.name)}
                 </Typography>
               </div>
               <DishesInfo
-                dishes={filteredDishesMap.get(station.name) ?? station.dishes}
+                dishes={filteredDishesMap.get(station.id) ?? station.dishes}
                 isLoading={isLoading}
                 isError={isError || (!isLoading && !hallData)}
                 errorMessage={errorMessage}
@@ -96,20 +127,19 @@ export function DishesView({
           ))
         : // Normal View: Render active station
           activeStation && (
-            <div className="[&_#food-scroll]:h-auto [&_#food-scroll]:overflow-y-visible">
-              <div className="mt-2 mb-4 !bg-sky-700/20 dark:!bg-[#46566a] !rounded-lg !p-2">
+            <div>
+              <div className="mb-3 rounded-[6px] bg-[#CDE2F1] px-3 py-1.5 dark:bg-[#46566a]">
                 <Typography
                   variant="h5"
-                  fontWeight={650}
                   color="primary"
-                  sx={{ fontSize: "1.5rem" }}
+                  className="!font-poppins !text-[24px] !font-bold !leading-[30px]"
                 >
                   {toTitleCase(activeStation.name)}
                 </Typography>
               </div>
               <DishesInfo
                 dishes={
-                  filteredDishesMap.get(activeStation.name) ??
+                  filteredDishesMap.get(activeStation.id) ??
                   activeStation.dishes
                 }
                 isLoading={isLoading}

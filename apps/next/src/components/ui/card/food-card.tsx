@@ -114,11 +114,13 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
         ref={ref}
         {...divProps}
         className={cn(
-          "relative cursor-pointer border border-gray-300 hover:shadow-lg transition w-full dark:bg-[#303035]",
+          "relative w-full cursor-pointer border border-gray-300 transition hover:border-slate-300 dark:bg-[#303035]",
+          isCompact ? "min-h-[92px]" : "min-h-[96px]",
           conflictsWithUserPrefs && "opacity-70",
+          className,
         )}
         sx={{
-          borderRadius: "12px",
+          borderRadius: "6px",
           border: 1,
           backgroundImage: "none",
           boxShadow: "none",
@@ -128,20 +130,25 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
         }}
       >
         <CardContent sx={{ padding: 0, "&:last-child": { paddingBottom: 0 } }}>
-          <div className="flex justify-between h-full w-full p-4 gap-4">
+          <div
+            className={cn(
+              "flex h-full w-full justify-between gap-3",
+              isCompact ? "p-3" : "p-3.5",
+            )}
+          >
             <div
               className={cn(
-                "flex items-center gap-4 w-full",
-                isCompact && "justify-between",
+                "flex w-full items-center gap-3",
+                isCompact && "justify-between gap-2",
               )}
             >
               {!isCompact && showImage && dish.imageUrl && !imageError && (
                 <Image
                   src={dish.imageUrl}
                   alt=""
-                  width={64}
-                  height={64}
-                  className="w-16 h-16 object-cover rounded"
+                  width={72}
+                  height={72}
+                  className="h-[72px] w-[72px] flex-shrink-0 rounded-[6px] object-cover"
                   onError={() => setImageError(true)}
                 />
               )}
@@ -153,16 +160,16 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
               )}
               <div
                 className={cn(
-                  "flex flex-col flex-1 min-w-0 gap-1",
-                  isCompact && "w-3/4",
+                  "flex min-w-0 flex-1 flex-col gap-1",
+                  isCompact && "w-3/4 pr-1",
                   !isCompact && "md:w-full",
                 )}
               >
                 <Typography
                   color="primary"
                   className={cn(
-                    "font-semibold text-base",
-                    isCompact && "font-bold",
+                    "!font-poppins !text-[15px] !font-bold !leading-[18px]",
+                    isCompact && "!text-[14px]",
                   )}
                   noWrap
                 >
@@ -174,7 +181,7 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                     />
                   )}
                 </Typography>
-                <div className="flex gap-2 items-center text-zinc-700 text-sm w-fit flex-shrink">
+                <div className="flex w-fit flex-shrink items-center gap-2 text-[13px] text-zinc-700">
                   <Typography
                     noWrap
                     color="text.primary"
@@ -199,7 +206,7 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                   noWrap
                   color="text.primary"
                   className={cn(
-                    "text-sm font-normal",
+                    "!font-poppins !text-[13px] !font-normal !leading-[16px]",
                     !dish.description && "italic",
                   )}
                 >

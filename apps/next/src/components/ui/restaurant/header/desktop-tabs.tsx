@@ -31,27 +31,25 @@ export function DesktopTabs({
           value={selectedStation || false}
           onChange={(_event, value: string) => {
             const val = value || "";
-            if (isCompactView) {
-              const element = document.getElementById(val);
-              if (element) {
-                element.scrollIntoView({
-                  behavior: "smooth",
-                  block: "start",
-                });
-              }
+            const element = document.getElementById(`station-${val}`);
+            if (element) {
+              element.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+              });
             }
             setSelectedStation(val);
           }}
-          className="flex w-full overflow-x-auto no-scrollbar !bg-sky-700/20 dark:!bg-[#46566a] !rounded-lg !p-2 [&_.MuiTabs-flexContainer]:justify-between [&_.MuiTabs-flexContainer]:gap-2 [&_.MuiTabs-indicator]:hidden"
+          className="flex w-full overflow-x-auto no-scrollbar !rounded-[6px] !bg-[#CDE2F1] !p-1 dark:!bg-[#46566a] [&_.MuiTabs-flexContainer]:w-full [&_.MuiTabs-flexContainer]:justify-between [&_.MuiTabs-flexContainer]:gap-1 [&_.MuiTabs-indicator]:hidden"
           variant="scrollable"
           scrollButtons={false}
         >
           {stations.map((station) => (
             <Tab
-              key={station.name}
-              value={station.name.toLowerCase()}
+              key={station.id}
+              value={station.id}
               label={toTitleCase(station.name)}
-              className="!rounded !border !border-transparent !bg-transparent !px-4 !py-1.5 !text-sm !font-medium !text-black dark:!text-white !normal-case !min-h-0 aria-selected:!bg-white dark:aria-selected:!bg-white aria-selected:!text-slate-900 dark:aria-selected:!text-gray-900 aria-selected:!border-slate-200 dark:aria-selected:!border-slate-200 aria-selected:!shadow-sm"
+              className="!min-h-0 !flex-1 !rounded-[5px] !border !border-transparent !px-4 !py-2 !font-poppins !text-[13px] !font-semibold !normal-case !leading-none !text-slate-900 dark:!text-white aria-selected:!border-white aria-selected:!bg-white aria-selected:!text-slate-900 aria-selected:!shadow-sm dark:aria-selected:!border-white dark:aria-selected:!bg-white dark:aria-selected:!text-slate-900"
             />
           ))}
         </Tabs>

@@ -62,11 +62,7 @@ export default function DishesInfo({
   const isFavoritesLoading = isLoadingFavorites;
 
   return (
-    <div
-      className="flex flex-col gap-6 mt-6 px-2 overflow-y-auto 
-      flex-grow h-1"
-      id="food-scroll"
-    >
+    <div className="flex flex-col gap-4">
       {isLoading && (
         <>
           <FoodCardSkeleton />
@@ -92,7 +88,7 @@ export default function DishesInfo({
             No dishes available for this selection.
           </Typography>
         ) : isCompactView ? (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
             {dishes.map((dish) => (
               <FoodCard
                 key={dish.id}
@@ -109,7 +105,7 @@ export default function DishesInfo({
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 min-[960px]:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 min-[960px]:grid-cols-2">
             {dishes.map((dish) => (
               <FoodCard
                 key={dish.id}

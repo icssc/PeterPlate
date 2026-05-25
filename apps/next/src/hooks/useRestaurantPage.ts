@@ -191,16 +191,13 @@ export function useRestaurantPage(hall: HallEnum): UseRestaurantPageResult {
       return;
     }
 
-    const isValid = stations.some(
-      (s) => s.name.toLowerCase() === selectedStation,
-    );
+    const isValid = stations.some((s) => s.id === selectedStation);
 
-    if (!isValid) setSelectedStation(stations[0].name.toLowerCase());
+    if (!isValid) setSelectedStation(stations[0].id);
   }, [selectedStation, stations, setSelectedStation]);
 
   const activeStation =
-    stations.find((s) => s.name.toLowerCase() === selectedStation) ??
-    stations[0];
+    stations.find((s) => s.id === selectedStation) ?? stations[0];
 
   const dishes: DishWithRating[] = activeStation?.dishes ?? [];
 

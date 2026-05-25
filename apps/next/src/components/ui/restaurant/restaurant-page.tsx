@@ -138,6 +138,7 @@ export function RestaurantPage({
               <DishesView
                 stations={stations}
                 activeStation={activeStation}
+                isDesktop={isDesktop}
                 isLoading={isLoading}
                 isError={isError}
                 error={error as TRPCClientErrorLike<AppRouter> | null}

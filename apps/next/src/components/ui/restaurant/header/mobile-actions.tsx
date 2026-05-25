@@ -86,12 +86,14 @@ export function MobileActions({
                 {stations.map((station) => (
                   <button
                     type="button"
-                    key={station.name}
+                    key={station.id}
                     className="text-left px-2 py-1.5 text-sm font-medium rounded-sm hover:bg-slate-100 dark:text-white dark:hover:bg-[#434e5d] transition-colors"
                     onClick={() => {
-                      const val = station.name.toLowerCase();
+                      const val = station.id;
                       if (isCompactView) {
-                        const element = document.getElementById(val);
+                        const element = document.getElementById(
+                          `station-${val}`,
+                        );
                         if (element) {
                           element.scrollIntoView({
                             behavior: "smooth",

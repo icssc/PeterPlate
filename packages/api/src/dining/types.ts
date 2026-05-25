@@ -96,6 +96,7 @@ export type FormattedRestaurantInfo = {
 
 /** Station information, with name and dishes currently available at this station for this period. */
 export type Station = {
+  id: string;
   name: string;
   dishes: DishWithRating[];
 };
