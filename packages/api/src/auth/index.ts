@@ -1,6 +1,7 @@
 import { join } from "node:path";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { nextCookies } from "better-auth/next-js";
 import { genericOAuth } from "better-auth/plugins";
 import { config } from "dotenv";
 import * as schema from "../../../db/src/index";
@@ -79,6 +80,8 @@ export const auth = betterAuth({
         ];
       })(),
     }),
+    // Required for Set-Cookie on OAuth callbacks in Next.js App Router (see AntAlmanac).
+    nextCookies(),
   ],
   database: drizzleAdapter(db, {
     provider: "pg",

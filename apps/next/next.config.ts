@@ -24,6 +24,17 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      // iOS ASWebAuthenticationSession callback lands on /auth/native (AASA-listed).
+      // Forward to Better Auth's handler so session cookies are set via toNextJsHandler.
+      {
+        source: '/auth/native',
+        destination: '/api/auth/oauth2/callback/icssc-native',
+        permanent: false,
+      },
+    ];
+  },
   async headers() {
     return [
       {
