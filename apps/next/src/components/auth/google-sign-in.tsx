@@ -12,7 +12,10 @@ export function GoogleSignInButton() {
     setSignInError(null);
 
     try {
-      const authUrl = await getSignInUrl(isNativeIosApp());
+      const authUrl = await getSignInUrl(
+        isNativeIosApp(),
+        `${window.location.pathname}${window.location.search}${window.location.hash}`,
+      );
       window.location.href = authUrl;
     } catch (error) {
       console.error("Sign in error:", error);

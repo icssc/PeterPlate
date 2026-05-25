@@ -5,7 +5,10 @@ import { getNativeIosRedirectUri } from "@/lib/platform";
 
 const OIDC_ISSUER_URL = "https://auth.icssc.club";
 
-export async function getSignInUrl(isNativeIosApp: boolean) {
+export async function getSignInUrl(
+  isNativeIosApp: boolean,
+  returnUrl?: string,
+) {
   const baseURL =
     process.env.NEXT_PUBLIC_BASE_URL ??
     process.env.BETTER_AUTH_URL ??
@@ -15,6 +18,7 @@ export async function getSignInUrl(isNativeIosApp: boolean) {
     body: {
       providerId: "icssc",
       callbackURL: isNativeIosApp ? getNativeIosRedirectUri(baseURL) : "/",
+      additionalData: returnUrl ? { returnUrl } : undefined,
     },
   });
 

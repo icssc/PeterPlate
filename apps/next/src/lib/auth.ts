@@ -1,10 +1,17 @@
 import "server-only";
 
 import { db, account, session, users, verification } from "@peterplate/db";
+import { createAuthMiddleware, getOAuthState } from "better-auth/api";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { betterAuth } from "better-auth/minimal";
 import { nextCookies } from "better-auth/next-js";
 import { genericOAuth } from "better-auth/plugins";
+
+import { getSafeAuthRedirectPath } from "@/lib/auth-utils";
+
+type AuthAdditionalData = {
+  returnUrl?: string;
+};
 
 const authSecret =
   process.env.BETTER_AUTH_SECRET ?? process.env.NEXT_PUBLIC_BETTER_AUTH_SECRET;
@@ -55,6 +62,23 @@ export const auth = betterAuth({
     }),
     nextCookies(),
   ],
+  hooks: {
+    after: createAuthMiddleware(async (ctx) => {
+      if (ctx.path === "/oauth2/callback/:providerId") {
+        const additionalData = (await getOAuthState()) as
+          | AuthAdditionalData
+          | null;
+        if (additionalData?.returnUrl) {
+          const returnUrl = getSafeAuthRedirectPath(
+            additionalData.returnUrl,
+            ctx.request?.url,
+            new URL(baseURL).origin,
+          );
+          ctx.redirect(returnUrl);
+        }
+      }
+    }),
+  },
   database: drizzleAdapter(db, {
     provider: "pg",
     schema: {
