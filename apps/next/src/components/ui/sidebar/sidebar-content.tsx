@@ -60,7 +60,7 @@ export default function SidebarContent({
   };
 
   return (
-    <Box className="w-full h-full rounded-2xl bg-white dark:bg-[#313136] shadow-xl flex flex-col">
+    <Box className="w-full h-full rounded-2xl bg-white dark:bg-[#313136] shadow-2xl flex flex-col">
       {/* Header */}
       <div className="flex items-start justify-between px-5 pt-5">
         <div className="flex items-center gap-3">
@@ -244,7 +244,7 @@ export default function SidebarContent({
           <button
             type="button"
             onClick={handleSignOut}
-            className="w-28 rounded-lg bg-sky-700 hover:bg-sky-800 text-white
+            className="w-full rounded-lg bg-sky-700 hover:bg-sky-800 text-white
   dark:bg-accent-primary dark:hover:bg-accent-primary/85 dark:text-black
   py-2.5 px-6 text-sm font-semibold inline-flex items-center justify-center gap-2"
           >

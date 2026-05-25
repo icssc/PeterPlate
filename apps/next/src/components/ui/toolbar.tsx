@@ -335,8 +335,7 @@ export function DesktopToolbar(): React.JSX.Element {
           horizontal: "right",
         }}
         PaperProps={{
-          className:
-            "bg-transparent shadow-none p-0 w-[357px] max-h-[658px] mt-1",
+          className: "p-0 w-[357px] max-h-[658px] mt-1 shadow-2xl rounded-2xl",
         }}
         MenuListProps={{
           className: "p-0",
