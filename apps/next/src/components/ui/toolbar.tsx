@@ -1,10 +1,11 @@
 "use client";
 
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import CloseIcon from "@mui/icons-material/Close";
+import ContentPasteOutlinedIcon from "@mui/icons-material/ContentPasteOutlined";
 import FavoriteBorder from "@mui/icons-material/FavoriteBorder";
-import FeedbackIcon from "@mui/icons-material/Feedback";
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
-import InfoIcon from "@mui/icons-material/Info";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import InsertInvitation from "@mui/icons-material/InsertInvitation";
 import ListAltRoundedIcon from "@mui/icons-material/ListAltRounded";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -30,6 +31,7 @@ import { useEffect, useState } from "react";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useSession } from "@/utils/auth-client";
+import AppearancePicker from "./appearance-picker";
 import EditPreferencesContent from "./edit-preferences-content";
 import SidebarContent from "./sidebar/sidebar-content";
 
@@ -223,6 +225,7 @@ function GuestToolbarMenu({
           }}
         />
       </IconButton>
+      <MenuScrim open={open} />
       <Menu
         anchorEl={anchorEl}
         open={open}
@@ -237,44 +240,76 @@ function GuestToolbarMenu({
         }}
         PaperProps={{
           className:
-            "mt-1 w-[280px] rounded-xl border border-gray-200 bg-white shadow-xl dark:border-zinc-700 dark:bg-[#323235]",
+            "mt-2 w-[280px] max-w-[calc(100vw-2rem)] overflow-hidden rounded-[20px] border border-gray-200 bg-white dark:border-zinc-700 dark:bg-[#323235]",
           sx: {
             backgroundImage: "none",
+            boxShadow:
+              "0 3px 14px 2px rgba(0, 0, 0, 0.12), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 5px 5px -3px rgba(0, 0, 0, 0.20)",
           },
         }}
         MenuListProps={{
-          className: "p-2",
+          className: "p-0",
         }}
       >
-        <MenuItem
-          component={Link}
-          href="/about"
-          onClick={handleClose}
-          className="!rounded-lg !px-3 !py-2"
-        >
-          <InfoIcon
-            fontSize="small"
-            className="mr-3 text-sky-700 dark:text-blue-300"
+        <li className="list-none">
+          <div className="flex h-14 items-center justify-end border-b border-gray-300 px-4 dark:border-zinc-700">
+            <IconButton
+              type="button"
+              onClick={handleClose}
+              aria-label="Close menu"
+              className="!p-1 !text-black dark:!text-white"
+            >
+              <CloseIcon sx={{ fontSize: 26 }} />
+            </IconButton>
+          </div>
+        </li>
+        <li className="list-none border-t border-gray-300 px-5 py-4 dark:border-zinc-700">
+          <AppearancePicker />
+        </li>
+        <li className="list-none space-y-1 px-5 pb-5 pt-2">
+          <Link
+            href="/feedback"
+            onClick={handleClose}
+            className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-sm font-medium text-black hover:bg-sky-50 dark:text-white dark:hover:bg-blue-300/10"
+          >
+            <ContentPasteOutlinedIcon
+              fontSize="small"
+              className="text-sky-700 dark:text-blue-300"
+            />
+            Feedback
+          </Link>
+          <Link
+            href="/about"
+            onClick={handleClose}
+            className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-sm font-medium text-black hover:bg-sky-50 dark:text-white dark:hover:bg-blue-300/10"
+          >
+            <InfoOutlinedIcon
+              fontSize="small"
+              className="text-sky-700 dark:text-blue-300"
+            />
+            About PeterPlate
+          </Link>
+        </li>
+        <li className="list-none border-t border-gray-300 px-5 pb-5 pt-3 dark:border-zinc-700">
+          <GoogleSignInButton
+            className="h-auto w-full rounded-lg bg-sky-700 py-2.5 text-sm font-medium text-white shadow-none hover:bg-sky-800 dark:bg-blue-300 dark:text-gray-900 dark:hover:bg-blue-400 [&_svg]:!size-5"
+            label="Sign In"
+            showIcon
           />
-          About PeterPlate
-        </MenuItem>
-        <MenuItem
-          component={Link}
-          href="/feedback"
-          onClick={handleClose}
-          className="!rounded-lg !px-3 !py-2"
-        >
-          <FeedbackIcon
-            fontSize="small"
-            className="mr-3 text-sky-700 dark:text-blue-300"
-          />
-          Feedback Form
-        </MenuItem>
-        <li className="mt-2 list-none border-t border-gray-200 p-2 dark:border-zinc-700">
-          <GoogleSignInButton />
         </li>
       </Menu>
     </>
+  );
+}
+
+function MenuScrim({ open }: { open: boolean }): React.JSX.Element | null {
+  if (!open) return null;
+
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none fixed inset-0 z-[1200] bg-black/40"
+    />
   );
 }
 
@@ -401,13 +436,17 @@ export function DesktopToolbar(): React.JSX.Element {
                   />
                 </IconButton>
               ) : (
-                <GuestToolbarMenu {...{ isTransparent }} />
+                <>
+                  <GoogleSignInButton iconOnly />
+                  <GuestToolbarMenu {...{ isTransparent }} />
+                </>
               )}
             </div>
           </div>
         </MuiToolbar>
       </AppBar>
 
+      <MenuScrim open={profileOpen} />
       <Menu
         anchorEl={profileAnchor}
         open={profileOpen}
@@ -555,7 +594,7 @@ function MobileToolbar(): React.JSX.Element {
         }`}
       >
         <span
-          className={`text-[15px] font-semibold truncate pr-2 ${
+          className={`min-w-0 flex-1 truncate pr-2 text-[15px] font-semibold ${
             isTransparent
               ? "text-white"
               : "text-neutral-800 dark:text-neutral-100"
@@ -586,10 +625,13 @@ function MobileToolbar(): React.JSX.Element {
               />
             </IconButton>
           ) : (
-            <GuestToolbarMenu
-              {...{ isTransparent }}
-              buttonClassName="!min-w-[44px] !min-h-[44px]"
-            />
+            <>
+              <GoogleSignInButton iconOnly />
+              <GuestToolbarMenu
+                {...{ isTransparent }}
+                buttonClassName="!min-w-[44px] !min-h-[44px]"
+              />
+            </>
           )}
         </div>
       </div>
@@ -648,6 +690,7 @@ function MobileToolbar(): React.JSX.Element {
         </div>
       </div>
 
+      <MenuScrim open={profileOpen} />
       <Menu
         anchorEl={profileAnchor}
         open={profileOpen}

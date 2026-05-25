@@ -2,22 +2,19 @@
 
 import {
   Close as CloseIcon,
-  DarkMode as DarkModeIcon,
-  DesktopWindows as DesktopWindowsIcon,
   Edit as EditIcon,
   Feedback as FeedbackIcon,
   Info as InfoIcon,
-  LightMode as LightModeIcon,
   Logout as LogoutIcon,
 } from "@mui/icons-material";
 import { Box, Tooltip, Typography } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
-import { useTheme } from "next-themes";
 import type React from "react";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in";
+import AppearancePicker from "@/components/ui/appearance-picker";
 import { signOut, useSession } from "@/utils/auth-client";
 import { formatDietaryKey } from "@/utils/dietary";
 import { trpc } from "@/utils/trpc";
@@ -34,7 +31,6 @@ export default function SidebarContent({
   const { data: session } = useSession();
   const user = session?.user;
   const userId = user?.id;
-  const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);
@@ -153,59 +149,30 @@ export default function SidebarContent({
         </div>
 
         {/* Appearance */}
-        <div>
-          <Typography variant="body2" fontWeight={600} color="primary" mb={1}>
-            Appearance
-          </Typography>
-
-          <div className="flex rounded-lg border border-sky-700 dark:border-blue-300 overflow-hidden">
-            <ThemeButton
-              active={theme === "light"}
-              onClick={() => setTheme("light")}
-              icon={<LightModeIcon fontSize="small" />}
-              label="Light"
-            />
-            <ThemeButton
-              active={theme === "system"}
-              onClick={() => setTheme("system")}
-              icon={<DesktopWindowsIcon fontSize="small" />}
-              label="Device"
-            />
-            <ThemeButton
-              active={theme === "dark"}
-              onClick={() => setTheme("dark")}
-              icon={<DarkModeIcon fontSize="small" />}
-              label="Dark"
-            />
-          </div>
-        </div>
+        <AppearancePicker />
 
         {/* Links */}
-        <div className="space-y-1">
-          <Tooltip title={!user ? "Please login to edit preferences." : ""}>
-            <span className="block">
-              <button
-                type="button"
-                disabled={!user}
-                onClick={() => {
-                  onClose();
-                  onEditPreferencesClick();
-                }}
-                className="w-full flex items-center gap-3 rounded-lg px-4 py-2 text-sm text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:dark:hover:bg-transparent"
-              >
-                <Box sx={{ color: "primary.main" }}>
-                  <EditIcon fontSize="small" />
-                </Box>
-                <Typography
-                  variant="body2"
-                  fontWeight={500}
-                  color="text.primary"
+        <div className="space-y-1 pb-2">
+          {user ? (
+            <Tooltip title={!user ? "Please login to edit preferences." : ""}>
+              <span className="block">
+                <button
+                  type="button"
+                  disabled={!user}
+                  onClick={() => {
+                    onClose();
+                    onEditPreferencesClick();
+                  }}
+                  className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-sm font-medium text-gray-900 hover:bg-sky-50 dark:text-white dark:hover:bg-blue-300/10 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:dark:hover:bg-transparent"
                 >
-                  Edit Preferences
-                </Typography>
-              </button>
-            </span>
-          </Tooltip>
+                  <Box sx={{ color: "primary.main" }}>
+                    <EditIcon fontSize="small" />
+                  </Box>
+                  <span>Edit Preferences</span>
+                </button>
+              </span>
+            </Tooltip>
+          ) : null}
 
           <MenuLink
             href="/feedback"
@@ -227,7 +194,7 @@ export default function SidebarContent({
 
       {/* Sign out */}
 
-      <div className="px-5 pb-5 pt-3">
+      <div className="border-t border-gray-200 px-5 pb-2 pt-3 dark:border-zinc-700">
         {user ? (
           <button
             type="button"
@@ -240,37 +207,14 @@ export default function SidebarContent({
             </span>
           </button>
         ) : (
-          <GoogleSignInButton />
+          <GoogleSignInButton
+            className="h-auto w-full rounded-xl bg-sky-700 py-2.5 text-sm font-medium text-white shadow-none hover:bg-sky-800 dark:bg-blue-300 dark:text-gray-900 dark:hover:bg-blue-400 [&_svg]:!size-5"
+            label="Sign In"
+            showIcon
+          />
         )}
       </div>
     </Box>
-  );
-}
-
-function ThemeButton({
-  active,
-  onClick,
-  icon,
-  label,
-}: {
-  active: boolean;
-  onClick: () => void;
-  icon: ReactNode;
-  label: string;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`flex-1 flex items-center justify-center gap-1 py-2 text-xs font-medium transition-colors ${
-        active
-          ? "bg-sky-700 text-white dark:bg-blue-300 dark:text-gray-900"
-          : "text-gray-700 hover:bg-sky-100 dark:text-white dark:hover:bg-zinc-700"
-      }`}
-    >
-      {icon}
-      {label}
-    </button>
   );
 }
 
@@ -289,7 +233,7 @@ function MenuLink({
     <Link
       href={href}
       onClick={onClick}
-      className="flex items-center gap-3 rounded-lg px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+      className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-sm font-medium text-gray-900 hover:bg-sky-50 dark:text-white dark:hover:bg-blue-300/10"
     >
       <Box sx={{ color: "primary.main" }}>{icon}</Box>
       <Typography variant="body2" fontWeight={500} color="text.primary">

@@ -1,8 +1,10 @@
 "use client";
 
+import LoginIcon from "@mui/icons-material/Login";
 import posthog from "posthog-js";
 import { useCallback, useState } from "react";
 import { authClient } from "@/utils/auth-client";
+import { cn } from "@/utils/tw";
 import { Button } from "../ui/shadcn/button";
 
 function isNativeIosApp(): boolean {
@@ -25,7 +27,21 @@ function isNativeIosApp(): boolean {
   return false;
 }
 
-export function GoogleSignInButton() {
+type GoogleSignInButtonProps = {
+  className?: string;
+  containerClassName?: string;
+  iconOnly?: boolean;
+  label?: string;
+  showIcon?: boolean;
+};
+
+export function GoogleSignInButton({
+  className,
+  containerClassName,
+  iconOnly = false,
+  label = "Sign In with Google",
+  showIcon = false,
+}: GoogleSignInButtonProps) {
   const [signInError, setSignInError] = useState<string | null>(null);
 
   const handleSignIn = useCallback(async () => {
@@ -61,15 +77,46 @@ export function GoogleSignInButton() {
   }, []);
 
   return (
-    <div className="flex w-full flex-col gap-2">
+    <div
+      className={cn(
+        "flex flex-col gap-2",
+        iconOnly ? "w-auto" : "w-full",
+        containerClassName,
+      )}
+    >
       <Button
         onClick={handleSignIn}
-        className="w-full bg-sky-700 text-white hover:bg-sky-800 dark:bg-blue-300 dark:text-gray-900 dark:hover:bg-blue-400"
+        size={iconOnly ? "icon" : "default"}
+        aria-label={iconOnly ? "Sign In with Google" : undefined}
+        className={cn(
+          iconOnly
+            ? "h-10 w-10 rounded-lg bg-sky-700 text-white shadow-none hover:bg-sky-800 dark:bg-blue-300 dark:text-gray-900 dark:hover:bg-blue-400"
+            : "w-full bg-sky-700 text-white hover:bg-sky-800 dark:bg-blue-300 dark:text-gray-900 dark:hover:bg-blue-400",
+          className,
+        )}
       >
-        Sign In with Google
+        {iconOnly ? (
+          <>
+            <LoginIcon aria-hidden="true" fontSize="small" />
+            <span className="sr-only">Sign In with Google</span>
+          </>
+        ) : (
+          <>
+            {showIcon ? (
+              <LoginIcon aria-hidden="true" fontSize="small" />
+            ) : null}
+            {label}
+          </>
+        )}
       </Button>
       {signInError ? (
-        <p className="text-center text-sm text-destructive" role="alert">
+        <p
+          className={cn(
+            "text-center text-sm text-destructive",
+            iconOnly && "sr-only",
+          )}
+          role="alert"
+        >
           {signInError}
         </p>
       ) : null}
