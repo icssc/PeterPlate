@@ -1,11 +1,14 @@
 "use server";
 
 import { auth } from "@/lib/auth";
+import { Provider } from "@/lib/auth-types";
+import { getProviderIcsscName } from "@/lib/auth-utils";
 import { getNativeIosRedirectUri } from "@/lib/platform";
 
 const OIDC_ISSUER_URL = "https://auth.icssc.club";
 
 export async function getSignInUrl(
+  provider: Provider,
   isNativeIosApp: boolean,
   returnUrl?: string,
 ) {
@@ -18,11 +21,16 @@ export async function getSignInUrl(
     body: {
       providerId: "icssc",
       callbackURL: isNativeIosApp ? getNativeIosRedirectUri(baseURL) : "/",
-      additionalData: returnUrl ? { returnUrl } : undefined,
+      additionalData: {
+        returnUrl,
+        provider,
+      },
     },
   });
 
-  return url;
+  const authUrl = new URL(url);
+  authUrl.searchParams.set("provider", getProviderIcsscName(provider));
+  return authUrl.toString();
 }
 
 export async function getSignOutUrl(redirectUrl: string) {

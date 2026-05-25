@@ -16,7 +16,7 @@ import Link from "next/link";
 import { useTheme } from "next-themes";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
-import { GoogleSignInButton } from "@/components/auth/google-sign-in";
+import { SignInButtons } from "@/components/auth/sign-in-buttons";
 import { signOut, useSession } from "@/utils/auth-client";
 import { trpc } from "@/utils/trpc";
 
@@ -212,7 +212,7 @@ export default function SidebarContent({
             </span>
           </button>
         ) : (
-          <GoogleSignInButton />
+          <SignInButtons />
         )}
       </div>
     </div>

@@ -24,7 +24,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { MouseEvent } from "react";
 import { useEffect, useState } from "react";
-import { GoogleSignInButton } from "@/components/auth/google-sign-in";
+import { SignInButtons } from "@/components/auth/sign-in-buttons";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useSession } from "@/utils/auth-client";
 import EditPreferencesContent from "./edit-preferences-content";
@@ -282,8 +282,8 @@ export function DesktopToolbar(): React.JSX.Element {
                   />
                 </IconButton>
               ) : (
-                <div className="flex items-center gap-2">
-                  <GoogleSignInButton />
+                <div className="flex flex-col gap-2">
+                  <SignInButtons fullWidth={false} />
                 </div>
               )}
             </div>

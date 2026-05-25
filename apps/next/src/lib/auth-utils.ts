@@ -1,3 +1,5 @@
+import { Provider } from "@/lib/auth-types";
+
 export function getSafeAuthRedirectPath(
   redirectUrl: string | null | undefined,
   requestUrl: string | null | undefined,
@@ -18,5 +20,23 @@ export function getSafeAuthRedirectPath(
     return "/";
   } catch {
     return "/";
+  }
+}
+
+export function getProviderDisplayName(provider: Provider): string {
+  switch (provider) {
+    case Provider.Google:
+      return "Google";
+    case Provider.Apple:
+      return "Apple";
+  }
+}
+
+export function getProviderIcsscName(provider: Provider): string {
+  switch (provider) {
+    case Provider.Google:
+      return "google";
+    case Provider.Apple:
+      return "apple";
   }
 }

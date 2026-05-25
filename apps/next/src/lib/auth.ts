@@ -8,10 +8,7 @@ import { nextCookies } from "better-auth/next-js";
 import { genericOAuth } from "better-auth/plugins";
 
 import { getSafeAuthRedirectPath } from "@/lib/auth-utils";
-
-type AuthAdditionalData = {
-  returnUrl?: string;
-};
+import type { AuthAdditionalData } from "@/lib/auth-types";
 
 const authSecret =
   process.env.BETTER_AUTH_SECRET ?? process.env.NEXT_PUBLIC_BETTER_AUTH_SECRET;
