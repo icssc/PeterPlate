@@ -2,20 +2,17 @@
 
 import { Restaurant, StarBorder } from "@mui/icons-material";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
-import { Card, CardContent, Dialog, Drawer, Typography } from "@mui/material";
+import { Card, CardContent, Typography } from "@mui/material";
 import type { DishWithRating } from "@peterplate/validators";
 import Image from "next/image";
 import React from "react";
-import { useSnackbarStore } from "@/context/useSnackbar";
 import { useUserStore } from "@/context/useUserStore";
-import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { getDietaryConflicts } from "@/utils/dietary";
 import { formatFoodName, getFoodIcon } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
 import { cn } from "@/utils/tw";
 import Favorite from "../favorite";
-import FoodDialogContent from "../food-dialog-content";
-import FoodDrawerContent from "../food-drawer-content";
+import FoodCardShell from "./food-card-shell";
 
 /** Handler for "Add to meal tracker" used by card, dialog, and drawer. */
 export type OnAddToMealTracker = (e: React.MouseEvent) => void;
@@ -267,43 +264,9 @@ export default function FoodCard({
   className,
   ...dish
 }: FoodCardProps): React.JSX.Element {
-  const isDesktop = useMediaQuery("(min-width: 768px)");
-  const [open, setOpen] = React.useState(false);
-  const userId = useUserStore((s) => s.userId);
-
-  const utils = trpc.useUtils();
-  const { showSnackbar } = useSnackbarStore();
-
-  const logMealMutation = trpc.nutrition.logMeal.useMutation({
-    onSuccess: () => {
-      showSnackbar(`Added ${formatFoodName(dish.name)} to your log`, "success");
-      utils.nutrition.invalidate();
-    },
-    onError: (error) => {
-      console.error(error.message);
-    },
-  });
-
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-
-  const handleAddToMealTracker = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!userId) {
-      showSnackbar("Login to track meals!", "error");
-      return;
-    }
-    logMealMutation.mutate({
-      dishId: dish.id,
-      userId,
-      dishName: dish.name,
-      servings: 1,
-    });
-  };
-
-  if (isDesktop)
-    return (
-      <>
+  return (
+    <FoodCardShell dish={dish} restaurant={restaurant}>
+      {(handleOpen, handleAddToMealTracker) => (
         <FoodCardContent
           {...{
             dish,
@@ -317,85 +280,7 @@ export default function FoodCard({
           onAddToMealTracker={handleAddToMealTracker}
           onClick={handleOpen}
         />
-        <Dialog
-          open={open}
-          onClose={handleClose}
-          maxWidth={false}
-          slotProps={{
-            paper: {
-              sx: {
-                width: "460px",
-                maxWidth: "90vw",
-                maxHeight: "90vh",
-                margin: 2,
-                padding: 0,
-                overflow: "hidden",
-                display: "flex",
-                flexDirection: "column",
-                borderRadius: "16px",
-              },
-            },
-          }}
-        >
-          <FoodDialogContent
-            {...{ dish, restaurant }}
-            onAddToMealTracker={handleAddToMealTracker}
-            isAddingToMealTracker={logMealMutation.isPending}
-          />
-        </Dialog>
-      </>
-    );
-  else
-    return (
-      <>
-        <FoodCardContent
-          {...{
-            dish,
-            restaurant,
-            isFavorited,
-            onToggleFavorite,
-            isCompact,
-            className,
-          }}
-          favoriteDisabled={favoriteIsLoading}
-          onAddToMealTracker={handleAddToMealTracker}
-          onClick={handleOpen}
-        />
-        <Drawer
-          anchor="bottom"
-          open={open}
-          onClose={handleClose}
-          slotProps={{
-            paper: {
-              sx: {
-                width: "460px",
-                maxWidth: "90vw",
-                maxHeight: "85vh",
-                margin: 2,
-                padding: 0,
-                overflow: "hidden",
-                display: "flex",
-                flexDirection: "column",
-                borderRadius: "16px",
-              },
-            },
-          }}
-          sx={{
-            "& .MuiDrawer-paper": {
-              borderTopLeftRadius: "10px",
-              borderTopRightRadius: "10px",
-              marginTop: "96px",
-              height: "auto",
-              maxHeight: "85vh",
-            },
-          }}
-        >
-          <FoodDrawerContent
-            {...{ dish, restaurant }}
-            onAddToMealTracker={handleAddToMealTracker}
-            isAddingToMealTracker={logMealMutation.isPending}
-          />
-        </Drawer>
-      </>
-    );
+      )}
+    </FoodCardShell>
+  );
 }
