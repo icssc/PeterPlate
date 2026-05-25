@@ -295,9 +295,9 @@ extension ViewController: WKScriptMessageHandler {
 //   2. Passkeys / WebAuthn bound to a third-party RP ID (e.g. google.com) only
 //      work in top-level Safari context, not in a WKWebView.
 //
-// The callback uses a Universal Link (`https://www.peterplate.com/auth/native`)
+// The callback uses a Universal Link (`https://peterplate.com/auth/native`)
 // via ASWebAuthenticationSession's HTTPS-callback initializer. The AASA file
-// at `https://www.peterplate.com/.well-known/apple-app-site-association` lists
+// at `https://peterplate.com/.well-known/apple-app-site-association` lists
 // this path, so the callback can only be delivered to our AASA-verified app.
 // Listing `/auth/native` (instead of the default callback path) prevents iOS
 // from hijacking normal Safari logins via Universal Links.
@@ -318,7 +318,7 @@ extension ViewController: ASWebAuthenticationPresentationContextProviding {
 
     func startAuthSession(url: URL, webView: WKWebView) {
         // Extract redirect_uri from the OIDC authorize URL.  Better Auth sets it to
-        // https://www.peterplate.com/auth/native via the genericOAuth `redirectURI`
+        // https://peterplate.com/auth/native via the genericOAuth `redirectURI`
         // config.  We derive the ASWebAuthenticationSession callback from this value
         // so that the session callback matches the redirect_uri we told the IdP to
         // use, which is what makes the AASA validation succeed.
@@ -329,7 +329,7 @@ extension ViewController: ASWebAuthenticationPresentationContextProviding {
             .value
             .flatMap { URL(string: $0) }
 
-        let callbackHost = redirectUri?.host ?? "www.peterplate.com"
+        let callbackHost = redirectUri?.host ?? "peterplate.com"
         // Use the path only if it's non-empty; a bare https://host URL has path "".
         let rawPath = redirectUri?.path ?? ""
         let callbackPath = rawPath.isEmpty ? "/auth/native" : rawPath
@@ -370,8 +370,8 @@ extension ViewController: ASWebAuthenticationPresentationContextProviding {
         let started = session.start()
         if !started {
             print("[PeterPlate] ⚠️ ASWebAuthenticationSession.start() returned false. " +
-                  "Check that applinks:www.peterplate.com is in the entitlements and " +
-                  "that the AASA at https://www.peterplate.com/.well-known/apple-app-site-association " +
+                  "Check that applinks:peterplate.com is in the entitlements and " +
+                  "that the AASA at https://peterplate.com/.well-known/apple-app-site-association " +
                   "lists the com.peterplate bundle ID with path /auth/native.")
         }
     }

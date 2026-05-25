@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 /**
  * Apple App Site Association (AASA) file.
  *
- * Served at `https://www.peterplate.com/.well-known/apple-app-site-association`
+ * Served at `https://peterplate.com/.well-known/apple-app-site-association`
  * (via a rewrite in `next.config.ts`). Apple's CDN fetches this to:
  *
  * 1. Authorize the PeterPlate iOS app to claim Universal Links for the
@@ -17,7 +17,7 @@ import { NextResponse } from 'next/server';
  *
  * - `TEAM_ID`: 10-char Apple Developer Team ID. Same ICSSC org as AntAlmanac.
  * - `BUNDLE_IDS`: every bundle ID that should resolve Universal Links for
- *   www.peterplate.com.
+ *   peterplate.com.
  *
  */
 

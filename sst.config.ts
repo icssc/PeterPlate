@@ -131,6 +131,7 @@ export default $config({
         BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET!,
         AUTH_CLIENT_ID: clientId,
         BETTER_AUTH_URL: `https://${domain}`,
+        NEXT_PUBLIC_BASE_URL: `https://${domain}`,
       },
       cachePolicy: "50ea56d0-b7b0-4bf7-9ab8-0f7f9a0d03d5",
       domain: {
