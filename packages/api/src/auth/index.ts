@@ -71,18 +71,6 @@ export const auth = betterAuth({
             pkce: true,
             mapProfileToUser,
           },
-          {
-            providerId: "icssc-native",
-            clientId,
-            discoveryUrl,
-            // Never fall back to localhost — unset baseURL would produce an unregistered
-            // redirect_uri and ASWebAuthenticationSession.start() would return false
-            // because localhost doesn't match the Associated Domains entitlement.
-            redirectURI: `${baseURL}/auth/native`,
-            scopes,
-            pkce: true,
-            mapProfileToUser,
-          },
         ];
       })(),
     }),

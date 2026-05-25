@@ -11,11 +11,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication,
                        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 
-        if Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil {
-            FirebaseApp.configure()
-            Messaging.messaging().delegate = self
-            application.registerForRemoteNotifications()
-        }
+        // GoogleService-Info.plist must match bundle ID `com.peterplate` and come from
+        // the Firebase console — the PWA Builder template (com.microsoft.pwabuilder-ios)
+        // will crash on configure(). Uncomment when a real plist is in place.
+        // FirebaseApp.configure()
+        // Messaging.messaging().delegate = self
+        // application.registerForRemoteNotifications()
 
         UNUserNotificationCenter.current().delegate = self
 
