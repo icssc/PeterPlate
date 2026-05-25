@@ -1,7 +1,6 @@
 import "server-only";
 
-import { db } from "@peterplate/db";
-import * as schema from "@peterplate/db/schema";
+import { db, account, session, users, verification } from "@peterplate/db";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { betterAuth } from "better-auth/minimal";
 import { nextCookies } from "better-auth/next-js";
@@ -59,10 +58,10 @@ export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "pg",
     schema: {
-      user: schema.users,
-      session: schema.session,
-      account: schema.account,
-      verification: schema.verification,
+      user: users,
+      session,
+      account,
+      verification,
     },
   }),
 });
