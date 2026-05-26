@@ -22,6 +22,83 @@ type DishDataRestaurantStation = DishWithRating & {
   stationName: string;
 };
 
+interface DiningHallCardProps {
+  href: string;
+  src: string;
+  alt: string;
+  name: string;
+  location: string;
+  statusText: string | null | undefined;
+  isLoading: boolean;
+  compact?: boolean;
+  imageClassName?: string;
+}
+
+function DiningHallCard({
+  href,
+  src,
+  alt,
+  name,
+  location,
+  statusText,
+  isLoading,
+  compact = false,
+  imageClassName = "object-cover",
+}: DiningHallCardProps): React.JSX.Element {
+  return (
+    <Link href={href} className={`group${compact ? " block" : ""}`}>
+      <Box
+        className="rounded-xl overflow-hidden shadow-sm hover:shadow-md transition dark:bg-surface-elevated"
+        sx={{ border: 1, borderColor: "divider" }}
+      >
+        <div className={`relative w-full ${compact ? "h-24" : "h-56"}`}>
+          <Image src={src} alt={alt} fill className={imageClassName} priority />
+        </div>
+        <div
+          className={`relative flex items-center justify-between ${
+            compact ? "p-3" : "p-4"
+          }`}
+        >
+          <div className={`space-y-${compact ? "1" : "1.5"}`}>
+            <Typography
+              className={`${compact ? "text-sm" : "text-lg"} font-semibold`}
+              color="primary"
+            >
+              {name}
+            </Typography>
+            <Box className="flex items-center gap-1.5">
+              <LocationOn
+                {...(compact
+                  ? { style: { fontSize: 16 } }
+                  : { fontSize: "small" })}
+              />
+              <Typography variant="body2" color="text.secondary">
+                {location}
+              </Typography>
+            </Box>
+            <Box className="flex items-center gap-1.5">
+              <AccessTime
+                {...(compact
+                  ? { style: { fontSize: 16 } }
+                  : { fontSize: "small" })}
+              />
+              <Typography variant="body2" color="text.secondary">
+                {isLoading ? "Loading..." : statusText || "Hours unavailable"}
+              </Typography>
+            </Box>
+          </div>
+          <ChevronRight
+            color="primary"
+            {...(compact
+              ? { className: "absolute top-3 right-3", style: { fontSize: 16 } }
+              : { className: "w-6 h-6" })}
+          />
+        </div>
+      </Box>
+    </Link>
+  );
+}
+
 export default function Home() {
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
@@ -105,7 +182,7 @@ function DesktopHome(): React.JSX.Element {
 
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8 mt-14">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
         <Typography className="text-2xl sm:text-3xl font-bold" gutterBottom>
           See what's on the menu today!
         </Typography>
@@ -116,91 +193,25 @@ function DesktopHome(): React.JSX.Element {
             Dining Halls
           </Typography>
           <div className="grid grid-cols-2 gap-12">
-            {/* Brandywine Card */}
-            <Link href="/brandywine" className="group">
-              <Box
-                className="rounded-xl overflow-hidden shadow-sm hover:shadow-md transition dark:bg-surface-elevated"
-                sx={{ border: 1, borderColor: "divider" }}
-              >
-                <div className="relative w-full h-56">
-                  <Image
-                    src="/brandywine.webp"
-                    alt="Brandywine dining hall"
-                    fill
-                    className="object-cover object-bottom"
-                    priority
-                  />
-                </div>
-                <div className="flex items-center justify-between p-4">
-                  <div className="space-y-1.5">
-                    <Typography
-                      className="text-lg font-semibold"
-                      color="primary"
-                    >
-                      Brandywine
-                    </Typography>
-                    <Box className="flex items-center gap-1.5">
-                      <LocationOn fontSize="small" />
-                      <Typography variant="body2" color="text.secondary">
-                        Middle Earth Community
-                      </Typography>
-                    </Box>
-                    <Box className="flex items-center gap-1.5">
-                      <AccessTime fontSize="small" />
-                      <Typography variant="body2" color="text.secondary">
-                        {isLoading
-                          ? "Loading..."
-                          : brandywineStatus.statusText || "Hours unavailable"}
-                      </Typography>
-                    </Box>
-                  </div>
-                  <ChevronRight color="primary" className="w-6 h-6" />
-                </div>
-              </Box>
-            </Link>
-
-            {/* Anteatery Card */}
-            <Link href="/anteatery" className="group">
-              <Box
-                className="rounded-xl overflow-hidden shadow-sm hover:shadow-md transition dark:bg-surface-elevated"
-                sx={{ border: 1, borderColor: "divider" }}
-              >
-                <div className="relative w-full h-56">
-                  <Image
-                    src="/anteatery.webp"
-                    alt="Anteatery dining hall"
-                    fill
-                    className="object-cover"
-                    priority
-                  />
-                </div>
-                <div className="flex items-center justify-between p-4">
-                  <div className="space-y-1.5">
-                    <Typography
-                      className="text-lg font-semibold"
-                      color="primary"
-                    >
-                      Anteatery
-                    </Typography>
-                    <Box className="flex items-center gap-1.5">
-                      <LocationOn fontSize="small" />
-                      <Typography variant="body2" color="text.secondary">
-                        Mesa Court
-                      </Typography>
-                    </Box>
-                    <Box className="flex items-center gap-1.5">
-                      <AccessTime fontSize="small" />
-                      <Typography variant="body2" color="text.secondary">
-                        {isLoading
-                          ? "Loading..."
-                          : anteateryStatus.statusText || "Hours unavailable"}
-                      </Typography>
-                    </Box>
-                  </div>
-                  <ChevronRight color="primary" className="w-6 h-6" />
-                </div>
-              </Box>
-            </Link>
+            <DiningHallCard
+              href="/brandywine"
+              src="/brandywine.webp"
+              alt="Brandywine dining hall"
+              name="Brandywine"
+              location="Middle Earth Community"
+              statusText={brandywineStatus.statusText}
+              isLoading={isLoading}
+              imageClassName="object-cover object-bottom"
+            />
+            <DiningHallCard
+              href="/anteatery"
+              src="/anteatery.webp"
+              alt="Anteatery dining hall"
+              name="Anteatery"
+              location="Mesa Court"
+              statusText={anteateryStatus.statusText}
+              isLoading={isLoading}
+            />
           </div>
         </section>
 
@@ -335,99 +346,27 @@ function MobileHome(): React.JSX.Element {
             Dining Halls
           </Typography>
           <div className="space-y-3">
-            {/* Brandywine Card */}
-            <Link href="/brandywine" className="group block">
-              <Box
-                className="rounded-xl overflow-hidden shadow-sm hover:shadow-md transition dark:bg-surface-elevated"
-                sx={{ border: 1, borderColor: "divider" }}
-              >
-                <div className="relative w-full h-24">
-                  <Image
-                    src="/brandywine.webp"
-                    alt="Brandywine dining hall"
-                    fill
-                    className="object-cover object-bottom"
-                    priority
-                  />
-                </div>
-                <div className="relative flex items-center justify-between p-3">
-                  <div className="space-y-1">
-                    <Typography
-                      className="text-sm font-semibold"
-                      color="primary"
-                    >
-                      Brandywine
-                    </Typography>
-                    <Box className="flex items-center gap-1.5">
-                      <LocationOn style={{ fontSize: 16 }} />
-                      <Typography variant="body2" color="text.secondary">
-                        Middle Earth Community
-                      </Typography>
-                    </Box>
-                    <Box className="flex items-center gap-1.5">
-                      <AccessTime style={{ fontSize: 16 }} />
-                      <Typography variant="body2" color="text.secondary">
-                        {isLoading
-                          ? "Loading..."
-                          : brandywineStatus.statusText || "Hours unavailable"}
-                      </Typography>
-                    </Box>
-                  </div>
-                  <ChevronRight
-                    color="primary"
-                    className="absolute top-3 right-3"
-                    style={{ fontSize: 16 }}
-                  />
-                </div>
-              </Box>
-            </Link>
-
-            {/* Anteatery Card */}
-            <Link href="/anteatery" className="group block">
-              <Box
-                className="rounded-xl overflow-hidden shadow-sm hover:shadow-md transition dark:bg-surface-elevated"
-                sx={{ border: 1, borderColor: "divider" }}
-              >
-                <div className="relative w-full h-24">
-                  <Image
-                    src="/anteatery.webp"
-                    alt="Anteatery dining hall"
-                    fill
-                    className="object-cover"
-                    priority
-                  />
-                </div>
-                <div className="relative flex items-center justify-between p-3">
-                  <div className="space-y-1">
-                    <Typography
-                      className="text-sm font-semibold"
-                      color="primary"
-                    >
-                      Anteatery
-                    </Typography>
-                    <Box className="flex items-center gap-1.5">
-                      <LocationOn style={{ fontSize: 16 }} />
-                      <Typography variant="body2" color="text.secondary">
-                        Mesa Court
-                      </Typography>
-                    </Box>
-                    <Box className="flex items-center gap-1.5">
-                      <AccessTime style={{ fontSize: 16 }} />
-                      <Typography variant="body2" color="text.secondary">
-                        {isLoading
-                          ? "Loading..."
-                          : anteateryStatus.statusText || "Hours unavailable"}
-                      </Typography>
-                    </Box>
-                  </div>
-                  <ChevronRight
-                    color="primary"
-                    className="absolute top-3 right-3"
-                    style={{ fontSize: 16 }}
-                  />
-                </div>
-              </Box>
-            </Link>
+            <DiningHallCard
+              href="/brandywine"
+              src="/brandywine.webp"
+              alt="Brandywine dining hall"
+              name="Brandywine"
+              location="Middle Earth Community"
+              statusText={brandywineStatus.statusText}
+              isLoading={isLoading}
+              compact
+              imageClassName="object-cover object-bottom"
+            />
+            <DiningHallCard
+              href="/anteatery"
+              src="/anteatery.webp"
+              alt="Anteatery dining hall"
+              name="Anteatery"
+              location="Mesa Court"
+              statusText={anteateryStatus.statusText}
+              isLoading={isLoading}
+              compact
+            />
           </div>
         </section>
 
