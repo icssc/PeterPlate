@@ -12,7 +12,6 @@
     "build": "turbo build",
     "clean": "git clean -xdf node_modules",
     "clean:workspaces": "turbo clean",
-    "cron:daily": "pnpm -F @peterplate/server test:daily",
     "cron:weekly": "pnpm -F @peterplate/server test:weekly",
     "db:generate": "pnpm -F db db:generate",
     "db:migrate": "pnpm -F db db:migrate",

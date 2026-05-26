@@ -10,6 +10,7 @@ import {
   InfoOutlined as InfoIcon,
   LightMode as LightModeIcon,
   Logout as LogoutIcon,
+  Notifications as NotificationsIcon,
 } from "@mui/icons-material";
 import { Box, Tooltip, Typography } from "@mui/material";
 import Image from "next/image";
@@ -19,6 +20,7 @@ import type React from "react";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in";
+import NotificationsPanel from "@/components/ui/notifications-panel";
 import { signOut, useSession } from "@/utils/auth-client";
 import { formatDietaryKey } from "@/utils/dietary";
 import { trpc } from "@/utils/trpc";
@@ -37,6 +39,7 @@ export default function SidebarContent({
   const userId = user?.id;
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
 
   useEffect(() => setMounted(true), []);
 
@@ -58,6 +61,10 @@ export default function SidebarContent({
     }
     window.location.href = "/";
   };
+
+  if (showNotifications) {
+    return <NotificationsPanel onBack={() => setShowNotifications(false)} />;
+  }
 
   return (
     <Box className="w-full h-full rounded-2xl bg-white dark:bg-[#313136] shadow-2xl flex flex-col">
@@ -174,6 +181,28 @@ export default function SidebarContent({
 
         {/* Links */}
         <div className="space-y-1">
+          <Tooltip title={!user ? "Please login to enable notifications." : ""}>
+            <span className="block">
+              <button
+                type="button"
+                disabled={!user}
+                onClick={() => setShowNotifications(true)}
+                className="w-full flex items-center gap-3 rounded-lg px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:dark:hover:bg-transparent"
+              >
+                <Box sx={{ color: "primary.main" }}>
+                  <NotificationsIcon fontSize="small" />
+                </Box>
+                <Typography
+                  variant="body2"
+                  fontWeight={500}
+                  color="text.primary"
+                >
+                  Notifications
+                </Typography>
+              </button>
+            </span>
+          </Tooltip>
+
           <Tooltip title={!user ? "Please login to edit preferences." : ""}>
             <span className="block">
               <button
@@ -183,7 +212,7 @@ export default function SidebarContent({
                   onClose();
                   onEditPreferencesClick();
                 }}
-                className="w-full flex items-center gap-3 rounded-lg px-4 py-2 text-sm text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:dark:hover:bg-transparent"
+                className="w-full flex items-center gap-3 rounded-lg px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:dark:hover:bg-transparent"
               >
                 <EditIcon
                   fontSize="small"
