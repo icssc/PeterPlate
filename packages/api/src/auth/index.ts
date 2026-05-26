@@ -1,6 +1,7 @@
 import { join } from "node:path";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { nextCookies } from "better-auth/next-js";
 import { genericOAuth } from "better-auth/plugins";
 import { config } from "dotenv";
 import * as schema from "../../../db/src/index";
@@ -18,28 +19,27 @@ const authSecret =
   process.env.BETTER_AUTH_SECRET ?? process.env.NEXT_PUBLIC_BETTER_AUTH_SECRET;
 if (!authSecret) throw new Error("BETTER_AUTH_SECRET is not set");
 
-const authBaseURL =
-  process.env.BETTER_AUTH_URL ??
+// SST sets NEXT_PUBLIC_BASE_URL (see sst.config.ts, mirroring AntAlmanac).
+// BETTER_AUTH_URL is kept as a server-side alias for the same value.
+const baseURL =
   process.env.NEXT_PUBLIC_BASE_URL ??
-  "https://www.peterplate.com";
-
-const trustedOrigins = Array.from(
-  new Set(["https://www.peterplate.com", authBaseURL]),
-);
+  process.env.BETTER_AUTH_URL ??
+  "https://peterplate.com";
 
 export const auth = betterAuth({
   debug: process.env.NODE_ENV !== "production",
   secret: authSecret,
-  baseURL: authBaseURL,
-  // The iOS PWA shell (WKWebView) always sends Origin: https://www.peterplate.com
-  // because Settings.swift hardcodes rootUrl to that domain.  Better Auth builds
-  // its trusted-origins list from baseURL alone, so if NEXT_PUBLIC_BASE_URL is
-  // unset or points to a different host (e.g. the Vercel deploy URL), the
-  // origin check rejects every request that carries a cookie — which in the
-  // WKWebView is every request, because Swift injects the app-platform cookie
-  // via WKHTTPCookieStore.  Listing the production origin explicitly makes the
-  // iOS auth flow immune to baseURL misconfiguration.
-  trustedOrigins,
+  baseURL,
+  // The iOS PWA shell (WKWebView) sends Origin from Settings.swift rootUrl.
+  // auth.icssc.club only allows redirect URIs on the apex domain (peterplate.com),
+  // not www — baseURL and trustedOrigins must match deploy + iOS + IdP registration.
+  trustedOrigins: [baseURL],
+  session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60,
+    },
+  },
   user: {
     additionalFields: {
       hasOnboarded: {
@@ -81,7 +81,7 @@ export const auth = betterAuth({
             // (b) causes Swift's ASWebAuthenticationSession.start() to silently
             //     return false because "localhost" doesn't match the Associated
             //     Domains entitlement (applinks:www.peterplate.com).
-            redirectURI: `${authBaseURL ?? "https://www.peterplate.com"}/auth/native`,
+            redirectURI: `${baseURL ?? "https://www.peterplate.com"}/auth/native`,
             scopes,
             pkce: true,
             mapProfileToUser,
@@ -89,6 +89,8 @@ export const auth = betterAuth({
         ];
       })(),
     }),
+    // Required for Set-Cookie on OAuth callbacks in Next.js App Router (see AntAlmanac).
+    nextCookies(),
   ],
   database: drizzleAdapter(db, {
     provider: "pg",

@@ -18,7 +18,7 @@ import { useTheme } from "next-themes";
 import type React from "react";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
-import { GoogleSignInButton } from "@/components/auth/google-sign-in";
+import { SignInButtons } from "@/components/auth/sign-in-buttons";
 import { signOut, useSession } from "@/utils/auth-client";
 import { formatDietaryKey } from "@/utils/dietary";
 import { trpc } from "@/utils/trpc";
@@ -252,7 +252,7 @@ export default function SidebarContent({
             Sign Out
           </button>
         ) : (
-          <GoogleSignInButton />
+          <SignInButtons />
         )}
       </div>
     </Box>
