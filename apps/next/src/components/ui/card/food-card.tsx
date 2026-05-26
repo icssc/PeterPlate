@@ -175,15 +175,17 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                   )}
                 </Typography>
                 <div className="flex gap-2 items-center text-zinc-700 text-sm w-fit flex-shrink">
-                  <Typography
-                    noWrap
-                    color="text.primary"
-                    className="font-normal"
-                  >
-                    {dish.nutritionInfo.calories == null
-                      ? "-"
-                      : `${Math.round(dish.nutritionInfo.calories)} cal`}
-                  </Typography>
+                  {!isCompact && (
+                    <Typography
+                      noWrap
+                      color="text.primary"
+                      className="font-normal"
+                    >
+                      {dish.nutritionInfo.calories == null
+                        ? "-"
+                        : `${Math.round(dish.nutritionInfo.calories)} cal`}
+                    </Typography>
+                  )}
                   <div className="flex gap-1 items-center text-zinc-500">
                     <StarBorder
                       className="w-4 h-4 stroke-zinc-500"
