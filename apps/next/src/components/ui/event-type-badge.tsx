@@ -5,7 +5,7 @@ export default function EventTypeBadge({ type }: { type: EventCategory }) {
   return (
     <Typography
       className={`absolute bottom-3 right-3 text-sm font-medium px-4 py-1.5 
-        rounded-2xl border-button-primary-bg dark:border-2 bg-button-primary-bg`}
+        rounded-2xl border-primary-accent dark:border-2 bg-primary-accent/20`}
       color="primary"
     >
       {type}

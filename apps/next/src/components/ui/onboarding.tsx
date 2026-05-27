@@ -356,7 +356,7 @@ const OnboardingContent = React.forwardRef<
               sx={{
                 height: "45px",
                 width: "80px",
-                bgcolor: "var(--button-primary-bg)",
+                bgcolor: "var(--primary-accent)",
                 color: "var(--button-primary-fg)",
                 "&:hover": {
                   filter: "brightness(0.85)",
@@ -378,7 +378,7 @@ const OnboardingContent = React.forwardRef<
               sx={{
                 height: "45px",
                 width: "80px",
-                bgcolor: "var(--button-primary-bg)",
+                bgcolor: "var(--primary-accent)",
                 color: "var(--button-primary-fg)",
                 "&:hover": {
                   filter: "brightness(0.85)",
@@ -402,7 +402,7 @@ const OnboardingContent = React.forwardRef<
             sx={{
               height: "45px",
               width: "80px",
-              bgcolor: "var(--button-primary-bg)",
+              bgcolor: "var(--primary-accent)",
               color: "var(--button-primary-fg)",
               "&:hover": {
                 filter: "brightness(0.85)",

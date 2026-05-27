@@ -97,7 +97,7 @@ export function DishesView({
                   fontWeight={700}
                   color="text.primary"
                   sx={{ fontSize: "1.875rem" }}
-                  className="w-full bg-primary-accent pl-4 py-2 rounded-xl text-sky-700 dark:text-black"
+                  className="w-full bg-primary-accent/20 pl-4 py-2 rounded-xl text-sky-700 dark:text-black"
                 >
                   {toTitleCase(activeStation.name)}
                 </Typography>
