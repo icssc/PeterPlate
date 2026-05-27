@@ -26,7 +26,7 @@ import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import type { MouseEvent } from "react";
 import { useEffect, useState } from "react";
-import { GoogleSignInButton } from "@/components/auth/google-sign-in";
+import { SignInButtons } from "@/components/auth/sign-in-buttons";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useSession } from "@/utils/auth-client";
 import EditPreferencesContent from "./edit-preferences-content";
@@ -315,7 +315,9 @@ export function DesktopToolbar(): React.JSX.Element {
                   />
                 </IconButton>
               ) : (
-                <GoogleSignInButton />
+                <div className="flex flex-col gap-2">
+                  <SignInButtons fullWidth={false} />
+                </div>
               )}
             </div>
           </div>
@@ -502,7 +504,7 @@ function MobileToolbar(): React.JSX.Element {
               />
             </IconButton>
           ) : (
-            <GoogleSignInButton />
+            <SignInButtons fullWidth={false} />
           )}
         </div>
       </div>

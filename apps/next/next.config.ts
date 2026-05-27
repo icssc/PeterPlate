@@ -22,6 +22,20 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "delivery-p140432-e1469601.adobeaemcloud.com" },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: "/auth",
+        destination: "/api/auth/oauth2/callback/icssc",
+        permanent: false,
+      },
+      {
+        source: "/auth/native",
+        destination: "/",
+        permanent: false,
+      },
+    ];
+  },
   async rewrites() {
     return [
       {
