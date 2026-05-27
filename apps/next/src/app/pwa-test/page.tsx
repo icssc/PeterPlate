@@ -23,11 +23,8 @@ function PushNotificationManager() {
   );
   const [message, setMessage] = useState("");
 
-  const registerServiceWorker = useCallback(async () => {
-    const registration = await navigator.serviceWorker.register("/sw.js", {
-      scope: "/",
-      updateViaCache: "none",
-    });
+  const loadPushSubscription = useCallback(async () => {
+    const registration = await navigator.serviceWorker.ready;
     const sub = await registration.pushManager.getSubscription();
     setSubscription(sub);
   }, []);
@@ -35,9 +32,9 @@ function PushNotificationManager() {
   useEffect(() => {
     if ("serviceWorker" in navigator && "PushManager" in window) {
       setIsSupported(true);
-      registerServiceWorker();
+      loadPushSubscription();
     }
-  }, [registerServiceWorker]);
+  }, [loadPushSubscription]);
 
   async function subscribeToPush() {
     const registration = await navigator.serviceWorker.ready;
