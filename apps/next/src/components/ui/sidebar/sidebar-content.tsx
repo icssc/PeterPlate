@@ -51,10 +51,10 @@ export default function SidebarContent({
   );
 
   const handleSignOut = async () => {
-    const savedTheme = localStorage.getItem("theme");
+    const userTheme = theme ?? localStorage.getItem("theme");
     await signOut();
-    if (savedTheme) {
-      localStorage.setItem("theme", savedTheme);
+    if (userTheme) {
+      localStorage.setItem("theme", userTheme);
     }
     window.location.href = "/";
   };
