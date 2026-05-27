@@ -151,7 +151,7 @@ export default function TrackerOnboarding() {
 
     if (finishedStatuses.includes(status) || action === "close") {
       setRun(false);
-      setHasOnboardedMealTracker(true); // mark onboarding complete when tour finishes or is skipped
+      setHasOnboardedMealTracker(true);
     }
   };
 
