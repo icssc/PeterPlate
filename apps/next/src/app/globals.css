@@ -56,7 +56,7 @@ body {
     --radius: 0.5rem;
     --surface-elevated: #ffffff;
     --surface-modal: #ffffff;
-    --button-primary-bg: #0069A8;
+    --button-primary-bg: 203 100% 33%;
     --primary-accent: rgba(0, 105, 168, 0.2);
     --button-primary-fg: #ffffff;
     --button-disabled-bg: rgba(0, 0, 0, 0.12);
