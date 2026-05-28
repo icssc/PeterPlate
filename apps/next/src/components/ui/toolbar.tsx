@@ -107,6 +107,7 @@ const MOBILE_TOOLBAR_ELEMENTS: ToolbarElement[] = [
   },
 ];
 
+// Routes on which the toolbar should remain transparent
 const TRANSPARENT_PAGES = ["/about", "/brandywine", "/anteatery"];
 
 function ToolbarDropdown({
@@ -134,7 +135,7 @@ function ToolbarDropdown({
       <Button
         onClick={handleClick}
         endIcon={<ArrowDropDownIcon fontSize="small" />}
-        className={`capitalize text-[16px] !font-medium bg-transparent ${
+        className={`capitalize text-[20px] !font-medium bg-transparent ${
           isTransparent ? "text-white" : "!text-black dark:!text-white"
         }`}
       >
@@ -144,7 +145,7 @@ function ToolbarDropdown({
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
-        className="capitalize text-[16px] font-medium
+        className="capitalize text-[20px] font-medium
         group-hover:text-white text-white/60 bg-transparent"
         slotProps={{
           paper: {
@@ -221,7 +222,7 @@ export function DesktopToolbar(): React.JSX.Element {
         position={isTransparent ? "absolute" : "sticky"}
         className={`shadow-none ${
           isTransparent
-            ? "bg-transparent bg-gradient-to-b from-black/50 to-black/0"
+            ? "bg-transparent bg-gradient-to-b from-black/70 to-black/0"
             : "bg-white dark:bg-[#323235]"
         }`}
         sx={{
@@ -271,7 +272,7 @@ export function DesktopToolbar(): React.JSX.Element {
                   key={element.title}
                   component={Link}
                   href={element.href || "#"}
-                  className={`normal-case text-[16px] !font-medium ${
+                  className={`normal-case text-[20px] !font-medium ${
                     isTransparent
                       ? "text-white"
                       : pathname === element.href
