@@ -225,8 +225,7 @@ function DesktopHome(): React.JSX.Element {
               {["s1", "s2", "s3", "s4", "s5"].map((key) => (
                 <Box
                   key={key}
-                  className="flex-shrink-0 w-44 h-52 rounded-xl animate-pulse"
-                  sx={{ bgcolor: "background.paper" }}
+                  className="flex-shrink-0 w-44 h-52 rounded-xl animate-pulse bg-zinc-100 dark:bg-zinc-700"
                 />
               ))}
             </div>
@@ -261,9 +260,21 @@ function DesktopHome(): React.JSX.Element {
               <ChevronRight color="primary" className="w-4 h-4" />
             </Link>
           </div>
-          {!events || events.length === 0 ? (
+          {isLoading && (
+            <div className="flex gap-4 overflow-x-auto pb-2">
+              {["s1", "s2", "s3", "s4"].map((key) => (
+                <Box
+                  key={key}
+                  className="flex-shrink-0 w-64 h-48 rounded-xl animate-pulse bg-zinc-100 dark:bg-zinc-700"
+                  sx={{ bgcolor: "background.paper" }}
+                />
+              ))}
+            </div>
+          )}
+          {!isLoading && events && events.length === 0 && (
             <Typography color="text.secondary">No upcoming events.</Typography>
-          ) : (
+          )}
+          {events && events.length > 0 && (
             <div className="grid grid-cols-4 gap-4">
               {sortedEvents(events, 4).map((event, idx) => (
                 <UpcomingEventCard
