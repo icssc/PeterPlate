@@ -1,78 +1,92 @@
-import { upsert } from "@api/utils";
-
-import type {
-  DishToMenu,
-  Drizzle,
-  InsertDishWithRelations,
-} from "@peterplate/db";
+import type { InsertDish } from "@peterplate/db";
+import { type Drizzle, dishes } from "@peterplate/db";
 import {
-  dietRestrictions,
-  dishes,
-  dishesToMenus,
-  nutritionInfos,
-} from "@peterplate/db";
+  type DishWithRating,
+  retrieveDishesByIdResponseSchema,
+} from "@peterplate/validators";
+import { TRPCError } from "@trpc/server";
+import { AAPI_DINING_ROUTE } from "..";
 
-export async function upsertDish(
+export async function upsertDishesIfMissing(
   db: Drizzle,
-  { dietRestriction, nutritionInfo, ...dishData }: InsertDishWithRelations,
-): Promise<Omit<InsertDishWithRelations, "stationId">> {
+  dishData: InsertDish[],
+): Promise<InsertDish[]> {
+  if (dishData.length === 0) return [];
+
   try {
-    const result = await db.transaction<
-      Omit<InsertDishWithRelations, "stationId">
-    >(async (tx) => {
-      const txDb = tx as unknown as Drizzle;
-
-      // Only update image_url when the incoming value is a valid non-empty string; do not overwrite existing image_url with null/empty.
-      const dishSet = { ...dishData };
-      if (
-        dishSet.image_url == null ||
-        typeof dishSet.image_url !== "string" ||
-        dishSet.image_url.trim() === ""
-      ) {
-        delete dishSet.image_url;
-      }
-
-      const upsertedDish = await upsert(tx, dishes, dishData, {
-        target: [dishes.id],
-        set: dishSet,
-      });
-
-      const upsertedDietRestriction = await upsert(
-        txDb,
-        dietRestrictions,
-        dietRestriction,
-        {
-          target: dietRestrictions.dishId,
-          set: dietRestriction,
-        },
-      );
-
-      const upsertedNutritionInfo = await upsert(
-        txDb,
-        nutritionInfos,
-        nutritionInfo,
-        {
-          target: nutritionInfos.dishId,
-          set: nutritionInfo,
-        },
-      );
-
-      return {
-        ...upsertedDish,
-        dietRestriction: upsertedDietRestriction,
-        nutritionInfo: upsertedNutritionInfo,
-      };
-    });
-
-    return result;
+    const results = db
+      .insert(dishes)
+      .values(dishData)
+      .onConflictDoNothing()
+      .returning();
+    return results;
   } catch (e) {
     console.error(e);
     throw e;
   }
 }
 
-export const upsertDishToMenu = async (db: Drizzle, dishToMenu: DishToMenu) =>
-  await upsert(db, dishesToMenus, dishToMenu, {
-    target: [dishesToMenus.dishId, dishesToMenus.menuId],
-    set: dishToMenu,
+export async function getDishes(ids: string[], db: Drizzle) {
+  const response = await fetch(
+    `${AAPI_DINING_ROUTE}/dishes/batch?ids=${ids.join()}`,
+  );
+
+  // Retrieve and parse data from AAPI Endpoint
+  if (!response.ok) {
+    throw new TRPCError({
+      code: "SERVICE_UNAVAILABLE",
+      message: "Could not reach AAPI dishes endpoint.",
+    });
+  }
+
+  const result = await response.json();
+  const parsedResult = retrieveDishesByIdResponseSchema.safeParse(result);
+
+  if (!parsedResult.success) {
+    throw new TRPCError({
+      code: "PARSE_ERROR",
+      message: `Could not parse the response from retrieving dish data: ${parsedResult.error.message}`,
+    });
+  }
+
+  const data = parsedResult.data.data;
+  const dishIds = data.flatMap((dish) => dish.id);
+
+  // Upsert all of the dishIds found from API, doing nothing if exists
+  const upsertData = data.map(
+    (dish) =>
+      ({
+        id: dish.id,
+        numRatings: 0,
+        totalRating: 0,
+        createdAt: new Date(),
+        updatedAt: dish.updatedAt,
+      }) satisfies InsertDish,
+  );
+  await upsertDishesIfMissing(db, upsertData);
+
+  // Retrieve ratings from PeterPlate database
+  const dishesWithRatings = await db.query.dishes.findMany({
+    where: (dishes, { inArray }) => inArray(dishes.id, dishIds),
   });
+
+  const ratingMap = new Map(
+    dishesWithRatings.map((dish) => [
+      dish.id,
+      [dish.totalRating, dish.numRatings],
+    ]),
+  );
+
+  // Merge the ratings with dish information
+  const DishWithRating = data.map((apiDish) => {
+    const ratingInfo = ratingMap.get(apiDish.id ?? null);
+
+    return {
+      ...apiDish,
+      totalRating: ratingInfo?.at(0) ?? 0,
+      numRatings: ratingInfo?.at(1) ?? 0,
+    };
+  });
+
+  return DishWithRating as DishWithRating[];
+}

@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useState, type ReactNode } from "react";
+import posthog from "posthog-js";
+import { type ReactNode, useCallback, useState } from "react";
 import { getSignInUrl } from "@/lib/auth-actions";
 import type { Provider } from "@/lib/auth-types";
 import { getProviderDisplayName } from "@/lib/auth-utils";
@@ -25,6 +26,7 @@ export function SignInButton({
   const [isSigningIn, setIsSigningIn] = useState(false);
 
   const handleSignIn = useCallback(async () => {
+    posthog.capture("sign_in_clicked", { provider });
     setSignInError(null);
     setIsSigningIn(true);
 
@@ -37,6 +39,7 @@ export function SignInButton({
       window.location.href = authUrl;
     } catch (error) {
       console.error("Sign in error:", error);
+      posthog.captureException(error);
       const message =
         error instanceof Error ? error.message : "Sign-in request failed.";
       setSignInError(message);

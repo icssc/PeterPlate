@@ -1,8 +1,9 @@
+import { getDishes } from "@api/dishes/services";
 import { upsert } from "@api/utils";
-import type { Drizzle, SelectFavorite } from "@peterplate/db";
+import type { Drizzle, RestaurantId, SelectFavorite } from "@peterplate/db";
 import { favorites } from "@peterplate/db";
-import { TRPCError } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
+import { ensureDishMetadataRow } from "../dishes/local-metadata";
 
 /**
  * Get all favorites for a given user ID.
@@ -11,63 +12,40 @@ import { and, eq } from "drizzle-orm";
 export async function getFavorites(db: Drizzle, userId: string) {
   const userFavorites = await db.query.favorites.findMany({
     where: (favorites, { eq }) => eq(favorites.userId, userId),
-    with: {
-      dish: {
-        with: {
-          dietRestriction: true,
-          nutritionInfo: true,
-          station: {
-            with: {
-              restaurant: true,
-            },
-          },
-        },
-      },
-    },
   });
 
-  // Transform the data to include restaurant name on each dish, matching the format
-  // used in the normal menu view (RestaurantInfo)
-  return userFavorites.map((favorite) => {
-    const { station, ...dishWithoutStation } = favorite.dish;
-    const restaurantName = station?.restaurant?.name;
-    if (!restaurantName) {
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: `Restaurant not found for dish ${favorite.dish.id}`,
-      });
-    }
-    return {
-      ...favorite,
-      dish: {
-        ...dishWithoutStation,
-        restaurant: restaurantName,
-        stationName: station?.name ?? "",
-      },
-    };
-  });
+  if (userFavorites.length === 0) return [];
+
+  const dishes = await getDishes(
+    userFavorites.map((favorite) => favorite.dishId),
+    db,
+  );
+  const dishesById = new Map(dishes.map((dish) => [dish.id, dish]));
+
+  return userFavorites
+    .map((favorite) => {
+      const dish = dishesById.get(favorite.dishId);
+      if (!dish) return null;
+
+      return {
+        ...favorite,
+        dish,
+      };
+    })
+    .filter((favorite) => favorite !== null);
 }
 
 /**
- * Add a favorite for a given dish ID and user ID.
+ * Add a favorite for a given dish ID, user ID, and restaurant.
  * If a favorite already exists, no change is made (idempotent).
  */
 export async function addFavorite(
   db: Drizzle,
   userId: string,
   dishId: string,
+  restaurant: RestaurantId,
 ): Promise<SelectFavorite> {
-  // Check if dish exists
-  const dish = await db.query.dishes.findFirst({
-    where: (dishes, { eq }) => eq(dishes.id, dishId),
-  });
-
-  if (!dish) {
-    throw new TRPCError({
-      code: "NOT_FOUND",
-      message: "dish not found",
-    });
-  }
+  await ensureDishMetadataRow(db, dishId);
 
   // Upsert the favorite (idempotent - if exists, no change)
   const favorite = await upsert(
@@ -76,6 +54,7 @@ export async function addFavorite(
     {
       userId,
       dishId,
+      restaurant,
     },
     {
       target: [favorites.userId, favorites.dishId],

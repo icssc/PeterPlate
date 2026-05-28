@@ -1,5 +1,5 @@
-import { upsert, upsertBatch } from "@api/utils";
-import type { Drizzle, InsertPreference } from "@peterplate/db";
+import { upsert } from "@api/utils";
+import type { Drizzle, UserDietaryPreference } from "@peterplate/db";
 import { userDietaryPreferences } from "@peterplate/db";
 import { TRPCError } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
@@ -19,7 +19,7 @@ export async function getDietaryPreferences(db: Drizzle, userId: string) {
 export async function addDietaryPreferences(
   db: Drizzle,
   userId: string,
-  preferences: Array<string>,
+  preferences: UserDietaryPreference[],
 ): Promise<void> {
   try {
     const upsertPromises = preferences.map((pref) =>
@@ -47,7 +47,7 @@ export async function addDietaryPreferences(
 export async function deletePreference(
   db: Drizzle,
   userId: string,
-  preference: string,
+  preference: UserDietaryPreference,
 ): Promise<void> {
   await db
     .delete(userDietaryPreferences)

@@ -58,3 +58,4 @@ apps/expo-rewrite/expo-env.d.ts
 .next
 apps/next/public/sw.js
 apps/next/public/workbox-*.js
+.env.local

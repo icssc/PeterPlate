@@ -1,7 +1,7 @@
 "use server";
 
 import { auth } from "@/lib/auth";
-import { Provider } from "@/lib/auth-types";
+import type { Provider } from "@/lib/auth-types";
 import { getProviderIcsscName } from "@/lib/auth-utils";
 import { getNativeIosRedirectUri } from "@/lib/platform";
 

@@ -11,7 +11,7 @@ export function RestaurantHeader({ isDesktop, hall }: RestaurantHeaderProps) {
 
   return (
     // Desktop title
-    <Typography variant="h4" fontWeight={700} className="text-sky-700">
+    <Typography variant="h4" fontWeight={700} color="primary">
       {hall === HallEnum.ANTEATERY ? "Anteatery" : "Brandywine"}
     </Typography>
   );

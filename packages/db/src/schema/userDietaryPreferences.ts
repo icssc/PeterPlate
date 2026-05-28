@@ -1,6 +1,16 @@
 import { relations } from "drizzle-orm";
-import { pgTable, primaryKey, text } from "drizzle-orm/pg-core";
+import { pgEnum, pgTable, primaryKey, text } from "drizzle-orm/pg-core";
 import { users } from "./users";
+
+export const preferenceEnum = pgEnum("preference", [
+  "glutenFree",
+  "halal",
+  "kosher",
+  "locallyGrown",
+  "organic",
+  "vegan",
+  "vegetarian",
+]);
 
 export const userDietaryPreferences = pgTable(
   "user_dietary_preferences",
@@ -8,7 +18,7 @@ export const userDietaryPreferences = pgTable(
     userId: text("userId")
       .notNull()
       .references(() => users.id, { onDelete: "cascade", onUpdate: "cascade" }),
-    preference: text("preference").notNull(),
+    preference: preferenceEnum("preference").notNull(),
   },
   (table) => ({
     pk: primaryKey({ columns: [table.userId, table.preference] }),
@@ -27,3 +37,5 @@ export const userDietaryPreferencesRelations = relations(
 
 export type InsertPreference = typeof userDietaryPreferences.$inferInsert;
 export type SelectPreference = typeof userDietaryPreferences.$inferSelect;
+
+export type UserDietaryPreference = NonNullable<InsertPreference["preference"]>;

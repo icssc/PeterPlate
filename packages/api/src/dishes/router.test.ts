@@ -1,94 +1,122 @@
 import { apiTest } from "@api/apiTest";
-import { upsertMenu } from "@api/menus/services";
-import { upsertPeriod } from "@api/periods/services";
-import { upsertRestaurant } from "@api/restaurants/services";
-import { upsertStation } from "@api/stations/services";
-import { testData } from "@api/testData";
 import { upsertUser } from "@api/users/services";
-import { TRPCError } from "@trpc/server";
 import { describe } from "vitest";
-import { upsertDish } from "./services";
+import { upsertDishesIfMissing } from "./services";
 
 describe("dish.get", () => {
-  apiTest("gets a dish", async ({ api, expect, db, testData }) => {
-    await upsertRestaurant(db, testData.brandywine);
-    await upsertStation(db, testData.station);
-    await upsertPeriod(db, testData.period);
-    await upsertMenu(db, testData.menu);
-    await upsertDish(db, testData.dish);
+  apiTest(
+    "gets a dish, upserts if missing",
+    async ({ api, db, expect, testData }) => {
+      const result = await api.dish.get({
+        ids: [testData.dishIds.at(0) ?? ""],
+      });
+
+      const dbResult = await db.query.dishes.findFirst({
+        where: (dishes, { eq }) => eq(dishes.id, testData.dishIds.at(0) ?? ""),
+      });
+
+      expect(result.at(0)).not.toBe(undefined);
+      expect(dbResult).not.toBe(undefined);
+    },
+  );
+
+  apiTest(
+    "gets multiple dishes, upserts if missing",
+    async ({ api, db, expect, testData }) => {
+      const result = await api.dish.get({
+        ids: testData.dishIds,
+      });
+
+      const dbResult = await db.query.dishes.findMany({
+        where: (dishes, { inArray }) => inArray(dishes.id, testData.dishIds),
+      });
+
+      expect(result.length).toBeGreaterThan(1);
+      expect(result.length).eq(dbResult.length);
+      result.forEach((dish) => {
+        expect(dish).not.toBe(undefined);
+      });
+    },
+  );
+
+  apiTest("adds rating metadata fields", async ({ api, expect, testData }) => {
     const result = await api.dish.get({
-      id: testData.dish.id,
+      ids: [testData.dishIds.at(0) ?? ""],
     });
-    expect(result.id).toEqual(testData.dish.id);
-    expect(result.numRatings).toEqual(0);
-    expect(result.totalRating).toEqual(0);
+
+    expect(result[0]).toEqual(
+      expect.objectContaining({
+        totalRating: expect.any(Number),
+        numRatings: expect.any(Number),
+      }),
+    );
   });
 
   apiTest("fails on invalid params", async ({ api, expect }) => {
-    await expect(
-      api.dish.get({
-        id: 1 as unknown as "1",
-      }),
-    ).rejects.toThrowError(TRPCError);
+    const result = await api.dish.get({
+      ids: ["1"],
+    });
+
+    expect(result.length).eq(0);
   });
 });
 
 describe("dish.rate", () => {
-  const dishId = `${testData.dish.id}2` as const; // TODO: temporary workaround since db is dirtied between tests. should clear db after procedure tests
   apiTest("rates a dish", async ({ api, expect, testData, db }) => {
-    // await upsertRestaurant(db, testData.brandywine);
-    // await upsertStation(db, testData.station);
-    await upsertPeriod(db, testData.period);
-    await upsertMenu(db, testData.menu);
-    await upsertDish(db, {
-      ...testData.dish,
-      id: dishId,
-    });
+    await upsertDishesIfMissing(db, [
+      {
+        id: testData.dish.id,
+        numRatings: 0,
+        totalRating: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ]);
     await upsertUser(db, testData.user);
     const result = await api.dish.rate({
       ...testData.rating,
       dishId: testData.dish.id,
     });
-    const fetchedDish = await api.dish.get({
-      id: testData.dish.id,
+    const fetchedDishes = await api.dish.get({
+      ids: [testData.dish.id],
     });
-    expect(result.averageRating).toEqual(fetchedDish.totalRating);
-    expect(fetchedDish.numRatings).toEqual(1);
+    expect(result.averageRating).toEqual(fetchedDishes[0]?.totalRating);
+    expect(fetchedDishes[0]?.numRatings).toEqual(1);
   });
 
   apiTest("updates existing rating", async ({ api, expect, testData, db }) => {
-    await upsertPeriod(db, testData.period);
-    await upsertMenu(db, testData.menu);
-    await upsertDish(db, {
-      ...testData.dish,
-      id: dishId,
-    });
+    await upsertDishesIfMissing(db, [
+      {
+        id: testData.dish.id,
+        numRatings: 0,
+        totalRating: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ]);
     await upsertUser(db, testData.user);
     await api.dish.rate({
       ...testData.rating,
-      dishId,
     });
     await api.dish.rate({
       ...testData.rating,
-      dishId,
       rating: testData.rating.rating + 2,
     });
     const fetchedDish = await api.dish.get({
-      id: dishId,
+      ids: [testData.dish.id],
     });
-    expect(fetchedDish.numRatings).toEqual(1);
-    expect(fetchedDish.totalRating).toEqual(testData.rating.rating + 2);
+    expect(fetchedDish.at(0)?.numRatings).toEqual(1);
+    expect(fetchedDish.at(0)?.totalRating).toEqual(testData.rating.rating + 2);
 
     await api.dish.rate({
       ...testData.rating,
-      dishId,
     });
 
     const fetchedDish2 = await api.dish.get({
-      id: dishId,
+      ids: [testData.dish.id],
     });
-    expect(fetchedDish2.numRatings).toEqual(1);
-    expect(fetchedDish2.totalRating).toEqual(fetchedDish.totalRating - 2);
+    expect(fetchedDish2.at(0)?.numRatings).toEqual(1);
+    expect(fetchedDish2.at(0)?.totalRating).toEqual(testData.rating.rating);
   });
 
   apiTest("fails on invalid params", async ({ api, expect, testData }) => {

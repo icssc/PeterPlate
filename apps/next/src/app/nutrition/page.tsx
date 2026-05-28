@@ -1,6 +1,9 @@
 "use client";
 
+import type { RouterOutputs } from "@api/index";
+import { Box, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
+import posthog from "posthog-js";
 import { useEffect, useMemo, useState } from "react";
 import SearchMealCard from "@/components/ui/card/search-meal-card";
 import TrackedMealCard from "@/components/ui/card/tracked-meal-card";
@@ -16,6 +19,20 @@ import { useSnackbarStore } from "@/context/useSnackbar";
 import { useUserStore } from "@/context/useUserStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { trpc } from "@/utils/trpc";
+
+type LoggedMealWithNutrition =
+  RouterOutputs["nutrition"]["getMealsInLastWeek"][number];
+type DisplayDish = {
+  id: string;
+  name: string;
+  imageUrl?: string | null;
+  nutritionInfo?: {
+    calories?: number | null;
+    proteinG?: number | null;
+    totalCarbsG?: number | null;
+    totalFatG?: number | null;
+  } | null;
+};
 
 export default function MealTracker() {
   const utils = trpc.useUtils();
@@ -66,7 +83,7 @@ export default function MealTracker() {
 
   const mealsGroupedByDay = useMemo(() => {
     if (!meals) return [];
-    const groups: Record<string, typeof meals> = {};
+    const groups: Record<string, LoggedMealWithNutrition[]> = {};
 
     meals.forEach((meal) => {
       const dateKey = new Date(meal.eatenAt).toDateString();
@@ -83,11 +100,11 @@ export default function MealTracker() {
     return result.sort((a, b) => b.rawDate.getTime() - a.rawDate.getTime());
   }, [meals]);
 
-  const activeDayIndex = mealsGroupedByDay.length > 0 ? 0 : null;
+  const todayKey = new Date().toDateString();
   const selectedDay =
-    activeDayIndex !== null ? mealsGroupedByDay[activeDayIndex] : null;
+    mealsGroupedByDay.find((g) => g.dateLabel === todayKey) ?? null;
 
-  const toNum = (v: string | null) => {
+  const toNum = (v: number | string | null | undefined) => {
     const n = v == null ? 0 : Number(v);
     return Number.isFinite(n) ? n : 0;
   };
@@ -99,18 +116,29 @@ export default function MealTracker() {
     ].map((d) => new Date(d));
   }, [meals]);
 
-  // Checks dish availability
-  const { data: hallData } = trpc.peterplate.useQuery(
-    { date: selectedDay?.rawDate ?? new Date() },
+  const selectedDate = selectedDay?.rawDate ?? new Date();
+  const { data: anteateryData } = trpc.restaurant.useQuery(
+    { date: selectedDate, restaurant: "anteatery" },
     { enabled: Boolean(selectedDay) },
+  );
+  const { data: brandywineData } = trpc.restaurant.useQuery(
+    { date: selectedDate, restaurant: "brandywine" },
+    { enabled: Boolean(selectedDay) },
+  );
+
+  const halls = useMemo(
+    () =>
+      [anteateryData, brandywineData].filter(
+        (hall): hall is NonNullable<typeof anteateryData> => Boolean(hall),
+      ),
+    [anteateryData, brandywineData],
   );
 
   const availableDishIds = useMemo(() => {
     const set = new Set<string>();
-    const halls = [hallData?.anteatery, hallData?.brandywine].filter(Boolean);
     for (const hall of halls) {
-      for (const menu of hall?.menus ?? []) {
-        for (const station of menu.stations ?? []) {
+      for (const period of hall?.periods ?? []) {
+        for (const station of period.stations ?? []) {
           for (const dish of station.dishes ?? []) {
             set.add(dish.id);
           }
@@ -118,54 +146,44 @@ export default function MealTracker() {
       }
     }
     return set;
-  }, [hallData]);
+  }, [halls]);
 
   const isUnavailable = (dishId: string) =>
-    Boolean(hallData) && !availableDishIds.has(dishId);
+    halls.length > 0 && !availableDishIds.has(dishId);
 
-  // Flatten today's dishes for search
-  const availableDishes = useMemo(() => {
-    const dishes: {
-      id: string;
-      name: string;
-      calories: number;
-      protein: number;
-      carbs: number;
-      fat: number;
-      image_url?: string | null;
-    }[] = [];
-
-    const halls = [hallData?.anteatery, hallData?.brandywine].filter(Boolean);
-    const seen = new Set<string>();
-
+  const availableDishMap = useMemo(() => {
+    const dishes = new Map<string, DisplayDish>();
     for (const hall of halls) {
-      for (const menu of hall?.menus ?? []) {
-        for (const station of menu.stations ?? []) {
+      for (const period of hall.periods) {
+        for (const station of period.stations ?? []) {
           for (const dish of station.dishes ?? []) {
-            if (seen.has(dish.id)) continue;
-            seen.add(dish.id);
-            dishes.push({
-              id: dish.id,
-              name: dish.name,
-              calories: Number(dish.nutritionInfo?.calories ?? 0),
-              protein: Number(dish.nutritionInfo?.proteinG ?? 0),
-              carbs: Number(dish.nutritionInfo?.totalCarbsG ?? 0),
-              fat: Number(dish.nutritionInfo?.totalFatG ?? 0),
-              image_url: dish.image_url,
-            });
+            if (!dishes.has(dish.id)) dishes.set(dish.id, dish);
           }
         }
       }
     }
-
     return dishes;
-  }, [hallData]);
+  }, [halls]);
+
+  const availableDishes = useMemo(
+    () =>
+      Array.from(availableDishMap.values()).map((dish) => ({
+        id: dish.id,
+        name: dish.name,
+        calories: Number(dish.nutritionInfo?.calories ?? 0),
+        protein: Number(dish.nutritionInfo?.proteinG ?? 0),
+        carbs: Number(dish.nutritionInfo?.totalCarbsG ?? 0),
+        fat: Number(dish.nutritionInfo?.totalFatG ?? 0),
+        imageUrl: dish.imageUrl,
+      })),
+    [availableDishMap],
+  );
 
   // suggested meals memo
   const suggestedMeals = useMemo(() => {
     if (!meals) return [];
     const servingCounts: Record<string, number> = {};
-    const latestByDish: Record<string, (typeof meals)[0]> = {};
+    const latestByDish: Record<string, LoggedMealWithNutrition> = {};
 
     for (const meal of meals) {
       if (!meal.dishId) continue;
@@ -178,7 +196,7 @@ export default function MealTracker() {
       .filter(([, total]) => total >= 1)
       .sort(([, a], [, b]) => b - a)
       .map(([dishId]) => {
-        const meal = latestByDish[dishId]!;
+        const meal = latestByDish[dishId];
         return {
           ...meal,
           calories: Number(meal.calories ?? 0),
@@ -190,9 +208,65 @@ export default function MealTracker() {
       });
   }, [meals]);
 
+  const visibleMeals = selectedDay?.items ?? [];
+  const countedMeals = visibleMeals.filter(
+    (m) => (m.servings ?? 0) > 0 && !isUnavailable(m.dishId),
+  );
+
+  const fallbackDishIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const meal of [...visibleMeals, ...suggestedMeals]) {
+      if (meal.dishId && !availableDishMap.has(meal.dishId)) {
+        ids.add(meal.dishId);
+      }
+    }
+    return [...ids];
+  }, [availableDishMap, suggestedMeals, visibleMeals]);
+
+  const { data: fallbackDishes = [] } = trpc.dish.get.useQuery(
+    { ids: fallbackDishIds },
+    { enabled: fallbackDishIds.length > 0 },
+  );
+
+  const dishDisplayMap = useMemo(() => {
+    const map = new Map<
+      string,
+      {
+        id: string;
+        name: string;
+        imageUrl?: string | null;
+      }
+    >();
+
+    for (const dish of availableDishMap.values()) {
+      map.set(dish.id, {
+        id: dish.id,
+        name: dish.name,
+        imageUrl: dish.imageUrl ?? null,
+      });
+    }
+
+    for (const dish of fallbackDishes) {
+      if (!map.has(dish.id)) {
+        map.set(dish.id, {
+          id: dish.id,
+          name: dish.name,
+          imageUrl: dish.imageUrl ?? null,
+        });
+      }
+    }
+
+    return map;
+  }, [availableDishMap, fallbackDishes]);
+
   // logmeal mutation
   const logMeal = trpc.nutrition.logMeal.useMutation({
-    onSuccess: async () => {
+    onSuccess: async (_, variables) => {
+      posthog.capture("meal_logged", {
+        dish_id: variables.dishId,
+        dish_name: variables.dishName,
+        servings: variables.servings,
+      });
       await utils.nutrition.invalidate();
     },
     onError: (err) => {
@@ -200,20 +274,23 @@ export default function MealTracker() {
     },
   });
 
-  const visibleMeals = selectedDay?.items ?? [];
-  const countedMeals = visibleMeals.filter(
-    (m) => (m.servings ?? 0) > 0 && !isUnavailable(m.dishId),
-  );
-
   const isMobile = useMediaQuery("(max-width: 768px)");
 
   if (isLoading) return <div>Loading meals...</div>;
   if (error) return <div>Error loading meals</div>;
 
   return (
-    <div className="min-h-screen p-2 md:p-8 mt-2 md:mt-12">
+    <Box
+      sx={{ bgcolor: "background.default", minHeight: "100vh" }}
+      className="p-2 md:p-8 mt-2 md:mt-12"
+    >
       <div className="px-2 md:px-8">
-        <h1 className="text-2xl md:text-3xl font-bold text-sky-700 dark:text-sky-400 flex items-center justify-between">
+        <Typography
+          variant="h5"
+          fontWeight={700}
+          color="primary"
+          className="text-2xl md:text-3xl flex items-center justify-between"
+        >
           <span className="flex items-center gap-2 flex-nowrap whitespace-nowrap">
             Tracker
             {selectedDay && (
@@ -240,14 +317,14 @@ export default function MealTracker() {
               />
             )}
           </div>
-        </h1>
+        </Typography>
 
         {/* Subheading + History - desktop only */}
         <div className="hidden md:flex items-center justify-between mt-1">
-          <p className="text-zinc-800 dark:text-zinc-400">
-            Keep track of your health using our Nutrition Tracker! Add dishes to
+          <Typography variant="body1" color="text.primary">
+            Keep track of your eating using our Nutrition Tracker! Add dishes to
             count them towards your totals!
-          </p>
+          </Typography>
           {userId && (
             <TrackerHistory
               onDateSelect={() => {}}
@@ -362,17 +439,20 @@ export default function MealTracker() {
 
         {/* Counted Foods */}
         <div className="mt-6">
-          <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
+          <Typography variant="h6" fontWeight={600} color="text.primary">
             Counted Foods
-          </h2>
+          </Typography>
           {countedMeals.length === 0 ? (
-            <p className="mt-2 text-sm text-zinc-500">No counted foods.</p>
+            <Typography variant="body2" color="text.secondary" className="mt-2">
+              No logged meals yet for this day.
+            </Typography>
           ) : (
             <div className="flex flex-wrap gap-4 mt-4">
               {countedMeals.map((meal) => (
                 <TrackedMealCard
                   key={meal.id}
                   isUnavailable={isUnavailable(meal.dishId)}
+                  dish={dishDisplayMap.get(meal.dishId)}
                   meal={{
                     ...meal,
                     calories: toNum(meal.calories),
@@ -388,25 +468,33 @@ export default function MealTracker() {
 
         {/* Suggested Foods */}
         <div className="mt-6">
-          <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
+          <Typography variant="h6" fontWeight={600} color="text.primary">
             Suggested Foods
-          </h2>
+          </Typography>
           <div className="flex flex-wrap gap-4 mt-4">
             {suggestedMeals.length === 0 ? (
-              <p className="mt-2 text-zinc-500 text-sm">
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                className="mt-2"
+              >
                 Dishes from the past week logged 5+ times will appear here.
-              </p>
+              </Typography>
             ) : (
               suggestedMeals.map((meal) => (
                 <SearchMealCard
                   key={meal.dishId}
+                  dish={dishDisplayMap.get(meal.dishId)}
                   meal={meal}
                   isUnavailable={isUnavailable(meal.dishId)}
                   onAdd={(meal, servings) =>
                     logMeal.mutate({
                       userId: userId ?? "",
                       dishId: meal.dishId ?? "",
-                      dishName: meal.dishName ?? "",
+                      dishName:
+                        "dishName" in meal && typeof meal.dishName === "string"
+                          ? meal.dishName
+                          : "",
                       servings,
                       eatenAt: new Date(),
                     })
@@ -432,6 +520,6 @@ export default function MealTracker() {
           })
         }
       />
-    </div>
+    </Box>
   );
 }

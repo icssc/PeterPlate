@@ -1,3 +1,4 @@
+import type { Station } from "@api/index";
 import {
   ExpandMore,
   GridView,
@@ -15,22 +16,17 @@ import {
   ToggleButtonGroup,
   Typography,
 } from "@mui/material";
+import type { DishWithRating, Event } from "@peterplate/validators";
+import { useRestaurantUIStore } from "@/context/useRestaurantUIStore";
 import { toTitleCase } from "@/utils/funcs";
 
 interface MobileActionsProps {
   isDesktop: boolean;
   isLoading: boolean;
   isError: boolean;
-  dishes: any[];
-  stations: any[];
-  menuAnchor: HTMLElement | null;
-  setMenuAnchor: (el: HTMLElement | null) => void;
-  scheduleAnchor: HTMLElement | null;
-  setScheduleAnchor: (el: HTMLElement | null) => void;
-  hallEvents: any[];
-  isCompactView: boolean;
-  setIsCompactView: (isCompact: boolean) => void;
-  setSelectedStation: (station: string) => void;
+  dishes: DishWithRating[];
+  stations: Station[];
+  hallEvents: Event[];
 }
 
 export function MobileActions({
@@ -39,15 +35,16 @@ export function MobileActions({
   isError,
   dishes,
   stations,
-  menuAnchor,
-  setMenuAnchor,
-  scheduleAnchor,
-  setScheduleAnchor,
   hallEvents,
-  isCompactView,
-  setIsCompactView,
-  setSelectedStation,
 }: MobileActionsProps) {
+  const menuAnchor = useRestaurantUIStore((s) => s.menuAnchor);
+  const setMenuAnchor = useRestaurantUIStore((s) => s.setMenuAnchor);
+  const scheduleAnchor = useRestaurantUIStore((s) => s.scheduleAnchor);
+  const setScheduleAnchor = useRestaurantUIStore((s) => s.setScheduleAnchor);
+  const isCompactView = useRestaurantUIStore((s) => s.isCompactView);
+  const setIsCompactView = useRestaurantUIStore((s) => s.setIsCompactView);
+  const setSelectedStation = useRestaurantUIStore((s) => s.setSelectedStation);
+
   if (isDesktop) return null;
 
   return (
@@ -58,7 +55,7 @@ export function MobileActions({
           <>
             <Button
               variant="outlined"
-              className="!flex-[1] !h-8 !px-1 text-xs !border-sky-700 !text-black hover:bg-sky-100 !flex-nowrap !items-center"
+              className="!flex-[1] !h-8 !px-1 text-xs !border-sky-700 dark:!border-blue-300 !text-black dark:!text-white hover:bg-sky-100 dark:hover:!bg-zinc-700 !flex-nowrap !items-center"
               type="button"
               onClick={(e) => setMenuAnchor(e.currentTarget)}
             >
@@ -79,7 +76,9 @@ export function MobileActions({
               }}
               slotProps={{
                 paper: {
-                  className: "w-[200px] p-2 mt-1",
+                  className:
+                    "w-[200px] p-2 mt-1 border border-sky-700 dark:!bg-[#323235] dark:!border-blue-300",
+                  sx: { backgroundImage: "none" },
                 },
               }}
             >
@@ -88,7 +87,7 @@ export function MobileActions({
                   <button
                     type="button"
                     key={station.name}
-                    className="text-left px-2 py-1.5 text-sm font-medium rounded-sm hover:bg-slate-100 transition-colors"
+                    className="text-left px-2 py-1.5 text-sm font-medium rounded-sm hover:bg-slate-100 dark:text-white dark:hover:bg-[#434e5d] transition-colors"
                     onClick={() => {
                       const val = station.name.toLowerCase();
                       if (isCompactView) {
@@ -99,10 +98,8 @@ export function MobileActions({
                             block: "start",
                           });
                         }
-                        setSelectedStation(val);
-                      } else {
-                        setSelectedStation(val);
                       }
+                      setSelectedStation(val);
                       setMenuAnchor(null);
                     }}
                   >
@@ -117,7 +114,7 @@ export function MobileActions({
           <>
             <Button
               variant="outlined"
-              className="!flex-[1.5] !h-8 !px-1 text-xs !border-sky-700 !text-black hover:bg-sky-100 !flex-nowrap !items-center"
+              className="!flex-[1.5] !h-8 !px-1 text-xs !border-sky-700 dark:!border-blue-300 !text-black dark:!text-white hover:bg-sky-100 dark:hover:!bg-zinc-700 !flex-nowrap !items-center"
               type="button"
               onClick={(e) => setScheduleAnchor(e.currentTarget)}
             >
@@ -141,7 +138,9 @@ export function MobileActions({
               }}
               slotProps={{
                 paper: {
-                  className: "w-[300px] p-0 mt-1",
+                  className:
+                    "w-[300px] p-0 mt-1 border border-sky-700 dark:!bg-[#323235] dark:!border-blue-300",
+                  sx: { backgroundImage: "none" },
                 },
               }}
             >
@@ -149,6 +148,7 @@ export function MobileActions({
                 <Typography
                   variant="subtitle1"
                   fontWeight={700}
+                  color="primary"
                   className="mb-2"
                 >
                   Special Schedules
@@ -168,12 +168,21 @@ export function MobileActions({
                         key={`${event.title}-${String(event.start)}-${event.restaurantId}`}
                         disableGutters
                         elevation={0}
-                        className="before:hidden border-b last:border-b-0"
+                        className="before:hidden border-b dark:border-blue-300/30 last:border-b-0 dark:bg-transparent"
                       >
-                        <AccordionSummary expandIcon={<ExpandMore />}>
+                        <AccordionSummary
+                          expandIcon={
+                            <ExpandMore className="dark:text-blue-300" />
+                          }
+                          className="dark:!bg-transparent"
+                        >
                           <div className="flex flex-col w-full pr-2 text-left">
                             <div className="flex justify-between items-center w-full">
-                              <Typography variant="body2" fontWeight={700}>
+                              <Typography
+                                variant="body2"
+                                fontWeight={700}
+                                color="primary"
+                              >
                                 {event.title}
                               </Typography>
                               {isActive && (
@@ -195,7 +204,7 @@ export function MobileActions({
                         </AccordionSummary>
                         <AccordionDetails className="pt-0 pb-2">
                           <Typography variant="body2" color="text.secondary">
-                            {event.shortDescription ?? dateRange}
+                            {event.description ?? dateRange}
                           </Typography>
                         </AccordionDetails>
                       </Accordion>
@@ -224,13 +233,13 @@ export function MobileActions({
           >
             <ToggleButton
               value="card"
-              className="!border-sky-700 !px-2 !min-w-0 aria-pressed:!bg-sky-700 aria-pressed:!text-white !bg-white !text-sky-700"
+              className="!border-sky-700 dark:!border-blue-300 !px-2 !min-w-0 aria-pressed:!bg-sky-700 dark:aria-pressed:!bg-blue-300 aria-pressed:!text-white dark:aria-pressed:!text-gray-900 !bg-white dark:!bg-transparent !text-sky-700 dark:!text-blue-300"
             >
               <MenuIcon className="h-4 w-4" />
             </ToggleButton>
             <ToggleButton
               value="compact"
-              className="!border-sky-700 !px-2 !min-w-0 aria-pressed:!bg-sky-700 aria-pressed:!text-white !bg-white !text-sky-700"
+              className="!border-sky-700 dark:!border-blue-300 !px-2 !min-w-0 aria-pressed:!bg-sky-700 dark:aria-pressed:!bg-blue-300 aria-pressed:!text-white dark:aria-pressed:!text-gray-900 !bg-white dark:!bg-transparent !text-sky-700 dark:!text-blue-300"
             >
               <GridView className="h-4 w-4" />
             </ToggleButton>

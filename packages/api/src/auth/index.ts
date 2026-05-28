@@ -71,6 +71,21 @@ export const auth = betterAuth({
             pkce: true,
             mapProfileToUser,
           },
+          {
+            providerId: "icssc-native",
+            clientId,
+            discoveryUrl,
+            // Never fall back to localhost — if NEXT_PUBLIC_BASE_URL is unset the
+            // redirect_uri would be http://localhost:3000/auth/native, which
+            // (a) isn't registered with auth.icssc.club and
+            // (b) causes Swift's ASWebAuthenticationSession.start() to silently
+            //     return false because "localhost" doesn't match the Associated
+            //     Domains entitlement (applinks:www.peterplate.com).
+            redirectURI: `${baseURL ?? "https://www.peterplate.com"}/auth/native`,
+            scopes,
+            pkce: true,
+            mapProfileToUser,
+          },
         ];
       })(),
     }),

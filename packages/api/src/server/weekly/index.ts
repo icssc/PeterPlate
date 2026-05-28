@@ -1,60 +1,9 @@
-import { queryEventImageEndpoint } from "@api/events/images";
-import { upsertEvents } from "@api/events/services";
 import { logger } from "@api/logger";
 import { upsert } from "@api/utils";
 import type { RestEndpointMethodTypes } from "@octokit/rest";
 import { Octokit } from "@octokit/rest";
 import type { Drizzle } from "@peterplate/db";
 import { contributors, type InsertContributor } from "@peterplate/db";
-import { getAEMEvents } from "../daily/parse";
-import { upsertMenusForWeek } from "./upsert";
-
-/**
- * Query the GraphQL Events Endpoint for both restaurants and upsert them into
- * the database.
- * @param db The Drizzle database instance to insert into.
- */
-export async function eventJob(db: Drizzle): Promise<void> {
-  try {
-    const [brandywineEvents, anteateryEvents] = await Promise.all([
-      getAEMEvents("Brandywine"),
-      getAEMEvents("The Anteatery"),
-    ]);
-
-    const allEvents = [...brandywineEvents, ...anteateryEvents];
-    const eventImages = await queryEventImageEndpoint();
-
-    logger.info(
-      `[weekly] Found images for events ${Array.from(eventImages.keys())}`,
-    );
-    for (const event of allEvents) {
-      const imageURL = eventImages.get(event.title);
-      if (imageURL) event.image = imageURL;
-      else
-        logger.info(`[weekly] Could not find image for event ${event.title}.`);
-    }
-
-    logger.info(`[weekly] Upserting ${allEvents.length} events...`);
-    const upsertedEvents = await upsertEvents(db, allEvents);
-    logger.info(`[weekly] Upserted ${upsertedEvents.length} events.`);
-  } catch (error) {
-    logger.error(
-      error,
-      "[weekly] eventJob(): Failed to fetch or upsert events.",
-    );
-  }
-}
-
-export async function weeklyJob(db: Drizzle): Promise<void> {
-  const today = new Date();
-
-  logger.info(`[weekly] Starting Brandywine and Anteatery Menu jobs...`);
-  await Promise.all([
-    upsertMenusForWeek(db, today, "brandywine"),
-    upsertMenusForWeek(db, today, "anteatery"),
-  ]);
-  logger.info(`[weekly] Finished Brandywine and Anteatery Menu jobs.`);
-}
 
 type ContributorsList =
   RestEndpointMethodTypes["repos"]["listContributors"]["response"]["data"];
@@ -141,11 +90,7 @@ export async function upsertContributors(
 }
 
 export async function weekly(db: Drizzle): Promise<void> {
-  const results = await Promise.allSettled([
-    eventJob(db),
-    contributorsJob(db),
-    weeklyJob(db),
-  ]);
+  const results = await Promise.allSettled([contributorsJob(db)]);
 
   results.forEach((result) => {
     if (result.status === "rejected") {

@@ -1,17 +1,12 @@
 "use client";
 
+import type { AppRouter } from "@api/index";
 import { LocationOn } from "@mui/icons-material";
-import { Container, Link, Typography } from "@mui/material";
-import type { RestaurantInfo } from "@peterplate/api";
-import type { DateList } from "@peterplate/db";
+import { Box, Container, Link, Typography } from "@mui/material";
+import type { TRPCClientErrorLike } from "@trpc/client";
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
-import type { CalendarRange } from "@/components/ui/toolbar";
-import { useDate } from "@/context/date-context";
-import { useHallDerived, useHallStore } from "@/context/useHallStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-import { isSameDay } from "@/utils/funcs";
-import { trpc } from "@/utils/trpc";
+import { useRestaurantPage } from "@/hooks/useRestaurantPage";
 import {
   ANTEATERY_MAP_LINK_URL,
   BRANDYWINE_MAP_LINK_URL,
@@ -31,159 +26,33 @@ export function RestaurantPage({
 }: RestaurantPageProps): React.JSX.Element {
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
-  const { selectedDate, setSelectedDate } = useDate();
-  const today = useHallStore((s) => s.today);
-  const setHallInputs = useHallStore((s) => s.setInputs);
-
-  const [showPreferencesOnly, setShowPreferencesOnly] = useState(false);
-
-  const [enabledDates, setEnabledDates] = useState<DateList>(null);
-  const [calendarRange, setCalendarRange] = useState<CalendarRange | null>(
-    null,
-  );
-
-  const { data: dateRes } = trpc.pickableDates.useQuery();
-
-  useEffect(() => {
-    if (dateRes && dateRes.length > 0) {
-      setEnabledDates(dateRes);
-      setCalendarRange({
-        earliest: dateRes[0],
-        latest: dateRes[dateRes.length - 1],
-      });
-    }
-  }, [dateRes]);
-
-  const handleDateSelect = (newDateFromPicker: Date | undefined) => {
-    if (newDateFromPicker) {
-      const todayLocal = new Date();
-      if (
-        newDateFromPicker.getFullYear() === todayLocal.getFullYear() &&
-        newDateFromPicker.getMonth() === todayLocal.getMonth() &&
-        newDateFromPicker.getDate() === todayLocal.getDate()
-      ) {
-        setSelectedDate(new Date());
-      } else {
-        setSelectedDate(newDateFromPicker);
-      }
-    } else {
-      setSelectedDate(undefined);
-    }
-  };
-
-  const { data, isLoading, isError, error } = trpc.peterplate.useQuery(
-    { date: selectedDate ?? today },
-    { staleTime: 2 * 60 * 60 * 1000 },
-  );
-
-  const { data: upcomingEvents = [] } = trpc.event.upcoming.useQuery();
-  const restaurantId = hall === HallEnum.ANTEATERY ? "anteatery" : "brandywine";
-  const hallEvents = useMemo(
-    () => [...upcomingEvents].filter((e) => e.restaurantId === restaurantId),
-    [upcomingEvents, restaurantId],
-  );
-
-  const hallData: RestaurantInfo | undefined = useMemo(() => {
-    if (isLoading || isError || !data) return undefined;
-    return hall === HallEnum.ANTEATERY ? data.anteatery : data.brandywine;
-  }, [data, hall, isError, isLoading]);
-
-  useEffect(() => {
-    if (hallData && selectedDate) {
-      setHallInputs({ hallData, selectedDate });
-    }
-  }, [hallData, selectedDate, setHallInputs]);
-
-  const { availablePeriodTimes, derivedHallStatus, openTime, closeTime } =
-    useHallDerived();
-
-  const periods = useMemo(() => {
-    const times = availablePeriodTimes ?? {};
-    return Object.keys(times).sort((a, b) => {
-      const startA = times[a]?.[0];
-      const startB = times[b]?.[0];
-      if (startA == null && startB == null) return 0;
-      if (startA == null) return 1;
-      if (startB == null) return -1;
-      return startA <= startB ? -1 : 1;
-    });
-  }, [availablePeriodTimes]);
-
-  const [selectedPeriod, setSelectedPeriod] = useState("");
-  const [selectedStation, setSelectedStation] = useState("");
-  const [isCompactView, setIsCompactView] = useState(false);
-  const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
-  const [scheduleAnchor, setScheduleAnchor] = useState<HTMLElement | null>(
-    null,
-  );
-  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
-
-  useEffect(() => {
-    if (!selectedDate || periods.length === 0) {
-      if (selectedPeriod !== "") {
-        setSelectedPeriod("");
-      }
-      return;
-    }
-
-    const isValid = periods.includes(selectedPeriod);
-
-    if (!isSameDay(selectedDate, today) && !selectedPeriod) {
-      setSelectedPeriod(periods[0]);
-      return;
-    }
-
-    if (!isValid) {
-      const current = getCurrentPeriod(selectedDate, availablePeriodTimes);
-      if (current !== selectedPeriod) {
-        setSelectedPeriod(current);
-      }
-    }
-  }, [availablePeriodTimes, periods, selectedDate, selectedPeriod, today]);
-
-  const currentMenu = useMemo(
-    () =>
-      (hallData?.menus ?? []).find(
-        (m) => m.period.name.toLowerCase() === selectedPeriod.toLowerCase(),
-      ),
-    [hallData, selectedPeriod],
-  );
-
-  const stations = currentMenu?.stations ?? [];
-
-  useEffect(() => {
-    if (stations.length === 0) {
-      if (selectedStation !== "") {
-        setSelectedStation("");
-      }
-      return;
-    }
-
-    const first = stations[0].name.toLowerCase();
-    const isValid = stations.some(
-      (s) => s.name.toLowerCase() === selectedStation,
-    );
-
-    if (!isValid) {
-      setSelectedStation(first);
-    }
-  }, [selectedStation, stations]);
-
-  const activeStation = stations.find(
-    (s) => s.name.toLowerCase() === selectedStation,
-  );
-
-  const dishes = activeStation?.dishes ?? [];
+  const {
+    hallData,
+    isLoading,
+    isError,
+    error,
+    hallEvents,
+    periods,
+    activeStation,
+    stations,
+    dishes,
+    calendarRange,
+    displayDate,
+    openTime,
+    closeTime,
+    derivedHallStatus,
+    availablePeriodTimes,
+    selectedDate,
+    handleDateSelect,
+  } = useRestaurantPage(hall);
 
   const hero =
     hall === HallEnum.ANTEATERY
       ? { src: "/anteatery.webp", alt: "Anteatery dining hall" }
       : { src: "/brandywine.webp", alt: "Brandywine dining hall" };
 
-  const displayDate = selectedDate ?? today;
-
   return (
-    <div>
+    <Box sx={{ bgcolor: "background.default", minHeight: "100vh" }}>
       {/* Hero image & mobile header */}
       <div className="relative w-full h-[200px] md:h-[250px]">
         <Image
@@ -194,6 +63,7 @@ export function RestaurantPage({
           className="object-cover object-bottom"
         />
         <div className="absolute inset-0 bg-gradient-to-tr from-black/80 via-black/20 to-transparent" />
+
         {/* Mobile Header Overlay */}
         {!isDesktop && (
           <div className="absolute bottom-0 left-0 p-4 w-full text-white">
@@ -254,41 +124,24 @@ export function RestaurantPage({
               derivedHallStatus={derivedHallStatus}
               periods={periods}
               availablePeriodTimes={availablePeriodTimes}
-              selectedPeriod={selectedPeriod}
-              setSelectedPeriod={setSelectedPeriod}
               selectedDate={selectedDate}
               handleDateSelect={handleDateSelect}
               calendarRange={calendarRange}
-              enabledDates={enabledDates}
-              isDatePickerOpen={isDatePickerOpen}
-              setIsDatePickerOpen={setIsDatePickerOpen}
               isLoading={isLoading}
               isError={isError}
               dishes={dishes}
               stations={stations}
-              menuAnchor={menuAnchor}
-              setMenuAnchor={setMenuAnchor}
-              scheduleAnchor={scheduleAnchor}
-              setScheduleAnchor={setScheduleAnchor}
               hallEvents={hallEvents}
-              isCompactView={isCompactView}
-              setIsCompactView={setIsCompactView}
-              selectedStation={selectedStation}
-              setSelectedStation={setSelectedStation}
-              showPreferencesOnly={showPreferencesOnly}
-              setShowPreferencesOnly={setShowPreferencesOnly}
             />
 
             <div className="w-full">
               <DishesView
-                isCompactView={isCompactView}
                 stations={stations}
                 activeStation={activeStation}
                 isLoading={isLoading}
                 isError={isError}
-                error={error}
+                error={error as TRPCClientErrorLike<AppRouter> | null}
                 hallData={hallData}
-                showPreferencesOnly={showPreferencesOnly}
               />
             </div>
           </div>
@@ -305,20 +158,6 @@ export function RestaurantPage({
           )}
         </div>
       </Container>
-    </div>
+    </Box>
   );
-}
-
-function getCurrentPeriod(
-  selectedDate: Date,
-  periods: { [periodName: string]: [Date, Date] },
-): string {
-  for (const key in periods) {
-    const periodBegin: Date = periods[key][0];
-    const periodEnd: Date = periods[key][1];
-
-    if (selectedDate >= periodBegin && selectedDate <= periodEnd) return key;
-  }
-
-  return Object.keys(periods)[0];
 }

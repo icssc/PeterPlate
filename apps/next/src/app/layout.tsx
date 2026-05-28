@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import { Poppins } from "next/font/google";
 import "./globals.css";
+import { Poppins } from "next/font/google";
 import { RootClient } from "./layout-client";
 
 const poppins = Poppins({
@@ -51,7 +51,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={poppins.variable} suppressHydrationWarning>
-      <body className={poppins.className}>
+      <body>
         <RootClient>{children}</RootClient>
       </body>
     </html>

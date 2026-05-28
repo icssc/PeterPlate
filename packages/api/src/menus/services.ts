@@ -1,37 +1,75 @@
-import { upsert, upsertBatch } from "@api/utils";
-import type { DateList, Drizzle, InsertMenu } from "@peterplate/db";
-import { menus } from "@peterplate/db";
-import { sql } from "drizzle-orm";
+import type { Drizzle } from "@peterplate/db";
+import { TRPCError } from "@trpc/server";
+import { addDays } from "date-fns";
+import { z } from "zod";
+import { AAPI_DINING_ROUTE } from "..";
+import type { PickableDatesPayload } from "../dining/types";
 
-export const upsertMenu = async (db: Drizzle, menu: InsertMenu) =>
-  await upsert(db, menus, menu, {
-    target: menus.id,
-    set: menu,
-  });
+const retrieveDatesResponseSchema = z.object({
+  ok: z.boolean(),
+  message: z.string().optional(),
+  data: z.object({
+    earliest: z.string().date().nullable(),
+    latest: z.string().date().nullable(),
+  }),
+});
 
-export const upsertMenuBatch = async (db: Drizzle, menuBatch: InsertMenu[]) =>
-  await upsertBatch(db, menus, menuBatch, {
-    target: menus.id,
-    set: {
-      periodId: sql`excluded.period_id`,
-      date: sql`excluded.date`,
-      price: sql`excluded.price`,
-    },
-  });
+type RetrieveDatesResponse = z.infer<typeof retrieveDatesResponseSchema>;
 
-/*
- * Returns an object with the earliest
- * and latest dates present in the menus table.
+const MENUS_DISABLED_ERROR =
+  "Menu upserts are unavailable because dining menu data now comes from AnteaterAPI.";
+
+export async function upsertMenu(_db: Drizzle, _menu: unknown) {
+  throw new Error(MENUS_DISABLED_ERROR);
+}
+
+export async function upsertMenuBatch(_db: Drizzle, _menuBatch: unknown[]) {
+  throw new Error(MENUS_DISABLED_ERROR);
+}
+
+/**
+ * AnteaterAPI currently describes its Dates route as earliest/latest only.
+ * PeterPlate's date picker expects a discrete `Date[]`, so we expand the range
+ * into day-sized entries normalized to Noon UTC.
  */
-export async function getPickableDates(db: Drizzle): Promise<DateList> {
-  const rows = await db
-    .selectDistinct({ date: menus.date })
-    .from(menus)
-    .orderBy(menus.date);
+export async function getPickableDates(
+  _db: Drizzle,
+): Promise<PickableDatesPayload> {
+  const response = await fetch(`${AAPI_DINING_ROUTE}/dateRange`);
 
-  if (!rows.length) return null;
+  if (!response.ok) {
+    throw new TRPCError({
+      code: "SERVICE_UNAVAILABLE",
+      message: "Could not reach AnteaterAPI dates endpoint.",
+    });
+  }
 
-  return rows.map((r) => toLocalDate(r.date)).filter((d) => d !== null);
+  const result = (await response.json()) as RetrieveDatesResponse;
+  const parsedResult = retrieveDatesResponseSchema.safeParse(result);
+
+  if (!parsedResult.success) {
+    throw new TRPCError({
+      code: "PARSE_ERROR",
+      message: `Could not parse AnteaterAPI dates response: ${parsedResult.error.message}`,
+    });
+  }
+
+  const { earliest, latest } = parsedResult.data.data;
+  const firstDate = toLocalDate(earliest);
+  const lastDate = toLocalDate(latest);
+
+  if (!firstDate || !lastDate) return null;
+
+  const dates: Date[] = [];
+
+  for (
+    let current = firstDate;
+    current <= lastDate;
+    current = addDays(current, 1)
+  )
+    dates.push(new Date(current));
+
+  return dates;
 }
 
 function toLocalDate(dateString: string | null): Date | null {
@@ -41,7 +79,5 @@ function toLocalDate(dateString: string | null): Date | null {
 
   if (!y || !m || !d) return null;
 
-  // Create date at noon UTC to prevent timezone offsets from shifting it to the previous day
-  // (e.g. Midnight UTC is 4pm/5pm previous day in PST)
   return new Date(Date.UTC(y, m - 1, d, 12));
 }
