@@ -1,16 +1,8 @@
 "use client";
 
 import CheckIcon from "@mui/icons-material/Check";
-import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
-import {
-  Button,
-  CircularProgress,
-  IconButton,
-  Input,
-  ToggleButton,
-  Tooltip,
-} from "@mui/material";
+import { Button, CircularProgress, ToggleButton, Tooltip } from "@mui/material";
 import type { UserAllergy, UserDietaryPreference } from "@peterplate/db";
 import posthog from "posthog-js";
 import { useEffect, useRef, useState } from "react";
@@ -168,12 +160,15 @@ export default function EditPreferencesContent({
       ]);
 
       posthog.capture("preferences_updated", {
-        allergies: [...formData.allergies /*, ...customAllergies */],
+        // allergies: [...formData.allergies, ...customAllergies],
+        // preferences: formData.preferences,
+        // allergies_count: formData.allergies.length + customAllergies.length,
+        // preferences_count: formData.preferences.length,
+        // custom_allergies_count: customAllergies.length,
+        allergies: formData.allergies,
         preferences: formData.preferences,
-        allergies_count:
-          formData.allergies.length /*+ customAllergies.length */,
+        allergies_count: formData.allergies.length,
         preferences_count: formData.preferences.length,
-        /*custom_allergies_count: customAllergies.length,*/
       });
 
       if (onSaved) {

@@ -5,8 +5,9 @@ import {
   DarkMode as DarkModeIcon,
   DesktopWindows as DesktopWindowsIcon,
   Edit as EditIcon,
-  Feedback as FeedbackIcon,
-  Info as InfoIcon,
+  ContentPaste as FeedbackIcon,
+  HelpOutlineOutlined as HelpIcon,
+  InfoOutlined as InfoIcon,
   LightMode as LightModeIcon,
   Logout as LogoutIcon,
 } from "@mui/icons-material";
@@ -17,7 +18,7 @@ import { useTheme } from "next-themes";
 import type React from "react";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
-import { GoogleSignInButton } from "@/components/auth/google-sign-in";
+import { SignInButtons } from "@/components/auth/sign-in-buttons";
 import { signOut, useSession } from "@/utils/auth-client";
 import { formatDietaryKey } from "@/utils/dietary";
 import { trpc } from "@/utils/trpc";
@@ -49,8 +50,6 @@ export default function SidebarContent({
     { userId: userId ?? "" },
     { enabled: !!userId },
   );
-
-  if (!mounted) return null;
 
   const handleSignOut = async () => {
     const savedTheme = localStorage.getItem("theme");
@@ -100,21 +99,17 @@ export default function SidebarContent({
         </button>
       </div>
 
+      <hr className="border-t border-gray-200 dark:border-gray-700 mx-5 mt-4" />
+
       {/* Content */}
       <div className="flex-1 px-5 p-4 space-y-5 border-b-2 border-gray-300 dark:border-zinc-700">
         {/* Dietary Preferences */}
         <div>
-          <Typography variant="body2" fontWeight={600} color="primary" mb={1}>
+          <Typography className="text-sm font-bold text-sky-700 dark:text-accent-primary mb-2">
             Dietary Preferences
           </Typography>
 
-          <Typography
-            variant="caption"
-            fontWeight={600}
-            color="text.secondary"
-            display="block"
-            mb={0.5}
-          >
+          <Typography className="text-xs font-semibold text-gray-500 dark:text-zinc-300 mb-1">
             Restrictions:
           </Typography>
 
@@ -124,17 +119,13 @@ export default function SidebarContent({
                 <PrefBadge key={pref} type="restriction" text={pref} />
               ))
             ) : (
-              <span className="text-xs text-gray-400">None</span>
+              <span className="text-xs text-gray-400 dark:text-zinc-300">
+                None
+              </span>
             )}
           </div>
 
-          <Typography
-            variant="caption"
-            fontWeight={600}
-            color="text.secondary"
-            display="block"
-            mb={0.5}
-          >
+          <Typography className="text-xs font-semibold text-gray-500 dark:text-zinc-300 mb-1">
             Allergies:
           </Typography>
           <div className="flex flex-wrap gap-1.5">
@@ -143,14 +134,16 @@ export default function SidebarContent({
                 <PrefBadge key={allergy} type="allergy" text={allergy} />
               ))
             ) : (
-              <span className="text-xs text-gray-400">None</span>
+              <span className="text-xs text-gray-400 dark:text-zinc-300">
+                None
+              </span>
             )}
           </div>
         </div>
 
         {/* Appearance */}
         <div>
-          <Typography variant="body2" fontWeight={600} color="primary" mb={1}>
+          <Typography className="text-sm font-bold text-sky-700 dark:text-accent-primary mb-2">
             Appearance
           </Typography>
 
@@ -160,19 +153,21 @@ export default function SidebarContent({
             dark:divide-blue-300`}
           >
             <ThemeButton
-              active={theme === "light"}
+              active={mounted && theme === "light"}
               onClick={() => setTheme("light")}
               icon={<LightModeIcon fontSize="small" />}
               label="Light"
             />
+            <div className="w-px self-stretch border-l border-sky-700 relative z-10" />
             <ThemeButton
-              active={theme === "system"}
+              active={mounted && theme === "system"}
               onClick={() => setTheme("system")}
               icon={<DesktopWindowsIcon fontSize="small" />}
               label="Device"
             />
+            <div className="w-px self-stretch border-l border-sky-700 relative z-10" />
             <ThemeButton
-              active={theme === "dark"}
+              active={mounted && theme === "dark"}
               onClick={() => setTheme("dark")}
               icon={<DarkModeIcon fontSize="small" />}
               label="Dark"
@@ -197,16 +192,11 @@ export default function SidebarContent({
                   disabled:cursor-not-allowed disabled:hover:bg-transparent 
                   disabled:dark:hover:bg-transparent`}
               >
-                <Box sx={{ color: "primary.main" }}>
-                  <EditIcon fontSize="small" />
-                </Box>
-                <Typography
-                  variant="body2"
-                  fontWeight={500}
-                  color="text.primary"
-                >
-                  Edit Preferences
-                </Typography>
+                <EditIcon
+                  fontSize="small"
+                  sx={{ color: "hsl(var(--accent-primary))" }}
+                />
+                <span className="font-medium">Edit Preferences</span>
               </button>
             </span>
           </Tooltip>
@@ -214,7 +204,12 @@ export default function SidebarContent({
           <MenuLink
             href="/feedback"
             onClick={onClose}
-            icon={<FeedbackIcon fontSize="small" />}
+            icon={
+              <FeedbackIcon
+                fontSize="small"
+                sx={{ color: "hsl(var(--accent-primary))" }}
+              />
+            }
           >
             Feedback
           </MenuLink>
@@ -222,9 +217,27 @@ export default function SidebarContent({
           <MenuLink
             href="/about"
             onClick={onClose}
-            icon={<InfoIcon fontSize="small" />}
+            icon={
+              <InfoIcon
+                fontSize="small"
+                sx={{ color: "hsl(var(--accent-primary))" }}
+              />
+            }
           >
             About PeterPlate
+          </MenuLink>
+
+          <MenuLink
+            href="/about"
+            onClick={onClose}
+            icon={
+              <HelpIcon
+                fontSize="small"
+                sx={{ color: "hsl(var(--accent-primary))" }}
+              />
+            }
+          >
+            Onboarding Tutorial
           </MenuLink>
         </div>
       </div>
@@ -240,13 +253,11 @@ export default function SidebarContent({
               text-white hover:bg-sky-800 dark:bg-blue-300 dark:text-gray-900 
               dark:hover:bg-blue-400 flex items-center justify-center`}
           >
-            <span className="inline-flex items-center gap-2">
-              <LogoutIcon fontSize="small" />
-              Sign Out
-            </span>
+            <LogoutIcon fontSize="small" />
+            Sign Out
           </button>
         ) : (
-          <GoogleSignInButton />
+          <SignInButtons />
         )}
       </div>
     </Box>

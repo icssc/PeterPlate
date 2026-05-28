@@ -11,6 +11,8 @@
 ▒▒▒▒▒         ▒▒▒▒▒▒     ▒▒▒▒▒   ▒▒▒▒▒▒  ▒▒▒▒▒     ▒▒▒▒▒        ▒▒▒▒▒  ▒▒▒▒▒▒▒▒    ▒▒▒▒▒   ▒▒▒▒▒▒
 </pre>
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/icssc/PeterPlate)
+[![Production](https://github.com/icssc/PeterPlate/actions/workflows/deploy-prod.yml/badge.svg)](https://github.com/icssc/PeterPlate/actions/workflows/deploy-prod.yml)
 ## About
 
 Navigating UCI's dining options at Brandywine and the Anteatery is now simpler and more informed with PeterPlate. This comprehensive menu viewer, available as a website and mobile app, is designed to enhance your campus dining experience. UCI students use PeterPlate to plan their daily meals and track progress toward their nutritional goals.

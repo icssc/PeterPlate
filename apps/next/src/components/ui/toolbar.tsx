@@ -26,7 +26,7 @@ import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import type { MouseEvent } from "react";
 import { useEffect, useState } from "react";
-import { GoogleSignInButton } from "@/components/auth/google-sign-in";
+import { SignInButtons } from "@/components/auth/sign-in-buttons";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useSession } from "@/utils/auth-client";
 import EditPreferencesContent from "./edit-preferences-content";
@@ -316,7 +316,9 @@ export function DesktopToolbar(): React.JSX.Element {
                   />
                 </IconButton>
               ) : (
-                <GoogleSignInButton />
+                <div className="flex flex-col gap-2">
+                  <SignInButtons fullWidth={false} />
+                </div>
               )}
             </div>
           </div>
@@ -505,7 +507,7 @@ function MobileToolbar(): React.JSX.Element {
               />
             </IconButton>
           ) : (
-            <GoogleSignInButton />
+            <SignInButtons fullWidth={false} />
           )}
         </div>
       </div>
@@ -566,31 +568,22 @@ function MobileToolbar(): React.JSX.Element {
         </div>
       </div>
 
-      <Menu
-        anchorEl={profileAnchor}
+      <Drawer
+        anchor="bottom"
         open={profileOpen}
         onClose={handleProfileClose}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "right",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "right",
-        }}
-        PaperProps={{
-          className:
-            "bg-transparent shadow-none p-0 w-[357px] max-h-[658px] mt-1",
-        }}
-        MenuListProps={{
-          className: "p-0",
+        slotProps={{
+          paper: {
+            className:
+              "p-0 overflow-hidden rounded-t-[10px] h-auto max-h-[85vh] flex flex-col min-h-0 bg-white dark:bg-zinc-900",
+          },
         }}
       >
         <SidebarContent
           onClose={handleProfileClose}
           onEditPreferencesClick={handleEditPreferencesOpen}
         />
-      </Menu>
+      </Drawer>
 
       <Drawer
         anchor="bottom"

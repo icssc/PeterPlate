@@ -1,0 +1,18 @@
+# CocoaPods dependencies (regenerated via `pod install`)
+src/Pods/
+
+# Xcode user-specific data
+xcuserdata/
+
+# Firebase credentials
+src/PeterPlate/GoogleService-Info.plist
+
+# Xcode build artifacts
+build/
+DerivedData/
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# iOS-specific
+ios-next-steps.html

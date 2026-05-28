@@ -1,15 +1,16 @@
+"use client";
+
 import { Star } from "@mui/icons-material";
-import { Box, Card, Dialog, Drawer, Typography } from "@mui/material";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import { Box, Card, Typography } from "@mui/material";
 import type { DishWithRating } from "@peterplate/validators";
 import Image from "next/image";
-import React, { useState } from "react";
-import { useSnackbarStore } from "@/context/useSnackbar";
+import React from "react";
 import { useUserStore } from "@/context/useUserStore";
-import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { getDietaryConflicts } from "@/utils/dietary";
 import { formatFoodName, getFoodIcon, toTitleCase } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
-import FoodDialogContent from "../food-dialog-content";
-import FoodDrawerContent from "../food-drawer-content";
+import FoodCardShell from "./food-card-shell";
 
 interface PopularDishCardContentProps
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -27,15 +28,34 @@ const PopularDishCardContent = React.forwardRef<
   const iconSize = compact ? 16 : 24;
   const descSize = compact ? "text-[8px]" : "text-[10px]";
 
+  const { userId } = useUserStore();
+
   const { data: ratingData } = trpc.dish.getAverageRating.useQuery(
     { dishId: dish.id },
     { staleTime: 5 * 60 * 1000 },
   );
   const averageRating = ratingData?.averageRating ?? 0;
 
+  const { data: allergies } = trpc.allergy.getAllergies.useQuery(
+    { userId: userId ?? "" },
+    { staleTime: Infinity },
+  );
+
+  const { data: preferences } = trpc.preference.getDietaryPreferences.useQuery(
+    { userId: userId ?? "" },
+    { staleTime: Infinity },
+  );
+
+  const violations = getDietaryConflicts(
+    dish.dietRestriction,
+    preferences ?? [],
+    allergies ?? [],
+  );
+  const conflictsWithUserPrefs = violations.length > 0;
+
   return (
     <Card
-      className="w-full h-full min-h-[210px] flex flex-col rounded-xl border border-neutral-200 dark:border-neutral-700 overflow-hidden shadow-sm hover:shadow-md transition cursor-pointer text-left bg-transparent p-0"
+      className={`w-full h-full min-h-[210px] flex flex-col rounded-xl border border-neutral-200 dark:border-neutral-700 overflow-hidden shadow-sm hover:shadow-md transition cursor-pointer text-left bg-transparent p-0 ${conflictsWithUserPrefs ? "opacity-70" : ""}`}
       onClick={onClick}
       ref={ref}
     >
@@ -64,6 +84,12 @@ const PopularDishCardContent = React.forwardRef<
           color="primary"
         >
           {formatFoodName(dish.name)}
+          {conflictsWithUserPrefs && (
+            <ErrorOutlineIcon
+              fontSize="inherit"
+              className="ml-1 text-red-600 align-[-0.125em]"
+            />
+          )}
         </Typography>
         <Typography className={`${descSize} mb-1`} color="text.secondary">
           {toTitleCase(restaurant)} • {toTitleCase(stationName)}
@@ -87,118 +113,15 @@ export default function PopularDishCard({
   restaurant,
   stationName,
   compact = false,
-  onClick,
 }: PopularDishCardContentProps): React.JSX.Element {
-  const isDesktop = useMediaQuery("(min-width: 768px)");
-  const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-  const userId = useUserStore((s) => s.userId);
-  const utils = trpc.useUtils();
-  const { showSnackbar } = useSnackbarStore();
-
-  const logMealMutation = trpc.nutrition.logMeal.useMutation({
-    onSuccess: () => {
-      showSnackbar(`Added ${formatFoodName(dish.name)} to your log`, "success");
-      utils.nutrition.invalidate();
-    },
-    onError: (error) => {
-      console.error(error.message);
-    },
-  });
-
-  const handleAddToMealTracker = (e: React.MouseEvent) => {
-    e.stopPropagation();
-
-    if (!userId) {
-      showSnackbar("Login to track meals!", "error");
-      return;
-    }
-
-    logMealMutation.mutate({
-      dishId: dish.id,
-      userId,
-      dishName: dish.name,
-      servings: 1,
-    });
-  };
-
-  if (isDesktop) {
-    return (
-      <>
-        {/* ...When you could do this! */}
+  return (
+    <FoodCardShell dish={dish} restaurant={restaurant}>
+      {(handleOpen) => (
         <PopularDishCardContent
           {...{ dish, restaurant, stationName, compact }}
           onClick={handleOpen}
         />
-        <Dialog
-          open={open}
-          onClose={handleClose}
-          maxWidth={false}
-          slotProps={{
-            paper: {
-              sx: {
-                width: "460px",
-                maxWidth: "90vw",
-                margin: 2,
-                padding: 0,
-                overflow: "hidden",
-                borderRadius: "16px",
-              },
-            },
-          }}
-        >
-          <FoodDialogContent
-            dish={dish}
-            onAddToMealTracker={handleAddToMealTracker}
-            isAddingToMealTracker={logMealMutation.isPending}
-          />
-        </Dialog>
-      </>
-    );
-  } else {
-    return (
-      <>
-        <PopularDishCardContent
-          {...{ dish, restaurant, compact, stationName }}
-          onClick={handleOpen}
-        />
-        <Drawer
-          anchor="bottom"
-          open={open}
-          onClose={handleClose}
-          slotProps={{
-            paper: {
-              sx: {
-                width: "460px",
-                maxWidth: "90vw",
-                maxHeight: "85vh",
-                margin: 2,
-                padding: 0,
-                overflow: "hidden",
-                display: "flex",
-                flexDirection: "column",
-                borderRadius: "16px",
-              },
-            },
-          }}
-          sx={{
-            "& .MuiDrawer-paper": {
-              borderTopLeftRadius: "10px",
-              borderTopRightRadius: "10px",
-              marginTop: "96px",
-              height: "auto",
-              maxHeight: "85vh",
-            },
-          }}
-        >
-          <FoodDrawerContent
-            dish={dish}
-            onAddToMealTracker={handleAddToMealTracker}
-            isAddingToMealTracker={logMealMutation.isPending}
-          />
-        </Drawer>
-      </>
-    );
-  }
+      )}
+    </FoodCardShell>
+  );
 }

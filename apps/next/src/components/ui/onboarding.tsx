@@ -18,7 +18,7 @@ import { useUserStore } from "@/context/useUserStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useSession } from "@/utils/auth-client";
 import { trpc } from "@/utils/trpc";
-import { GoogleSignInButton } from "../auth/google-sign-in";
+import { SignInButtons } from "../auth/sign-in-buttons";
 
 interface PersonalizeViewProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
@@ -90,10 +90,11 @@ const WelcomeView = React.forwardRef<HTMLDivElement>((_, ref) => {
           pt="10px"
           pb="20px"
         >
-          Sign in with your UCI Google account to access dining hall menus; rate
-          and favorite dishes; and personalize your dining experience.
+          Sign in with your UCI Google or Apple account to access dining hall
+          menus; rate and favorite dishes; and personalize your dining
+          experience.
         </Typography>
-        <GoogleSignInButton />
+        <SignInButtons />
         <Typography
           fontFamily="Poppins, sans-serif"
           color="text.secondary"

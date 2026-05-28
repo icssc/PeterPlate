@@ -1,4 +1,5 @@
-import type { DishWithRating } from "@peterplate/validators";
+import type { Station } from "@api/index";
+import type { DishWithRating, Event } from "@peterplate/validators";
 import { DiningHallStatus } from "@/components/ui/status";
 import type { CalendarRange } from "@/components/ui/toolbar";
 import type { HallEnum, HallStatusEnum } from "@/utils/types";
@@ -13,28 +14,16 @@ interface RestaurantControlsProps {
   derivedHallStatus: HallStatusEnum;
   periods: string[];
   availablePeriodTimes: Record<string, [Date, Date] | null> | undefined;
-  selectedPeriod: string;
-  setSelectedPeriod: (period: string) => void;
+  // Date selection — owned by date-context, not the UI store
   selectedDate: Date | undefined;
   handleDateSelect: (date: Date | undefined) => void;
   calendarRange: CalendarRange | null;
-  isDatePickerOpen: boolean;
-  setIsDatePickerOpen: (isOpen: boolean) => void;
+  // Loading / data for conditional rendering
   isLoading: boolean;
   isError: boolean;
   dishes: DishWithRating[];
-  stations: any[];
-  menuAnchor: HTMLElement | null;
-  setMenuAnchor: (el: HTMLElement | null) => void;
-  scheduleAnchor: HTMLElement | null;
-  setScheduleAnchor: (el: HTMLElement | null) => void;
-  hallEvents: any[];
-  isCompactView: boolean;
-  setIsCompactView: (isCompact: boolean) => void;
-  selectedStation: string;
-  setSelectedStation: (station: string) => void;
-  showPreferencesOnly: boolean;
-  setShowPreferencesOnly: (isSet: boolean) => void;
+  stations: Station[];
+  hallEvents: Event[];
 }
 
 export function RestaurantControls({
@@ -43,88 +32,57 @@ export function RestaurantControls({
   derivedHallStatus,
   periods,
   availablePeriodTimes,
-  selectedPeriod,
-  setSelectedPeriod,
   selectedDate,
   handleDateSelect,
   calendarRange,
-  isDatePickerOpen,
-  setIsDatePickerOpen,
   isLoading,
   isError,
   dishes,
   stations,
-  menuAnchor,
-  setMenuAnchor,
-  scheduleAnchor,
-  setScheduleAnchor,
   hallEvents,
-  isCompactView,
-  setIsCompactView,
-  selectedStation,
-  setSelectedStation,
-  showPreferencesOnly,
-  setShowPreferencesOnly,
 }: RestaurantControlsProps) {
   return (
     <>
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2 mb-2 flex-wrap md:flex-nowrap">
-        {/* Desktop title & status (Header) */}
-        <div className="inline-flex gap-4">
-          <RestaurantHeader isDesktop={isDesktop} hall={hall} />
-          {isDesktop && <DiningHallStatus status={derivedHallStatus} />}
-        </div>
+        {/* Desktop title */}
+        <RestaurantHeader isDesktop={isDesktop} hall={hall} />
 
-        <div className="flex flex-col gap-3 w-full md:w-auto md:flex-row md:items-center">
-          {/* Meal & date selectors (Filters) */}
-          {!isLoading && (
-            <RestaurantFilters
-              isDesktop={isDesktop}
-              // ... filters props
-              periods={periods}
-              availablePeriodTimes={availablePeriodTimes}
-              selectedPeriod={selectedPeriod}
-              setSelectedPeriod={setSelectedPeriod}
-              selectedDate={selectedDate}
-              handleDateSelect={handleDateSelect}
-              calendarRange={calendarRange}
-              isDatePickerOpen={isDatePickerOpen}
-              setIsDatePickerOpen={setIsDatePickerOpen}
-              showPreferencesOnly={showPreferencesOnly}
-              setShowPreferencesOnly={setShowPreferencesOnly}
-            />
+        <div className="flex flex-col gap-3 w-full md:w-auto md:flex-row md:items-center md:justify-end">
+          {/* Status badge — desktop only, shown next to filters */}
+          {isDesktop && (
+            <div>
+              <DiningHallStatus status={derivedHallStatus} />
+            </div>
           )}
 
-          {/* Mobile Actions */}
+          {/* Meal & date selectors */}
+          <RestaurantFilters
+            isDesktop={isDesktop}
+            periods={periods}
+            availablePeriodTimes={availablePeriodTimes}
+            selectedDate={selectedDate}
+            handleDateSelect={handleDateSelect}
+            calendarRange={calendarRange}
+          />
+
+          {/* Menu / schedule popovers & view-toggle (mobile only) */}
           <MobileActions
-            // ... mobile actions props
             isDesktop={isDesktop}
             isLoading={isLoading}
             isError={isError}
             dishes={dishes}
             stations={stations}
-            menuAnchor={menuAnchor}
-            setMenuAnchor={setMenuAnchor}
-            scheduleAnchor={scheduleAnchor}
-            setScheduleAnchor={setScheduleAnchor}
             hallEvents={hallEvents}
-            isCompactView={isCompactView}
-            setIsCompactView={setIsCompactView}
-            setSelectedStation={setSelectedStation}
           />
         </div>
       </div>
 
-      {/* Desktop Tabs */}
+      {/* Station tabs & card/compact view toggles (desktop only) */}
       <DesktopTabs
         isDesktop={isDesktop}
         isLoading={isLoading}
         isError={isError}
         stations={stations}
-        selectedStation={selectedStation}
-        setSelectedStation={setSelectedStation}
-        isCompactView={isCompactView}
-        setIsCompactView={setIsCompactView}
       />
     </>
   );
