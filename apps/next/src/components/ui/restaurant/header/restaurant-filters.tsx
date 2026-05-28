@@ -85,7 +85,7 @@ export function RestaurantFilters({
             label="Meal"
             onChange={(e) => setSelectedPeriod(e.target.value)}
             IconComponent={ArrowDropDownRounded}
-            className="bg-white dark:bg-[#27272A] [&_fieldset]:!border-sky-700 dark:[&_fieldset]:!border-blue-300 [&:hover_fieldset]:!border-sky-700 dark:[&:hover_fieldset]:!border-blue-300 [&_.Mui-focused_fieldset]:!border-sky-700 dark:[&_.Mui-focused_fieldset]:!border-blue-300 [&_.MuiSvgIcon-root]:!text-sky-700 dark:[&_.MuiSvgIcon-root]:!text-blue-300"
+            className="bg-white dark:bg-[#27272A] [&_fieldset]:!border-sky-700 dark:[&_fieldset]:!border-blue-300  [&_.Mui-focused_fieldset]:!border-sky-700 dark:[&_.Mui-focused_fieldset]:!border-blue-300 [&_.MuiSvgIcon-root]:!text-sky-700 dark:[&_.MuiSvgIcon-root]:!text-blue-300"
             MenuProps={{
               anchorOrigin: {
                 vertical: "bottom",
@@ -131,7 +131,7 @@ export function RestaurantFilters({
                   <MenuItem
                     key={time}
                     value={mealTimeKey}
-                    className="!flex !justify-between !items-center !gap-4 [&.Mui-selected]:!bg-sky-700 [&.Mui-selected]:!text-white [&:hover]:!bg-sky-50 dark:[&.Mui-selected]:!bg-blue-300 dark:[&.Mui-selected]:!text-gray-900 dark:[&:hover]:!bg-[#434e5d]"
+                    className="!flex !justify-between !items-center !gap-4 [&.Mui-selected]:!bg-sky-700 [&.Mui-selected]:!text-white [&:hover]:!bg-sky-50 [&.Mui-selected:hover]:!bg-sky-800 dark:[&.Mui-selected]:!bg-blue-300 dark:[&.Mui-selected]:!text-gray-900 dark:[&:hover]:!bg-[#434e5d] dark:[&.Mui-selected:hover]:!bg-blue-400"
                   >
                     <span>{toTitleCase(time)}</span>
                     <Typography

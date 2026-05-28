@@ -77,21 +77,23 @@ export function RestaurantControls({
 
         <div className="flex flex-col gap-3 w-full md:w-auto md:flex-row md:items-center">
           {/* Meal & date selectors (Filters) */}
-          <RestaurantFilters
-            isDesktop={isDesktop}
-            // ... filters props
-            periods={periods}
-            availablePeriodTimes={availablePeriodTimes}
-            selectedPeriod={selectedPeriod}
-            setSelectedPeriod={setSelectedPeriod}
-            selectedDate={selectedDate}
-            handleDateSelect={handleDateSelect}
-            calendarRange={calendarRange}
-            isDatePickerOpen={isDatePickerOpen}
-            setIsDatePickerOpen={setIsDatePickerOpen}
-            showPreferencesOnly={showPreferencesOnly}
-            setShowPreferencesOnly={setShowPreferencesOnly}
-          />
+          {!isLoading && (
+            <RestaurantFilters
+              isDesktop={isDesktop}
+              // ... filters props
+              periods={periods}
+              availablePeriodTimes={availablePeriodTimes}
+              selectedPeriod={selectedPeriod}
+              setSelectedPeriod={setSelectedPeriod}
+              selectedDate={selectedDate}
+              handleDateSelect={handleDateSelect}
+              calendarRange={calendarRange}
+              isDatePickerOpen={isDatePickerOpen}
+              setIsDatePickerOpen={setIsDatePickerOpen}
+              showPreferencesOnly={showPreferencesOnly}
+              setShowPreferencesOnly={setShowPreferencesOnly}
+            />
+          )}
 
           {/* Mobile Actions */}
           <MobileActions

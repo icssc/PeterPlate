@@ -60,30 +60,32 @@ export function DesktopTabs({
         </Tabs>
       )}
       {/* Card/compact view toggles */}
-      <div className="flex justify-end mt-2">
-        <div className="flex gap-2">
-          <Button
-            variant="outlined"
-            size="small"
-            type="button"
-            onClick={() => setIsCompactView(false)}
-            className={`!border-sky-700 dark:!border-blue-300 !normal-case ${!isCompactView ? "!bg-sky-700 !text-white hover:!bg-sky-700 dark:!bg-blue-300 dark:!text-gray-900" : "!bg-white !text-sky-700 hover:!bg-sky-50 dark:!bg-transparent dark:!text-white"}`}
-            startIcon={<MenuIcon className="h-4 w-4" />}
-          >
-            Card View
-          </Button>
-          <Button
-            variant="outlined"
-            size="small"
-            type="button"
-            onClick={() => setIsCompactView(true)}
-            className={`!border-sky-700 dark:!border-blue-300 !normal-case ${isCompactView ? "!bg-sky-700 !text-white hover:!bg-sky-700 dark:!bg-blue-300 dark:!text-gray-900" : "!bg-white !text-sky-700 hover:!bg-sky-50 dark:!bg-transparent dark:!text-white"}`}
-            startIcon={<GridView className="h-4 w-4" />}
-          >
-            Compact View
-          </Button>
+      {!isLoading && (
+        <div className="flex justify-end mt-2">
+          <div className="flex gap-2">
+            <Button
+              variant="outlined"
+              size="small"
+              type="button"
+              onClick={() => setIsCompactView(false)}
+              className={`!border-sky-700 dark:!border-blue-300 !normal-case ${!isCompactView ? "!bg-sky-700 !text-white hover:!bg-sky-700 dark:!bg-blue-300 dark:!text-gray-900" : "!bg-white !text-sky-700 hover:!bg-sky-50 dark:!bg-transparent dark:!text-white"}`}
+              startIcon={<MenuIcon className="h-4 w-4" />}
+            >
+              Card View
+            </Button>
+            <Button
+              variant="outlined"
+              size="small"
+              type="button"
+              onClick={() => setIsCompactView(true)}
+              className={`!border-sky-700 dark:!border-blue-300 !normal-case ${isCompactView ? "!bg-sky-700 !text-white hover:!bg-sky-700 dark:!bg-blue-300 dark:!text-gray-900" : "!bg-white !text-sky-700 hover:!bg-sky-50 dark:!bg-transparent dark:!text-white"}`}
+              startIcon={<GridView className="h-4 w-4" />}
+            >
+              Compact View
+            </Button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

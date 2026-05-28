@@ -25,6 +25,7 @@ import { DiningHallStatus } from "../status";
 import { DishesView } from "./dishes-view";
 import { RestaurantControls } from "./restaurant-controls";
 import { Sidebar } from "./sidebar";
+import RestaurantSpinner from "./spinner";
 
 interface RestaurantPageProps {
   hall: HallEnum;
@@ -241,7 +242,7 @@ export function RestaurantPage({
       >
         <div className="flex flex-col md:flex-row items-start gap-3">
           {/* Left column: menu controls & dishes */}
-          <div className="w-full flex-1 md:min-h-[740px] min-w-0">
+          <div className="w-full flex-1 md:min-h-[740px] min-w-0 flex flex-col">
             <RestaurantControls
               hall={hall}
               isDesktop={isDesktop}
@@ -283,6 +284,7 @@ export function RestaurantPage({
                 hallData={hallData}
                 showPreferencesOnly={showPreferencesOnly}
               />
+              {isLoading && <RestaurantSpinner />}
             </div>
           </div>
 
