@@ -82,7 +82,7 @@ const NutritionBreakdown = ({
   };
 
   const cardBase =
-    "bg-sky-100 dark:bg-[#8EC5FF33] rounded-xl px-4 flex flex-row items-center justify-between h-36 min-w-0";
+    "bg-sky-100 dark:bg-[rgba(142,197,255,0.2)] rounded-xl px-4 flex flex-row items-center justify-between h-36 min-w-0";
 
   const labelBase =
     "text-3xl text-sky-700 dark:text-blue-300 font-medium pl-3 truncate min-w-0";

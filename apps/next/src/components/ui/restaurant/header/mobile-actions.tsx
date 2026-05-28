@@ -80,7 +80,7 @@ export function MobileActions({
               slotProps={{
                 paper: {
                   className:
-                    "w-[200px] p-2 mt-1 border border-sky-700 dark:!bg-[#323235] dark:!border-blue-300",
+                    "w-[200px] p-2 mt-1 border border-sky-700 dark:!bg-[var(--surface-elevated)] dark:!border-blue-300",
                   sx: { backgroundImage: "none" },
                 },
               }}
@@ -90,7 +90,7 @@ export function MobileActions({
                   <button
                     type="button"
                     key={station.name}
-                    className="text-left px-2 py-1.5 text-sm font-medium rounded-sm hover:bg-slate-100 dark:text-white dark:hover:bg-[#434e5d] transition-colors"
+                    className="text-left px-2 py-1.5 text-sm font-medium rounded-sm hover:bg-slate-100 dark:text-white dark:hover:bg-[var(--surface-tinted)] transition-colors"
                     onClick={() => {
                       const val = station.name.toLowerCase();
                       if (isCompactView) {
@@ -144,7 +144,7 @@ export function MobileActions({
               slotProps={{
                 paper: {
                   className:
-                    "w-[300px] p-0 mt-1 border border-sky-700 dark:!bg-[#323235] dark:!border-blue-300",
+                    "w-[300px] p-0 mt-1 border border-sky-700 dark:!bg-[var(--surface-elevated)] dark:!border-blue-300",
                   sx: { backgroundImage: "none" },
                 },
               }}

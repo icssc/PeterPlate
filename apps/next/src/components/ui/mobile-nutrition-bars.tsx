@@ -19,7 +19,7 @@ function MacroBar({ label, value, max, unit }: MacroBarProps) {
       <span className="text-sky-700 dark:text-blue-300 font-semibold w-16">
         {label}
       </span>
-      <div className="flex-1 bg-white dark:bg-[#27272A] rounded-full h-3">
+      <div className="flex-1 bg-white dark:bg-[var(--surface-scroll)] rounded-full h-3">
         <div
           className="h-3 rounded-full"
           style={{
@@ -53,7 +53,7 @@ export default function MobileNutritionBars({
   const nutrition = compileMealData(mealsEaten);
 
   return (
-    <div className="bg-sky-100 dark:bg-[#8EC5FF33] rounded-xl p-4 flex flex-col gap-4 w-full">
+    <div className="bg-sky-100 dark:bg-[rgba(142,197,255,0.2)] rounded-xl p-4 flex flex-col gap-4 w-full">
       <MacroBar
         label="Protein"
         value={nutrition.protein_g}

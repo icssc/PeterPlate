@@ -19,7 +19,7 @@ import { timeToString, toTitleCase } from "@/utils/funcs";
  */
 export default function EventDrawerContent(props: Event): React.JSX.Element {
   return (
-    <Box className="dark:bg-[#303035]">
+    <Box className="dark:bg-[var(--surface-modal)]">
       <div className="relative">
         <Image
           src={props.image}

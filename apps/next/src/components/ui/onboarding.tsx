@@ -121,7 +121,7 @@ const PersonalizeView = React.forwardRef<HTMLDivElement, PersonalizeViewProps>(
           sx={{
             py: "20px",
           }}
-          className="bg-sky-700 dark:bg-[#323235]"
+          className="bg-sky-700 dark:bg-[var(--surface-elevated)]"
         >
           <Avatar
             src="/peterplate-icon.webp"

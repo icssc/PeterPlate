@@ -36,7 +36,7 @@ function SidebarSection({
   return (
     <Paper
       elevation={0}
-      className="mb-4 overflow-hidden dark:bg-[#303035]"
+      className="mb-4 overflow-hidden dark:bg-[var(--surface-modal)]"
       sx={{ border: 1, borderColor: "divider" }}
     >
       <div className="bg-primary-accent/20 px-4 py-3">

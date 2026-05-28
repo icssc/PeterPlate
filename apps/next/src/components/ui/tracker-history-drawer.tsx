@@ -58,7 +58,7 @@ export default function TrackerHistoryDrawer({
         },
         ".dark & .MuiDrawer-paper": {
           backgroundImage: "none",
-          backgroundColor: "#303035",
+          backgroundColor: "var(--surface-modal)",
         },
       }}
     >
