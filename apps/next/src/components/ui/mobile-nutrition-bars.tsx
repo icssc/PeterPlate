@@ -53,7 +53,7 @@ export default function MobileNutritionBars({
   const nutrition = compileMealData(mealsEaten);
 
   return (
-    <div className="bg-sky-100 dark:bg-[rgba(142,197,255,0.2)] rounded-xl p-4 flex flex-col gap-4 w-full">
+    <div className="bg-sky-100 dark:bg-[#8EC5FF33] rounded-xl p-4 flex flex-col gap-4 w-full">
       <MacroBar
         label="Protein"
         value={nutrition.protein_g}

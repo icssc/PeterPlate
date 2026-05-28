@@ -107,7 +107,7 @@ export default function NutritionGoals({ userId, date }: Props) {
           onKeyDown={(e) => {
             if (e.key === "Enter") e.currentTarget.blur();
           }}
-          className="w-24 border-b border-sky-400 bg-sky-100 dark:border-blue-300 dark:bg-[rgba(142,197,255,0.2)] dark:text-white rounded px-2 py-1 text-sm"
+          className="w-24 border-b border-sky-400 bg-sky-100 dark:border-blue-300 dark:bg-[#8EC5FF33] dark:text-white rounded px-2 py-1 text-sm"
         />
       </label>
       <label className="flex items-center justify-between gap-4 text-sm font-medium text-zinc-900 dark:text-white">
@@ -135,7 +135,7 @@ export default function NutritionGoals({ userId, date }: Props) {
           onKeyDown={(e) => {
             if (e.key === "Enter") e.currentTarget.blur();
           }}
-          className="w-24 border-b border-sky-400 bg-sky-100 dark:border-blue-300 dark:bg-[rgba(142,197,255,0.2)] dark:text-white rounded px-2 py-1 text-sm"
+          className="w-24 border-b border-sky-400 bg-sky-100 dark:border-blue-300 dark:bg-[#8EC5FF33] dark:text-white rounded px-2 py-1 text-sm"
         />
       </label>
       <label className="flex items-center justify-between gap-4 text-sm font-medium text-zinc-900 dark:text-white">
@@ -163,7 +163,7 @@ export default function NutritionGoals({ userId, date }: Props) {
           onKeyDown={(e) => {
             if (e.key === "Enter") e.currentTarget.blur();
           }}
-          className="w-24 border-b border-sky-400 bg-sky-100 dark:border-blue-300 dark:bg-[rgba(142,197,255,0.2)] dark:text-white rounded px-2 py-1 text-sm"
+          className="w-24 border-b border-sky-400 bg-sky-100 dark:border-blue-300 dark:bg-[#8EC5FF33] dark:text-white rounded px-2 py-1 text-sm"
         />
       </label>
       <label className="flex items-center justify-between gap-4 text-sm font-medium text-zinc-900 dark:text-white">
@@ -191,7 +191,7 @@ export default function NutritionGoals({ userId, date }: Props) {
           onKeyDown={(e) => {
             if (e.key === "Enter") e.currentTarget.blur();
           }}
-          className="w-24 border-b border-sky-400 bg-sky-100 dark:border-blue-300 dark:bg-[rgba(142,197,255,0.2)] dark:text-white rounded px-2 py-1 text-sm"
+          className="w-24 border-b border-sky-400 bg-sky-100 dark:border-blue-300 dark:bg-[#8EC5FF33] dark:text-white rounded px-2 py-1 text-sm"
         />
       </label>
     </>

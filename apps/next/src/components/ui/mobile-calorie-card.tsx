@@ -25,7 +25,7 @@ export default function MobileCalorieCard({
   const nutrition = compileMealData(mealsEaten);
 
   return (
-    <div className="bg-sky-100 dark:bg-[rgba(142,197,255,0.2)] rounded-xl px-4 flex flex-row items-center justify-between h-36 w-full relative">
+    <div className="bg-sky-100 dark:bg-[#8EC5FF33] rounded-xl px-4 flex flex-row items-center justify-between h-36 w-full relative">
       <div className="absolute top-0 right-4">
         {!hideEditButton && <NutritionGoals userId={userId} date={date} />}
       </div>
