@@ -22,6 +22,7 @@ import { SignInButtons } from "@/components/auth/sign-in-buttons";
 import { signOut, useSession } from "@/utils/auth-client";
 import { formatDietaryKey } from "@/utils/dietary";
 import { trpc } from "@/utils/trpc";
+import { cn } from "@/utils/tw";
 
 interface ProfileMenuContentProps {
   onClose: () => void;
@@ -60,9 +61,17 @@ export default function SidebarContent({
   };
 
   return (
-    <Box className="w-full h-full rounded-2xl bg-white dark:bg-[#313136] shadow-2xl flex flex-col">
+    <Box
+      className={`w-full h-full rounded-2xl bg-white 
+        dark:bg-[var(--surface-elevated)] shadow-xl flex flex-col border-2 
+        border-gray-300 dark:border-zinc-700`}
+      sx={{ border: 1, borderColor: "divider" }}
+    >
       {/* Header */}
-      <div className="flex items-start justify-between px-5 pt-5">
+      <div
+        className={`flex items-start justify-between px-5 p-5 border-b-2 
+        border-gray-300 dark:border-zinc-700`}
+      >
         <div className="flex items-center gap-3">
           <Image
             src={user?.image || "/peter.webp"}
@@ -93,7 +102,7 @@ export default function SidebarContent({
       <hr className="border-t border-gray-200 dark:border-gray-700 mx-5 mt-4" />
 
       {/* Content */}
-      <div className="flex-1 px-5 pt-4 space-y-5">
+      <div className="flex-1 px-5 p-4 space-y-5 border-b-2 border-gray-300 dark:border-zinc-700">
         {/* Dietary Preferences */}
         <div>
           <Typography className="text-sm font-bold text-sky-700 dark:text-accent-primary mb-2">
@@ -107,12 +116,7 @@ export default function SidebarContent({
           <div className="flex flex-wrap gap-1.5 mb-3">
             {preferences?.length ? (
               preferences.map((pref) => (
-                <span
-                  key={pref}
-                  className="rounded-md border border-sky-700 px-2.5 py-0.5 text-xs text-sky-700 bg-sky-100 dark:text-accent-primary dark:border-accent-primary dark:bg-zinc-700"
-                >
-                  {formatDietaryKey(pref)}
-                </span>
+                <PrefBadge key={pref} type="restriction" text={pref} />
               ))
             ) : (
               <span className="text-xs text-gray-400 dark:text-zinc-300">
@@ -127,12 +131,7 @@ export default function SidebarContent({
           <div className="flex flex-wrap gap-1.5">
             {allergies?.length ? (
               allergies.map((allergy) => (
-                <span
-                  key={allergy}
-                  className="rounded-md border border-sky-700 px-2.5 py-0.5 text-xs text-sky-700 bg-sky-100 dark:text-accent-primary dark:border-accent-primary dark:bg-zinc-700"
-                >
-                  {formatDietaryKey(allergy)}
-                </span>
+                <PrefBadge key={allergy} type="allergy" text={allergy} />
               ))
             ) : (
               <span className="text-xs text-gray-400 dark:text-zinc-300">
@@ -148,7 +147,11 @@ export default function SidebarContent({
             Appearance
           </Typography>
 
-          <div className="flex w-fit rounded-lg border border-sky-700 overflow-hidden">
+          <div
+            className={`flex rounded-lg border border-sky-700 
+            dark:border-blue-300 overflow-hidden divide-x divide-sky-700 
+            dark:divide-blue-300`}
+          >
             <ThemeButton
               active={mounted && theme === "light"}
               onClick={() => setTheme("light")}
@@ -183,7 +186,11 @@ export default function SidebarContent({
                   onClose();
                   onEditPreferencesClick();
                 }}
-                className="w-full flex items-center gap-3 rounded-lg px-4 py-2 text-sm text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:dark:hover:bg-transparent"
+                className={`w-full flex items-center gap-3 rounded-lg px-4 py-2 
+                  text-sm text-gray-900 dark:text-white hover:bg-gray-100 
+                  dark:hover:bg-gray-700 disabled:opacity-50 
+                  disabled:cursor-not-allowed disabled:hover:bg-transparent 
+                  disabled:dark:hover:bg-transparent`}
               >
                 <EditIcon
                   fontSize="small"
@@ -237,16 +244,14 @@ export default function SidebarContent({
 
       {/* Sign out */}
 
-      <hr className="border-t border-gray-200 dark:border-gray-700 mx-5 mt-4" />
-
-      <div className="px-5 pb-5 pt-5 flex justify-center">
+      <div className="p-5">
         {user ? (
           <button
             type="button"
             onClick={handleSignOut}
-            className="w-full rounded-lg bg-sky-700 hover:bg-sky-800 text-white
-  dark:bg-accent-primary dark:hover:bg-accent-primary/85 dark:text-black
-  py-2.5 px-6 text-sm font-semibold inline-flex items-center justify-center gap-2"
+            className={`w-full rounded-lg bg-sky-700 py-2.5 text-sm font-medium 
+              text-white hover:bg-sky-800 dark:bg-blue-300 dark:text-gray-900 
+              dark:hover:bg-blue-400 flex items-center justify-center`}
           >
             <LogoutIcon fontSize="small" />
             Sign Out
@@ -274,11 +279,12 @@ function ThemeButton({
     <button
       type="button"
       onClick={onClick}
-      className={`w-24 flex items-center justify-center gap-1 py-2 text-xs font-medium transition-colors ${
-        active
-          ? "bg-sky-700 text-white"
-          : "text-black dark:text-white hover:bg-sky-700/50 hover:text-white"
-      }`}
+      className={cn(
+        `flex-1 flex items-center justify-center gap-1 py-1.5 text-xs font-medium transition-colors`,
+        active && "bg-sky-700 text-white dark:bg-blue-300 dark:text-gray-900",
+        !active &&
+          "text-gray-700 hover:bg-sky-100 dark:text-white dark:hover:bg-zinc-700 ",
+      )}
     >
       {icon}
       {label}
@@ -301,7 +307,8 @@ function MenuLink({
     <Link
       href={href}
       onClick={onClick}
-      className="flex items-center gap-3 rounded-lg px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+      className={`flex items-center gap-3 rounded-lg px-4 py-2 hover:bg-gray-100
+        dark:hover:bg-gray-700`}
     >
       <Box sx={{ color: "primary.main" }}>{icon}</Box>
       <Typography variant="body2" fontWeight={500} color="text.primary">
@@ -310,3 +317,23 @@ function MenuLink({
     </Link>
   );
 }
+
+const PrefBadge = ({
+  text,
+  type,
+}: {
+  text: string;
+  type: "restriction" | "allergy";
+}) => {
+  return (
+    <span
+      className={cn(
+        `rounded-md px-3 py-1 text-xs font-bold text-white`,
+        type === "restriction" && "bg-red-600",
+        type === "allergy" && "bg-orange-500",
+      )}
+    >
+      {formatDietaryKey(text)}
+    </span>
+  );
+};
