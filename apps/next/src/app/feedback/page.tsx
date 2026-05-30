@@ -49,6 +49,8 @@ export default function FeedbackForm() {
   });
 
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const calculateProgress = () => {
     let filledFields = 0;
@@ -92,8 +94,33 @@ export default function FeedbackForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
-    setIsSubmitted(true);
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/feedback/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to submit feedback");
+      }
+
+      setIsSubmitted(true);
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : "An error occurred while submitting";
+      setError(errorMessage);
+      console.error("Submission error:", err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleSubmitAnother = () => {
@@ -585,9 +612,24 @@ export default function FeedbackForm() {
 
         {/* Submit Button and Footer */}
         <Box sx={{ textAlign: "center", pb: 4 }}>
+          {error && (
+            <Box
+              sx={{
+                mb: 2,
+                p: 2,
+                bgcolor: "#fee2e2",
+                border: "1px solid #fecaca",
+                borderRadius: 1,
+                color: "#dc2626",
+              }}
+            >
+              <Typography sx={{ fontSize: "14px" }}>{error}</Typography>
+            </Box>
+          )}
           <Button
             onClick={handleSubmit}
             variant="contained"
+            disabled={isLoading}
             sx={{
               width: "100%",
               py: 1.5,
@@ -600,9 +642,13 @@ export default function FeedbackForm() {
               "&:hover": {
                 bgcolor: "#0052a3",
               },
+              "&:disabled": {
+                bgcolor: "#0069a8",
+                opacity: 0.7,
+              },
             }}
           >
-            Submit Feedback
+            {isLoading ? "Submitting..." : "Submit Feedback"}
           </Button>
           <Typography sx={{ fontSize: "15px", color: "#4a5565", mt: 2 }}>
             By submitting to this form, you agree to let us use your feedback to
