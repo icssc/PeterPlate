@@ -134,7 +134,9 @@ class ViewController: UIViewController, WKNavigationDelegate, UIDocumentInteract
     }
     
     @objc func loadRootUrl(cachePolicy: NSURLRequest.CachePolicy = .useProtocolCachePolicy) {
-        PeterPlate.webView.load(URLRequest(url: SceneDelegate.universalLinkToLaunch ?? SceneDelegate.shortcutLinkToLaunch ?? rootUrl, cachePolicy: cachePolicy))
+        let launchUrl = SceneDelegate.universalLinkToLaunch ?? SceneDelegate.shortcutLinkToLaunch ?? rootUrl
+        let urlToLoad = rewriteNativeOAuthCallbackUrl(launchUrl)
+        PeterPlate.webView.load(URLRequest(url: urlToLoad, cachePolicy: cachePolicy))
     }
     
     func reloadWebview(

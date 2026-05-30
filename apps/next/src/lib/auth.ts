@@ -6,6 +6,8 @@ import { createAuthMiddleware, getOAuthState } from "better-auth/api";
 import { betterAuth } from "better-auth/minimal";
 import { nextCookies } from "better-auth/next-js";
 import { genericOAuth } from "better-auth/plugins";
+
+import { AUTH_PROVIDER_ID } from "@/lib/auth-constants";
 import type { AuthAdditionalData } from "@/lib/auth-types";
 import { getSafeAuthRedirectPath } from "@/lib/auth-utils";
 
@@ -18,7 +20,10 @@ const baseURL =
   process.env.BETTER_AUTH_URL ??
   "https://peterplate.com";
 
+const OIDC_ISSUER_URL = "https://auth.icssc.club";
+
 export const auth = betterAuth({
+  appName: "PeterPlate",
   debug: process.env.NODE_ENV !== "production",
   secret: authSecret,
   baseURL,
@@ -42,10 +47,10 @@ export const auth = betterAuth({
     genericOAuth({
       config: [
         {
-          providerId: "icssc",
+          providerId: AUTH_PROVIDER_ID,
+          issuer: OIDC_ISSUER_URL,
+          discoveryUrl: `${OIDC_ISSUER_URL}/.well-known/openid-configuration`,
           clientId: process.env.AUTH_CLIENT_ID || "peterplate-dev",
-          discoveryUrl:
-            "https://auth.icssc.club/.well-known/openid-configuration",
           scopes: ["openid", "profile", "email"],
           pkce: true,
           mapProfileToUser: (profile: Record<string, string>) => ({
@@ -84,3 +89,5 @@ export const auth = betterAuth({
     },
   }),
 });
+
+export type AuthorizationUrlParams = Record<string, string>;

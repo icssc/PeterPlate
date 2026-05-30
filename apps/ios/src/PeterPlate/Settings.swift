@@ -45,6 +45,18 @@ func shouldHandOffOidcToASWebAuthenticationSession(_ url: URL) -> Bool {
 
 let platformCookie = Cookie(name: "app-platform", value: "iOS App Store")
 
+/// ICSSC-wide convention: OAuth Universal Link callbacks land on `/auth/native`.
+/// Strip the suffix so the WKWebView loads the real handler at `/auth`.
+func rewriteNativeOAuthCallbackUrl(_ url: URL) -> URL {
+    guard var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+        return url
+    }
+    if components.path.hasSuffix("/native") {
+        components.path = String(components.path.dropLast("/native".count))
+    }
+    return components.url ?? url
+}
+
 // UI options
 let displayMode = "standalone" // standalone / fullscreen.
 let adaptiveUIStyle = true     // iOS 15+ only. Change app theme on the fly to dark/light related to WebView background color.

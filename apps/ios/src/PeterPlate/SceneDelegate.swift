@@ -47,8 +47,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             comps?.scheme = "https"
 
             if let url = comps?.url {
-                // Handle it inside our web view in a SPA-friendly way.
-                PeterPlate.webView.evaluateJavaScript("location.href = '\(url)'")
+                let rewritten = rewriteNativeOAuthCallbackUrl(url)
+                PeterPlate.webView.evaluateJavaScript("location.href = '\(rewritten)'")
             }
         }
     }
@@ -66,7 +66,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         }
 
         // Handle it inside our web view in a SPA-friendly way.
-        PeterPlate.webView.evaluateJavaScript("location.href = '\(universalLink)'")
+        let rewritten = rewriteNativeOAuthCallbackUrl(universalLink)
+        PeterPlate.webView.evaluateJavaScript("location.href = '\(rewritten)'")
     }
 
     // This function is called if our app is already loaded and the user activates the app via shortcut

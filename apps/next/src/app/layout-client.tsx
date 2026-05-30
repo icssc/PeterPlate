@@ -21,7 +21,6 @@ export function RootClient({ children }: { children: React.ReactNode }) {
       new QueryClient({
         defaultOptions: {
           queries: {
-            // 5m default stale time
             staleTime: 5 * 60 * 1000,
             refetchOnWindowFocus: false,
             refetchOnReconnect: false,
@@ -46,8 +45,6 @@ export function RootClient({ children }: { children: React.ReactNode }) {
     }),
   );
 
-  // syncs better auth session
-  // with zustand user store
   const { data: session, isPending } = useSession();
   const setUserId = useUserStore((s) => s.setUserId);
   const clearUser = useUserStore((s) => s.clearUser);
@@ -75,7 +72,6 @@ export function RootClient({ children }: { children: React.ReactNode }) {
           <DateProvider>
             <Toolbar />
             <GlobalSnackbar />
-            {/* Extra spacing for mobile view so toolbar doesn't overlap content */}
             <main className="pb-20 md:pb-0">{children}</main>
           </DateProvider>
         </QueryClientProvider>

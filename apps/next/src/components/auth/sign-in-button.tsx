@@ -31,11 +31,10 @@ export function SignInButton({
     setIsSigningIn(true);
 
     try {
-      const authUrl = await getSignInUrl(
-        provider,
-        isNativeIosApp(),
-        `${window.location.pathname}${window.location.search}${window.location.hash}`,
-      );
+      const authUrl = await getSignInUrl(provider, {
+        returnUrl: `${window.location.pathname}${window.location.search}${window.location.hash}`,
+        isNativeIosApp: isNativeIosApp(),
+      });
       window.location.href = authUrl;
     } catch (error) {
       console.error("Sign in error:", error);

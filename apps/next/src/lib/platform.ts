@@ -1,21 +1,11 @@
 const NATIVE_IOS_COOKIE = "app-platform=iOS App Store";
 
 export function isNativeIosApp(): boolean {
-  if (
-    typeof navigator !== "undefined" &&
-    navigator.userAgent.includes("PWAShell")
-  ) {
-    return true;
+  if (typeof document === "undefined") {
+    return false;
   }
 
-  if (
-    typeof document !== "undefined" &&
-    document.cookie.includes(NATIVE_IOS_COOKIE)
-  ) {
-    return true;
-  }
-
-  return false;
+  return document.cookie.includes(NATIVE_IOS_COOKIE);
 }
 
 /**

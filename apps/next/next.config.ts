@@ -30,11 +30,6 @@ const nextConfig: NextConfig = {
         destination: "/api/auth/oauth2/callback/icssc",
         permanent: false,
       },
-      {
-        source: "/auth/native",
-        destination: "/",
-        permanent: false,
-      },
     ];
   },
   async rewrites() {
