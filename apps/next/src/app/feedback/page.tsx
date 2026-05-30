@@ -525,8 +525,12 @@ export default function FeedbackForm() {
               onChange={(e) =>
                 handleInputChange("additionalComments", e.target.value)
               }
-              inputProps={{ maxLength: 1000 }}
               variant="outlined"
+              slotProps={{
+                htmlInput: {
+                  maxLength: 1000,
+                },
+              }}
             />
             <Box sx={{ textAlign: "right", mt: 1 }}>
               <Typography sx={{ fontSize: "12px", color: "#6a7282" }}>
