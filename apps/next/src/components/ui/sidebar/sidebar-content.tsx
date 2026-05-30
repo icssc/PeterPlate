@@ -50,13 +50,16 @@ export default function SidebarContent({
     { enabled: !!userId },
   );
 
-  const handleSignOut = async () => {
-    const savedTheme = localStorage.getItem("theme");
-    await signOut();
-    if (savedTheme) {
-      localStorage.setItem("theme", savedTheme);
-    }
-    window.location.href = "/";
+  const handleSignOut = () => {
+    void signOut({
+      onBeforeRedirect: () => {
+        const savedTheme = localStorage.getItem("theme");
+        onClose();
+        if (savedTheme) {
+          localStorage.setItem("theme", savedTheme);
+        }
+      },
+    });
   };
 
   return (

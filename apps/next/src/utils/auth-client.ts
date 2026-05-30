@@ -3,6 +3,8 @@ import {
   inferAdditionalFields,
 } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
+import posthog from "posthog-js";
+import { useUserStore } from "@/context/useUserStore";
 import type { auth } from "@/lib/auth";
 import { getSignOutUrl } from "@/lib/auth-actions";
 
@@ -12,7 +14,12 @@ export const authClient = createAuthClient({
 
 export const { useSession } = authClient;
 
-export async function signOut() {
+interface SignOutOptions {
+  /** Runs after local/session cleanup, immediately before IdP redirect. */
+  onBeforeRedirect?: () => void;
+}
+
+export async function signOut({ onBeforeRedirect }: SignOutOptions = {}) {
   let logoutUrl: string | null = null;
   try {
     logoutUrl = await getSignOutUrl(window.location.origin);
@@ -25,9 +32,16 @@ export async function signOut() {
     console.error("Error during logout", error);
   }
 
+  useUserStore.getState().clearUser();
+  posthog.reset();
+  onBeforeRedirect?.();
+
+  // IdP logout clears auth.icssc.club session and redirects back to PeterPlate.
+  // Do not navigate anywhere else after this — callers must not override it.
   if (logoutUrl) {
-    window.location.href = logoutUrl;
-  } else {
-    window.location.reload();
+    window.location.assign(logoutUrl);
+    return;
   }
+
+  window.location.reload();
 }
