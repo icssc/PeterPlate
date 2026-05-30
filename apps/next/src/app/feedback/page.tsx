@@ -50,7 +50,22 @@ export default function FeedbackForm() {
 
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const progress = 13;
+  const calculateProgress = () => {
+    let filledFields = 0;
+    const totalRequiredFields = 7;
+
+    if (formData.fullName.trim()) filledFields++;
+    if (formData.email.trim()) filledFields++;
+    if (formData.allowFollowUp !== undefined) filledFields++;
+    if (formData.feedbackType) filledFields++;
+    if (formData.feedbackDescription.trim()) filledFields++;
+    if (formData.experienceRating > 0) filledFields++;
+    if (formData.completionStatus) filledFields++;
+
+    return Math.round((filledFields / totalRequiredFields) * 100);
+  };
+
+  const progress = calculateProgress();
 
   const handleInputChange = (
     field: keyof FeedbackFormData,
