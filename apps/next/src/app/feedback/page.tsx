@@ -1,5 +1,6 @@
 "use client";
 
+import { CheckCircle } from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -47,6 +48,8 @@ export default function FeedbackForm() {
     additionalComments: 0,
   });
 
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
   const progress = 13;
 
   const handleInputChange = (
@@ -75,7 +78,32 @@ export default function FeedbackForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Form submitted:", formData);
+    setIsSubmitted(true);
   };
+
+  const handleSubmitAnother = () => {
+    setIsSubmitted(false);
+    setFormData({
+      fullName: "",
+      email: "",
+      allowFollowUp: true,
+      feedbackType: "",
+      feedbackDescription: "",
+      experienceRating: 0,
+      completionStatus: "yes",
+      deviceType: "",
+      supportingFile: null,
+      additionalComments: "",
+    });
+    setCharCounts({
+      feedbackDescription: 0,
+      additionalComments: 0,
+    });
+  };
+
+  if (isSubmitted) {
+    return <SubmissionConfirmation onSubmitAnother={handleSubmitAnother} />;
+  }
 
   return (
     <Box
@@ -567,6 +595,108 @@ export default function FeedbackForm() {
           </Typography>
         </Box>
       </div>
+    </Box>
+  );
+}
+
+function SubmissionConfirmation({
+  onSubmitAnother,
+}: {
+  onSubmitAnother: () => void;
+}) {
+  return (
+    <Box
+      sx={{
+        height: "100vh",
+        background: "linear-gradient(to bottom, #ffffff, #abcde2 136.47%)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        py: 4,
+        px: 2,
+        overflow: "hidden",
+      }}
+    >
+      <Box
+        sx={{
+          bgcolor: "white",
+          borderRadius: 2,
+          boxShadow:
+            "0px 10px 7.5px rgba(0,0,0,0.1), 0px 4px 3px rgba(0,0,0,0.1)",
+          p: 4,
+          maxWidth: 600,
+          width: "100%",
+          textAlign: "center",
+        }}
+      >
+        {/* Checkmark Icon */}
+        <Box sx={{ mb: 3 }}>
+          <CheckCircle
+            sx={{
+              fontSize: 60,
+              color: "#008236",
+              mx: "auto",
+            }}
+          />
+        </Box>
+
+        {/* Heading */}
+        <Typography
+          variant="h4"
+          sx={{
+            fontWeight: 600,
+            color: "#020618",
+            mb: 1,
+          }}
+        >
+          Thank You!
+        </Typography>
+
+        {/* Subheading */}
+        <Typography
+          sx={{
+            fontSize: "18px",
+            fontWeight: 500,
+            color: "#4a5565",
+            mb: 2,
+          }}
+        >
+          Thank you for helping improve PeterPlate.
+        </Typography>
+
+        {/* Description */}
+        <Typography
+          sx={{
+            fontSize: "14px",
+            color: "#6a7282",
+            lineHeight: 1.5,
+            mb: 3,
+          }}
+        >
+          Your feedback has been submitted successfully. We will review it
+          carefully and use it to make PeterPlate better for everyone.
+        </Typography>
+
+        {/* Submit Another Button */}
+        <Button
+          onClick={onSubmitAnother}
+          variant="contained"
+          fullWidth
+          sx={{
+            py: 1.5,
+            bgcolor: "#0069a8",
+            color: "white",
+            fontWeight: 500,
+            fontSize: "15px",
+            textTransform: "capitalize",
+            "&:hover": {
+              bgcolor: "#0052a3",
+            },
+          }}
+        >
+          Submit Another Response
+        </Button>
+      </Box>
     </Box>
   );
 }
