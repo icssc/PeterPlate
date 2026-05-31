@@ -18,7 +18,7 @@ import { useUserStore } from "@/context/useUserStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useSession } from "@/utils/auth-client";
 import { trpc } from "@/utils/trpc";
-import { GoogleSignInButton } from "../auth/google-sign-in";
+import { SignInButtons } from "../auth/sign-in-buttons";
 
 interface PersonalizeViewProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
@@ -90,10 +90,11 @@ const WelcomeView = React.forwardRef<HTMLDivElement>((_, ref) => {
           pt="10px"
           pb="20px"
         >
-          Sign in with your UCI Google account to access dining hall menus; rate
-          and favorite dishes; and personalize your dining experience.
+          Sign in with your UCI Google or Apple account to access dining hall
+          menus; rate and favorite dishes; and personalize your dining
+          experience.
         </Typography>
-        <GoogleSignInButton />
+        <SignInButtons />
         <Typography
           fontFamily="Poppins, sans-serif"
           color="text.secondary"
@@ -121,7 +122,7 @@ const PersonalizeView = React.forwardRef<HTMLDivElement, PersonalizeViewProps>(
           sx={{
             py: "20px",
           }}
-          className="bg-sky-700 dark:bg-[#323235]"
+          className="bg-sky-700 dark:bg-[var(--surface-elevated)]"
         >
           <Avatar
             src="/peterplate-icon.webp"
@@ -356,17 +357,14 @@ const OnboardingContent = React.forwardRef<
               sx={{
                 height: "45px",
                 width: "80px",
-                bgcolor: "#0069A8",
+                bgcolor: "var(--primary-accent)",
+                color: "var(--button-primary-fg)",
                 "&:hover": {
                   filter: "brightness(0.85)",
                 },
-                ".dark &": {
-                  bgcolor: "#93C5FD",
-                  color: "#111827",
-                },
-                ".dark &.Mui-disabled": {
-                  backgroundColor: "#3F3F47",
-                  color: "#71717A",
+                "&.Mui-disabled": {
+                  backgroundColor: "var(--button-disabled-bg)",
+                  color: "var(--button-disabled-fg)",
                 },
               }}
             >
@@ -381,17 +379,14 @@ const OnboardingContent = React.forwardRef<
               sx={{
                 height: "45px",
                 width: "80px",
-                bgcolor: "#0069A8",
+                bgcolor: "var(--primary-accent)",
+                color: "var(--button-primary-fg)",
                 "&:hover": {
                   filter: "brightness(0.85)",
                 },
-                ".dark &": {
-                  bgcolor: "#93C5FD",
-                  color: "#111827",
-                },
-                ".dark &.Mui-disabled": {
-                  backgroundColor: "#3F3F47",
-                  color: "#71717A",
+                "&.Mui-disabled": {
+                  backgroundColor: "var(--button-disabled-bg)",
+                  color: "var(--button-disabled-fg)",
                 },
               }}
             >
@@ -408,17 +403,14 @@ const OnboardingContent = React.forwardRef<
             sx={{
               height: "45px",
               width: "80px",
-              bgcolor: "#0069A8",
+              bgcolor: "var(--primary-accent)",
+              color: "var(--button-primary-fg)",
               "&:hover": {
                 filter: "brightness(0.85)",
               },
-              ".dark &": {
-                bgcolor: "#93C5FD",
-                color: "#111827",
-              },
-              ".dark &.Mui-disabled": {
-                backgroundColor: "#3F3F47",
-                color: "#71717A",
+              "&.Mui-disabled": {
+                backgroundColor: "var(--button-disabled-bg)",
+                color: "var(--button-disabled-fg)",
               },
             }}
           >
@@ -460,7 +452,7 @@ export default function OnboardingDialog(): React.JSX.Element {
                 border: "3px solid",
                 borderColor: "var(--mui-palette-divider)",
                 backgroundImage: "none",
-                backgroundColor: "#303035",
+                backgroundColor: "var(--surface-modal)",
               },
             },
           },
@@ -493,7 +485,7 @@ export default function OnboardingDialog(): React.JSX.Element {
           },
           ".dark & .MuiDrawer-paper": {
             backgroundImage: "none",
-            backgroundColor: "#303035",
+            backgroundColor: "var(--surface-modal)",
           },
         }}
       >

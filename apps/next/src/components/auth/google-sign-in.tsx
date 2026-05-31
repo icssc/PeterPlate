@@ -3,123 +3,45 @@
 import LoginIcon from "@mui/icons-material/Login";
 import posthog from "posthog-js";
 import { useCallback, useState } from "react";
+import { Provider } from "@/lib/auth-types";
 import { authClient } from "@/utils/auth-client";
 import { cn } from "@/utils/tw";
 import { Button } from "../ui/shadcn/button";
+import { SignInButton } from "./sign-in-button";
 
-function isNativeIosApp(): boolean {
-  if (
-    typeof navigator !== "undefined" &&
-    navigator.userAgent.includes("PWAShell")
-  ) {
-    // WKWebView shell sets this in `apps/pwa/src/PeterPlate/WebView.swift`. Prefer it over
-    // `document.cookie`: cookies injected via WKHTTPCookieStore often are not visible to JS,
-    // so the old check could miss the shell and route OAuth through `icssc` instead of
-    // `icssc-native` — breaking ASWebAuthenticationSession + `/auth/native` flow.
-    return true;
-  }
-  if (
-    typeof document !== "undefined" &&
-    document.cookie.includes("app-platform=iOS")
-  ) {
-    return true;
-  }
-  return false;
-}
+const GoogleLogo = () => (
+  <svg
+    width="18"
+    height="18"
+    viewBox="0 0 48 48"
+    xmlns="http://www.w3.org/2000/svg"
+    aria-hidden="true"
+  >
+    <path
+      fill="#EA4335"
+      d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"
+    />
+    <path
+      fill="#4285F4"
+      d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"
+    />
+    <path
+      fill="#FBBC05"
+      d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"
+    />
+    <path
+      fill="#34A853"
+      d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
+    />
+  </svg>
+);
 
-type GoogleSignInButtonProps = {
-  className?: string;
-  containerClassName?: string;
-  iconOnly?: boolean;
-  label?: string;
-  showIcon?: boolean;
-};
-
-export function GoogleSignInButton({
-  className,
-  containerClassName,
-  iconOnly = false,
-  label = "Sign In with Google",
-  showIcon = false,
-}: GoogleSignInButtonProps) {
-  const [signInError, setSignInError] = useState<string | null>(null);
-
-  const handleSignIn = useCallback(async () => {
-    posthog.capture("sign_in_clicked", { provider: "google" });
-    setSignInError(null);
-    // In the native iOS shell, use the "icssc-native" provider which sets
-    // redirect_uri to /auth/native (an AASA-listed Universal Link path).
-    // The WKWebView's decidePolicyFor intercepts auth.icssc.club/authorize
-    // and hands it off to ASWebAuthenticationSession.
-    //
-    // In the browser, use the standard "icssc" provider with the default
-    // redirect_uri so Safari OAuth flows aren't hijacked via Universal Links.
-    const providerId = isNativeIosApp() ? "icssc-native" : "icssc";
-
-    try {
-      // authClient methods resolve with { data, error } — they do NOT throw on
-      // server errors (4xx/5xx). If we only `await` without checking the return
-      // value, a server-side failure silently swallows the error: the
-      // redirectPlugin.onSuccess hook never fires, window.location.href is
-      // never set, decidePolicyFor never fires, and the auth sheet never appears.
-      const { error } = await authClient.signIn.oauth2({
-        providerId,
-        callbackURL: "/",
-      });
-      if (error) throw new Error(error.message ?? "Sign-in request failed.");
-    } catch (error) {
-      console.error("Sign in error:", error);
-      posthog.captureException(error);
-      const message =
-        error instanceof Error ? error.message : "Sign-in request failed.";
-      setSignInError(message);
-    }
-  }, []);
-
+export function GoogleSignInButton({ fullWidth }: { fullWidth?: boolean }) {
   return (
-    <div
-      className={cn(
-        "flex flex-col gap-2",
-        iconOnly ? "w-auto" : "w-full",
-        containerClassName,
-      )}
-    >
-      <Button
-        onClick={handleSignIn}
-        size={iconOnly ? "icon" : "default"}
-        aria-label={iconOnly ? "Sign In with Google" : undefined}
-        className={cn(
-          iconOnly
-            ? "h-10 w-10 rounded-lg bg-sky-700 text-white shadow-none hover:bg-sky-800 dark:bg-blue-300 dark:text-gray-900 dark:hover:bg-blue-400"
-            : "w-full bg-sky-700 text-white hover:bg-sky-800 dark:bg-blue-300 dark:text-gray-900 dark:hover:bg-blue-400",
-          className,
-        )}
-      >
-        {iconOnly ? (
-          <>
-            <LoginIcon aria-hidden="true" fontSize="small" />
-            <span className="sr-only">Sign In with Google</span>
-          </>
-        ) : (
-          <>
-            {showIcon ? (
-              <LoginIcon aria-hidden="true" fontSize="small" />
-            ) : null}
-            {label}
-          </>
-        )}
-      </Button>
-      {signInError ? (
-        <p
-          className={cn(
-            "text-center text-sm text-destructive",
-            iconOnly && "sr-only",
-          )}
-          role="alert"
-        >
-          {signInError}
-        </p>
-      ) : null}
-    </div>
+    <SignInButton
+      icon={<GoogleLogo />}
+      provider={Provider.Google}
+      fullWidth={fullWidth}
+    />
   );
 }

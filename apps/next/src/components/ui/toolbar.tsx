@@ -28,7 +28,7 @@ import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import type { MouseEvent } from "react";
 import { useEffect, useState } from "react";
-import { GoogleSignInButton } from "@/components/auth/google-sign-in";
+import { SignInButtons } from "@/components/auth/sign-in-buttons";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useSession } from "@/utils/auth-client";
 import AppearancePicker from "./appearance-picker";
@@ -110,6 +110,7 @@ const MOBILE_TOOLBAR_ELEMENTS: ToolbarElement[] = [
   },
 ];
 
+// Routes on which the toolbar should remain transparent
 const TRANSPARENT_PAGES = ["/about", "/brandywine", "/anteatery"];
 
 function ToolbarDropdown({
@@ -137,7 +138,7 @@ function ToolbarDropdown({
       <Button
         onClick={handleClick}
         endIcon={<ArrowDropDownIcon fontSize="small" />}
-        className={`capitalize text-[16px] !font-medium bg-transparent ${
+        className={`capitalize text-[20px] !font-medium bg-transparent ${
           isTransparent ? "text-white" : "!text-black dark:!text-white"
         }`}
       >
@@ -147,15 +148,15 @@ function ToolbarDropdown({
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
-        className="capitalize text-[16px] font-medium
+        className="capitalize text-[20px] font-medium
         group-hover:text-white text-white/60 bg-transparent"
         slotProps={{
           paper: {
             sx: {
               backgroundImage: "none",
-              bgcolor: "#ffffff",
+              bgcolor: "var(--surface-elevated)",
               ".dark &": {
-                bgcolor: "#323235",
+                bgcolor: "var(--surface-elevated)",
               },
             },
           },
@@ -353,8 +354,8 @@ export function DesktopToolbar(): React.JSX.Element {
         position={isTransparent ? "absolute" : "sticky"}
         className={`shadow-none ${
           isTransparent
-            ? "bg-transparent bg-gradient-to-b from-black/50 to-black/0"
-            : "bg-white dark:bg-[#323235]"
+            ? "bg-transparent bg-gradient-to-b from-black/70 to-black/0"
+            : "bg-white dark:bg-[var(--surface-elevated)]"
         }`}
         sx={{
           backgroundImage: "none",
@@ -403,7 +404,7 @@ export function DesktopToolbar(): React.JSX.Element {
                   key={element.title}
                   component={Link}
                   href={element.href || "#"}
-                  className={`normal-case text-[16px] !font-medium ${
+                  className={`normal-case text-[20px] !font-medium ${
                     isTransparent
                       ? "text-white"
                       : pathname === element.href
@@ -436,10 +437,9 @@ export function DesktopToolbar(): React.JSX.Element {
                   />
                 </IconButton>
               ) : (
-                <>
-                  <GoogleSignInButton iconOnly />
-                  <GuestToolbarMenu {...{ isTransparent }} />
-                </>
+                <div className="flex flex-col gap-2">
+                  <SignInButtons fullWidth={false} />
+                </div>
               )}
             </div>
           </div>
@@ -461,7 +461,7 @@ export function DesktopToolbar(): React.JSX.Element {
         }}
         PaperProps={{
           className:
-            "bg-transparent shadow-none p-0 w-[357px] max-h-[658px] mt-1",
+            "bg-transparent shadow-none p-0 w-[300px] max-h-[658px] mt-1 rounded-2xl",
         }}
         MenuListProps={{
           className: "p-0",
@@ -480,7 +480,7 @@ export function DesktopToolbar(): React.JSX.Element {
           maxWidth={false}
           PaperProps={{
             className:
-              "w-[500px] max-w-[90vw] m-2 p-0 overflow-hidden flex flex-col rounded-[12px] bg-white shadow-[0_4px_20px_0_#6A7282] dark:bg-[#313136] dark:border-[3px] dark:border-[#3F3F47] dark:shadow-none",
+              "w-[500px] max-w-[90vw] m-2 p-0 overflow-hidden flex flex-col rounded-[12px] bg-white shadow-[0_4px_20px_0_var(--text-muted-soft)] dark:bg-[var(--surface-dialog)] dark:border-[3px] dark:border-[var(--button-disabled-bg)] dark:shadow-none",
             style: {
               height: editPreferencesExpanded ? 593 : 558,
             },
@@ -499,7 +499,7 @@ export function DesktopToolbar(): React.JSX.Element {
           slotProps={{
             paper: {
               className:
-                "p-0 overflow-hidden rounded-t-[10px] mt-[96px] h-auto max-h-[85vh] flex flex-col min-h-0 bg-white dark:bg-[#313136] dark:border-[3px] dark:border-[#3F3F47] dark:border-b-0 dark:rounded-t-[12px]",
+                "p-0 overflow-hidden rounded-t-[10px] mt-[96px] h-auto max-h-[85vh] flex flex-col min-h-0 bg-white dark:bg-[var(--surface-dialog)] dark:border-[3px] dark:border-[var(--button-disabled-bg)] dark:border-b-0 dark:rounded-t-[12px]",
             },
           }}
         >
@@ -590,7 +590,7 @@ function MobileToolbar(): React.JSX.Element {
         className={`top-0 z-50 w-full px-4 py-2.5 flex items-center justify-between ${
           isTransparent
             ? "absolute bg-transparent"
-            : "sticky bg-white dark:bg-[#27272A]"
+            : "sticky bg-white dark:bg-[var(--surface-scroll)]"
         }`}
       >
         <span
@@ -626,7 +626,7 @@ function MobileToolbar(): React.JSX.Element {
             </IconButton>
           ) : (
             <>
-              <GoogleSignInButton iconOnly />
+              <SignInButtons fullWidth={false} />
               <GuestToolbarMenu
                 {...{ isTransparent }}
                 buttonClassName="!min-w-[44px] !min-h-[44px]"
@@ -642,7 +642,7 @@ function MobileToolbar(): React.JSX.Element {
             rounded-[28px]
             px-4 py-3
             shadow-lg
-            bg-gradient-to-b from-sky-700 to-sky-900 dark:from-[#8EC5FF] dark:to-[#4281CA]
+            bg-gradient-to-b from-sky-700 to-sky-900 dark:from-[var(--gradient-from)] dark:to-[var(--gradient-to)]
           "
         >
           <div className="flex items-center justify-between">
@@ -671,14 +671,16 @@ function MobileToolbar(): React.JSX.Element {
                       color: "white",
                       opacity: active ? 1 : 0.9,
                     }}
-                    className={active ? "dark:!text-[#162456]" : ""}
+                    className={
+                      active ? "dark:!text-[var(--nav-active-text)]" : ""
+                    }
                   >
                     {element.icon}
                   </div>
                   <span
                     className={`
                       text-[12px] leading-none text-white
-                      ${active ? "font-semibold dark:!text-[#162456]" : "font-medium"}
+                      ${active ? "font-semibold dark:!text-[var(--nav-active-text)]" : "font-medium"}
                     `}
                   >
                     {element.title}
@@ -695,20 +697,11 @@ function MobileToolbar(): React.JSX.Element {
         anchorEl={profileAnchor}
         open={profileOpen}
         onClose={handleProfileClose}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "right",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "right",
-        }}
-        PaperProps={{
-          className:
-            "bg-transparent shadow-none p-0 w-[357px] max-h-[658px] mt-1",
-        }}
-        MenuListProps={{
-          className: "p-0",
+        slotProps={{
+          paper: {
+            className:
+              "p-0 overflow-hidden rounded-t-[10px] h-auto max-h-[85vh] flex flex-col min-h-0 bg-white dark:bg-zinc-900",
+          },
         }}
       >
         <SidebarContent
@@ -724,7 +717,7 @@ function MobileToolbar(): React.JSX.Element {
         slotProps={{
           paper: {
             className:
-              "p-0 overflow-hidden rounded-t-[10px] mt-[96px] h-auto max-h-[85vh] flex flex-col min-h-0 bg-white dark:bg-[#313136] dark:border-[3px] dark:border-[#3F3F47] dark:border-b-0 dark:rounded-t-[12px]",
+              "p-0 overflow-hidden rounded-t-[10px] mt-[96px] h-auto max-h-[85vh] flex flex-col min-h-0 bg-white dark:bg-[var(--surface-dialog)] dark:border-[3px] dark:border-[var(--button-disabled-bg)] dark:border-b-0 dark:rounded-t-[12px]",
           },
         }}
       >

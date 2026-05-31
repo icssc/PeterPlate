@@ -66,7 +66,7 @@ func setCustomCookie(webView: WKWebView) {
         .path: "/",
         .name: platformCookie.name,
         .value: platformCookie.value,
-        .secure: "FALSE",
+        .secure: rootUrl.scheme == "https" ? "TRUE" : "FALSE",
         .expires: NSDate(timeIntervalSinceNow: 31556926)
     ])!
 

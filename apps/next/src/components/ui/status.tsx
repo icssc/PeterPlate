@@ -23,7 +23,9 @@ function StatusDot({ status }: StatusDotProps) {
         status === HallStatusEnum.OPEN && "bg-emerald-500",
         status === HallStatusEnum.CLOSED && "bg-red-500",
         status === HallStatusEnum.PREVIEW && "bg-sky-500",
-        status === HallStatusEnum.ERROR && "bg-amber-500",
+        (status === HallStatusEnum.ERROR ||
+          status === HallStatusEnum.LOADING) &&
+          "bg-amber-500 animate-pulse",
       )}
     />
   );
@@ -35,6 +37,8 @@ function StatusDot({ status }: StatusDotProps) {
 interface StatusProps {
   /** The current status of the dining hall. */
   status: HallStatusEnum;
+  /** If on mobile */
+  mobile?: boolean;
 }
 
 /**
@@ -42,7 +46,7 @@ interface StatusProps {
  * @param {StatusProps} props - The props for the component.
  * @returns A JSX element representing the dining hall status.
  */
-function DiningHallStatus({ status }: StatusProps): React.JSX.Element {
+function DiningHallStatus({ status, mobile }: StatusProps): React.JSX.Element {
   let statusMessage: string = "";
 
   switch (status) {
@@ -50,13 +54,16 @@ function DiningHallStatus({ status }: StatusProps): React.JSX.Element {
       statusMessage = "Open";
       break;
     case HallStatusEnum.CLOSED:
-      statusMessage = `Closed`;
+      statusMessage = "Closed";
       break;
     case HallStatusEnum.ERROR:
-      statusMessage = `Error (Cannot obtain scheduling info)`;
+      statusMessage = "Error (Cannot obtain scheduling info)";
       break;
     case HallStatusEnum.PREVIEW:
-      statusMessage = `Preview`;
+      statusMessage = "Preview";
+      break;
+    case HallStatusEnum.LOADING:
+      statusMessage = "Loading..";
       break;
     default:
       break;
@@ -65,7 +72,7 @@ function DiningHallStatus({ status }: StatusProps): React.JSX.Element {
   return (
     <div className="flex items-center gap-2">
       <StatusDot status={status} />
-      <span>{statusMessage}</span>
+      <span className={cn(mobile && "font-bold")}>{statusMessage}</span>
     </div>
   );
 }

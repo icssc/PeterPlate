@@ -83,7 +83,7 @@ const TrackedMealCardContent = React.forwardRef<
             "cursor-pointer transition w-full border",
             isUnavailable
               ? "bg-zinc-200/90 dark:bg-zinc-700"
-              : "bg-white dark:bg-[#303035] hover:shadow-lg",
+              : "bg-white dark:bg-[var(--surface-modal)] hover:shadow-lg",
           )}
           sx={{ borderRadius: "12px", backgroundImage: "none" }}
         >
