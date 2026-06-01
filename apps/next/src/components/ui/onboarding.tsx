@@ -1,4 +1,3 @@
-import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
 import {
   Avatar,
   Box,

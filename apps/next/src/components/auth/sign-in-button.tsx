@@ -52,7 +52,7 @@ export function SignInButton({
       <Button
         onClick={handleSignIn}
         disabled={isSigningIn}
-        className={cn(fullWidth && "w-full", className)}
+        className={cn(fullWidth && "w-full", className, "py-6")}
       >
         {icon}
         Sign in with {getProviderDisplayName(provider)}

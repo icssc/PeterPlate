@@ -1,5 +1,6 @@
 "use client";
 
+import { Login } from "@mui/icons-material";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import CloseIcon from "@mui/icons-material/Close";
 import ContentPasteOutlinedIcon from "@mui/icons-material/ContentPasteOutlined";
@@ -33,6 +34,7 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useSession } from "@/utils/auth-client";
 import AppearancePicker from "./appearance-picker";
 import EditPreferencesContent from "./edit-preferences-content";
+import LoginDialog from "./login-dialog";
 import SidebarContent from "./sidebar/sidebar-content";
 
 export type CalendarRange = {
@@ -112,6 +114,26 @@ const MOBILE_TOOLBAR_ELEMENTS: ToolbarElement[] = [
 
 // Routes on which the toolbar should remain transparent
 const TRANSPARENT_PAGES = ["/about", "/brandywine", "/anteatery"];
+
+function LoginButton() {
+  const [loginDialogOpen, setLoginDialogOpen] = useState(false);
+
+  const handleClickOpen = () => setLoginDialogOpen(true);
+  const handleClose = () => setLoginDialogOpen(false);
+
+  return (
+    <>
+      <Button
+        onClick={handleClickOpen}
+        className="text-black dark:text-white text-xs md:text-lg md:mr-2"
+      >
+        <Login className="mr-2 text-md md:text-2xl" />
+        Sign In
+      </Button>
+      <LoginDialog open={loginDialogOpen} onClose={handleClose} />
+    </>
+  );
+}
 
 function ToolbarDropdown({
   element,
@@ -239,17 +261,19 @@ function GuestToolbarMenu({
           vertical: "top",
           horizontal: "right",
         }}
-        PaperProps={{
-          className:
-            "mt-2 w-[280px] max-w-[calc(100vw-2rem)] overflow-hidden rounded-[20px] border border-gray-200 bg-white dark:border-zinc-700 dark:bg-[#323235]",
-          sx: {
-            backgroundImage: "none",
-            boxShadow:
-              "0 3px 14px 2px rgba(0, 0, 0, 0.12), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 5px 5px -3px rgba(0, 0, 0, 0.20)",
+        slotProps={{
+          paper: {
+            className:
+              "mt-2 w-[280px] max-w-[calc(100vw-2rem)] overflow-hidden rounded-[20px] border border-gray-200 bg-white dark:border-zinc-700 dark:bg-[#323235]",
+            sx: {
+              backgroundImage: "none",
+              boxShadow:
+                "0 3px 14px 2px rgba(0, 0, 0, 0.12), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 5px 5px -3px rgba(0, 0, 0, 0.20)",
+            },
           },
-        }}
-        MenuListProps={{
-          className: "p-0",
+          list: {
+            className: "p-0",
+          },
         }}
       >
         <li className="list-none">
@@ -290,13 +314,6 @@ function GuestToolbarMenu({
             />
             About PeterPlate
           </Link>
-        </li>
-        <li className="list-none border-t border-gray-300 px-5 pb-5 pt-3 dark:border-zinc-700">
-          <GoogleSignInButton
-            className="h-auto w-full rounded-lg bg-sky-700 py-2.5 text-sm font-medium text-white shadow-none hover:bg-sky-800 dark:bg-blue-300 dark:text-gray-900 dark:hover:bg-blue-400 [&_svg]:!size-5"
-            label="Sign In"
-            showIcon
-          />
         </li>
       </Menu>
     </>
@@ -421,7 +438,10 @@ export function DesktopToolbar(): React.JSX.Element {
           <div className="flex-none flex items-center gap-4">
             <div className="flex-none flex items-center gap-4">
               {isPending ? (
-                <GuestToolbarMenu {...{ isTransparent }} disabled />
+                <>
+                  <LoginButton />
+                  <GuestToolbarMenu {...{ isTransparent }} disabled />
+                </>
               ) : user ? (
                 <IconButton
                   onClick={handleProfileOpen}
@@ -437,8 +457,9 @@ export function DesktopToolbar(): React.JSX.Element {
                   />
                 </IconButton>
               ) : (
-                <div className="flex flex-col gap-2">
-                  <SignInButtons fullWidth={false} />
+                <div className="flex gap-2">
+                  <LoginButton />
+                  <GuestToolbarMenu {...{ isTransparent }} />
                 </div>
               )}
             </div>
@@ -459,12 +480,14 @@ export function DesktopToolbar(): React.JSX.Element {
           vertical: "top",
           horizontal: "right",
         }}
-        PaperProps={{
-          className:
-            "bg-transparent shadow-none p-0 w-[300px] max-h-[658px] mt-1 rounded-2xl",
-        }}
-        MenuListProps={{
-          className: "p-0",
+        slotProps={{
+          paper: {
+            className:
+              "bg-transparent shadow-none p-0 w-[300px] max-h-[658px] mt-1 rounded-2xl",
+          },
+          list: {
+            className: "p-0",
+          },
         }}
       >
         <SidebarContent
@@ -478,11 +501,13 @@ export function DesktopToolbar(): React.JSX.Element {
           open={editPreferencesOpen}
           onClose={handleEditPreferencesClose}
           maxWidth={false}
-          PaperProps={{
-            className:
-              "w-[500px] max-w-[90vw] m-2 p-0 overflow-hidden flex flex-col rounded-[12px] bg-white shadow-[0_4px_20px_0_var(--text-muted-soft)] dark:bg-[var(--surface-dialog)] dark:border-[3px] dark:border-[var(--button-disabled-bg)] dark:shadow-none",
-            style: {
-              height: editPreferencesExpanded ? 593 : 558,
+          slotProps={{
+            paper: {
+              className:
+                "w-[500px] max-w-[90vw] m-2 p-0 overflow-hidden flex flex-col rounded-[12px] bg-white shadow-[0_4px_20px_0_var(--text-muted-soft)] dark:bg-[var(--surface-dialog)] dark:border-[3px] dark:border-[var(--button-disabled-bg)] dark:shadow-none",
+              style: {
+                height: editPreferencesExpanded ? 593 : 558,
+              },
             },
           }}
         >
@@ -604,11 +629,14 @@ function MobileToolbar(): React.JSX.Element {
         </span>
         <div className="flex-shrink-0 min-h-[44px] flex items-center justify-center gap-2">
           {!isMounted || isPending ? (
-            <GuestToolbarMenu
-              {...{ isTransparent }}
-              disabled
-              buttonClassName="!min-w-[44px] !min-h-[44px]"
-            />
+            <>
+              <LoginButton />
+              <GuestToolbarMenu
+                {...{ isTransparent }}
+                disabled
+                buttonClassName="!min-w-[44px] !min-h-[44px]"
+              />
+            </>
           ) : user ? (
             <IconButton
               type="button"
@@ -626,7 +654,7 @@ function MobileToolbar(): React.JSX.Element {
             </IconButton>
           ) : (
             <>
-              <SignInButtons fullWidth={false} />
+              <LoginButton />
               <GuestToolbarMenu
                 {...{ isTransparent }}
                 buttonClassName="!min-w-[44px] !min-h-[44px]"
