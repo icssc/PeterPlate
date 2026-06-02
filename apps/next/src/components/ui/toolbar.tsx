@@ -32,6 +32,7 @@ import { useEffect, useState } from "react";
 import { SignInButtons } from "@/components/auth/sign-in-buttons";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useSession } from "@/utils/auth-client";
+import { cn } from "@/utils/tw";
 import AppearancePicker from "./appearance-picker";
 import EditPreferencesContent from "./edit-preferences-content";
 import LoginDialog from "./login-dialog";
@@ -115,7 +116,7 @@ const MOBILE_TOOLBAR_ELEMENTS: ToolbarElement[] = [
 // Routes on which the toolbar should remain transparent
 const TRANSPARENT_PAGES = ["/about", "/brandywine", "/anteatery"];
 
-function LoginButton() {
+function LoginButton({ isTransparent }: { isTransparent: boolean }) {
   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
 
   const handleClickOpen = () => setLoginDialogOpen(true);
@@ -125,7 +126,10 @@ function LoginButton() {
     <>
       <Button
         onClick={handleClickOpen}
-        className="text-black dark:text-white text-xs md:text-lg md:mr-2"
+        className={cn(
+          "text-black dark:text-white text-xs md:text-lg md:mr-2",
+          isTransparent && "text-white",
+        )}
       >
         <Login className="mr-2 text-md md:text-2xl" />
         Sign In
@@ -439,7 +443,7 @@ export function DesktopToolbar(): React.JSX.Element {
             <div className="flex-none flex items-center gap-4">
               {isPending ? (
                 <>
-                  <LoginButton />
+                  <LoginButton {...{ isTransparent }} />
                   <GuestToolbarMenu {...{ isTransparent }} disabled />
                 </>
               ) : user ? (
@@ -458,7 +462,7 @@ export function DesktopToolbar(): React.JSX.Element {
                 </IconButton>
               ) : (
                 <div className="flex gap-2">
-                  <LoginButton />
+                  <LoginButton {...{ isTransparent }} />
                   <GuestToolbarMenu {...{ isTransparent }} />
                 </div>
               )}
@@ -630,7 +634,7 @@ function MobileToolbar(): React.JSX.Element {
         <div className="flex-shrink-0 min-h-[44px] flex items-center justify-center gap-2">
           {!isMounted || isPending ? (
             <>
-              <LoginButton />
+              <LoginButton {...{ isTransparent }} />
               <GuestToolbarMenu
                 {...{ isTransparent }}
                 disabled
@@ -654,7 +658,7 @@ function MobileToolbar(): React.JSX.Element {
             </IconButton>
           ) : (
             <>
-              <LoginButton />
+              <LoginButton {...{ isTransparent }} />
               <GuestToolbarMenu
                 {...{ isTransparent }}
                 buttonClassName="!min-w-[44px] !min-h-[44px]"

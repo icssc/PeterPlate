@@ -1,10 +1,28 @@
 "use client";
 
 import { GitHub, Language } from "@mui/icons-material";
+import { Button } from "@mui/material";
 import Image from "next/image";
+import type React from "react";
 import Contributor from "@/components/ui/contributor";
-import { Button } from "@/components/ui/shadcn/button";
 import { trpc } from "@/utils/trpc";
+
+function AboutButton({
+  href,
+  children,
+}: {
+  href: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <Button
+      className="bg-primary-accent text-white dark:text-black"
+      onClick={() => window.open(href, "_blank", "noopener,noreferrer")}
+    >
+      {children}
+    </Button>
+  );
+}
 
 export default function About() {
   const {
@@ -30,8 +48,7 @@ export default function About() {
         <div className="flex flex-col" id="about-text">
           <div className="flex gap-4 items-center mb-2" id="about-header">
             <h1 className="text-3xl font-bold" id="about-title">
-              About{" "}
-              <span className="text-sky-700 dark:text-sky-400">PeterPlate</span>
+              About <span className="text-primary-accent">PeterPlate</span>
             </h1>
           </div>
           <div id="about-paragraph" className="grid gap-4 max-w-100">
@@ -45,7 +62,7 @@ export default function About() {
             <p>
               This project is proudly developed and maintained by&nbsp;
               <a
-                className="underline text-sky-600 dark:text-sky-400"
+                className="underline text-primary-accent"
                 href="https://studentcouncil.ics.uci.edu/"
                 rel="noreferrer"
                 target="_blank"
@@ -90,7 +107,7 @@ export default function About() {
               Want to contribute? PeterPlate is open-source, and we welcome
               contributions on our&nbsp;
               <a
-                className="underline text-sky-600 dark:text-sky-400"
+                className="underline text-primary-accent"
                 href="https://github.com/icssc/PeterPlate"
                 rel="noreferrer"
                 target="_blank"
@@ -99,7 +116,7 @@ export default function About() {
               </a>
               ! Have questions or ideas? Join the conversation on our&nbsp;
               <a
-                className="underline text-sky-600 dark:text-sky-400"
+                className="underline text-primary-accent"
                 href="https://discord.gg/GzF76D7UhY"
                 rel="noreferrer"
                 target="_blank"
@@ -109,30 +126,12 @@ export default function About() {
               !
             </p>
             <div className="flex align-items gap-4">
-              <Button
-                className="bg-sky-700 dark:bg-sky-600 dark:hover:bg-sky-500 dark:text-white"
-                onClick={() =>
-                  window.open(
-                    "https://github.com/icssc/PeterPlate/",
-                    "_blank",
-                    "noopener,noreferrer",
-                  )
-                }
-              >
-                <GitHub /> GitHub
-              </Button>
-              <Button
-                className="bg-sky-700 dark:bg-sky-600 dark:hover:bg-sky-500 dark:text-white"
-                onClick={() =>
-                  window.open(
-                    "https://studentcouncil.ics.uci.edu/",
-                    "_blank",
-                    "noopener,noreferrer",
-                  )
-                }
-              >
-                <Language /> Visit ICSSC
-              </Button>
+              <AboutButton href="https://github.com/icssc/PeterPlate/">
+                <GitHub className="mr-2 w-5" /> GitHub
+              </AboutButton>
+              <AboutButton href="https://studentcouncil.ics.uci.edu/">
+                <Language className="mr-2 w-5" /> Visit ICSSC
+              </AboutButton>
             </div>
           </div>
         </div>
