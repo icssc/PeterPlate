@@ -31,6 +31,9 @@ export const auth = betterAuth({
     accountLinking: {
       enabled: true,
       trustedProviders: [AUTH_PROVIDER_ID],
+      // ICSSC userinfo / id_token do not include email_verified; Google sign-ups
+      // stay emailVerified=false, which blocks implicit Apple→Google linking otherwise.
+      requireLocalEmailVerified: false,
     },
   },
   session: {
@@ -65,6 +68,7 @@ export const auth = betterAuth({
               ...profile,
               name,
               email,
+              emailVerified: profile.emailVerified ?? Boolean(email),
               image: profile.picture ?? profile.image,
             };
           },

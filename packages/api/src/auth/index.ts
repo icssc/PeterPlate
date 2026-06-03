@@ -39,6 +39,7 @@ export const auth = betterAuth({
     accountLinking: {
       enabled: true,
       trustedProviders: [AUTH_PROVIDER_ID],
+      requireLocalEmailVerified: false,
     },
   },
   session: {
@@ -70,6 +71,7 @@ export const auth = betterAuth({
             ...profile,
             name,
             email,
+            emailVerified: profile.emailVerified ?? Boolean(email),
             image: profile.picture ?? profile.image,
           };
         };
