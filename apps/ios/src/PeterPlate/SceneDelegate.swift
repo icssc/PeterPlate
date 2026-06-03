@@ -17,7 +17,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // If so, store that link so we can navigate to it once our webView is initialized.
         for userActivity in connectionOptions.userActivities {
             if let universalLink = userActivity.webpageURL {
-                SceneDelegate.universalLinkToLaunch = universalLink;
+                SceneDelegate.universalLinkToLaunch = rewriteNativeOAuthCallbackUrl(universalLink);
                 break
             }
         }
@@ -34,7 +34,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             comps?.scheme = "https"
             
             if let url = comps?.url {
-                SceneDelegate.universalLinkToLaunch = url;
+                SceneDelegate.universalLinkToLaunch = rewriteNativeOAuthCallbackUrl(url);
             }
         }
     }

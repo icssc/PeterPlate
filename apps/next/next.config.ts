@@ -25,6 +25,15 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      // iOS OAuth lands on /auth/native (AASA). Rewrite to /auth so the existing
+      // /auth → Better Auth callback redirect runs. Preserves ?code= & ?state=.
+      // AntAlmanac serves this path as 200; PeterPlate was 404, breaking older
+      // App Store builds that load the Universal Link without a client-side strip.
+      {
+        source: "/auth/native",
+        destination: "/auth",
+        permanent: false,
+      },
       {
         source: "/auth",
         destination: "/api/auth/oauth2/callback/icssc",
@@ -77,4 +86,11 @@ export default withPWA({
   disable: process.env.NODE_ENV === "development",
   // PeterPlate-only: PostHog reverse proxy at /app-data/* must not be cached by Workbox.
   buildExcludes: [/app-data/],
+  runtimeCaching: [
+    {
+      urlPattern: /\/api\/auth\//,
+      handler: "NetworkOnly",
+      method: "GET",
+    },
+  ],
 })(nextConfig);
