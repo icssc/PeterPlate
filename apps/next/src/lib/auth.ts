@@ -24,10 +24,15 @@ const OIDC_ISSUER_URL = "https://auth.icssc.club";
 
 export const auth = betterAuth({
   appName: "PeterPlate",
-  debug: process.env.NODE_ENV !== "production",
   secret: authSecret,
   baseURL,
   trustedOrigins: [baseURL],
+  account: {
+    accountLinking: {
+      enabled: true,
+      trustedProviders: [AUTH_PROVIDER_ID],
+    },
+  },
   session: {
     cookieCache: {
       enabled: true,
@@ -53,11 +58,16 @@ export const auth = betterAuth({
           clientId: process.env.AUTH_CLIENT_ID || "peterplate-dev",
           scopes: ["openid", "profile", "email"],
           pkce: true,
-          mapProfileToUser: (profile: Record<string, string>) => ({
-            name: profile.name,
-            email: profile.email,
-            image: profile.picture,
-          }),
+          mapProfileToUser: (profile) => {
+            const email = profile.email;
+            const name = profile.name ?? email?.split("@")[0] ?? "User";
+            return {
+              ...profile,
+              name,
+              email,
+              image: profile.picture ?? profile.image,
+            };
+          },
         },
       ],
     }),
@@ -68,13 +78,15 @@ export const auth = betterAuth({
       if (ctx.path === "/oauth2/callback/:providerId") {
         const additionalData =
           (await getOAuthState()) as AuthAdditionalData | null;
-        if (additionalData?.returnUrl) {
-          const returnUrl = getSafeAuthRedirectPath(
-            additionalData.returnUrl,
-            ctx.request?.url,
-            new URL(baseURL).origin,
-          );
-          ctx.redirect(returnUrl);
+        if (additionalData) {
+          if (additionalData.returnUrl) {
+            const returnUrl = getSafeAuthRedirectPath(
+              additionalData.returnUrl,
+              ctx.request?.url,
+              new URL(baseURL).origin,
+            );
+            ctx.redirect(returnUrl);
+          }
         }
       }
     }),

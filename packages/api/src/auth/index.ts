@@ -26,14 +26,21 @@ const baseURL =
   process.env.BETTER_AUTH_URL ??
   "https://peterplate.com";
 
+const AUTH_PROVIDER_ID = "icssc";
+
 export const auth = betterAuth({
-  debug: process.env.NODE_ENV !== "production",
   secret: authSecret,
   baseURL,
   // The iOS PWA shell (WKWebView) sends Origin from Settings.swift rootUrl.
   // auth.icssc.club only allows redirect URIs on the apex domain (peterplate.com),
   // not www — baseURL and trustedOrigins must match deploy + iOS + IdP registration.
   trustedOrigins: [baseURL],
+  account: {
+    accountLinking: {
+      enabled: true,
+      trustedProviders: [AUTH_PROVIDER_ID],
+    },
+  },
   session: {
     cookieCache: {
       enabled: true,
@@ -56,11 +63,16 @@ export const auth = betterAuth({
         const discoveryUrl =
           "https://auth.icssc.club/.well-known/openid-configuration";
         const scopes = ["openid", "profile", "email"];
-        const mapProfileToUser = (profile: Record<string, string>) => ({
-          name: profile.name,
-          email: profile.email,
-          image: profile.picture,
-        });
+        const mapProfileToUser = (profile: Record<string, string>) => {
+          const email = profile.email;
+          const name = profile.name ?? email?.split("@")[0] ?? "User";
+          return {
+            ...profile,
+            name,
+            email,
+            image: profile.picture ?? profile.image,
+          };
+        };
 
         return [
           {
