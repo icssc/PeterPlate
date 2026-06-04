@@ -108,7 +108,7 @@ export default function FeedbackForm() {
 
       if (!response.ok) {
         throw new Error(
-          `[${response.status}] Failed to submit feedback: ${response.body}`,
+          `[${response.status}] Failed to submit feedback: ${await response.json()}`,
         );
       }
 
