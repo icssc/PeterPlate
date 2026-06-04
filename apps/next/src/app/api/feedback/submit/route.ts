@@ -136,6 +136,14 @@ export async function POST(request: NextRequest) {
   try {
     const formData: FeedbackFormData = await request.json();
 
+    const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
+    const scriptsUrl = process.env.GOOGLE_APPS_SCRIPT_URL;
+    if (!webhookUrl || !scriptsUrl)
+      return NextResponse.json(
+        { error: "Missing webhook and/or scripts env variable" },
+        { status: 400 },
+      );
+
     // Validate required fields
     if (
       !formData.fullName ||

@@ -107,7 +107,9 @@ export default function FeedbackForm() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to submit feedback");
+        throw new Error(
+          `[${response.status}] Failed to submit feedback: ${response.body}`,
+        );
       }
 
       setIsSubmitted(true);
