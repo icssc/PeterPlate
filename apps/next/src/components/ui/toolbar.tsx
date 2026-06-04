@@ -468,7 +468,7 @@ function MobileToolbar(): React.JSX.Element {
         className={`top-0 z-50 w-full px-4 py-2.5 flex items-center justify-between ${
           isTransparent
             ? "absolute bg-transparent"
-            : "sticky bg-white dark:bg-[var(--surface-scroll)]"
+            : "sticky bg-white dark:bg-surface-scroll"
         }`}
       >
         <span

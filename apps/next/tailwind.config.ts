@@ -46,6 +46,7 @@ export default {
 				ring: 'hsl(var(--ring))',
 				'surface-elevated': 'var(--surface-elevated)',
 				'surface-modal': 'var(--surface-modal)',
+				'surface-scroll': 'var(--surface-scroll)',
 				'primary-accent': 'hsl(var(--primary-accent))',
 				'button-primary-fg': 'var(--button-primary-fg)',
 				'button-disabled-bg': 'var(--button-disabled-bg)',

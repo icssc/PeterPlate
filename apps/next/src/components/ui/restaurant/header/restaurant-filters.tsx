@@ -66,7 +66,7 @@ export function RestaurantFilters({
           "bg-sky-700 text-white border-sky-700 shadow-md dark:bg-blue-300 dark:text-gray-900 dark:border-blue-300",
         !showPreferencesOnly &&
           userId &&
-          "bg-white text-sky-700 border-sky-700 hover:bg-sky-50 dark:bg-[var(--surface-scroll)] dark:text-blue-300 dark:border-blue-300 dark:hover:bg-zinc-700",
+          "bg-white text-sky-700 border-sky-700 hover:bg-sky-50 dark:bg-surface-scroll dark:text-blue-300 dark:border-blue-300 dark:hover:bg-zinc-700",
       )}
     >
       Show Preferences Only
@@ -89,7 +89,7 @@ export function RestaurantFilters({
             label="Meal"
             onChange={(e) => setSelectedPeriod(e.target.value)}
             IconComponent={ArrowDropDownRounded}
-            className="bg-white dark:bg-[var(--surface-scroll)] [&_fieldset]:!border-sky-700 dark:[&_fieldset]:!border-blue-300  [&_.Mui-focused_fieldset]:!border-sky-700 dark:[&_.Mui-focused_fieldset]:!border-blue-300 [&_.MuiSvgIcon-root]:!text-sky-700 dark:[&_.MuiSvgIcon-root]:!text-blue-300"
+            className="bg-white  dark:bg-surface-scroll [&_fieldset]:!border-sky-700 dark:[&_fieldset]:!border-blue-300  [&_.Mui-focused_fieldset]:!border-sky-700 dark:[&_.Mui-focused_fieldset]:!border-blue-300 [&_.MuiSvgIcon-root]:!text-sky-700 dark:[&_.MuiSvgIcon-root]:!text-blue-300"
             MenuProps={{
               anchorOrigin: {
                 vertical: "bottom",
@@ -182,7 +182,7 @@ export function RestaurantFilters({
                     className: "!cursor-pointer",
                   },
                   className:
-                    "bg-white dark:bg-[var(--surface-scroll)] [&_fieldset]:!border-sky-700 dark:[&_fieldset]:!border-blue-300 [&:hover_fieldset]:!border-sky-700 dark:[&:hover_fieldset]:!border-blue-300 [&_.Mui-focused_fieldset]:!border-sky-700 dark:[&_.Mui-focused_fieldset]:!border-blue-300 [&_.MuiSvgIcon-root]:!text-sky-700 dark:[&_.MuiSvgIcon-root]:!text-blue-300 !cursor-pointer",
+                    "bg-white dark:bg-surface-scroll [&_fieldset]:!border-sky-700 dark:[&_fieldset]:!border-blue-300 [&:hover_fieldset]:!border-sky-700 dark:[&:hover_fieldset]:!border-blue-300 [&_.Mui-focused_fieldset]:!border-sky-700 dark:[&_.Mui-focused_fieldset]:!border-blue-300 [&_.MuiSvgIcon-root]:!text-sky-700 dark:[&_.MuiSvgIcon-root]:!text-blue-300 !cursor-pointer",
                 },
                 openPickerIcon: {
                   className: "!text-sky-700 dark:!text-blue-300",
