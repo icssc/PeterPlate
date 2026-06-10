@@ -137,7 +137,7 @@ const MyFoodsCardContent = React.forwardRef<
     return (
       <div ref={ref} {...divProps} className={cn("w-full", className)}>
         <Card
-          className="cursor-pointer hover:shadow-lg transition w-full dark:bg-[#323235]"
+          className="cursor-pointer hover:shadow-lg transition w-full dark:bg-[var(--surface-elevated)]"
           sx={{
             borderRadius: "16px",
             border: 1,
