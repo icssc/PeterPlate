@@ -3,11 +3,21 @@ import {
   inferAdditionalFields,
 } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
-import type { auth } from "@/lib/auth";
 import { getSignOutUrl } from "@/lib/auth-actions";
 
 export const authClient = createAuthClient({
-  plugins: [genericOAuthClient(), inferAdditionalFields<typeof auth>()],
+  plugins: [
+    genericOAuthClient(),
+    inferAdditionalFields({
+      user: {
+        hasOnboarded: {
+          type: "boolean" as const,
+          required: false,
+          defaultValue: false,
+        },
+      },
+    }),
+  ],
 });
 
 export const { useSession } = authClient;
