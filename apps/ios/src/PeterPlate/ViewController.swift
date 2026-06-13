@@ -135,8 +135,7 @@ class ViewController: UIViewController, WKNavigationDelegate, UIDocumentInteract
     
     @objc func loadRootUrl(cachePolicy: NSURLRequest.CachePolicy = .useProtocolCachePolicy) {
         let launchUrl = SceneDelegate.universalLinkToLaunch ?? SceneDelegate.shortcutLinkToLaunch ?? rootUrl
-        let urlToLoad = rewriteNativeOAuthCallbackUrl(launchUrl)
-        PeterPlate.webView.load(URLRequest(url: urlToLoad, cachePolicy: cachePolicy))
+        PeterPlate.webView.load(URLRequest(url: launchUrl, cachePolicy: cachePolicy))
     }
     
     func reloadWebview(
@@ -297,24 +296,16 @@ extension ViewController: WKScriptMessageHandler {
 //   2. Passkeys / WebAuthn bound to a third-party RP ID (e.g. google.com) only
 //      work in top-level Safari context, not in a WKWebView.
 //
-// The callback uses a Universal Link (`https://peterplate.com/auth/native`)
-// via ASWebAuthenticationSession's HTTPS-callback initializer. The AASA file
-// at `https://peterplate.com/.well-known/apple-app-site-association` lists
-// this path, so the callback can only be delivered to our AASA-verified app.
-// Listing `/auth/native` (instead of the default callback path) prevents iOS
-// from hijacking normal Safari logins via Universal Links.
-//
-// On callback, we rewrite the URL path from /auth/native to /auth and load it
-// in the WKWebView. next.config redirects /auth → Better Auth's icssc callback,
-// which sets the session cookie in the WKWebView via nextCookies().
+// ASW uses the `redirect_uri` from auth.icssc.club/authorize (Better Auth:
+// `/api/auth/oauth2/callback/icssc`). `webcredentials` in AASA validates the
+// domain; the callback path is not under `applinks` so Safari logins are not
+// hijacked into the app.
 extension ViewController: ASWebAuthenticationPresentationContextProviding {
     func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
         return view.window ?? ASPresentationAnchor()
     }
 
     func startAuthSession(url: URL, webView: WKWebView) {
-        // Extract redirect_uri from the OIDC authorize URL. getSignInUrl sets
-        // callbackURL to https://peterplate.com/auth/native for the iOS shell.
         let authComponents = URLComponents(url: url, resolvingAgainstBaseURL: false)
         let redirectUri = authComponents?
             .queryItems?
@@ -323,7 +314,7 @@ extension ViewController: ASWebAuthenticationPresentationContextProviding {
             .flatMap { URL(string: $0) }
 
         let callbackHost = redirectUri?.host ?? "peterplate.com"
-        let callbackPath = redirectUri?.path ?? "/auth/native"
+        let callbackPath = redirectUri?.path ?? "/api/auth/oauth2/callback/icssc"
 
         let callback: ASWebAuthenticationSession.Callback = .https(
             host: callbackHost,
@@ -346,20 +337,11 @@ extension ViewController: ASWebAuthenticationPresentationContextProviding {
                 return
             }
 
-            guard let callbackURL = callbackURL,
-                  var components = URLComponents(url: callbackURL, resolvingAgainstBaseURL: false) else {
+            guard let callbackURL = callbackURL else {
                 return
             }
 
-            // ICSSC-wide convention: strip `/native` so the WKWebView loads the real
-            // handler at /auth (next.config redirects to Better Auth's callback).
-            if components.path.hasSuffix("/native") {
-                components.path = String(components.path.dropLast("/native".count))
-            }
-
-            if let redirectURL = components.url {
-                webView?.load(URLRequest(url: redirectURL))
-            }
+            webView?.load(URLRequest(url: callbackURL))
         }
         session.presentationContextProvider = self
         // Share Safari cookies + iCloud Keychain passkeys so Google SSO, UCI
@@ -369,9 +351,7 @@ extension ViewController: ASWebAuthenticationPresentationContextProviding {
         let started = session.start()
         if !started {
             print("[PeterPlate] ⚠️ ASWebAuthenticationSession.start() returned false. " +
-                  "Check that applinks:peterplate.com is in the entitlements and " +
-                  "that the AASA at https://peterplate.com/.well-known/apple-app-site-association " +
-                  "lists the com.peterplate bundle ID with path /auth/native.")
+                  "Check webcredentials:peterplate.com in entitlements and AASA.")
         }
     }
 }

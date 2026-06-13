@@ -17,7 +17,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // If so, store that link so we can navigate to it once our webView is initialized.
         for userActivity in connectionOptions.userActivities {
             if let universalLink = userActivity.webpageURL {
-                SceneDelegate.universalLinkToLaunch = rewriteNativeOAuthCallbackUrl(universalLink);
+                SceneDelegate.universalLinkToLaunch = universalLink;
                 break
             }
         }
@@ -34,7 +34,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             comps?.scheme = "https"
             
             if let url = comps?.url {
-                SceneDelegate.universalLinkToLaunch = rewriteNativeOAuthCallbackUrl(url);
+                SceneDelegate.universalLinkToLaunch = url;
             }
         }
     }
@@ -47,8 +47,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             comps?.scheme = "https"
 
             if let url = comps?.url {
-                let rewritten = rewriteNativeOAuthCallbackUrl(url)
-                PeterPlate.webView.evaluateJavaScript("location.href = '\(rewritten)'")
+                PeterPlate.webView.evaluateJavaScript("location.href = '\(url)'")
             }
         }
     }
@@ -66,8 +65,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         }
 
         // Handle it inside our web view in a SPA-friendly way.
-        let rewritten = rewriteNativeOAuthCallbackUrl(universalLink)
-        PeterPlate.webView.evaluateJavaScript("location.href = '\(rewritten)'")
+        PeterPlate.webView.evaluateJavaScript("location.href = '\(universalLink)'")
     }
 
     // This function is called if our app is already loaded and the user activates the app via shortcut

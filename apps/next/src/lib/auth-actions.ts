@@ -4,7 +4,6 @@ import { auth } from "@/lib/auth";
 import { AUTH_PROVIDER_ID } from "@/lib/auth-constants";
 import type { AuthAdditionalData, Provider } from "@/lib/auth-types";
 import { getProviderIcsscName } from "@/lib/auth-utils";
-import { getNativeIosRedirectUri } from "@/lib/platform";
 
 const OIDC_ISSUER_URL = "https://auth.icssc.club";
 
@@ -16,23 +15,15 @@ const baseURL =
 interface GetSignInUrlOptions {
   authorizationUrlParams?: Record<string, string>;
   returnUrl?: string;
-  isNativeIosApp?: boolean;
 }
 
 export async function getSignInUrl(
   provider: Provider,
-  {
-    authorizationUrlParams,
-    returnUrl,
-    isNativeIosApp,
-  }: GetSignInUrlOptions = {},
+  { authorizationUrlParams, returnUrl }: GetSignInUrlOptions = {},
 ) {
   const { url } = await auth.api.signInWithOAuth2({
     body: {
       providerId: AUTH_PROVIDER_ID,
-      callbackURL: isNativeIosApp
-        ? getNativeIosRedirectUri(baseURL)
-        : undefined,
       additionalData: {
         returnUrl,
         provider,
