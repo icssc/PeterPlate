@@ -42,7 +42,7 @@ export function DesktopTabs({
             }
             setSelectedStation(val);
           }}
-          className="flex w-full overflow-x-auto no-scrollbar !bg-sky-700/20 dark:!bg-[#46566a] !rounded-lg !p-2 [&_.MuiTabs-flexContainer]:justify-between [&_.MuiTabs-flexContainer]:gap-2 [&_.MuiTabs-indicator]:hidden"
+          className="flex w-full overflow-x-auto no-scrollbar !bg-primary-accent/20 dark:!bg-[var(--desktop-tabs-bg)] !rounded-lg !p-2 [&_.MuiTabs-flexContainer]:justify-between [&_.MuiTabs-flexContainer]:gap-2 [&_.MuiTabs-indicator]:hidden"
           variant="scrollable"
           scrollButtons={false}
         >

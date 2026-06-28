@@ -29,7 +29,7 @@ export const useHallDerived = () =>
     const { hallData, selectedDate, today } = state;
 
     const availablePeriodTimes: Record<string, [Date, Date]> = {};
-    let derivedHallStatus = HallStatusEnum.CLOSED;
+    let derivedHallStatus = HallStatusEnum.LOADING;
     let openTime: Date | undefined;
     let closeTime: Date | undefined;
 
