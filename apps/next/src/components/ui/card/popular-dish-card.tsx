@@ -55,7 +55,13 @@ const PopularDishCardContent = React.forwardRef<
 
   return (
     <Card
-      className={`w-full h-full min-h-[210px] flex flex-col rounded-xl border border-neutral-200 dark:border-neutral-700 overflow-hidden shadow-sm hover:shadow-md transition cursor-pointer text-left bg-transparent p-0 ${conflictsWithUserPrefs ? "opacity-70" : ""}`}
+      className={`w-full h-full min-h-[210px] flex flex-col rounded-xl border border-neutral-200 dark:border-neutral-700 overflow-hidden shadow-sm hover:shadow-md transition cursor-pointer text-left p-0 ${conflictsWithUserPrefs ? "opacity-70" : ""}`}
+      sx={{
+        backgroundImage: "none",
+        backgroundColor: conflictsWithUserPrefs
+          ? "rgba(245, 158, 11, 0.2)"
+          : "transparent",
+      }}
       onClick={onClick}
       ref={ref}
     >
