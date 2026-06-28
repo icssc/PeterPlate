@@ -3,7 +3,7 @@ import { Skeleton } from "./skeleton";
 
 export default function FoodCardSkeleton() {
   return (
-    <Card className="rounded-[6px] border-gray-300 bg-white shadow-none dark:border-[#3F3F47] dark:bg-[rgba(63,63,71,0.40)]">
+    <Card className="rounded-[6px] border-gray-300 bg-white shadow-none dark:border-[#3F3F47] dark:bg-[var(--surface-modal)]">
       <CardContent>
         <div className="flex justify-between h-full pt-6">
           <div className="flex items-center gap-6">
