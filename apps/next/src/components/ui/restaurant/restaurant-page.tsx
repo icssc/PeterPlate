@@ -7,15 +7,17 @@ import type { TRPCClientErrorLike } from "@trpc/client";
 import Image from "next/image";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useRestaurantPage } from "@/hooks/useRestaurantPage";
+import { cn } from "@/utils/tw";
 import {
   ANTEATERY_MAP_LINK_URL,
   BRANDYWINE_MAP_LINK_URL,
   HallEnum,
-  HallStatusEnum,
 } from "@/utils/types";
+import { DiningHallStatus } from "../status";
 import { DishesView } from "./dishes-view";
 import { RestaurantControls } from "./restaurant-controls";
 import { Sidebar } from "./sidebar";
+import RestaurantSpinner from "./spinner";
 
 interface RestaurantPageProps {
   hall: HallEnum;
@@ -60,7 +62,10 @@ export function RestaurantPage({
           alt={hero.alt}
           fill
           priority
-          className="object-cover object-bottom"
+          className={cn(
+            "object-cover",
+            hall === HallEnum.BRANDYWINE && "object-bottom",
+          )}
         />
         <div className="absolute inset-0 bg-gradient-to-tr from-black/80 via-black/20 to-transparent" />
 
@@ -75,20 +80,7 @@ export function RestaurantPage({
               >
                 {hall === HallEnum.ANTEATERY ? "Anteatery" : "Brandywine"}
               </Typography>
-              <div className="flex items-center gap-2 pl-1 text-md font-small text-white">
-                {openTime && closeTime ? (
-                  <>
-                    <div
-                      className={`w-2.5 h-2.5 rounded-full ${derivedHallStatus === HallStatusEnum.OPEN ? "bg-green-500" : "bg-red-500"}`}
-                    />
-                    <span>
-                      {derivedHallStatus === HallStatusEnum.OPEN
-                        ? "Open"
-                        : "Closed"}
-                    </span>
-                  </>
-                ) : null}
-              </div>
+              <DiningHallStatus status={derivedHallStatus} mobile />
             </div>
             <Link
               href={
@@ -117,7 +109,7 @@ export function RestaurantPage({
       >
         <div className="flex flex-col md:flex-row items-start gap-3">
           {/* Left column: menu controls & dishes */}
-          <div className="w-full flex-1 md:min-h-[740px] min-w-0">
+          <div className="w-full flex-1 md:min-h-[740px] min-w-0 flex flex-col">
             <RestaurantControls
               hall={hall}
               isDesktop={isDesktop}
@@ -143,6 +135,7 @@ export function RestaurantPage({
                 error={error as TRPCClientErrorLike<AppRouter> | null}
                 hallData={hallData}
               />
+              {isLoading && <RestaurantSpinner />}
             </div>
           </div>
 

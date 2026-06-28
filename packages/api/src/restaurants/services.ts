@@ -41,7 +41,9 @@ export async function getRestaurantByDate(
     `${AAPI_DINING_ROUTE}/restaurants?id=${restaurant}`,
   );
 
-  const dateString = date.toLocaleDateString("en-CA");
+  const dateString = date.toLocaleDateString("en-CA", {
+    timeZone: "America/Los_Angeles",
+  });
   const dishReq = await fetch(
     `${AAPI_DINING_ROUTE}/restaurantToday?id=${restaurant}&date=${dateString}`,
   );

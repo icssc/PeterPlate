@@ -29,7 +29,7 @@ export default function EventDialogContent(
   props: Event & { type: EventCategory },
 ): React.JSX.Element {
   return (
-    <Box className="dark:bg-[#303035]">
+    <Box className="dark:bg-[var(--surface-modal)]">
       <div className="relative">
         <Image
           src={props.image}

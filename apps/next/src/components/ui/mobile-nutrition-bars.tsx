@@ -19,7 +19,7 @@ function MacroBar({ label, value, max, unit }: MacroBarProps) {
       <span className="text-sky-700 dark:text-blue-300 font-semibold w-16">
         {label}
       </span>
-      <div className="flex-1 bg-white dark:bg-[#27272A] rounded-full h-3">
+      <div className="flex-1 bg-white dark:bg-surface-scroll rounded-full h-3">
         <div
           className="h-3 rounded-full"
           style={{

@@ -119,6 +119,9 @@ export default $config({
         BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET!,
         AUTH_CLIENT_ID: clientId,
         BETTER_AUTH_URL: `https://${domain}`,
+        NEXT_PUBLIC_BASE_URL: `https://${domain}`,
+        DISCORD_WEBHOOK_URL: process.env.DISCORD_WEBHOOK_URL!,
+        GOOGLE_APPS_SCRIPT_URL: process.env.GOOGLE_APPS_SCRIPT_URL!,
       },
       cachePolicy: "50ea56d0-b7b0-4bf7-9ab8-0f7f9a0d03d5",
       domain: {
