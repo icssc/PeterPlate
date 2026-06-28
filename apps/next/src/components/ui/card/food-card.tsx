@@ -127,7 +127,10 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
           },
           ...(conflictsWithUserPrefs && {
             backgroundColor: "rgba(245, 158, 11, 0.2)",
-            opacity: 0.7,
+            opacity: 1,
+            ".dark &": {
+              backgroundColor: "rgba(255, 183, 103, 0.21)",
+            },
           }),
         }}
       >
