@@ -114,12 +114,11 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
         ref={ref}
         {...divProps}
         className={cn(
-          "relative cursor-pointer border border-gray-300 hover:shadow-lg transition w-full dark:bg-[#303035]",
+          "relative cursor-pointer border border-gray-300 bg-white dark:border-[#3F3F47] dark:bg-[rgba(63,63,71,0.40)] hover:shadow-lg transition w-full",
           conflictsWithUserPrefs && "opacity-70",
         )}
         sx={{
-          borderRadius: "12px",
-          border: 1,
+          borderRadius: "6px",
           backgroundImage: "none",
           boxShadow: "none",
           "&:hover": {
