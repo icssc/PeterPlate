@@ -128,11 +128,11 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
         }}
       >
         <CardContent sx={{ padding: 0, "&:last-child": { paddingBottom: 0 } }}>
-          <div className="flex justify-between h-full w-full p-4 gap-4">
+          <div className={cn("flex h-full w-full", isCompact ? "p-3" : "p-4")}>
             <div
               className={cn(
-                "flex items-center gap-4 w-full",
-                isCompact && "justify-between",
+                "flex items-center w-full",
+                isCompact ? "gap-3" : "gap-4",
               )}
             >
               {!isCompact && showImage && dish.imageUrl && !imageError && (
@@ -151,13 +151,7 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                   color="primary"
                 />
               )}
-              <div
-                className={cn(
-                  "flex flex-col flex-1 min-w-0 gap-1",
-                  isCompact && "w-3/4",
-                  !isCompact && "md:w-full",
-                )}
-              >
+              <div className="flex flex-col flex-1 min-w-0 gap-1">
                 <Typography
                   color="primary"
                   className={cn(
@@ -174,51 +168,58 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                     />
                   )}
                 </Typography>
-                <div className="flex gap-2 items-center text-zinc-700 text-sm w-fit flex-shrink">
-                  {!isCompact && (
+                <div className="flex items-center gap-2">
+                  <div className="flex flex-col flex-1 min-w-0 gap-1">
+                    <div className="flex gap-2 items-center text-zinc-700 text-sm w-fit flex-shrink">
+                      {!isCompact && (
+                        <Typography
+                          noWrap
+                          color="text.primary"
+                          className="font-normal"
+                        >
+                          {dish.nutritionInfo.calories == null
+                            ? "-"
+                            : `${Math.round(dish.nutritionInfo.calories)} cal`}
+                        </Typography>
+                      )}
+                      <div className="flex gap-1 items-center text-zinc-500">
+                        <StarBorder
+                          className="w-4 h-4 stroke-zinc-500"
+                          strokeWidth={0.15}
+                        />
+                        <p>
+                          {averageRating.toFixed(1)}&nbsp;
+                          {!isCompact && <span>({ratingCount})</span>}
+                        </p>
+                      </div>
+                    </div>
                     <Typography
                       noWrap
                       color="text.primary"
-                      className="font-normal"
+                      className={cn(
+                        "text-sm font-normal",
+                        !dish.description && "italic",
+                      )}
                     >
-                      {dish.nutritionInfo.calories == null
-                        ? "-"
-                        : `${Math.round(dish.nutritionInfo.calories)} cal`}
+                      {dish.description
+                        ? dish.description
+                        : "No description available."}
                     </Typography>
-                  )}
-                  <div className="flex gap-1 items-center text-zinc-500">
-                    <StarBorder
-                      className="w-4 h-4 stroke-zinc-500"
-                      strokeWidth={0.15}
+                  </div>
+                  {/* Nudges the heart up so it looks visually centered */}
+                  <div className="shrink-0 pb-2">
+                    <Favorite
+                      dishId={dish.id}
+                      {...{
+                        isFavorited,
+                        favoriteDisabled,
+                        onToggleFavorite,
+                        restaurant,
+                      }}
                     />
-                    <p>
-                      {averageRating.toFixed(1)}&nbsp;
-                      {!isCompact && <span>({ratingCount})</span>}
-                    </p>
                   </div>
                 </div>
-                <Typography
-                  noWrap
-                  color="text.primary"
-                  className={cn(
-                    "text-sm font-normal",
-                    !dish.description && "italic",
-                  )}
-                >
-                  {dish.description
-                    ? dish.description
-                    : "No description available."}
-                </Typography>
               </div>
-              <Favorite
-                dishId={dish.id}
-                {...{
-                  isFavorited,
-                  favoriteDisabled,
-                  onToggleFavorite,
-                  restaurant,
-                }}
-              />
             </div>
           </div>
         </CardContent>
