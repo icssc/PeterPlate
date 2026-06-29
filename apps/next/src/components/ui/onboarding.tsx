@@ -54,7 +54,7 @@ interface OnboardingContentProps extends React.HTMLAttributes<HTMLDivElement> {
   handleClose: () => void;
 }
 
-const WelcomeView = React.forwardRef<HTMLDivElement>((_, ref) => {
+export const WelcomeView = React.forwardRef<HTMLDivElement>((_, ref) => {
   return (
     <Box
       ref={ref}

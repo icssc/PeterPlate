@@ -69,81 +69,87 @@ export default function SidebarContent({
     >
       {/* Header */}
       <div
-        className={`flex items-start justify-between px-5 p-5 border-b-2 
-        border-gray-300 dark:border-zinc-700`}
+        className={cn(
+          "flex items-start justify-between px-5 border-b-2 border-gray-300 dark:border-zinc-700",
+          user ? "py-5" : "py-2",
+        )}
       >
-        <div className="flex items-center gap-3">
-          <Image
-            src={user?.image || "/peter.webp"}
-            alt="Profile"
-            width={44}
-            height={44}
-            className="rounded-full object-cover"
-          />
-          <div>
-            <Typography variant="body2" fontWeight={600} color="text.primary">
-              {user?.name || "Peter Anteater"}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {user?.email || "panteater@uci.edu"}
-            </Typography>
+        {user ? (
+          <div className="flex items-center gap-3">
+            <Image
+              src={user.image || "/peter.webp"}
+              alt="Profile"
+              width={44}
+              height={44}
+              className="rounded-full object-cover"
+            />
+            <div>
+              <Typography variant="body2" fontWeight={600} color="text.primary">
+                {user.name || "Peter Anteater"}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {user.email || "panteater@uci.edu"}
+              </Typography>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div />
+        )}
 
         <button
           type="button"
           onClick={onClose}
-          className="rounded-full p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
         >
-          <CloseIcon sx={{ fontSize: 18, color: "text.primary" }} />
+          <CloseIcon sx={{ fontSize: 20, color: "text.primary" }} />
         </button>
       </div>
 
-      <hr className="border-t border-gray-200 dark:border-gray-700 mx-5 mt-4" />
-
       {/* Content */}
       <div className="flex-1 px-5 p-4 space-y-5 border-b-2 border-gray-300 dark:border-zinc-700">
-        {/* Dietary Preferences */}
-        <div>
-          <Typography className="text-sm font-bold text-sky-700 dark:text-accent-primary mb-2">
-            Dietary Preferences
-          </Typography>
+        {/* Dietary Preferences (signed-in users only) */}
+        {user && (
+          <div>
+            <Typography className="text-sm font-bold text-sky-700 dark:text-blue-300 mb-2">
+              Dietary Preferences
+            </Typography>
 
-          <Typography className="text-xs font-semibold text-gray-500 dark:text-zinc-300 mb-1">
-            Restrictions:
-          </Typography>
+            <Typography className="text-xs font-semibold text-gray-500 dark:text-zinc-300 mb-1">
+              Restrictions:
+            </Typography>
 
-          <div className="flex flex-wrap gap-1.5 mb-3">
-            {preferences?.length ? (
-              preferences.map((pref) => (
-                <PrefBadge key={pref} type="restriction" text={pref} />
-              ))
-            ) : (
-              <span className="text-xs text-gray-400 dark:text-zinc-300">
-                None
-              </span>
-            )}
+            <div className="flex flex-wrap gap-1.5 mb-3">
+              {preferences?.length ? (
+                preferences.map((pref) => (
+                  <PrefBadge key={pref} type="restriction" text={pref} />
+                ))
+              ) : (
+                <span className="text-xs text-gray-400 dark:text-zinc-300">
+                  None
+                </span>
+              )}
+            </div>
+
+            <Typography className="text-xs font-semibold text-gray-500 dark:text-zinc-300 mb-1">
+              Allergies:
+            </Typography>
+            <div className="flex flex-wrap gap-1.5">
+              {allergies?.length ? (
+                allergies.map((allergy) => (
+                  <PrefBadge key={allergy} type="allergy" text={allergy} />
+                ))
+              ) : (
+                <span className="text-xs text-gray-400 dark:text-zinc-300">
+                  None
+                </span>
+              )}
+            </div>
           </div>
-
-          <Typography className="text-xs font-semibold text-gray-500 dark:text-zinc-300 mb-1">
-            Allergies:
-          </Typography>
-          <div className="flex flex-wrap gap-1.5">
-            {allergies?.length ? (
-              allergies.map((allergy) => (
-                <PrefBadge key={allergy} type="allergy" text={allergy} />
-              ))
-            ) : (
-              <span className="text-xs text-gray-400 dark:text-zinc-300">
-                None
-              </span>
-            )}
-          </div>
-        </div>
+        )}
 
         {/* Appearance */}
         <div>
-          <Typography className="text-sm font-bold text-sky-700 dark:text-accent-primary mb-2">
+          <Typography className="text-sm font-bold text-sky-700 dark:text-blue-300 mb-2">
             Appearance
           </Typography>
 
@@ -186,7 +192,7 @@ export default function SidebarContent({
                   onClose();
                   onEditPreferencesClick();
                 }}
-                className={`w-full flex items-center gap-3 rounded-lg px-4 py-2 
+                className={`w-full flex items-center gap-3 rounded-lg px-2 py-2 
                   text-sm text-gray-900 dark:text-white hover:bg-gray-100 
                   dark:hover:bg-gray-700 disabled:opacity-50 
                   disabled:cursor-not-allowed disabled:hover:bg-transparent 
@@ -307,7 +313,7 @@ function MenuLink({
     <Link
       href={href}
       onClick={onClick}
-      className={`flex items-center gap-3 rounded-lg px-4 py-2 hover:bg-gray-100
+      className={`flex items-center gap-3 rounded-lg px-2 py-2 hover:bg-gray-100
         dark:hover:bg-gray-700`}
     >
       <Box sx={{ color: "primary.main" }}>{icon}</Box>
