@@ -79,7 +79,7 @@ export function DishesView({
                   variant="h5"
                   fontWeight={700}
                   color="text.primary"
-                  className="w-full bg-primary-accent/20 pl-4 py-2 rounded-xl text-sky-700 dark:bg-transparent dark:text-white dark:pl-0"
+                  className="w-full bg-primary-accent/20 pl-4 py-2 rounded-xl text-sky-700 dark:bg-[#46566a] dark:text-white"
                   sx={{ fontSize: "1.875rem" }}
                 >
                   {toTitleCase(station.name)}
@@ -104,7 +104,7 @@ export function DishesView({
                   fontWeight={700}
                   color="text.primary"
                   sx={{ fontSize: "1.875rem" }}
-                  className="w-full bg-primary-accent/20 pl-4 py-2 rounded-xl text-sky-700 dark:bg-transparent dark:text-white dark:pl-0"
+                  className="w-full bg-primary-accent/20 pl-4 py-2 rounded-xl text-sky-700 dark:bg-[#46566a] dark:text-white"
                 >
                   {toTitleCase(activeStation.name)}
                 </Typography>

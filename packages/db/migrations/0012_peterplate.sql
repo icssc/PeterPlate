@@ -16,5 +16,7 @@ UPDATE "user_dietary_preferences" SET "preference" = 'locallyGrown' WHERE "prefe
 UPDATE "user_dietary_preferences" SET "preference" = 'organic' WHERE "preference" = 'Organic';--> statement-breakpoint
 UPDATE "user_dietary_preferences" SET "preference" = 'vegan' WHERE "preference" = 'Vegan';--> statement-breakpoint
 UPDATE "user_dietary_preferences" SET "preference" = 'vegetarian' WHERE "preference" = 'Vegetarian';--> statement-breakpoint
+DELETE FROM "user_allergies" WHERE "allergy" NOT IN ('eggs', 'fish', 'milk', 'peanuts', 'sesame', 'shellfish', 'soy', 'treeNuts', 'wheat');--> statement-breakpoint
+DELETE FROM "user_dietary_preferences" WHERE "preference" NOT IN ('glutenFree', 'halal', 'kosher', 'locallyGrown', 'organic', 'vegan', 'vegetarian');--> statement-breakpoint
 ALTER TABLE "user_allergies" ALTER COLUMN "allergy" SET DATA TYPE "public"."allergy" USING "allergy"::"public"."allergy";--> statement-breakpoint
 ALTER TABLE "user_dietary_preferences" ALTER COLUMN "preference" SET DATA TYPE "public"."preference" USING "preference"::"public"."preference";
