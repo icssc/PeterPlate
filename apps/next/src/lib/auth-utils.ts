@@ -1,10 +1,10 @@
 import { Provider } from "@/lib/auth-types";
 
-export function getSafeAuthRedirectPath(
+export const getSafeAuthRedirectPath = (
   redirectUrl: string | null | undefined,
   requestUrl: string | null | undefined,
   allowedOrigin: string,
-): string {
+): string => {
   if (!redirectUrl) {
     return "/";
   }
@@ -15,28 +15,38 @@ export function getSafeAuthRedirectPath(
       : allowedOrigin;
     const url = new URL(redirectUrl, requestOrigin);
     if (url.origin === allowedOrigin) {
-      return `${url.pathname}${url.search}${url.hash}`;
+      return url.toString();
     }
     return "/";
   } catch {
     return "/";
   }
-}
+};
 
-export function getProviderDisplayName(provider: Provider): string {
+export function getProviderDisplayName(provider: Provider) {
   switch (provider) {
     case Provider.Google:
       return "Google";
     case Provider.Apple:
       return "Apple";
+    default: {
+      const _exhaustive: never = provider;
+      console.error("Unrecognized provider:", _exhaustive);
+      return "";
+    }
   }
 }
 
-export function getProviderIcsscName(provider: Provider): string {
+export function getProviderIcsscName(provider: Provider) {
   switch (provider) {
     case Provider.Google:
       return "google";
     case Provider.Apple:
       return "apple";
+    default: {
+      const _exhaustive: never = provider;
+      console.error("Unrecognized provider:", _exhaustive);
+      return "";
+    }
   }
 }

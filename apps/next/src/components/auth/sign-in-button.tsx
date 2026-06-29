@@ -5,7 +5,6 @@ import { type ReactNode, useCallback, useState } from "react";
 import { getSignInUrl } from "@/lib/auth-actions";
 import type { Provider } from "@/lib/auth-types";
 import { getProviderDisplayName } from "@/lib/auth-utils";
-import { isNativeIosApp } from "@/lib/platform";
 import { cn } from "@/utils/tw";
 import { Button } from "../ui/shadcn/button";
 
@@ -31,11 +30,9 @@ export function SignInButton({
     setIsSigningIn(true);
 
     try {
-      const authUrl = await getSignInUrl(
-        provider,
-        isNativeIosApp(),
-        `${window.location.pathname}${window.location.search}${window.location.hash}`,
-      );
+      const authUrl = await getSignInUrl(provider, {
+        returnUrl: `${window.location.pathname}${window.location.search}${window.location.hash}`,
+      });
       window.location.href = authUrl;
     } catch (error) {
       console.error("Sign in error:", error);

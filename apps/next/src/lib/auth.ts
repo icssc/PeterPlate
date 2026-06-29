@@ -6,6 +6,8 @@ import { createAuthMiddleware, getOAuthState } from "better-auth/api";
 import { betterAuth } from "better-auth/minimal";
 import { nextCookies } from "better-auth/next-js";
 import { genericOAuth } from "better-auth/plugins";
+
+import { AUTH_PROVIDER_ID } from "@/lib/auth-constants";
 import type { AuthAdditionalData } from "@/lib/auth-types";
 import { getSafeAuthRedirectPath } from "@/lib/auth-utils";
 
@@ -18,11 +20,22 @@ const baseURL =
   process.env.BETTER_AUTH_URL ??
   "https://peterplate.com";
 
+const OIDC_ISSUER_URL = "https://auth.icssc.club";
+
 export const auth = betterAuth({
-  debug: process.env.NODE_ENV !== "production",
+  appName: "PeterPlate",
   secret: authSecret,
   baseURL,
   trustedOrigins: [baseURL],
+  account: {
+    accountLinking: {
+      enabled: true,
+      trustedProviders: [AUTH_PROVIDER_ID],
+      // ICSSC userinfo / id_token do not include email_verified; Google sign-ups
+      // stay emailVerified=false, which blocks implicit Apple→Google linking otherwise.
+      requireLocalEmailVerified: false,
+    },
+  },
   session: {
     cookieCache: {
       enabled: true,
@@ -42,17 +55,23 @@ export const auth = betterAuth({
     genericOAuth({
       config: [
         {
-          providerId: "icssc",
+          providerId: AUTH_PROVIDER_ID,
+          issuer: OIDC_ISSUER_URL,
+          discoveryUrl: `${OIDC_ISSUER_URL}/.well-known/openid-configuration`,
           clientId: process.env.AUTH_CLIENT_ID || "peterplate-dev",
-          discoveryUrl:
-            "https://auth.icssc.club/.well-known/openid-configuration",
           scopes: ["openid", "profile", "email"],
           pkce: true,
-          mapProfileToUser: (profile: Record<string, string>) => ({
-            name: profile.name,
-            email: profile.email,
-            image: profile.picture,
-          }),
+          mapProfileToUser: (profile) => {
+            const email = profile.email;
+            const name = profile.name ?? email?.split("@")[0] ?? "User";
+            return {
+              ...profile,
+              name,
+              email,
+              emailVerified: profile.emailVerified ?? Boolean(email),
+              image: profile.picture ?? profile.image,
+            };
+          },
         },
       ],
     }),
@@ -63,13 +82,15 @@ export const auth = betterAuth({
       if (ctx.path === "/oauth2/callback/:providerId") {
         const additionalData =
           (await getOAuthState()) as AuthAdditionalData | null;
-        if (additionalData?.returnUrl) {
-          const returnUrl = getSafeAuthRedirectPath(
-            additionalData.returnUrl,
-            ctx.request?.url,
-            new URL(baseURL).origin,
-          );
-          ctx.redirect(returnUrl);
+        if (additionalData) {
+          if (additionalData.returnUrl) {
+            const returnUrl = getSafeAuthRedirectPath(
+              additionalData.returnUrl,
+              ctx.request?.url,
+              new URL(baseURL).origin,
+            );
+            ctx.redirect(returnUrl);
+          }
         }
       }
     }),
@@ -84,3 +105,5 @@ export const auth = betterAuth({
     },
   }),
 });
+
+export type AuthorizationUrlParams = Record<string, string>;
