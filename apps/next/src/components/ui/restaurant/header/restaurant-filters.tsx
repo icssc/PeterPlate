@@ -60,7 +60,8 @@ export function RestaurantFilters({
       disabled={userId === null}
       className={cn(
         "h-[40px] rounded-md border text-sm font-medium transition-all duration-200 w-full",
-        userId === null && "text-black/50 border-sky-700/50",
+        userId === null &&
+          "text-black/50 border-sky-700/50 dark:text-white/40 dark:border-blue-300/40",
         isDesktop && "w-[240px]",
         showPreferencesOnly &&
           "bg-sky-700 text-white border-sky-700 shadow-md dark:bg-blue-300 dark:text-gray-900 dark:border-blue-300",
