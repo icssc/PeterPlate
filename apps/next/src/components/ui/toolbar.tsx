@@ -6,6 +6,7 @@ import FavoriteBorder from "@mui/icons-material/FavoriteBorder";
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import InsertInvitation from "@mui/icons-material/InsertInvitation";
 import ListAltRoundedIcon from "@mui/icons-material/ListAltRounded";
+import LoginIcon from "@mui/icons-material/Login";
 import MenuIcon from "@mui/icons-material/Menu";
 import RestaurantRoundedIcon from "@mui/icons-material/RestaurantRounded";
 import {
@@ -26,10 +27,10 @@ import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import type { MouseEvent } from "react";
 import { useEffect, useState } from "react";
-import { SignInButtons } from "@/components/auth/sign-in-buttons";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useSession } from "@/utils/auth-client";
 import EditPreferencesContent from "./edit-preferences-content";
+import { WelcomeView } from "./onboarding";
 import SidebarContent from "./sidebar/sidebar-content";
 
 export type CalendarRange = {
@@ -190,6 +191,7 @@ export function DesktopToolbar(): React.JSX.Element {
 
   const [profileAnchor, setProfileAnchor] = useState<null | HTMLElement>(null);
   const profileOpen = Boolean(profileAnchor);
+  const [welcomeOpen, setWelcomeOpen] = useState(false);
   const [editPreferencesOpen, setEditPreferencesOpen] = useState(false);
   const [editPreferencesSnackbarOpen, setEditPreferencesSnackbarOpen] =
     useState(false);
@@ -316,8 +318,29 @@ export function DesktopToolbar(): React.JSX.Element {
                   />
                 </IconButton>
               ) : (
-                <div className="flex flex-col gap-2">
-                  <SignInButtons fullWidth={false} />
+                <div className="flex items-center gap-1">
+                  <IconButton
+                    onClick={() => setWelcomeOpen(true)}
+                    aria-label="Sign in"
+                  >
+                    <LoginIcon
+                      sx={{
+                        fontSize: 28,
+                        color: isTransparent ? "white" : "primary.main",
+                      }}
+                    />
+                  </IconButton>
+                  <IconButton
+                    onClick={handleProfileOpen}
+                    aria-label="Open menu"
+                  >
+                    <MenuIcon
+                      sx={{
+                        fontSize: 28,
+                        color: isTransparent ? "white" : "text.primary",
+                      }}
+                    />
+                  </IconButton>
                 </div>
               )}
             </div>
@@ -350,6 +373,32 @@ export function DesktopToolbar(): React.JSX.Element {
           onEditPreferencesClick={handleEditPreferencesOpen}
         />
       </Menu>
+
+      <Dialog
+        open={welcomeOpen}
+        onClose={() => setWelcomeOpen(false)}
+        maxWidth={false}
+        slotProps={{
+          paper: {
+            sx: {
+              width: "520px",
+              maxWidth: "90vw",
+              margin: 2,
+              padding: 0,
+              overflow: "hidden",
+              borderRadius: "16px",
+              ".dark &": {
+                border: "3px solid",
+                borderColor: "var(--mui-palette-divider)",
+                backgroundImage: "none",
+                backgroundColor: "var(--surface-modal)",
+              },
+            },
+          },
+        }}
+      >
+        <WelcomeView />
+      </Dialog>
 
       {isDesktop ? (
         <Dialog
@@ -404,6 +453,7 @@ function MobileToolbar(): React.JSX.Element {
   const isTransparent = TRANSPARENT_PAGES.includes(pathname);
   const [profileAnchor, setProfileAnchor] = useState<null | HTMLElement>(null);
   const profileOpen = Boolean(profileAnchor);
+  const [welcomeOpen, setWelcomeOpen] = useState(false);
   const { data: session, isPending } = useSession();
   const user = session?.user;
   const [isMounted, setIsMounted] = useState(false);
@@ -507,7 +557,38 @@ function MobileToolbar(): React.JSX.Element {
               />
             </IconButton>
           ) : (
-            <SignInButtons fullWidth={false} />
+            <>
+              <IconButton
+                type="button"
+                onClick={() => setWelcomeOpen(true)}
+                className="!p-0 !min-w-[44px] !min-h-[44px]"
+                aria-label="Sign in"
+              >
+                <LoginIcon
+                  style={{ fontSize: 30 }}
+                  className={
+                    isTransparent
+                      ? "text-white"
+                      : "text-sky-700 dark:text-blue-300"
+                  }
+                />
+              </IconButton>
+              <IconButton
+                type="button"
+                onClick={handleProfileOpen}
+                className="!p-0 !min-w-[44px] !min-h-[44px]"
+                aria-label="Open menu"
+              >
+                <MenuIcon
+                  style={{ fontSize: 30 }}
+                  className={
+                    isTransparent
+                      ? "text-white"
+                      : "text-neutral-800 dark:text-neutral-100"
+                  }
+                />
+              </IconButton>
+            </>
           )}
         </div>
       </div>
@@ -583,6 +664,20 @@ function MobileToolbar(): React.JSX.Element {
           onClose={handleProfileClose}
           onEditPreferencesClick={handleEditPreferencesOpen}
         />
+      </Drawer>
+
+      <Drawer
+        anchor="bottom"
+        open={welcomeOpen}
+        onClose={() => setWelcomeOpen(false)}
+        slotProps={{
+          paper: {
+            className:
+              "p-0 overflow-hidden rounded-t-[10px] h-auto max-h-[85vh] bg-white dark:bg-zinc-900",
+          },
+        }}
+      >
+        <WelcomeView />
       </Drawer>
 
       <Drawer
