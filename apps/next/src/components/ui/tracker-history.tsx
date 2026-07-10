@@ -12,12 +12,14 @@ interface Props {
   onDateSelect: (date: Date) => void;
   onDayClick: (date: Date) => void;
   loggedDates: Date[];
+  tourId?: string;
 }
 
 export default function TrackerHistory({
   onDateSelect,
   onDayClick,
   loggedDates,
+  tourId,
 }: Props) {
   const isMobile = useMediaQuery("(max-width: 768px)");
   const [open, setOpen] = useState(false);
@@ -78,9 +80,10 @@ export default function TrackerHistory({
   return (
     <div className="relative" ref={containerRef}>
       <Button
+        id={tourId}
         onClick={() => setOpen(!open)}
         variant="contained"
-        className="!bg-sky-700 !text-white !text-sm !font-semibold hover:!bg-sky-800 !rounded-lg !px-3 !py-1 !normal-case dark:!bg-blue-300 dark:!text-gray-900 dark:hover:!bg-blue-400"
+        className="tour-history-btn !bg-sky-700 !text-white !text-sm !font-semibold hover:!bg-sky-800 !rounded-lg !px-3 !py-1 !normal-case dark:!bg-blue-300 dark:!text-gray-900 dark:hover:!bg-blue-400"
         endIcon={<RestoreIcon fontSize="small" />}
       >
         History
