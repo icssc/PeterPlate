@@ -10,7 +10,7 @@ import {
   ToggleButtonGroup,
   Typography,
 } from "@mui/material";
-import type { UserAllergy } from "@peterplate/db";
+import type { UserAllergy, UserDietaryPreference } from "@peterplate/db";
 import { AllergenKeys, PreferenceKeys } from "@peterplate/validators";
 import posthog from "posthog-js";
 import React, { useEffect, useState } from "react";
@@ -19,6 +19,27 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useSession } from "@/utils/auth-client";
 import { trpc } from "@/utils/trpc";
 import { SignInButtons } from "../auth/sign-in-buttons";
+
+const ALLERGY_DISPLAY_TO_DB: Partial<Record<string, UserAllergy>> = {
+  Eggs: "eggs",
+  Fish: "fish",
+  Milk: "milk",
+  Peanuts: "peanuts",
+  Sesame: "sesame",
+  Shellfish: "shellfish",
+  Soy: "soy",
+  "Tree Nuts": "treeNuts",
+  Wheat: "wheat",
+};
+
+const PREFERENCE_DISPLAY_TO_DB: Partial<Record<string, UserDietaryPreference>> =
+  {
+    "Gluten-Free": "glutenFree",
+    Halal: "halal",
+    Kosher: "kosher",
+    Vegan: "vegan",
+    Vegetarian: "vegetarian",
+  };
 
 interface PersonalizeViewProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
@@ -33,7 +54,7 @@ interface OnboardingContentProps extends React.HTMLAttributes<HTMLDivElement> {
   handleClose: () => void;
 }
 
-const WelcomeView = React.forwardRef<HTMLDivElement>((_, ref) => {
+export const WelcomeView = React.forwardRef<HTMLDivElement>((_, ref) => {
   return (
     <Box
       ref={ref}
@@ -122,7 +143,7 @@ const PersonalizeView = React.forwardRef<HTMLDivElement, PersonalizeViewProps>(
           sx={{
             py: "20px",
           }}
-          className="bg-sky-700 dark:bg-[#323235]"
+          className="bg-sky-700 dark:bg-[var(--surface-elevated)]"
         >
           <Avatar
             src="/peterplate-icon.webp"
@@ -270,13 +291,17 @@ const OnboardingContent = React.forwardRef<
 
     setIsSubmitting(true);
     try {
-      await addAllergies.mutateAsync({
-        userId: session.user.id,
-        allergies: formData.allergies as UserAllergy[],
-      });
+      const allergies = formData.allergies
+        .map((a) => ALLERGY_DISPLAY_TO_DB[a])
+        .filter((a): a is UserAllergy => a !== undefined);
+      const preferences = formData.preferences
+        .map((p) => PREFERENCE_DISPLAY_TO_DB[p])
+        .filter((p): p is UserDietaryPreference => p !== undefined);
+
+      await addAllergies.mutateAsync({ userId: session.user.id, allergies });
       await addPreferences.mutateAsync({
         userId: session.user.id,
-        preferences: formData.preferences,
+        preferences,
       });
       await onboard.mutateAsync({
         id: session?.user.id,
@@ -298,13 +323,8 @@ const OnboardingContent = React.forwardRef<
     }
   };
 
-  const handleNext = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-  };
-
-  const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  };
+  const handleNext = () => setActiveStep((s) => s + 1);
+  const handleBack = () => setActiveStep((s) => s - 1);
 
   return (
     <Box
@@ -318,22 +338,28 @@ const OnboardingContent = React.forwardRef<
       {activeStep === 0 && <WelcomeView />}
       {activeStep === 1 && (
         <PersonalizeView
-          title="Food Allergies"
-          description="Help us keep you safe by selecting your food allergies (optional)"
-          name={firstName}
-          options={AllergenKeys}
-          selected={formData.allergies}
-          onSelection={(vals) => handleToggle("allergies", vals)}
+          {...{
+            title: "Food Allergies",
+            description:
+              "Help us keep you safe by selecting your food allergies (optional)",
+            name: firstName,
+            options: AllergenKeys,
+            selected: formData.allergies,
+            onSelection: (vals: string[]) => handleToggle("allergies", vals),
+          }}
         />
       )}
       {activeStep === 2 && (
         <PersonalizeView
-          title="Dietary Preferences"
-          description="Select any dietary restrictions that apply to you (optional)"
-          name={firstName}
-          options={PreferenceKeys}
-          selected={formData.preferences}
-          onSelection={(vals) => handleToggle("preferences", vals)}
+          {...{
+            title: "Dietary Preferences",
+            description:
+              "Select any dietary restrictions that apply to you (optional)",
+            name: firstName,
+            options: PreferenceKeys,
+            selected: formData.preferences,
+            onSelection: (vals: string[]) => handleToggle("preferences", vals),
+          }}
         />
       )}
 
@@ -357,17 +383,14 @@ const OnboardingContent = React.forwardRef<
               sx={{
                 height: "45px",
                 width: "80px",
-                bgcolor: "#0069A8",
+                bgcolor: "var(--primary-accent-hex)",
+                color: "var(--button-primary-fg)",
                 "&:hover": {
                   filter: "brightness(0.85)",
                 },
-                ".dark &": {
-                  bgcolor: "#93C5FD",
-                  color: "#111827",
-                },
-                ".dark &.Mui-disabled": {
-                  backgroundColor: "#3F3F47",
-                  color: "#71717A",
+                "&.Mui-disabled": {
+                  backgroundColor: "var(--button-disabled-bg)",
+                  color: "var(--button-disabled-fg)",
                 },
               }}
             >
@@ -382,17 +405,14 @@ const OnboardingContent = React.forwardRef<
               sx={{
                 height: "45px",
                 width: "80px",
-                bgcolor: "#0069A8",
+                bgcolor: "var(--primary-accent-hex)",
+                color: "var(--button-primary-fg)",
                 "&:hover": {
                   filter: "brightness(0.85)",
                 },
-                ".dark &": {
-                  bgcolor: "#93C5FD",
-                  color: "#111827",
-                },
-                ".dark &.Mui-disabled": {
-                  backgroundColor: "#3F3F47",
-                  color: "#71717A",
+                "&.Mui-disabled": {
+                  backgroundColor: "var(--button-disabled-bg)",
+                  color: "var(--button-disabled-fg)",
                 },
               }}
             >
@@ -409,17 +429,14 @@ const OnboardingContent = React.forwardRef<
             sx={{
               height: "45px",
               width: "80px",
-              bgcolor: "#0069A8",
+              bgcolor: "var(--primary-accent-hex)",
+              color: "var(--button-primary-fg)",
               "&:hover": {
                 filter: "brightness(0.85)",
               },
-              ".dark &": {
-                bgcolor: "#93C5FD",
-                color: "#111827",
-              },
-              ".dark &.Mui-disabled": {
-                backgroundColor: "#3F3F47",
-                color: "#71717A",
+              "&.Mui-disabled": {
+                backgroundColor: "var(--button-disabled-bg)",
+                color: "var(--button-disabled-fg)",
               },
             }}
           >
@@ -461,7 +478,7 @@ export default function OnboardingDialog(): React.JSX.Element {
                 border: "3px solid",
                 borderColor: "var(--mui-palette-divider)",
                 backgroundImage: "none",
-                backgroundColor: "#303035",
+                backgroundColor: "var(--surface-modal)",
               },
             },
           },
@@ -494,7 +511,7 @@ export default function OnboardingDialog(): React.JSX.Element {
           },
           ".dark & .MuiDrawer-paper": {
             backgroundImage: "none",
-            backgroundColor: "#303035",
+            backgroundColor: "var(--surface-modal)",
           },
         }}
       >

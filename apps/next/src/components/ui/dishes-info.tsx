@@ -63,7 +63,7 @@ export default function DishesInfo({
 
   return (
     <div
-      className="flex flex-col gap-6 mt-6 px-2 overflow-y-auto 
+      className="flex flex-col gap-6 overflow-y-auto 
       flex-grow h-1"
       id="food-scroll"
     >
@@ -92,7 +92,7 @@ export default function DishesInfo({
             No dishes available for this selection.
           </Typography>
         ) : isCompactView ? (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-1 lg:grid-cols-3 gap-2 md:gap-4 w-full">
             {dishes.map((dish) => (
               <FoodCard
                 key={dish.id}

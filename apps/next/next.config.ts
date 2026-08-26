@@ -69,8 +69,11 @@ export default withPWA({
   register: true,
   skipWaiting: true,
   disable: process.env.NODE_ENV === "development",
-  // PeterPlate-only: PostHog reverse proxy at /app-data/* must not be cached by Workbox.
+  // Prevent Workbox from intercepting the PostHog reverse-proxy route.
+  // Without this, the SW intercepts /app-data/* requests and fails because
+  // the proxied PostHog responses are not cacheable in the expected way.
   buildExcludes: [/app-data/],
+  // Never let the service worker serve cached auth responses (from main).
   runtimeCaching: [
     {
       urlPattern: /\/api\/auth\//,

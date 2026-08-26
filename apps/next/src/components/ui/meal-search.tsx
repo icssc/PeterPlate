@@ -222,7 +222,6 @@ function DesktopMealSearchDialog({
         },
       }}
     >
-      {/* sky-100 header — X inline with search bar, no extra top space */}
       <DialogTitle
         sx={{
           backgroundColor: colors.sky100,
@@ -288,7 +287,7 @@ function MobileMealSearchDrawer({
         },
         ".dark & .MuiDrawer-paper": {
           backgroundImage: "none",
-          backgroundColor: "#303035",
+          backgroundColor: "var(--surface-modal)",
         },
       }}
     >
@@ -365,7 +364,10 @@ export default function MealSearchDialog(props: MealSearchDialogProps) {
           "&:hover": { backgroundColor: colors.sky800 },
           color: "white",
           zIndex: 50,
-          ".dark &": { backgroundColor: "#93C5FD", color: "#111827" },
+          ".dark &": {
+            backgroundColor: "var(--primary-accent-light)",
+            color: "var(--button-primary-fg)",
+          },
           ".dark &:hover": { backgroundColor: "#60a5fa" },
         }}
       >

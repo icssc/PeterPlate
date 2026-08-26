@@ -65,7 +65,7 @@ export default function FoodDrawerContent({
   ]);
 
   return (
-    <Box className="h-full max-h-[85vh] flex flex-col font-poppins min-h-0 dark:bg-[#303035]">
+    <Box className="h-full max-h-[85vh] flex flex-col font-poppins min-h-0 dark:bg-[var(--surface-modal)]">
       <Box className="pb-4 shrink-0">
         {showImage ? (
           <Image
