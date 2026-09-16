@@ -256,12 +256,11 @@ erDiagram
 3. While still in the root directory and install the dependencies by running
    `cd PeterPlate && pnpm install`
 
-4. To start a local Postgres container database run the `docker compose up` in the root directory.
-   This will automatically set up and run a test database using docker.
+4. To start a local Postgres container database run the `docker compose up` in the root directory. This will automatically set up and run a test database using docker.
 
-5. Create a new file called `.env` based on the example given in `.env.development`
-
-6. Run `pnpm db:push` to push the schema to the docker database.
+5. Open another terminal. If you made any database changes, run `pnpm db:generate` to generate a migration file. Run `pnpm db:migrate` to apply the migration files to the docker database.
+   
+6. In the root file, create a new file called `.env` based on the example given in `.env.development`. Do the same in `apps/next`.
 
 7. Start local development by running `pnpm dev` in the root directory. This will start the server in `apps/server` and the client in `apps/next`.
    The tRPC procedures are available on <http://localhost:3000/><router.procedure\>?input={field: value}
@@ -271,9 +270,7 @@ erDiagram
    http://localhost:3000/events.get
    ```
 
-8. Pull the latest CampusDish data into your local database by running `pnpm dev:data`.
-
-9. View the local website at [http://localhost:3000](http://localhost:3000). As you make changes to the Next.js application, those changes will be automatically
+8.  View the local website at [http://localhost:3000](http://localhost:3000). As you make changes to the Next.js application, those changes will be automatically
    reflected on the local website.
 
 ### Troubleshooting
