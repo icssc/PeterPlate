@@ -210,7 +210,7 @@ erDiagram
 
 5. Open another terminal. If you made any database changes, run `pnpm db:generate` to generate a migration file. Run `pnpm db:migrate` to apply the migration files to the docker database.
    
-6. In the root file, create a new file called `.env` based on the example variables given in `.env.example`. Do the same in `apps/next`.
+6. In the root file, create a new file called `.env` based on the example variables given in `.env.example`. Do the same in `apps/next`. Ensure that all variables are nonempty to run the app properly.
 
 7. Start local development by running `pnpm dev` in the root directory. This will start the server in `apps/server` and the client in `apps/next`.
    The tRPC procedures are available on <http://localhost:3000/><router.procedure\>?input={field: value}
