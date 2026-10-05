@@ -4,14 +4,13 @@ import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import GridOnIcon from "@mui/icons-material/GridOn";
 import { Typography } from "@mui/material";
 import Button from "@mui/material/Button";
-import { useState } from "react";
-import { trpc } from "@/utils/trpc";
-// @ts-expect-error: big-calendar import error always, for some reason
-import "react-big-calendar/lib/css/react-big-calendar.css";
+import type { SelectChangeEvent } from "@mui/material/Select";
 import type { Event } from "@peterplate/validators";
 import { addMonths, subMonths } from "date-fns";
+import { useCallback, useMemo, useState } from "react";
 import CalendarView from "@/components/ui/calendar-view";
 import EventCard from "@/components/ui/card/event-card";
+import MobileEventsView from "@/components/ui/mobile-events-view";
 import EventCardSkeleton from "@/components/ui/skeleton/event-card-skeleton";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import {
@@ -19,6 +18,11 @@ import {
   EVENT_CATEGORIES,
   type EventCategory,
 } from "@/utils/classifyEvent";
+import { trpc } from "@/utils/trpc";
+import "react-big-calendar/lib/css/react-big-calendar.css";
+
+/** An event plus the category we derive from its title and description. */
+export type EventWithType = Event & { eventType: EventCategory };
 
 const Events = () => {
   const [selectedDiningHall, setSelectedDiningHall] = useState<
@@ -28,58 +32,82 @@ const Events = () => {
     "both" | EventCategory
   >("both");
   const [viewMode, setViewMode] = useState<"grid" | "calendar">("grid");
-  const [selectedEventData, setSelectedEventData] = useState<Event | null>(
-    null,
-  );
+  const [selectedEventData, setSelectedEventData] =
+    useState<EventWithType | null>(null);
   const [currentDate, setCurrentDate] = useState(new Date());
 
   const { data: events, isLoading, error } = trpc.event.upcoming.useQuery();
-  // TODO: Add inBetween here when route is complete
-  // } = trpc.event.inBetween.useQuery({
-  //   after: startOfMonth(currentDate),
-  //   before: endOfMonth(currentDate),
-  // });
 
-  const sortedEvents =
-    (events?.length ?? -1 > 0)
-      ? events?.sort(
-          (a, b) => new Date(a.start).getTime() - new Date(b.start).getTime(),
-        )
-      : [];
+  const eventsWithType = useMemo<EventWithType[]>(
+    () =>
+      [...(events ?? [])]
+        .sort((a, b) => a.start.getTime() - b.start.getTime())
+        .map((event) => ({
+          ...event,
+          eventType: classifyEvent(event.title, event.description),
+        })),
+    [events],
+  );
 
-  const eventsWithType =
-    sortedEvents?.map((event) => ({
-      ...event,
-      eventType: classifyEvent(event.title, event.description),
-    })) ?? [];
+  const matchesFilters = useCallback(
+    (event: EventWithType) => {
+      const matchesDiningHall =
+        selectedDiningHall === "both" ||
+        event.restaurantId === selectedDiningHall;
+      const matchesEventType =
+        selectedEventType === "both" || event.eventType === selectedEventType;
+      return matchesDiningHall && matchesEventType;
+    },
+    [selectedDiningHall, selectedEventType],
+  );
 
-  const filteredEvents = eventsWithType.filter((event) => {
-    const matchesDiningHall =
-      selectedDiningHall === "both" ||
-      (selectedDiningHall === "anteatery" &&
-        event.restaurantId === "anteatery") ||
-      (selectedDiningHall === "brandywine" &&
-        event.restaurantId === "brandywine");
-    const matchesEventType =
-      selectedEventType === "both" || event.eventType === selectedEventType;
-    return matchesDiningHall && matchesEventType;
-  });
+  const filteredEvents = useMemo(
+    () => eventsWithType.filter(matchesFilters),
+    [eventsWithType, matchesFilters],
+  );
 
-  const calendarEvents = filteredEvents?.map((event) => ({
-    title: event.title,
-    start: new Date(event.start),
-    end: new Date(event.end),
-    resource: event,
-    allDay: true,
-  }));
+  // Months that have at least one event, so the mobile month picker only
+  // offers months the views can actually show something for.
+  const availableMonths = useMemo(() => {
+    const seen = new Set<string>();
+    const months: { year: number; monthIndex: number }[] = [];
+    for (const event of filteredEvents) {
+      const year = event.start.getFullYear();
+      const monthIndex = event.start.getMonth();
+      const key = `${year}-${monthIndex}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      months.push({ year, monthIndex });
+    }
+    return months.sort(
+      (a, b) => a.year - b.year || a.monthIndex - b.monthIndex,
+    );
+  }, [filteredEvents]);
+
+  const calendarEvents = useMemo(
+    () =>
+      filteredEvents.map((event) => ({
+        title: event.title,
+        start: event.start,
+        end: event.end,
+        resource: event,
+        allDay: true,
+      })),
+    [filteredEvents],
+  );
 
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
-  const handleSelectEvent = (calendarEvent: any) => {
-    const resource = calendarEvent.resource;
-    setSelectedEventData({
-      ...resource,
-    });
+  const handleLocationChange = (
+    event: SelectChangeEvent<"both" | "anteatery" | "brandywine">,
+  ) => {
+    setSelectedDiningHall(
+      event.target.value as "both" | "anteatery" | "brandywine",
+    );
+  };
+
+  const handleSelectEvent = (calendarEvent: { resource: EventWithType }) => {
+    setSelectedEventData(calendarEvent.resource);
   };
 
   const handleClose = () => setSelectedEventData(null);
@@ -91,6 +119,29 @@ const Events = () => {
   const viewPreviousMonthsEvents = () => {
     setCurrentDate(subMonths(currentDate, 1));
   };
+
+  if (isDesktop === null) {
+    return null; // Return null on initial render until media query state is determined
+  }
+
+  if (!isDesktop) {
+    return (
+      <MobileEventsView
+        currentDate={currentDate}
+        setCurrentDate={setCurrentDate}
+        selectedDiningHall={selectedDiningHall}
+        filteredEvents={filteredEvents}
+        filteredUpcomingEvents={filteredEvents}
+        selectedEventData={selectedEventData}
+        isLoading={isLoading}
+        error={error}
+        handleLocationChange={handleLocationChange}
+        handleSelectEvent={handleSelectEvent}
+        handleClose={handleClose}
+        availableMonths={availableMonths}
+      />
+    );
+  }
 
   return (
     <div className="max-w-full h-screen ">
@@ -252,10 +303,11 @@ const Events = () => {
               </Typography>
 
               <div className="flex sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12 overflow-x-auto sm:overflow-visible pb-2 sm:pb-0">
-                {filteredEvents?.map((event) => (
+                {filteredEvents.map((event) => (
                   <EventCard
                     key={`${event.title}-${event.start}-${event.restaurantId}`}
                     {...event}
+                    type={event.eventType}
                   />
                 ))}
               </div>
@@ -279,7 +331,7 @@ const Events = () => {
               isLoading={isLoading}
               error={error}
               currentDate={currentDate}
-              calendarEvents={calendarEvents ?? []}
+              calendarEvents={calendarEvents}
               selectedEventData={selectedEventData}
               onPreviousMonth={viewPreviousMonthsEvents}
               onNextMonth={viewNextMonthsEvents}

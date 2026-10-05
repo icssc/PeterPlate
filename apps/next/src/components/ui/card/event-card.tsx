@@ -120,18 +120,16 @@ export default function EventCard(props: EventWithType): React.JSX.Element {
         <Dialog
           open={open}
           onClose={handleClose}
-          maxWidth={false}
-          slotProps={{
-            paper: {
-              sx: {
-                bgcolor: "background.paper",
-                width: "570px",
-                maxWidth: "90vw",
-                margin: 2,
-                padding: 0,
-                overflow: "hidden",
-                borderRadius: "6px",
-              },
+          maxWidth="sm"
+          PaperProps={{
+            sx: {
+              bgcolor: "background.paper",
+              width: "570px",
+              maxWidth: "90vw",
+              margin: 2,
+              padding: 0,
+              overflow: "hidden",
+              borderRadius: "6px",
             },
           }}
         >
