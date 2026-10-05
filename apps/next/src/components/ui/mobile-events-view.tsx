@@ -9,9 +9,7 @@ import {
   type SelectChangeEvent,
 } from "@mui/material";
 import { useState } from "react";
-import { getEventType } from "@/utils/funcs";
-import { HallEnum } from "@/utils/types";
-import type { EventInfo } from "./card/event-card";
+import type { EventWithType } from "@/app/events/page";
 import EventDetailsDrawer from "./event-details-drawer";
 import MobileCalendarView from "./mobile-calendar-view";
 import MobileListView from "./mobile-list-view";
@@ -23,15 +21,13 @@ interface MobileEventsViewProps {
     event: SelectChangeEvent<"both" | "anteatery" | "brandywine">,
   ) => void;
   isLoading: boolean;
-  error: Error | null;
-  filteredEvents: EventInfo[];
-  filteredUpcomingEvents: EventInfo[];
+  error: { message: string } | null;
+  filteredEvents: EventWithType[];
+  filteredUpcomingEvents: EventWithType[];
   currentDate: Date;
   setCurrentDate: (date: Date) => void;
-  selectedEventData: EventInfo | null;
-  handleSelectEvent: (calendarEvent: {
-    resource: Record<string, unknown>;
-  }) => void;
+  selectedEventData: EventWithType | null;
+  handleSelectEvent: (calendarEvent: { resource: EventWithType }) => void;
   handleClose: () => void;
   availableMonths: { year: number; monthIndex: number }[];
 }
@@ -52,7 +48,9 @@ const MobileEventsView = ({
 }: MobileEventsViewProps) => {
   const [mobileView, setMobileView] = useState<"calendar" | "list">("calendar");
   const [monthPickerOpen, setMonthPickerOpen] = useState(false);
-  const [selectedDayEvents, setSelectedDayEvents] = useState<EventInfo[]>([]);
+  const [selectedDayEvents, setSelectedDayEvents] = useState<EventWithType[]>(
+    [],
+  );
 
   const locationFormControlClasses =
     "w-36 [&_.MuiOutlinedInput-root]:h-[38px] [&_.MuiOutlinedInput-root]:rounded-lg [&_.MuiOutlinedInput-root]:bg-white [&_.MuiOutlinedInput-root]:text-[0.9rem] [&_.MuiOutlinedInput-root]:text-slate-900 [&_.MuiOutlinedInput-notchedOutline]:border-sky-700 [&_.MuiOutlinedInput-root:hover_.MuiOutlinedInput-notchedOutline]:border-sky-800 [&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-2 [&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-sky-700";
@@ -132,32 +130,7 @@ const MobileEventsView = ({
             filteredEvents={filteredEvents}
             availableMonths={availableMonths}
             onSelectEventDay={(_date, eventsForDay) => {
-              if (eventsForDay.length > 0) {
-                const now = new Date();
-                const mappedEvents = (
-                  eventsForDay as unknown as Record<string, unknown>[]
-                ).map(
-                  (resource) =>
-                    ({
-                      name: (resource.title as string) || "",
-                      shortDesc: (resource.shortDescription as string) || "",
-                      longDesc: (resource.longDescription as string) || "",
-                      imgSrc: (resource.image as string) || "",
-                      alt: `${(resource.title as string) || ""} promotion image`,
-                      startTime: new Date(resource.start),
-                      endTime: new Date(resource.end),
-                      location:
-                        (resource.restaurantId as string) === "anteatery"
-                          ? HallEnum.ANTEATERY
-                          : HallEnum.BRANDYWINE,
-                      isOngoing:
-                        new Date(resource.start) <= now &&
-                        new Date(resource.end) >= now,
-                      type: getEventType((resource.title as string) || ""),
-                    }) as EventInfo,
-                );
-                setSelectedDayEvents(mappedEvents);
-              }
+              if (eventsForDay.length > 0) setSelectedDayEvents(eventsForDay);
             }}
             onOpenMonthPicker={() => setMonthPickerOpen(true)}
           />

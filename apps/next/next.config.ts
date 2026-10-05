@@ -1,11 +1,17 @@
 import type { NextConfig } from "next";
-import path from "node:path";
+import withPWA from "next-pwa";
 
 const nextConfig: NextConfig = {
-  // ! TODO: Fix these errors
+  transpilePackages: [
+    "@peterplate/api",
+    "@peterplate/db",
+    "@peterplate/validators",
+  ],
   typescript: {
     ignoreBuildErrors: true,
   },
+  skipTrailingSlashRedirect: true,
+
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "uci.campusdish.com" },
@@ -16,6 +22,17 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "lh6.googleusercontent.com" },
       { protocol: "https", hostname: "delivery-p140432-e1469601.adobeaemcloud.com" },
     ],
+  },
+  async redirects() {
+    return [];
+  },
+  async rewrites() {
+    return [
+      {
+        source: '/.well-known/apple-app-site-association',
+        destination: '/apple-app-site-association',
+      },
+    ];
   },
   async headers() {
     return [
@@ -36,23 +53,6 @@ const nextConfig: NextConfig = {
           },
         ],
       },
-      {
-        source: '/sw.js',
-        headers: [
-          {
-            key: 'Content-Type',
-            value: 'application/javascript; charset=utf-8',
-          },
-          {
-            key: 'Cache-Control',
-            value: 'no-cache, no-store, must-revalidate',
-          },
-          {
-            key: 'Content-Security-Policy',
-            value: "default-src 'self'; script-src 'self'",
-          },
-        ],
-      },
     ];
   },
   /* webpack: (config) => {
@@ -64,5 +64,21 @@ const nextConfig: NextConfig = {
   }, */
 };
 
-export default nextConfig;
-
+export default withPWA({
+  dest: "public",
+  register: true,
+  skipWaiting: true,
+  disable: process.env.NODE_ENV === "development",
+  // Prevent Workbox from intercepting the PostHog reverse-proxy route.
+  // Without this, the SW intercepts /app-data/* requests and fails because
+  // the proxied PostHog responses are not cacheable in the expected way.
+  buildExcludes: [/app-data/],
+  // Never let the service worker serve cached auth responses (from main).
+  runtimeCaching: [
+    {
+      urlPattern: /\/api\/auth\//,
+      handler: "NetworkOnly",
+      method: "GET",
+    },
+  ],
+})(nextConfig);

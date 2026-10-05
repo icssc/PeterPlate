@@ -4,20 +4,20 @@ import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { format, isSameDay, startOfDay } from "date-fns";
 import { useEffect, useMemo, useRef } from "react";
-import type { EventInfo } from "./card/event-card";
+import type { EventWithType } from "@/app/events/page";
 import MobileListEventRow from "./mobile-list-event-row";
 
 interface MobileListViewProps {
   currentDate: Date;
   onDateChange: (date: Date) => void;
-  filteredEvents: EventInfo[];
+  filteredEvents: EventWithType[];
   onOpenMonthPicker: () => void;
-  onSelectEvent: (event: EventInfo) => void;
+  onSelectEvent: (event: EventWithType) => void;
 }
 
 interface DayGroup {
   date: Date;
-  events: EventInfo[];
+  events: EventWithType[];
 }
 
 interface MonthGroup {

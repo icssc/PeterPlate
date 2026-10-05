@@ -1,7 +1,9 @@
+import { getDishes } from "@api/dishes/services";
 import { upsert } from "@api/utils";
 import type { Drizzle, InsertRating } from "@peterplate/db";
 import { dishes, ratings } from "@peterplate/db";
 import { and, avg, count, eq, sum } from "drizzle-orm";
+import { ensureDishMetadataRow } from "../dishes/local-metadata";
 
 const updateDishStats = async (db: Drizzle, dishId: string) => {
   const result = await db
@@ -23,6 +25,7 @@ const updateDishStats = async (db: Drizzle, dishId: string) => {
 };
 
 export const upsertRating = async (db: Drizzle, rating: InsertRating) => {
+  await ensureDishMetadataRow(db, rating.dishId);
   const result = await upsert(db, ratings, rating, {
     target: [ratings.userId, ratings.dishId],
     set: rating,
@@ -86,46 +89,32 @@ export const deleteRating = async (
 
 export const getUserRatedDishes = async (db: Drizzle, userId: string) => {
   try {
-    // Step 1: Get all ratings for this user
     const allRatings = await db.query.ratings.findMany({
       where: (ratings, { eq }) => eq(ratings.userId, userId),
       orderBy: (ratings, { desc }) => [desc(ratings.updatedAt)],
     });
 
-    // Step 2: For each rating, fetch the full dish info
-    const enrichedResults = await Promise.all(
-      allRatings.map(async (rating) => {
-        const dish = await db.query.dishes.findFirst({
-          where: (dishes, { eq }) => eq(dishes.id, rating.dishId),
-          with: {
-            nutritionInfo: true,
-            dietRestriction: true,
-            station: {
-              with: {
-                restaurant: true, // Fetch the restaurant from station
-              },
-            },
-          },
-        });
+    if (allRatings.length === 0) return [];
 
-        if (!dish) {
-          console.warn(`Dish not found for rating: ${rating.dishId}`);
-          return null;
-        }
+    const dishes = await getDishes(
+      allRatings.map((rating) => rating.dishId),
+      db,
+    );
+    const dishesById = new Map(dishes.map((dish) => [dish.id, dish]));
 
-        // Add the restaurant field to match DishInfo type
+    return allRatings
+      .map((rating) => {
+        const dish = dishesById.get(rating.dishId);
+        if (!dish) return null;
+
         return {
           ...dish,
-          restaurant: dish.station?.restaurant?.name || "Unknown Restaurant",
-          stationName: dish.station?.name ?? "",
+          restaurant: rating.restaurant,
           rating: rating.rating,
-          ratedAt: rating.updatedAt,
+          ratedAt: rating.updatedAt ?? rating.createdAt,
         };
-      }),
-    );
-
-    const result = enrichedResults.filter((item) => item !== null);
-    return result;
+      })
+      .filter((dish) => dish !== null);
   } catch (error) {
     console.error("Error fetching rated dishes:", error);
     return [];

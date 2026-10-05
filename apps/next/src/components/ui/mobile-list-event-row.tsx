@@ -2,10 +2,10 @@
 
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import { format } from "date-fns";
-import type { EventInfo } from "./card/event-card";
+import type { EventWithType } from "@/app/events/page";
 
 interface MobileListEventRowProps {
-  event: EventInfo;
+  event: EventWithType;
   onClick: () => void;
 }
 

@@ -2,12 +2,12 @@
 
 import CloseIcon from "@mui/icons-material/Close";
 import Drawer from "@mui/material/Drawer";
-import type { EventInfo } from "./card/event-card";
+import type { EventWithType } from "@/app/events/page";
 import EventDrawerContent from "./event-drawer-content";
 
 interface EventDetailsDrawerProps {
-  selectedEventData: EventInfo | null;
-  selectedDayEvents: EventInfo[];
+  selectedEventData: EventWithType | null;
+  selectedDayEvents: EventWithType[];
   onClose: () => void;
 }
 
@@ -56,7 +56,7 @@ const EventDetailsDrawer = ({
           <div className="flex flex-col gap-4 p-4 pt-12 pb-10">
             {selectedDayEvents.map((event, idx) => (
               <div
-                key={`event-drawer-${event.name}-${idx}`}
+                key={`event-drawer-${event.title}-${idx}`}
                 className="bg-white dark:bg-zinc-900 rounded-xl overflow-hidden shadow-sm border border-slate-200 dark:border-zinc-800"
               >
                 <EventDrawerContent {...event} />

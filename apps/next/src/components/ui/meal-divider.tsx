@@ -1,3 +1,5 @@
+import type { JSX } from "react";
+
 function formatMealDividerTitle(title: string): string {
   return title
     .toLowerCase()

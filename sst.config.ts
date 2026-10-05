@@ -99,18 +99,6 @@ export default $config({
       },
     });
 
-    const dailyCron = new sst.aws.Cron("Daily", {
-      schedule: "cron(0 0 * * ? *)", // Run daily at 00:00 UTC
-      job: {
-        handler: "apps/server/src/functions/cron/daily.main",
-        timeout: "10 minutes",
-        environment: {
-          DATABASE_URL: process.env.DATABASE_URL!,
-          NODE_ENV: process.env.NODE_ENV || "development",
-        },
-      },
-    });
-
     const weeklyCron = new sst.aws.Cron("Weekly", {
       schedule: "cron(0 0 ? * 1 *)", // Run at 00:00 on Sunday
       job: {
@@ -131,6 +119,9 @@ export default $config({
         BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET!,
         AUTH_CLIENT_ID: clientId,
         BETTER_AUTH_URL: `https://${domain}`,
+        NEXT_PUBLIC_BASE_URL: `https://${domain}`,
+        DISCORD_WEBHOOK_URL: process.env.DISCORD_WEBHOOK_URL!,
+        GOOGLE_APPS_SCRIPT_URL: process.env.GOOGLE_APPS_SCRIPT_URL!,
       },
       cachePolicy: "50ea56d0-b7b0-4bf7-9ab8-0f7f9a0d03d5",
       domain: {
@@ -147,33 +138,6 @@ export default $config({
       functionName: weeklyCron.nodes.function.name,
       input: JSON.stringify({}),
     });
-
-    // ! TODO @KevinWu098: figure out the router
-    // Redirect peterplate.com and www.peterplate.com to peterplate.com
-    // if ($app.stage === "production") {
-    //   new sst.aws.Router("PeterplateRedirect", {
-    //     domain: {
-    //       name: "peterplate.com",
-    //       redirects: ["www.peterplate.com"],
-    //       dns: sst.aws.dns({
-    //         zone: "Z05683903NC7KZ5HQGFOI",
-    //       }),
-    //     },
-    //     edge: {
-    //       viewerRequest: {
-    //         injection: `
-    //           return {
-    //             statusCode: 301,
-    //             statusDescription: 'Moved Permanently',
-    //             headers: {
-    //               'location': { value: 'https://peterplate.com' + event.request.uri }
-    //             }
-    //           };
-    //         `,
-    //       },
-    //     },
-    //   });
-    // }
 
     return {
       api: api.url,

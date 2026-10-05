@@ -31,6 +31,7 @@ enum HallStatusEnum {
   CLOSED,
   ERROR,
   PREVIEW,
+  LOADING,
 }
 
 /**

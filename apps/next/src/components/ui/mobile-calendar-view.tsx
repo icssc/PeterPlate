@@ -14,13 +14,13 @@ import {
   subMonths,
 } from "date-fns";
 import { useState } from "react";
-import type { EventInfo } from "./card/event-card";
+import type { EventWithType } from "@/app/events/page";
 
 interface MobileCalendarViewProps {
   currentDate: Date;
   onDateChange: (date: Date) => void;
-  filteredEvents: EventInfo[];
-  onSelectEventDay: (date: Date, events: EventInfo[]) => void;
+  filteredEvents: EventWithType[];
+  onSelectEventDay: (date: Date, events: EventWithType[]) => void;
   onOpenMonthPicker: () => void;
   availableMonths: { year: number; monthIndex: number }[];
 }
@@ -193,7 +193,7 @@ const MobileCalendarView = ({
                 <div className="absolute z-10 -bottom-3 flex space-x-0.5">
                   {eventsOnDay.slice(0, 3).map((event) => (
                     <div
-                      key={`${event.title}-${String(event.start)}-${event.restaurantId || event.location}`}
+                      key={`${event.title}-${String(event.start)}-${event.restaurantId}`}
                       className="w-1.5 h-1.5 rounded-full bg-sky-700 dark:bg-sky-400"
                     />
                   ))}

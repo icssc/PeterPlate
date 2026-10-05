@@ -1,23 +1,42 @@
 "use client";
 
 import CheckIcon from "@mui/icons-material/Check";
-import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
-import {
-  Button,
-  CircularProgress,
-  IconButton,
-  Input,
-  ToggleButton,
-  Tooltip,
-} from "@mui/material";
+import { Button, CircularProgress, ToggleButton, Tooltip } from "@mui/material";
+import type { UserAllergy, UserDietaryPreference } from "@peterplate/db";
+import posthog from "posthog-js";
 import { useEffect, useRef, useState } from "react";
 import { useSession } from "@/utils/auth-client";
 import { trpc } from "@/utils/trpc";
-import {
-  AllergenKeys,
-  PreferenceKeys,
-} from "../../../../../packages/validators/src/adobe-ecommerce";
+
+const ALLERGY_LABELS: Record<UserAllergy, string> = {
+  eggs: "Eggs",
+  fish: "Fish",
+  milk: "Milk",
+  peanuts: "Peanuts",
+  sesame: "Sesame",
+  shellfish: "Shellfish",
+  soy: "Soy",
+  treeNuts: "Tree Nuts",
+  wheat: "Wheat",
+};
+
+const PREFERENCE_LABELS: Record<UserDietaryPreference, string> = {
+  glutenFree: "Gluten-Free",
+  halal: "Halal",
+  kosher: "Kosher",
+  locallyGrown: "Locally Grown",
+  organic: "Organic",
+  vegan: "Vegan",
+  vegetarian: "Vegetarian",
+};
+
+const ALLERGY_KEYS = Object.keys(
+  ALLERGY_LABELS,
+) as (keyof typeof ALLERGY_LABELS)[];
+const PREFERENCE_KEYS = Object.keys(
+  PREFERENCE_LABELS,
+) as (keyof typeof PREFERENCE_LABELS)[];
 
 type EditPreferencesContentProps = {
   onSaved?: () => void;
@@ -35,11 +54,9 @@ export default function EditPreferencesContent({
   const isMounted = useRef(true);
 
   const [formData, setFormData] = useState({
-    allergies: [] as string[],
-    preferences: [] as string[],
+    allergies: [] as UserAllergy[],
+    preferences: [] as UserDietaryPreference[],
   });
-  const [customAllergies, setCustomAllergies] = useState<string[]>([]);
-  const [customAllergyInput, setCustomAllergyInput] = useState("");
 
   const utils = trpc.useUtils();
   const isGuest = !session?.user;
@@ -64,29 +81,17 @@ export default function EditPreferencesContent({
 
   useEffect(() => {
     if (existingAllergies !== undefined || existingPreferences !== undefined) {
-      const allergies = existingAllergies ?? [];
-      const knownAllergies = allergies.filter((a) =>
-        (AllergenKeys as readonly string[]).includes(a),
-      );
-      const custom = allergies.filter(
-        (a) => !(AllergenKeys as readonly string[]).includes(a),
-      );
       setFormData((prev) => ({
         ...prev,
-        allergies:
-          existingAllergies !== undefined ? knownAllergies : prev.allergies,
+        allergies: existingAllergies ?? prev.allergies,
         preferences: existingPreferences ?? prev.preferences,
       }));
-      if (existingAllergies !== undefined) {
-        setCustomAllergies(custom);
-        onExpandChange?.(custom.length > 0);
-      }
     }
-  }, [existingAllergies, existingPreferences, onExpandChange]);
+  }, [existingAllergies, existingPreferences]);
 
   useEffect(() => {
-    onExpandChange?.(customAllergies.length > 0);
-  }, [customAllergies.length, onExpandChange]);
+    onExpandChange?.(false);
+  }, [onExpandChange]);
 
   const addAllergies = trpc.allergy.addAllergies.useMutation();
   const addPreferences = trpc.preference.addDietaryPreferences.useMutation();
@@ -100,21 +105,22 @@ export default function EditPreferencesContent({
     }));
   };
 
-  const trimmedCustomInput = customAllergyInput.trim();
-  const isAddCustomDisabled = !trimmedCustomInput || isGuest;
+  // const trimmedCustomInput = customAllergyInput.trim();
+  // const isAddCustomDisabled = !trimmedCustomInput || isGuest;
 
-  const handleAddCustomAllergy = () => {
-    if (isAddCustomDisabled) return;
-    const value = trimmedCustomInput;
-    setCustomAllergies((prev) =>
-      prev.includes(value) ? prev : [...prev, value],
-    );
-    setCustomAllergyInput("");
-  };
+  // TODO: When we add custom allergy functionality, add this back.
+  // const handleAddCustomAllergy = () => {
+  //   if (isAddCustomDisabled) return;
+  //   const value = trimmedCustomInput;
+  //   setCustomAllergies((prev) =>
+  //     prev.includes(value) ? prev : [...prev, value],
+  //   );
+  //   setCustomAllergyInput("");
+  // };
 
-  const handleRemoveCustomAllergy = (index: number) => {
-    setCustomAllergies((prev) => prev.filter((_, i) => i !== index));
-  };
+  // const handleRemoveCustomAllergy = (index: number) => {
+  //   setCustomAllergies((prev) => prev.filter((_, i) => i !== index));
+  // };
 
   const handleSubmit = async () => {
     if (!session?.user?.id || isSubmitting) return;
@@ -123,7 +129,7 @@ export default function EditPreferencesContent({
     try {
       const userId = session.user.id;
 
-      const allAllergies = [...formData.allergies, ...customAllergies];
+      const allAllergies = formData.allergies;
       const allergiesToDelete =
         existingAllergies?.filter((x) => !allAllergies.includes(x)) ?? [];
 
@@ -153,11 +159,24 @@ export default function EditPreferencesContent({
         utils.preference.getDietaryPreferences.invalidate(),
       ]);
 
+      posthog.capture("preferences_updated", {
+        // allergies: [...formData.allergies, ...customAllergies],
+        // preferences: formData.preferences,
+        // allergies_count: formData.allergies.length + customAllergies.length,
+        // preferences_count: formData.preferences.length,
+        // custom_allergies_count: customAllergies.length,
+        allergies: formData.allergies,
+        preferences: formData.preferences,
+        allergies_count: formData.allergies.length,
+        preferences_count: formData.preferences.length,
+      });
+
       if (onSaved) {
         onSaved();
       }
     } catch (error) {
       console.error("Save failed", error);
+      posthog.captureException(error);
       if (isMounted.current) {
         setIsSubmitting(false);
       }
@@ -169,7 +188,7 @@ export default function EditPreferencesContent({
 
   if (loadingAllergies || loadingPrefs) {
     return (
-      <div className="flex h-64 w-full items-center justify-center bg-white dark:bg-[#313136]">
+      <div className="flex h-64 w-full items-center justify-center bg-white dark:bg-[var(--surface-dialog)]">
         <CircularProgress />
       </div>
     );
@@ -178,32 +197,32 @@ export default function EditPreferencesContent({
   const optionButtonBase =
     "font-poppins text-[14px] font-medium leading-[21px] text-center !rounded-[8px] border-2 transition-all duration-200 !normal-case !box-border overflow-visible";
   const optionButtonUnselected =
-    "!border-[#D1D5DC] !bg-white !text-black hover:!bg-gray-50 dark:!border-[1px] dark:!border-[#D4D4D8] dark:!bg-[rgba(63,63,71,0.40)] dark:!text-white dark:hover:!bg-[rgba(63,63,71,0.5)]";
+    "!border-[var(--border-input)] !bg-white !text-black hover:!bg-gray-50 dark:!border-[1px] dark:!border-[var(--border-input)] dark:!bg-[rgba(63,63,71,0.40)] dark:!text-white dark:hover:!bg-[rgba(63,63,71,0.5)]";
 
   const sectionHeading =
-    "font-poppins text-[24px] font-bold leading-[36px] text-[#0069A8] dark:text-[#8EC5FF]";
+    "font-poppins text-[24px] font-bold leading-[36px] text-[var(--primary-accent-hex)] dark:text-[var(--primary-accent-light)]";
   const sectionDescription =
-    "font-poppins text-[14px] font-normal leading-[21px] text-[#6A7282] dark:text-white";
+    "font-poppins text-[14px] font-normal leading-[21px] text-[var(--text-muted-soft)] dark:text-white";
 
   return (
-    <div className="flex h-full min-h-0 w-full flex-1 flex-col bg-white dark:bg-[#313136] pb-[22px]">
-      <div className="w-full shrink-0 rounded-t-[12px] flex flex-row items-center gap-3 pl-[18px] pr-4 pt-4 pb-4 md:flex-col md:items-center md:gap-0 md:pt-4 md:pb-0 md:pl-0 md:pr-0 md:h-[122px] bg-white dark:bg-[#313136] md:bg-[#0069A8] md:dark:border-b-[3px] md:dark:border-b-[#3F3F47]">
+    <div className="flex h-full min-h-0 w-full flex-1 flex-col bg-white dark:bg-[var(--surface-dialog)] pb-[22px]">
+      <div className="w-full shrink-0 rounded-t-[12px] flex flex-row items-center gap-3 pl-[18px] pr-4 pt-4 pb-4 md:flex-col md:items-center md:gap-0 md:pt-4 md:pb-0 md:pl-0 md:pr-0 md:h-[122px] bg-white dark:bg-[var(--surface-dialog)] md:bg-[var(--primary-accent-hex)] md:dark:border-b-[3px] md:dark:border-b-[var(--button-disabled-bg)]">
         <div
           className="flex !h-10 !w-10 flex-shrink-0 items-center justify-center rounded-full !p-2 bg-[rgba(0,105,168,0.12)] dark:bg-[rgba(142,197,255,0.12)] md:bg-white/20 md:dark:bg-white/10"
           aria-hidden
         >
           <EditIcon
-            className="!h-6 !w-6 flex-shrink-0 text-[#0069A8] dark:text-[#8EC5FF] md:!text-white"
+            className="!h-6 !w-6 flex-shrink-0 text-[var(--primary-accent-hex)] dark:text-[var(--primary-accent-light)] md:!text-white"
             style={{ width: 24, height: 24 }}
           />
         </div>
         <div className="flex flex-col items-start justify-center gap-0 min-w-0 md:items-center">
-          <p className="font-poppins text-[16px] font-bold leading-[42px] text-[#0069A8] dark:text-[#8EC5FF] md:text-white -mt-1">
+          <p className="font-poppins text-[16px] font-bold leading-[42px] text-[var(--primary-accent-hex)] dark:text-[var(--primary-accent-light)] md:text-white -mt-1">
             {activeStep === 0
               ? "Update food allergies"
               : "Update dietary preferences"}
           </p>
-          <p className="font-poppins text-[14px] font-normal leading-[21px] text-[#6A7282] dark:text-white md:text-white -mt-2">
+          <p className="font-poppins text-[14px] font-normal leading-[21px] text-[var(--text-muted-soft)] dark:text-white md:text-white -mt-2">
             Make changes to your current needs
           </p>
         </div>
@@ -218,7 +237,7 @@ export default function EditPreferencesContent({
             </p>
             <Tooltip title={isGuest ? "Log in to edit preferences" : ""} arrow>
               <div className="grid grid-cols-2 md:grid-cols-3 md:grid-rows-3 gap-[7px] w-full max-w-[464px] md:h-[161px] min-w-0">
-                {AllergenKeys.map((opt) => {
+                {ALLERGY_KEYS.map((opt) => {
                   const selected = formData.allergies.includes(opt);
                   return (
                     <ToggleButton
@@ -232,12 +251,12 @@ export default function EditPreferencesContent({
                           : [...formData.allergies, opt];
                         handleToggle("allergies", next);
                       }}
-                      className={`${optionButtonBase} ${optionButtonUnselected} [&.Mui-selected]:!border-[#0069A8] [&.Mui-selected]:!bg-[rgba(0,105,168,0.20)] [&.Mui-selected]:!text-[#0069A8] [&.Mui-selected]:!rounded-[8px] dark:[&.Mui-selected]:!border-[1px] dark:[&.Mui-selected]:!border-[#8EC5FF] dark:[&.Mui-selected]:!bg-[rgba(142,197,255,0.20)] dark:[&.Mui-selected]:!text-[#8EC5FF] !h-[49px] !w-full !min-w-0 !flex !items-center !justify-center !gap-2`}
+                      className={`${optionButtonBase} ${optionButtonUnselected} [&.Mui-selected]:!border-[var(--primary-accent-hex)] [&.Mui-selected]:!bg-[rgba(0,105,168,0.20)] [&.Mui-selected]:!text-[var(--primary-accent-hex)] [&.Mui-selected]:!rounded-[8px] dark:[&.Mui-selected]:!border-[1px] dark:[&.Mui-selected]:!border-[var(--primary-accent-light)] dark:[&.Mui-selected]:!bg-[rgba(142,197,255,0.20)] dark:[&.Mui-selected]:!text-[var(--primary-accent-light)] !h-[49px] !w-full !min-w-0 !flex !items-center !justify-center !gap-2`}
                     >
-                      <span className="truncate">{opt}</span>
+                      <span className="truncate">{ALLERGY_LABELS[opt]}</span>
                       {selected ? (
                         <CheckIcon
-                          className="flex-shrink-0 text-[#0069A8] dark:text-[#8EC5FF]"
+                          className="flex-shrink-0 text-[var(--primary-accent-hex)] dark:text-[var(--primary-accent-light)]"
                           style={{ width: 20, height: 20 }}
                         />
                       ) : null}
@@ -248,7 +267,7 @@ export default function EditPreferencesContent({
             </Tooltip>
 
             {/* Custom allergy input row */}
-            <div className="mt-4 flex h-10 items-start gap-2 self-stretch">
+            {/* <div className="mt-4 flex h-10 items-start gap-2 self-stretch">
               <Input
                 disableUnderline
                 value={customAllergyInput}
@@ -284,7 +303,7 @@ export default function EditPreferencesContent({
             </div>
 
             {/* Custom allergies list */}
-            {customAllergies.length > 0 && (
+            {/* {customAllergies.length > 0 && (
               <div className="mt-[7.5px] flex w-full max-w-[346px] flex-col items-start gap-2">
                 <div className="flex items-center self-stretch">
                   <span className="font-poppins text-[13px] font-normal leading-[19.5px] tracking-[-0.076px] text-[#6A7282] dark:text-gray-400">
@@ -317,7 +336,7 @@ export default function EditPreferencesContent({
                   ))}
                 </div>
               </div>
-            )}
+            )} */}
           </>
         ) : (
           <>
@@ -327,7 +346,7 @@ export default function EditPreferencesContent({
             </p>
             <Tooltip title={isGuest ? "Log in to edit preferences" : ""} arrow>
               <div className="grid grid-cols-2 md:grid-cols-3 md:grid-rows-3 gap-[7px] w-full max-w-[464px] md:h-[161px] min-w-0">
-                {PreferenceKeys.map((opt) => {
+                {PREFERENCE_KEYS.map((opt) => {
                   const selected = formData.preferences.includes(opt);
                   return (
                     <ToggleButton
@@ -341,9 +360,9 @@ export default function EditPreferencesContent({
                           : [...formData.preferences, opt];
                         handleToggle("preferences", next);
                       }}
-                      className={`${optionButtonBase} ${optionButtonUnselected} [&.Mui-selected]:!border-[#0069A8] [&.Mui-selected]:!bg-[rgba(0,105,168,0.20)] [&.Mui-selected]:!text-[#0069A8] [&.Mui-selected]:!rounded-[8px] dark:[&.Mui-selected]:!border-[1px] dark:[&.Mui-selected]:!border-[#8EC5FF] dark:[&.Mui-selected]:!bg-[rgba(142,197,255,0.20)] dark:[&.Mui-selected]:!text-[#8EC5FF] !min-h-[49px] !w-full !min-w-0`}
+                      className={`${optionButtonBase} ${optionButtonUnselected} [&.Mui-selected]:!border-[var(--primary-accent-hex)] [&.Mui-selected]:!bg-[rgba(0,105,168,0.20)] [&.Mui-selected]:!text-[var(--primary-accent-hex)] [&.Mui-selected]:!rounded-[8px] dark:[&.Mui-selected]:!border-[1px] dark:[&.Mui-selected]:!border-[var(--primary-accent-light)] dark:[&.Mui-selected]:!bg-[rgba(142,197,255,0.20)] dark:[&.Mui-selected]:!text-[var(--primary-accent-light)] !min-h-[49px] !w-full !min-w-0`}
                     >
-                      {opt}
+                      {PREFERENCE_LABELS[opt]}
                     </ToggleButton>
                   );
                 })}
@@ -353,14 +372,14 @@ export default function EditPreferencesContent({
         )}
       </div>
 
-      <footer className="shrink-0 w-full px-[18px] grid grid-cols-2 gap-[7px] h-[49px] md:mx-auto md:w-[464px] md:px-0 md:flex md:justify-between md:items-center md:gap-0 bg-white dark:bg-[#313136] rounded-b-[12px]">
+      <footer className="shrink-0 w-full px-[18px] grid grid-cols-2 gap-[7px] h-[49px] md:mx-auto md:w-[464px] md:px-0 md:flex md:justify-between md:items-center md:gap-0 bg-white dark:bg-[var(--surface-dialog)] rounded-b-[12px]">
         {activeStep === 0 ? (
           <Button
             variant="outlined"
             size="small"
             disabled={!!isSubmitting}
             onClick={handleNext}
-            className="font-poppins text-[14px] font-medium leading-[26px] tracking-[0.46px] !flex !items-center !justify-center !rounded-[8px] !h-[49px] !w-full !min-w-0 md:!w-[81.4px] !border-2 !border-[#D1D5DC] !bg-white !text-black hover:!bg-gray-50 dark:!border-2 dark:!border-[#8EC5FF] dark:!bg-transparent dark:!text-white dark:hover:!bg-[rgba(142,197,255,0.08)] dark:!shadow-[0_1px_8px_0_rgba(0,0,0,0.12),0_3px_4px_0_rgba(0,0,0,0.14),0_3px_3px_-2px_rgba(0,0,0,0.2)]"
+            className="font-poppins text-[14px] font-medium leading-[26px] tracking-[0.46px] !flex !items-center !justify-center !rounded-[8px] !h-[49px] !w-full !min-w-0 md:!w-[81.4px] !border-2 !border-[var(--border-input)] !bg-white !text-black hover:!bg-gray-50 dark:!border-2 dark:!border-[var(--primary-accent-light)] dark:!bg-transparent dark:!text-white dark:hover:!bg-[rgba(142,197,255,0.08)] dark:!shadow-[0_1px_8px_0_rgba(0,0,0,0.12),0_3px_4px_0_rgba(0,0,0,0.14),0_3px_3px_-2px_rgba(0,0,0,0.2)]"
           >
             Skip
           </Button>
@@ -370,7 +389,7 @@ export default function EditPreferencesContent({
             size="small"
             disabled={!!isSubmitting}
             onClick={handleBack}
-            className="font-poppins text-[14px] font-medium leading-[26px] tracking-[0.46px] !flex !items-center !justify-center !rounded-[8px] !h-[49px] !w-full !min-w-0 md:!w-[81.4px] !border-2 !border-[#D1D5DC] !bg-white !text-black hover:!bg-gray-50 dark:!border-2 dark:!border-[#8EC5FF] dark:!bg-transparent dark:!text-white dark:hover:!bg-[rgba(142,197,255,0.08)] dark:!shadow-[0_1px_8px_0_rgba(0,0,0,0.12),0_3px_4px_0_rgba(0,0,0,0.14),0_3px_3px_-2px_rgba(0,0,0,0.2)]"
+            className="font-poppins text-[14px] font-medium leading-[26px] tracking-[0.46px] !flex !items-center !justify-center !rounded-[8px] !h-[49px] !w-full !min-w-0 md:!w-[81.4px] !border-2 !border-[var(--border-input)] !bg-white !text-black hover:!bg-gray-50 dark:!border-2 dark:!border-[var(--primary-accent-light)] dark:!bg-transparent dark:!text-white dark:hover:!bg-[rgba(142,197,255,0.08)] dark:!shadow-[0_1px_8px_0_rgba(0,0,0,0.12),0_3px_4px_0_rgba(0,0,0,0.14),0_3px_3px_-2px_rgba(0,0,0,0.2)]"
           >
             Back
           </Button>
@@ -380,7 +399,7 @@ export default function EditPreferencesContent({
           size="small"
           disabled={isSubmitting || isGuest}
           onClick={activeStep === 1 ? handleSubmit : handleNext}
-          className="font-poppins text-[14px] font-medium leading-[21px] !flex !items-center !justify-center !rounded-[8px] !h-[49px] !w-full !min-w-0 md:!w-[81.4px] !bg-[#0069A8] !text-white dark:!border-2 dark:!border-[#51A2FF] dark:!bg-[#8EC5FF] dark:!text-black dark:hover:!bg-[#7ab8f0] dark:hover:!border-[#51A2FF]"
+          className="font-poppins text-[14px] font-medium leading-[21px] !flex !items-center !justify-center !rounded-[8px] !h-[49px] !w-full !min-w-0 md:!w-[81.4px] !bg-[var(--primary-accent-hex)] !text-white dark:!border-2 dark:!border-[var(--accent-border)] dark:!bg-[var(--primary-accent-light)] dark:!text-black dark:hover:!bg-[var(--accent-hover)] dark:hover:!border-[var(--accent-border)]"
         >
           {activeStep === 1 ? (isSubmitting ? "Saving..." : "Update") : "Next"}
         </Button>

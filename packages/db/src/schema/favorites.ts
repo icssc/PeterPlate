@@ -2,6 +2,7 @@ import { relations } from "drizzle-orm";
 import { pgTable, primaryKey, text } from "drizzle-orm/pg-core";
 
 import { dishes } from "./dishes";
+import { restaurantIdEnum } from "./enums";
 import { users } from "./users";
 import { metadataColumns } from "./utils";
 
@@ -20,12 +21,13 @@ export const favorites = pgTable(
         onDelete: "cascade",
         onUpdate: "cascade",
       }),
+    restaurant: restaurantIdEnum("restaurant").notNull(),
     ...metadataColumns,
   },
   (table) => {
     return {
       pk: primaryKey({
-        name: "pins_pk",
+        name: "favorites_pk",
         columns: [table.userId, table.dishId],
       }),
     };

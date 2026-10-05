@@ -6,6 +6,7 @@ import FavoriteBorder from "@mui/icons-material/FavoriteBorder";
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import InsertInvitation from "@mui/icons-material/InsertInvitation";
 import ListAltRoundedIcon from "@mui/icons-material/ListAltRounded";
+import LoginIcon from "@mui/icons-material/Login";
 import MenuIcon from "@mui/icons-material/Menu";
 import RestaurantRoundedIcon from "@mui/icons-material/RestaurantRounded";
 import {
@@ -18,16 +19,18 @@ import {
   MenuItem,
   Toolbar as MuiToolbar,
   Snackbar,
+  Typography,
 } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTheme } from "next-themes";
 import type { MouseEvent } from "react";
 import { useEffect, useState } from "react";
-import { GoogleSignInButton } from "@/components/auth/google-sign-in";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useSession } from "@/utils/auth-client";
 import EditPreferencesContent from "./edit-preferences-content";
+import { WelcomeView } from "./onboarding";
 import SidebarContent from "./sidebar/sidebar-content";
 
 export type CalendarRange = {
@@ -63,12 +66,6 @@ const DESKTOP_TOOLBAR_ELEMENTS: ToolbarElement[] = [
       },
     ],
   },
-
-  {
-    title: "Meal Tracker",
-    href: "/nutrition",
-  },
-
   {
     title: "Events",
     href: "/events",
@@ -76,6 +73,10 @@ const DESKTOP_TOOLBAR_ELEMENTS: ToolbarElement[] = [
   {
     title: "My Foods",
     href: "/my-foods",
+  },
+  {
+    title: "Tracker",
+    href: "/nutrition",
   },
 ];
 
@@ -102,19 +103,22 @@ const MOBILE_TOOLBAR_ELEMENTS: ToolbarElement[] = [
   },
   {
     title: "Tracker",
-    href: "/tracker",
+    href: "/nutrition",
     icon: <ListAltRoundedIcon />,
   },
 ];
 
-const TRANSPARENT_PAGES = ["/about", "/brandywine", "/anteatery", "/events"];
+// Routes on which the toolbar should remain transparent
+const TRANSPARENT_PAGES = ["/about", "/brandywine", "/anteatery"];
 
 function ToolbarDropdown({
   element,
   isTransparent,
+  pathname,
 }: {
   element: ToolbarElement;
   isTransparent: boolean;
+  pathname: string;
 }) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -132,10 +136,8 @@ function ToolbarDropdown({
       <Button
         onClick={handleClick}
         endIcon={<ArrowDropDownIcon fontSize="small" />}
-        className={`capitalize text-[16px] !font-medium bg-transparent ${
-          isTransparent
-            ? "text-white/60 group-hover:text-white"
-            : "!text-black dark:!text-white"
+        className={`capitalize text-[20px] !font-medium bg-transparent ${
+          isTransparent ? "text-white" : "!text-black dark:!text-white"
         }`}
       >
         {element.title}
@@ -144,8 +146,19 @@ function ToolbarDropdown({
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
-        className="capitalize text-[16px] font-medium
+        className="capitalize text-[20px] font-medium
         group-hover:text-white text-white/60 bg-transparent"
+        slotProps={{
+          paper: {
+            sx: {
+              backgroundImage: "none",
+              bgcolor: "var(--surface-elevated)",
+              ".dark &": {
+                bgcolor: "var(--surface-elevated)",
+              },
+            },
+          },
+        }}
       >
         {element.children?.map((child) => (
           <MenuItem
@@ -153,6 +166,14 @@ function ToolbarDropdown({
             component={Link}
             href={child.href}
             onClick={handleClose}
+            sx={{
+              color: pathname === child.href ? "primary.main" : "text.primary",
+              "&.Mui-selected": { backgroundColor: "transparent" },
+              borderLeft:
+                pathname === child.href ? "3px solid" : "3px solid transparent",
+              borderColor:
+                pathname === child.href ? "primary.main" : "transparent",
+            }}
           >
             {child.title}
           </MenuItem>
@@ -163,12 +184,14 @@ function ToolbarDropdown({
 }
 
 export function DesktopToolbar(): React.JSX.Element {
+  const { resolvedTheme } = useTheme();
   const pathname = usePathname();
   const isTransparent = TRANSPARENT_PAGES.includes(pathname);
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   const [profileAnchor, setProfileAnchor] = useState<null | HTMLElement>(null);
   const profileOpen = Boolean(profileAnchor);
+  const [welcomeOpen, setWelcomeOpen] = useState(false);
   const [editPreferencesOpen, setEditPreferencesOpen] = useState(false);
   const [editPreferencesSnackbarOpen, setEditPreferencesSnackbarOpen] =
     useState(false);
@@ -198,12 +221,16 @@ export function DesktopToolbar(): React.JSX.Element {
   return (
     <>
       <AppBar
-        position="absolute"
+        position={isTransparent ? "absolute" : "sticky"}
         className={`shadow-none ${
           isTransparent
-            ? "bg-transparent bg-gradient-to-b from-black/50 to-black/0"
-            : "!bg-white dark:!bg-zinc-900 !border-b !border-zinc-200 dark:!border-zinc-700"
+            ? "bg-transparent bg-gradient-to-b from-black/70 to-black/0"
+            : "bg-white dark:bg-[var(--surface-elevated)]"
         }`}
+        sx={{
+          backgroundImage: "none",
+          ...(!isTransparent && { borderBottom: 1, borderColor: "divider" }),
+        }}
       >
         <MuiToolbar className="justify-between px-4 py-1 group">
           <div className="flex-none flex items-center">
@@ -215,13 +242,18 @@ export function DesktopToolbar(): React.JSX.Element {
                 width={40}
                 height={40}
               />
-              <span
-                className={`font-poppins font-bold text-[28px] leading-[24px] ${
-                  isTransparent ? "text-white" : "text-sky-700 dark:text-white"
-                }`}
+              <Typography
+                className="font-poppins text-[28px] leading-[24px]"
+                fontWeight={700}
+                sx={{
+                  color:
+                    isTransparent && resolvedTheme === "light"
+                      ? "white"
+                      : "primary.main",
+                }}
               >
                 PeterPlate
-              </span>
+              </Typography>
             </Link>
           </div>
 
@@ -233,6 +265,7 @@ export function DesktopToolbar(): React.JSX.Element {
                     key={element.title}
                     element={element}
                     isTransparent={isTransparent}
+                    pathname={pathname}
                   />
                 );
               }
@@ -241,10 +274,12 @@ export function DesktopToolbar(): React.JSX.Element {
                   key={element.title}
                   component={Link}
                   href={element.href || "#"}
-                  className={`normal-case text-[16px] !font-medium ${
+                  className={`normal-case text-[20px] !font-medium ${
                     isTransparent
-                      ? "text-white/60 group-hover:text-white"
-                      : "!text-black dark:!text-white"
+                      ? "text-white"
+                      : pathname === element.href
+                        ? "!text-sky-700 dark:!text-blue-300"
+                        : "!text-black dark:!text-white"
                   }`}
                 >
                   {element.title}
@@ -259,12 +294,12 @@ export function DesktopToolbar(): React.JSX.Element {
                 <>
                   <div className="w-24 h-5" />
                   <IconButton
-                    className="!text-[#1f2937] hover:!bg-[rgba(0, 0, 0, 0.04)]"
+                    className="!text-gray-800 hover:!bg-black/[0.04]"
                     aria-label="Open sidebar"
                     disabled
                   >
                     <MenuIcon
-                      style={{ color: isTransparent ? "white" : "black" }}
+                      sx={{ color: isTransparent ? "white" : "text.primary" }}
                     />
                   </IconButton>
                 </>
@@ -283,8 +318,29 @@ export function DesktopToolbar(): React.JSX.Element {
                   />
                 </IconButton>
               ) : (
-                <div className="flex items-center gap-2">
-                  <GoogleSignInButton />
+                <div className="flex items-center gap-1">
+                  <IconButton
+                    onClick={() => setWelcomeOpen(true)}
+                    aria-label="Sign in"
+                  >
+                    <LoginIcon
+                      sx={{
+                        fontSize: 28,
+                        color: isTransparent ? "white" : "primary.main",
+                      }}
+                    />
+                  </IconButton>
+                  <IconButton
+                    onClick={handleProfileOpen}
+                    aria-label="Open menu"
+                  >
+                    <MenuIcon
+                      sx={{
+                        fontSize: 28,
+                        color: isTransparent ? "white" : "text.primary",
+                      }}
+                    />
+                  </IconButton>
                 </div>
               )}
             </div>
@@ -306,7 +362,7 @@ export function DesktopToolbar(): React.JSX.Element {
         }}
         PaperProps={{
           className:
-            "bg-transparent shadow-none p-0 w-[357px] max-h-[658px] mt-1",
+            "bg-transparent shadow-none p-0 w-[300px] max-h-[658px] mt-1 rounded-2xl",
         }}
         MenuListProps={{
           className: "p-0",
@@ -318,6 +374,32 @@ export function DesktopToolbar(): React.JSX.Element {
         />
       </Menu>
 
+      <Dialog
+        open={welcomeOpen}
+        onClose={() => setWelcomeOpen(false)}
+        maxWidth={false}
+        slotProps={{
+          paper: {
+            sx: {
+              width: "520px",
+              maxWidth: "90vw",
+              margin: 2,
+              padding: 0,
+              overflow: "hidden",
+              borderRadius: "16px",
+              ".dark &": {
+                border: "3px solid",
+                borderColor: "var(--mui-palette-divider)",
+                backgroundImage: "none",
+                backgroundColor: "var(--surface-modal)",
+              },
+            },
+          },
+        }}
+      >
+        <WelcomeView />
+      </Dialog>
+
       {isDesktop ? (
         <Dialog
           open={editPreferencesOpen}
@@ -325,7 +407,7 @@ export function DesktopToolbar(): React.JSX.Element {
           maxWidth={false}
           PaperProps={{
             className:
-              "w-[500px] max-w-[90vw] m-2 p-0 overflow-hidden flex flex-col rounded-[12px] bg-white shadow-[0_4px_20px_0_#6A7282] dark:bg-[#313136] dark:border-[3px] dark:border-[#3F3F47] dark:shadow-none",
+              "w-[500px] max-w-[90vw] m-2 p-0 overflow-hidden flex flex-col rounded-[12px] bg-white shadow-[0_4px_20px_0_var(--text-muted-soft)] dark:bg-[var(--surface-dialog)] dark:border-[3px] dark:border-[var(--button-disabled-bg)] dark:shadow-none",
             style: {
               height: editPreferencesExpanded ? 593 : 558,
             },
@@ -344,7 +426,7 @@ export function DesktopToolbar(): React.JSX.Element {
           slotProps={{
             paper: {
               className:
-                "p-0 overflow-hidden rounded-t-[10px] mt-[96px] h-auto max-h-[85vh] flex flex-col min-h-0 bg-white dark:bg-[#313136] dark:border-[3px] dark:border-[#3F3F47] dark:border-b-0 dark:rounded-t-[12px]",
+                "p-0 overflow-hidden rounded-t-[10px] mt-[96px] h-auto max-h-[85vh] flex flex-col min-h-0 bg-white dark:bg-[var(--surface-dialog)] dark:border-[3px] dark:border-[var(--button-disabled-bg)] dark:border-b-0 dark:rounded-t-[12px]",
             },
           }}
         >
@@ -371,6 +453,7 @@ function MobileToolbar(): React.JSX.Element {
   const isTransparent = TRANSPARENT_PAGES.includes(pathname);
   const [profileAnchor, setProfileAnchor] = useState<null | HTMLElement>(null);
   const profileOpen = Boolean(profileAnchor);
+  const [welcomeOpen, setWelcomeOpen] = useState(false);
   const { data: session, isPending } = useSession();
   const user = session?.user;
   const [isMounted, setIsMounted] = useState(false);
@@ -435,7 +518,7 @@ function MobileToolbar(): React.JSX.Element {
         className={`top-0 z-50 w-full px-4 py-2.5 flex items-center justify-between ${
           isTransparent
             ? "absolute bg-transparent"
-            : "sticky bg-white dark:bg-neutral-950"
+            : "sticky bg-white dark:bg-surface-scroll"
         }`}
       >
         <span
@@ -447,7 +530,7 @@ function MobileToolbar(): React.JSX.Element {
         >
           {greeting}
         </span>
-        <div className="flex-shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center">
+        <div className="flex-shrink-0 min-h-[44px] flex items-center justify-center gap-2">
           {!isMounted || isPending ? (
             <IconButton
               type="button"
@@ -455,7 +538,8 @@ function MobileToolbar(): React.JSX.Element {
               aria-label="Open profile menu"
               disabled
             >
-              <AccountCircleIcon style={{ fontSize: 36, color: "#bdbdbd" }} />
+              <AccountCircleIcon style={{ fontSize: 36, color: "#bdbdbd" }} />{" "}
+              {/* bdbdbd ≈ gray-400, no CSS var needed */}
             </IconButton>
           ) : user ? (
             <IconButton
@@ -473,14 +557,38 @@ function MobileToolbar(): React.JSX.Element {
               />
             </IconButton>
           ) : (
-            <IconButton
-              type="button"
-              onClick={handleProfileOpen}
-              className="!p-0 !min-w-[44px] !min-h-[44px]"
-              aria-label="Open profile menu"
-            >
-              <AccountCircleIcon style={{ fontSize: 36, color: "#bdbdbd" }} />
-            </IconButton>
+            <>
+              <IconButton
+                type="button"
+                onClick={() => setWelcomeOpen(true)}
+                className="!p-0 !min-w-[44px] !min-h-[44px]"
+                aria-label="Sign in"
+              >
+                <LoginIcon
+                  style={{ fontSize: 30 }}
+                  className={
+                    isTransparent
+                      ? "text-white"
+                      : "text-sky-700 dark:text-blue-300"
+                  }
+                />
+              </IconButton>
+              <IconButton
+                type="button"
+                onClick={handleProfileOpen}
+                className="!p-0 !min-w-[44px] !min-h-[44px]"
+                aria-label="Open menu"
+              >
+                <MenuIcon
+                  style={{ fontSize: 30 }}
+                  className={
+                    isTransparent
+                      ? "text-white"
+                      : "text-neutral-800 dark:text-neutral-100"
+                  }
+                />
+              </IconButton>
+            </>
           )}
         </div>
       </div>
@@ -491,7 +599,7 @@ function MobileToolbar(): React.JSX.Element {
             rounded-[28px]
             px-4 py-3
             shadow-lg
-            bg-gradient-to-b from-sky-700 to-sky-900
+            bg-gradient-to-b from-sky-700 to-sky-900 dark:from-[var(--gradient-from)] dark:to-[var(--gradient-to)]
           "
         >
           <div className="flex items-center justify-between">
@@ -520,13 +628,16 @@ function MobileToolbar(): React.JSX.Element {
                       color: "white",
                       opacity: active ? 1 : 0.9,
                     }}
+                    className={
+                      active ? "dark:!text-[var(--nav-active-text)]" : ""
+                    }
                   >
                     {element.icon}
                   </div>
                   <span
                     className={`
                       text-[12px] leading-none text-white
-                      ${active ? "font-semibold" : "font-medium"}
+                      ${active ? "font-semibold dark:!text-[var(--nav-active-text)]" : "font-medium"}
                     `}
                   >
                     {element.title}
@@ -538,31 +649,36 @@ function MobileToolbar(): React.JSX.Element {
         </div>
       </div>
 
-      <Menu
-        anchorEl={profileAnchor}
+      <Drawer
+        anchor="bottom"
         open={profileOpen}
         onClose={handleProfileClose}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "right",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "right",
-        }}
-        PaperProps={{
-          className:
-            "bg-transparent shadow-none p-0 w-[357px] max-h-[658px] mt-1",
-        }}
-        MenuListProps={{
-          className: "p-0",
+        slotProps={{
+          paper: {
+            className:
+              "p-0 overflow-hidden rounded-t-[10px] h-auto max-h-[85vh] flex flex-col min-h-0 bg-white dark:bg-zinc-900",
+          },
         }}
       >
         <SidebarContent
           onClose={handleProfileClose}
           onEditPreferencesClick={handleEditPreferencesOpen}
         />
-      </Menu>
+      </Drawer>
+
+      <Drawer
+        anchor="bottom"
+        open={welcomeOpen}
+        onClose={() => setWelcomeOpen(false)}
+        slotProps={{
+          paper: {
+            className:
+              "p-0 overflow-hidden rounded-t-[10px] h-auto max-h-[85vh] bg-white dark:bg-zinc-900",
+          },
+        }}
+      >
+        <WelcomeView />
+      </Drawer>
 
       <Drawer
         anchor="bottom"
@@ -571,7 +687,7 @@ function MobileToolbar(): React.JSX.Element {
         slotProps={{
           paper: {
             className:
-              "p-0 overflow-hidden rounded-t-[10px] mt-[96px] h-auto max-h-[85vh] flex flex-col min-h-0 bg-white dark:bg-[#313136] dark:border-[3px] dark:border-[#3F3F47] dark:border-b-0 dark:rounded-t-[12px]",
+              "p-0 overflow-hidden rounded-t-[10px] mt-[96px] h-auto max-h-[85vh] flex flex-col min-h-0 bg-white dark:bg-[var(--surface-dialog)] dark:border-[3px] dark:border-[var(--button-disabled-bg)] dark:border-b-0 dark:rounded-t-[12px]",
           },
         }}
       >

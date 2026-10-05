@@ -1,5 +1,4 @@
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
-import type { RestaurantInfo } from "./restaurants/services";
 import type { AppRouter } from "./root";
 import { appRouter } from "./root";
 import { createCallerFactory, createTRPCContext } from "./trpc";
@@ -31,9 +30,7 @@ type RouterOutputs = inferRouterOutputs<AppRouter>;
 
 export { createTRPCContext, appRouter, createCaller };
 export type { AppRouter, RouterInputs, RouterOutputs };
+export type * from "./dining/types";
 export * from "./server";
 
-// Next.js Exports
-export type { RestaurantInfo };
-export type DishInfo =
-  RestaurantInfo["menus"][number]["stations"][number]["dishes"][number];
+export const AAPI_DINING_ROUTE = "https://anteaterapi.com/v2/rest/dining";

@@ -1,9 +1,5 @@
 import { apiTest } from "@api/apiTest";
-import { upsertDish } from "@api/dishes/services";
-import { upsertMenu } from "@api/menus/services";
-import { upsertPeriod } from "@api/periods/services";
-import { upsertRestaurant } from "@api/restaurants/services";
-import { upsertStation } from "@api/stations/services";
+import { upsertDishesIfMissing } from "@api/dishes/services";
 import { upsertUser } from "@api/users/services";
 import { describe } from "vitest";
 import { upsertRating } from "./services";
@@ -13,11 +9,7 @@ describe("upsertRating", () => {
     await expect(
       async () =>
         await db.transaction(async (trx) => {
-          await upsertRestaurant(trx, testData.brandywine);
-          await upsertStation(trx, testData.station);
-          await upsertPeriod(trx, testData.period);
-          await upsertMenu(trx, testData.menu);
-          await upsertDish(trx, testData.dish);
+          await upsertDishesIfMissing(trx, [{ id: testData.dish.id }]);
           await upsertUser(trx, testData.user);
           const result = await upsertRating(trx, testData.rating);
           expect(result.rating).toEqual(testData.rating.rating);
@@ -30,11 +22,7 @@ describe("upsertRating", () => {
     await expect(
       async () =>
         await db.transaction(async (trx) => {
-          await upsertRestaurant(trx, testData.brandywine);
-          await upsertStation(trx, testData.station);
-          await upsertPeriod(trx, testData.period);
-          await upsertMenu(trx, testData.menu);
-          await upsertDish(trx, testData.dish);
+          await upsertDishesIfMissing(trx, [{ id: testData.dish.id }]);
           await upsertUser(trx, testData.user);
           const insertedRating = await upsertRating(trx, testData.rating);
           const newRating = await upsertRating(trx, {

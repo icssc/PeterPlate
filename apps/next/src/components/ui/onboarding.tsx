@@ -10,16 +10,36 @@ import {
   ToggleButtonGroup,
   Typography,
 } from "@mui/material";
+import type { UserAllergy, UserDietaryPreference } from "@peterplate/db";
+import { AllergenKeys, PreferenceKeys } from "@peterplate/validators";
+import posthog from "posthog-js";
 import React, { useEffect, useState } from "react";
 import { useUserStore } from "@/context/useUserStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useSession } from "@/utils/auth-client";
 import { trpc } from "@/utils/trpc";
-import {
-  AllergenKeys,
-  PreferenceKeys,
-} from "../../../../../packages/validators/src/adobe-ecommerce";
-import { GoogleSignInButton } from "../auth/google-sign-in";
+import { SignInButtons } from "../auth/sign-in-buttons";
+
+const ALLERGY_DISPLAY_TO_DB: Partial<Record<string, UserAllergy>> = {
+  Eggs: "eggs",
+  Fish: "fish",
+  Milk: "milk",
+  Peanuts: "peanuts",
+  Sesame: "sesame",
+  Shellfish: "shellfish",
+  Soy: "soy",
+  "Tree Nuts": "treeNuts",
+  Wheat: "wheat",
+};
+
+const PREFERENCE_DISPLAY_TO_DB: Partial<Record<string, UserDietaryPreference>> =
+  {
+    "Gluten-Free": "glutenFree",
+    Halal: "halal",
+    Kosher: "kosher",
+    Vegan: "vegan",
+    Vegetarian: "vegetarian",
+  };
 
 interface PersonalizeViewProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
@@ -34,7 +54,7 @@ interface OnboardingContentProps extends React.HTMLAttributes<HTMLDivElement> {
   handleClose: () => void;
 }
 
-const WelcomeView = React.forwardRef<HTMLDivElement>((_, ref) => {
+export const WelcomeView = React.forwardRef<HTMLDivElement>((_, ref) => {
   return (
     <Box
       ref={ref}
@@ -61,13 +81,13 @@ const WelcomeView = React.forwardRef<HTMLDivElement>((_, ref) => {
           variant="h4"
           fontWeight={700}
           fontFamily="Poppins, sans-serif"
-          className="text-sky-700"
+          className="text-sky-700 dark:text-blue-300"
         >
           PeterPlate
         </Typography>
         <Typography
           fontFamily="Poppins, sans-serif"
-          color="gray"
+          color="text.secondary"
           fontWeight={500}
           fontSize={18}
           pt="10px"
@@ -77,7 +97,7 @@ const WelcomeView = React.forwardRef<HTMLDivElement>((_, ref) => {
         <Typography
           variant="h5"
           fontFamily="Poppins, sans-serif"
-          color="black"
+          color="text.primary"
           fontWeight={700}
           pt="20px"
         >
@@ -85,19 +105,20 @@ const WelcomeView = React.forwardRef<HTMLDivElement>((_, ref) => {
         </Typography>
         <Typography
           fontFamily="Poppins, sans-serif"
-          color="gray"
+          color="text.secondary"
           fontWeight={500}
           fontSize={15}
           pt="10px"
           pb="20px"
         >
-          Sign in with your UCI Google account to access dining hall menus; rate
-          and favorite dishes; and personalize your dining experience.
+          Sign in with your UCI Google or Apple account to access dining hall
+          menus; rate and favorite dishes; and personalize your dining
+          experience.
         </Typography>
-        <GoogleSignInButton />
+        <SignInButtons />
         <Typography
           fontFamily="Poppins, sans-serif"
-          color="gray"
+          color="text.secondary"
           fontWeight={500}
           fontSize={13}
           py="10px"
@@ -122,7 +143,7 @@ const PersonalizeView = React.forwardRef<HTMLDivElement, PersonalizeViewProps>(
           sx={{
             py: "20px",
           }}
-          className="bg-sky-700"
+          className="bg-sky-700 dark:bg-[var(--surface-elevated)]"
         >
           <Avatar
             src="/peterplate-icon.webp"
@@ -135,8 +156,11 @@ const PersonalizeView = React.forwardRef<HTMLDivElement, PersonalizeViewProps>(
           <Typography
             variant="h5"
             fontFamily="Poppins, sans-serif"
-            color="white"
             fontWeight={700}
+            sx={{
+              color: "white",
+              ".dark &": { color: "var(--mui-palette-primary-main)" },
+            }}
           >
             Welcome, {name}!
           </Typography>
@@ -145,18 +169,22 @@ const PersonalizeView = React.forwardRef<HTMLDivElement, PersonalizeViewProps>(
           </Typography>
         </Box>
 
-        <Box px="40px" pt="20px">
+        <Box
+          px="40px"
+          pt="20px"
+          sx={{ borderTop: "3px solid", borderColor: "divider" }}
+        >
           <Typography
             variant="h5"
             fontFamily="Poppins, sans-serif"
             fontWeight={700}
-            className="text-sky-700"
+            className="text-sky-700 dark:text-blue-300"
           >
             {title}
           </Typography>
           <Typography
             fontFamily="Poppins, sans-serif"
-            color="gray"
+            color="text.primary"
             fontSize={16}
             pt="16px"
           >
@@ -193,14 +221,16 @@ const PersonalizeView = React.forwardRef<HTMLDivElement, PersonalizeViewProps>(
               sx={{
                 py: 3,
                 textTransform: "none",
-                color: "black",
+                color: "var(--mui-palette-text-primary)",
                 height: "40px",
                 "&.Mui-selected": {
-                  backgroundColor: "rgba(0, 105, 168, .2)",
-                  color: "#0069A8",
-                  borderColor: "#0069A8 !important",
+                  backgroundColor:
+                    "color-mix(in srgb, var(--mui-palette-primary-main) 20%, transparent)",
+                  color: "var(--mui-palette-primary-main)",
+                  borderColor: "var(--mui-palette-primary-main) !important",
                   "&:hover": {
-                    backgroundColor: "rgba(0, 105, 168, .4)",
+                    backgroundColor:
+                      "color-mix(in srgb, var(--mui-palette-primary-main) 35%, transparent)",
                   },
                 },
               }}
@@ -261,33 +291,40 @@ const OnboardingContent = React.forwardRef<
 
     setIsSubmitting(true);
     try {
-      await addAllergies.mutateAsync({
-        userId: session.user.id,
-        allergies: formData.allergies,
-      });
+      const allergies = formData.allergies
+        .map((a) => ALLERGY_DISPLAY_TO_DB[a])
+        .filter((a): a is UserAllergy => a !== undefined);
+      const preferences = formData.preferences
+        .map((p) => PREFERENCE_DISPLAY_TO_DB[p])
+        .filter((p): p is UserDietaryPreference => p !== undefined);
+
+      await addAllergies.mutateAsync({ userId: session.user.id, allergies });
       await addPreferences.mutateAsync({
         userId: session.user.id,
-        preferences: formData.preferences,
+        preferences,
       });
       await onboard.mutateAsync({
         id: session?.user.id,
       });
 
+      posthog.capture("onboarding_completed", {
+        allergies: formData.allergies,
+        preferences: formData.preferences,
+        allergies_count: formData.allergies.length,
+        preferences_count: formData.preferences.length,
+      });
+
       handleClose();
     } catch (error) {
       console.error("Onboarding failed:", error);
+      posthog.captureException(error);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleNext = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-  };
-
-  const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  };
+  const handleNext = () => setActiveStep((s) => s + 1);
+  const handleBack = () => setActiveStep((s) => s - 1);
 
   return (
     <Box
@@ -301,22 +338,28 @@ const OnboardingContent = React.forwardRef<
       {activeStep === 0 && <WelcomeView />}
       {activeStep === 1 && (
         <PersonalizeView
-          title="Food Allergies"
-          description="Help us keep you safe by selecting your food allergies (optional)"
-          name={firstName}
-          options={AllergenKeys}
-          selected={formData.allergies}
-          onSelection={(vals) => handleToggle("allergies", vals)}
+          {...{
+            title: "Food Allergies",
+            description:
+              "Help us keep you safe by selecting your food allergies (optional)",
+            name: firstName,
+            options: AllergenKeys,
+            selected: formData.allergies,
+            onSelection: (vals: string[]) => handleToggle("allergies", vals),
+          }}
         />
       )}
       {activeStep === 2 && (
         <PersonalizeView
-          title="Dietary Preferences"
-          description="Select any dietary restrictions that apply to you (optional)"
-          name={firstName}
-          options={PreferenceKeys}
-          selected={formData.preferences}
-          onSelection={(vals) => handleToggle("preferences", vals)}
+          {...{
+            title: "Dietary Preferences",
+            description:
+              "Select any dietary restrictions that apply to you (optional)",
+            name: firstName,
+            options: PreferenceKeys,
+            selected: formData.preferences,
+            onSelection: (vals: string[]) => handleToggle("preferences", vals),
+          }}
         />
       )}
 
@@ -325,7 +368,11 @@ const OnboardingContent = React.forwardRef<
         steps={3}
         position="static"
         activeStep={activeStep}
-        sx={{ px: "40px" }}
+        sx={{
+          px: "40px",
+          backgroundColor: "transparent",
+          backgroundImage: "none",
+        }}
         nextButton={
           activeStep === 2 ? (
             <Button
@@ -336,9 +383,14 @@ const OnboardingContent = React.forwardRef<
               sx={{
                 height: "45px",
                 width: "80px",
-                bgcolor: "#0069A8",
+                bgcolor: "var(--primary-accent-hex)",
+                color: "var(--button-primary-fg)",
                 "&:hover": {
                   filter: "brightness(0.85)",
+                },
+                "&.Mui-disabled": {
+                  backgroundColor: "var(--button-disabled-bg)",
+                  color: "var(--button-disabled-fg)",
                 },
               }}
             >
@@ -353,9 +405,14 @@ const OnboardingContent = React.forwardRef<
               sx={{
                 height: "45px",
                 width: "80px",
-                bgcolor: "#0069A8",
+                bgcolor: "var(--primary-accent-hex)",
+                color: "var(--button-primary-fg)",
                 "&:hover": {
                   filter: "brightness(0.85)",
+                },
+                "&.Mui-disabled": {
+                  backgroundColor: "var(--button-disabled-bg)",
+                  color: "var(--button-disabled-fg)",
                 },
               }}
             >
@@ -372,9 +429,14 @@ const OnboardingContent = React.forwardRef<
             sx={{
               height: "45px",
               width: "80px",
-              bgcolor: "#0069A8",
+              bgcolor: "var(--primary-accent-hex)",
+              color: "var(--button-primary-fg)",
               "&:hover": {
                 filter: "brightness(0.85)",
+              },
+              "&.Mui-disabled": {
+                backgroundColor: "var(--button-disabled-bg)",
+                color: "var(--button-disabled-fg)",
               },
             }}
           >
@@ -412,6 +474,12 @@ export default function OnboardingDialog(): React.JSX.Element {
               padding: 0,
               overflow: "hidden",
               borderRadius: "16px",
+              ".dark &": {
+                border: "3px solid",
+                borderColor: "var(--mui-palette-divider)",
+                backgroundImage: "none",
+                backgroundColor: "var(--surface-modal)",
+              },
             },
           },
         }}
@@ -440,6 +508,10 @@ export default function OnboardingDialog(): React.JSX.Element {
             borderTopRightRadius: "10px",
             marginTop: "96px",
             height: "auto",
+          },
+          ".dark & .MuiDrawer-paper": {
+            backgroundImage: "none",
+            backgroundColor: "var(--surface-modal)",
           },
         }}
       >

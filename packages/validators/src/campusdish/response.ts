@@ -1,10 +1,9 @@
-import { restaurantIds } from "@peterplate/db";
 import { z } from "zod";
 
 import { MenuProductSchema, MenuStationSchema } from "./models";
 
 export const CampusDishMenuSchema = z.object({
-  LocationId: z.enum(restaurantIds),
+  LocationId: z.enum(["anteatery", "brandywine"]),
   Date: z.string().min(1),
   SelectedPeriodId: z
     .string({
