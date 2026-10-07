@@ -66,62 +66,36 @@ export function DishesView({
 
   return (
     <div className="w-full">
-      {isCompactView
-        ? // Compact View: Render ALL stations
-          stations.map((station) => (
-            <div
-              key={station.name}
-              id={station.name.toLowerCase()}
-              className="[&_#food-scroll]:h-auto [&_#food-scroll]:overflow-y-visible mb-8 scroll-mt-4"
-            >
-              <div className="my-4">
-                <Typography
-                  variant="h5"
-                  fontWeight={700}
-                  color="text.primary"
-                  className="w-full bg-primary-accent/20 pl-4 py-2 rounded-xl text-sky-700 dark:bg-[#46566a] dark:text-white"
-                  sx={{ fontSize: "1.875rem" }}
-                >
-                  {toTitleCase(station.name)}
-                </Typography>
-              </div>
-              <DishesInfo
-                dishes={filteredDishesMap.get(station.name) ?? station.dishes}
-                isLoading={isLoading}
-                isError={isError || (!isLoading && !hallData)}
-                errorMessage={errorMessage}
-                isCompactView={isCompactView}
-                restaurant={hallData?.name ?? "brandywine"}
-              />
+      {
+        // Renders ALL stations
+        stations.map((station) => (
+          <div
+            key={station.name}
+            id={station.name.toLowerCase()}
+            className="[&_#food-scroll]:h-auto [&_#food-scroll]:overflow-y-visible mb-8 scroll-mt-4"
+          >
+            <div className="my-4">
+              <Typography
+                variant="h5"
+                fontWeight={700}
+                color="text.primary"
+                className="w-full bg-primary-accent/20 pl-4 py-2 rounded-xl text-sky-700 dark:bg-[#46566a] dark:text-white"
+                sx={{ fontSize: "1.875rem" }}
+              >
+                {toTitleCase(station.name)}
+              </Typography>
             </div>
-          ))
-        : // Normal View: Render active station
-          activeStation && (
-            <div className="[&_#food-scroll]:h-auto [&_#food-scroll]:overflow-y-visible">
-              <div className="my-4">
-                <Typography
-                  variant="h5"
-                  fontWeight={700}
-                  color="text.primary"
-                  sx={{ fontSize: "1.875rem" }}
-                  className="w-full bg-primary-accent/20 pl-4 py-2 rounded-xl text-sky-700 dark:bg-[#46566a] dark:text-white"
-                >
-                  {toTitleCase(activeStation.name)}
-                </Typography>
-              </div>
-              <DishesInfo
-                dishes={
-                  filteredDishesMap.get(activeStation.name) ??
-                  activeStation.dishes
-                }
-                isLoading={isLoading}
-                isError={isError || (!isLoading && !hallData)}
-                errorMessage={errorMessage}
-                restaurant={hallData?.name ?? "brandywine"}
-                isCompactView={isCompactView}
-              />
-            </div>
-          )}
+            <DishesInfo
+              dishes={filteredDishesMap.get(station.name) ?? station.dishes}
+              isLoading={isLoading}
+              isError={isError || (!isLoading && !hallData)}
+              errorMessage={errorMessage}
+              isCompactView={isCompactView}
+              restaurant={hallData?.name ?? "brandywine"}
+            />
+          </div>
+        ))
+      }
     </div>
   );
 }
