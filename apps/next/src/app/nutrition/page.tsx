@@ -35,10 +35,38 @@ type DisplayDish = {
   } | null;
 };
 
+// Mock meals for Joyride spotlight when history is empty
+const dummyMeals = [
+  {
+    id: "dummy-1",
+    name: "Chicken Teriyaki",
+    calories: 300,
+    protein: 25,
+    carbs: 20,
+    fat: 10,
+  },
+  {
+    id: "dummy-2",
+    name: "White Rice",
+    calories: 200,
+    protein: 4,
+    carbs: 45,
+    fat: 0.5,
+  },
+  {
+    id: "dummy-3",
+    name: "Steamed Broccoli",
+    calories: 50,
+    protein: 3,
+    carbs: 10,
+    fat: 0.5,
+  },
+];
+
 export default function MealTracker() {
   const utils = trpc.useUtils();
   const router = useRouter();
-  const { userId, isInitialized, hasOnboardedMealTracker } = useUserStore();
+  const { userId, isInitialized } = useUserStore();
   const { showSnackbar } = useSnackbarStore();
 
   useEffect(() => {
@@ -209,45 +237,6 @@ export default function MealTracker() {
         };
       });
 
-    // If user has history, show it
-    // TODO: Remove, or return only when we're not onboarding
-    //let hasOnboardedMealTracker = false; // --- IGNORE --- force onboarding for now
-    if (hasOnboardedMealTracker && calculated.length > 0) return calculated;
-
-    // We safely use 3 hardcoded dummy meals so Joyride spotlight doesn't break when history is empty
-    const dummyMeals = [
-      {
-        id: "dummy-1",
-        name: "Chicken Teriyaki",
-        calories: 300,
-        protein: 25,
-        carbs: 20,
-        fat: 10,
-      },
-      {
-        id: "dummy-2",
-        name: "White Rice",
-        calories: 200,
-        protein: 4,
-        carbs: 45,
-        fat: 0.5,
-      },
-      {
-        id: "dummy-3",
-        name: "Steamed Broccoli",
-        calories: 50,
-        protein: 3,
-        carbs: 10,
-        fat: 0.5,
-      },
-    ];
-
-    // TODO: Track when the user enters the onboarding procedure, and only return
-    // this when the user is in the onboarding.
-    // useuserstore to retrieve the hasonboardedmealtracker
-    // only return dummy meals when we have not onboarded the meal tracker
-    // when we complete onboarding, just set the userstore to true for hasonboardedmealtracker
-
     // Instead of using getPopularDishes which requires rating data,
     // we safely grab 3 dishes from the already-calculated availableDishes
     // const fallbackDishes = availableDishes.slice(0, 3);
@@ -271,8 +260,7 @@ export default function MealTracker() {
     }
 
     return [];
-  }, [hasOnboardedMealTracker, meals, userId]);
-  console.log(hasOnboardedMealTracker, "hasOnboardedMealTracker");
+  }, [meals, userId]);
   const visibleMeals = selectedDay?.items ?? [];
   const countedMeals = visibleMeals.filter(
     (m) => (m.servings ?? 0) > 0 && !isUnavailable(m.dishId),
@@ -350,7 +338,7 @@ export default function MealTracker() {
       className="p-2 md:p-8 mt-2 md:mt-12"
     >
       <div className="px-2 md:px-8">
-        {!hasOnboardedMealTracker && <TrackerOnboarding />}
+        {<TrackerOnboarding />}
         <Typography
           variant="h5"
           fontWeight={700}

@@ -1,7 +1,7 @@
 "use client";
 
 import { Close } from "@mui/icons-material";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   type CallBackProps,
   Joyride,
@@ -9,7 +9,6 @@ import {
   type Step,
   type TooltipRenderProps,
 } from "react-joyride";
-import { useUserStore } from "../../context/useUserStore";
 
 const steps: Step[] = [
   {
@@ -107,43 +106,6 @@ const CustomTooltip = ({
 
 export default function TrackerOnboarding() {
   const [run, setRun] = useState(false);
-  const hasOnboardedMealTracker = useUserStore(
-    (state) => state.hasOnboardedMealTracker,
-  );
-  const setHasOnboardedMealTracker = useUserStore(
-    (state) => state.setHasOnboardedMealTracker,
-  );
-
-  useEffect(() => {
-    if (!hasOnboardedMealTracker) {
-      // Add a slight delay so DOM renders before tour starts
-      const timer = setTimeout(() => {
-        setRun(true);
-      }, 500);
-
-      return () => clearTimeout(timer);
-    }
-  }, [hasOnboardedMealTracker]);
-
-  // We bypass Joyride and use a native browser listener to catch the gray background click
-  useEffect(() => {
-    const handleOverlayClick = (e: MouseEvent) => {
-      const target = e.target as Element;
-
-      if (target.closest(".react-joyride__overlay")) {
-        setRun(false);
-        setHasOnboardedMealTracker(true); // mark onboarding complete if user clicks outside
-      }
-    };
-
-    if (run) {
-      // The 'true' parameter ensures we catch the click before Joyride's engine does
-      document.addEventListener("click", handleOverlayClick, true);
-    }
-
-    return () =>
-      document.removeEventListener("click", handleOverlayClick, true);
-  }, [run, setHasOnboardedMealTracker]);
 
   const handleJoyrideCallback = (data: CallBackProps) => {
     const { status, action } = data;
@@ -151,7 +113,6 @@ export default function TrackerOnboarding() {
 
     if (finishedStatuses.includes(status) || action === "close") {
       setRun(false);
-      setHasOnboardedMealTracker(true);
     }
   };
 
