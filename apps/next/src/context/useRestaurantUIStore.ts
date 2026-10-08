@@ -28,11 +28,11 @@ interface RestaurantUIState {
   isDatePickerOpen: boolean;
   setIsDatePickerOpen: (isOpen: boolean) => void;
 
-  // Popover anchors (not serialisable — not persisted)
-  menuAnchor: HTMLElement | null;
-  setMenuAnchor: (el: HTMLElement | null) => void;
-  scheduleAnchor: HTMLElement | null;
-  setScheduleAnchor: (el: HTMLElement | null) => void;
+  // Mobile drawers
+  isMenuDrawerOpen: boolean;
+  setIsMenuDrawerOpen: (isOpen: boolean) => void;
+  isScheduleDrawerOpen: boolean;
+  setIsScheduleDrawerOpen: (isOpen: boolean) => void;
 }
 
 export const useRestaurantUIStore = create<RestaurantUIState>()((set) => ({
@@ -51,9 +51,9 @@ export const useRestaurantUIStore = create<RestaurantUIState>()((set) => ({
   isDatePickerOpen: false,
   setIsDatePickerOpen: (isOpen) => set({ isDatePickerOpen: isOpen }),
 
-  menuAnchor: null,
-  setMenuAnchor: (el) => set({ menuAnchor: el }),
+  isMenuDrawerOpen: false,
+  setIsMenuDrawerOpen: (isOpen) => set({ isMenuDrawerOpen: isOpen }),
 
-  scheduleAnchor: null,
-  setScheduleAnchor: (el) => set({ scheduleAnchor: el }),
+  isScheduleDrawerOpen: false,
+  setIsScheduleDrawerOpen: (isOpen) => set({ isScheduleDrawerOpen: isOpen }),
 }));
