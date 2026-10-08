@@ -3,6 +3,7 @@
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import FavoriteBorder from "@mui/icons-material/FavoriteBorder";
+import HelpOutline from "@mui/icons-material/HelpOutline";
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import InsertInvitation from "@mui/icons-material/InsertInvitation";
 import ListAltRoundedIcon from "@mui/icons-material/ListAltRounded";
@@ -18,6 +19,7 @@ import {
   MenuItem,
   Toolbar as MuiToolbar,
   Snackbar,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import Image from "next/image";
@@ -27,6 +29,7 @@ import { useTheme } from "next-themes";
 import type { MouseEvent } from "react";
 import { useEffect, useState } from "react";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in";
+import { useTourStore } from "@/context/useTourStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useSession } from "@/utils/auth-client";
 import EditPreferencesContent from "./edit-preferences-content";
@@ -214,6 +217,7 @@ export function DesktopToolbar(): React.JSX.Element {
   };
   const { data: session, isPending } = useSession();
   const user = session?.user;
+  const start = useTourStore((state) => state.start);
 
   return (
     <>
@@ -285,6 +289,20 @@ export function DesktopToolbar(): React.JSX.Element {
             })}
           </nav>
 
+          {pathname === "/nutrition" && (
+            <Tooltip title="Tracker tutorial">
+              <span>
+                <IconButton
+                  onClick={start}
+                  disabled={!user || isPending}
+                  aria-label="Start tracker tutorial"
+                  sx={{ color: "text.primary" }}
+                >
+                  <HelpOutline />
+                </IconButton>
+              </span>
+            </Tooltip>
+          )}
           <div className="flex-none flex items-center gap-4">
             <div className="flex-none flex items-center gap-4">
               {isPending ? (
