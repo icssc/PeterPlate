@@ -1,14 +1,14 @@
 "use client";
 
 import { Close } from "@mui/icons-material";
-import { useState } from "react";
 import {
-  type CallBackProps,
+  type EventData,
   Joyride,
   STATUS,
   type Step,
   type TooltipRenderProps,
 } from "react-joyride";
+import { useTourStore } from "@/context/useTourStore";
 
 const steps: Step[] = [
   {
@@ -105,30 +105,35 @@ const CustomTooltip = ({
 };
 
 export default function TrackerOnboarding() {
-  const [run, setRun] = useState(false);
+  const running = useTourStore((state) => state.running);
+  const launchId = useTourStore((state) => state.launchId);
+  const stop = useTourStore((state) => state.stop);
 
-  const handleJoyrideCallback = (data: CallBackProps) => {
-    const { status, action } = data;
-    const finishedStatuses: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
-
-    if (finishedStatuses.includes(status) || action === "close") {
-      setRun(false);
-    }
+  const handleEvent = ({ status, action }: EventData) => {
+    if (
+      status === STATUS.FINISHED ||
+      status === STATUS.SKIPPED ||
+      action === "close"
+    )
+      stop();
   };
 
-  if (!run) return null;
-
+  if (!running) return null;
   return (
     <Joyride
+      key={launchId}
       steps={steps}
-      run={run}
+      run
       continuous
-      scrollToFirstStep={false}
-      disableOverlayClose={false} // must be true tells Joyride to stop fighting the custom click listener
-      showProgress={false}
-      showSkipButton={true}
-      callback={handleJoyrideCallback}
+      scrollToFirstStep
+      onEvent={handleEvent}
       tooltipComponent={CustomTooltip}
+      options={{
+        skipBeacon: true,
+        overlayClickAction: false,
+        blockTargetInteraction: false,
+        zIndex: 1500,
+      }}
     />
   );
 }
