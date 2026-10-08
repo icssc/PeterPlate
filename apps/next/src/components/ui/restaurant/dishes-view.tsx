@@ -11,7 +11,6 @@ import { trpc } from "@/utils/trpc";
 
 interface DishesViewProps {
   stations: Station[];
-  activeStation: Station | undefined;
   isLoading: boolean;
   isError: boolean;
   error: TRPCClientErrorLike<AppRouter> | null;
@@ -20,7 +19,6 @@ interface DishesViewProps {
 
 export function DishesView({
   stations,
-  activeStation,
   isLoading,
   isError,
   error,
@@ -43,9 +41,8 @@ export function DishesView({
     userId: userId ?? "",
   });
 
-  // Pre-compute filtered dishes for every station so toggling isCompactView
-  // (which switches from single-station to all-stations) doesn't recompute
-  // getDietaryConflicts for every dish on each render.
+  // Pre-compute filtered dishes for every station so there's no
+  // recomputing getDietaryConflicts for every dish on each render.
   const filteredDishesMap = useMemo(() => {
     return new Map(
       stations.map((station) => [

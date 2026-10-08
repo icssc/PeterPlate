@@ -35,7 +35,6 @@ export function RestaurantPage({
     error,
     hallEvents,
     periods,
-    activeStation,
     stations,
     dishes,
     calendarRange,
@@ -129,7 +128,6 @@ export function RestaurantPage({
             <div className="w-full">
               <DishesView
                 stations={stations}
-                activeStation={activeStation}
                 isLoading={isLoading}
                 isError={isError}
                 error={error as TRPCClientErrorLike<AppRouter> | null}
