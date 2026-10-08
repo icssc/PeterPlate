@@ -17,6 +17,7 @@ import TrackerHistoryDialog from "@/components/ui/tracker-history-dialog";
 import TrackerHistoryDrawer from "@/components/ui/tracker-history-drawer";
 import TrackerOnboarding from "@/components/ui/tracker-onboarding";
 import { useSnackbarStore } from "@/context/useSnackbar";
+import { useTourStore } from "@/context/useTourStore";
 import { useUserStore } from "@/context/useUserStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { trpc } from "@/utils/trpc";
@@ -67,6 +68,8 @@ export default function MealTracker() {
   const utils = trpc.useUtils();
   const router = useRouter();
   const { userId, isInitialized } = useUserStore();
+  const running = useTourStore((state) => state.running);
+
   const { showSnackbar } = useSnackbarStore();
 
   useEffect(() => {
@@ -242,8 +245,8 @@ export default function MealTracker() {
     // const fallbackDishes = availableDishes.slice(0, 3);
     // console.log(fallbackDishes.length, "fallback dishes found");
 
-    // TODO: Return suggestedMeals when history exists/ onboarding complete
-    if (!hasOnboardedMealTracker) {
+    // TODO: Return suggestedMeals when history exists / onboarding complete
+    if (running && calculated.length === 0) {
       return dummyMeals.map((d) => ({
         id: `fallback-${d.id}`,
         dishId: d.id,
@@ -259,8 +262,8 @@ export default function MealTracker() {
       }));
     }
 
-    return [];
-  }, [meals, userId]);
+    return calculated;
+  }, [meals, userId, running]);
   const visibleMeals = selectedDay?.items ?? [];
   const countedMeals = visibleMeals.filter(
     (m) => (m.servings ?? 0) > 0 && !isUnavailable(m.dishId),
