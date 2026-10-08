@@ -31,14 +31,12 @@ export function DesktopTabs({
           value={selectedStation || false}
           onChange={(_event, value: string) => {
             const val = value || "";
-            if (isCompactView) {
-              const element = document.getElementById(val);
-              if (element) {
-                element.scrollIntoView({
-                  behavior: "smooth",
-                  block: "start",
-                });
-              }
+            const element = document.getElementById(val);
+            if (element) {
+              element.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+              });
             }
             setSelectedStation(val);
           }}
