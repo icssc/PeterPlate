@@ -1,0 +1,2 @@
+ALTER TABLE "push_subscriptions" ADD COLUMN "is_subscribed_food_favorites" boolean DEFAULT false NOT NULL;--> statement-breakpoint
+ALTER TABLE "push_subscriptions" ADD COLUMN "is_subscribed_events" boolean DEFAULT false NOT NULL;
