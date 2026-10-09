@@ -40,7 +40,7 @@ const RatingsCardContent = React.forwardRef<
   return (
     <div ref={ref} {...divProps} className={cn("w-full", className)}>
       <Card
-        className="cursor-pointer hover:shadow-lg transition w-full dark:bg-[#303035]"
+        className="cursor-pointer hover:shadow-lg transition w-full dark:bg-[var(--surface-modal)]"
         sx={{ borderRadius: "16px", border: 1, borderColor: "divider" }}
       >
         <CardContent sx={{ padding: "0 !important" }}>

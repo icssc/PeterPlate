@@ -34,7 +34,7 @@ export default function IngredientsDialog({
         Show All Ingredients
       </Button>
       <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-        <div className="grid gap-2 pb-6 dark:bg-[#303035]">
+        <div className="grid gap-2 pb-6 dark:bg-[var(--surface-modal)]">
           <Typography
             variant="h6"
             fontWeight={600}

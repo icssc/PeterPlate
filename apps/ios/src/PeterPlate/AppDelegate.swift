@@ -11,27 +11,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication,
                        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 
-// TODO: if we're using Firebase, uncomment next string
-        //FirebaseApp.configure()
-
-        // [START set_messaging_delegate]
-        Messaging.messaging().delegate = self
-        // [END set_messaging_delegate]
-        // Register for remote notifications. This shows a permission dialog on first run, to
-        // show the dialog at a more appropriate time move this registration accordingly.
-        // [START register_for_notifications]
-   
-        UNUserNotificationCenter.current().delegate = self
-
-      //  let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
-      //  UNUserNotificationCenter.current().requestAuthorization(
-      //      options: authOptions,
-      //      completionHandler: {_, _ in })
-
-// TODO: if we're using Firebase, uncomment next string
+        // GoogleService-Info.plist must match bundle ID `com.peterplate` and come from
+        // the Firebase console — the PWA Builder template (com.microsoft.pwabuilder-ios)
+        // will crash on configure(). Uncomment when a real plist is in place.
+        // FirebaseApp.configure()
+        // Messaging.messaging().delegate = self
         // application.registerForRemoteNotifications()
 
-        // [END register_for_notifications]
+        UNUserNotificationCenter.current().delegate = self
+
         return true
       }
 

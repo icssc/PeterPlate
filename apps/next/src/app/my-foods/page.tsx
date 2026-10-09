@@ -169,7 +169,7 @@ export default function MyFoodsPage() {
       {/* Filter bar */}
       {isDesktop ? (
         /* ── Desktop: single row ── */
-        <div className="flex flex-row flex-wrap items-center gap-4 rounded-2xl bg-sky-100 dark:bg-[#434e5d] p-4">
+        <div className="flex flex-row flex-wrap items-center gap-4 rounded-2xl bg-sky-100 dark:bg-[var(--surface-tinted)] p-4">
           {/* Location */}
           <div className="flex flex-col gap-1.5 flex-shrink-0">
             <Typography variant="body2" fontWeight={500} color="text.primary">
@@ -219,7 +219,7 @@ export default function MyFoodsPage() {
                 placeholder="Search meals..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-sky-700 dark:border-blue-300 !bg-white dark:!bg-[#323235] dark:!text-white focus:ring-2 focus:ring-sky-700 dark:focus:ring-blue-300 focus:outline-none"
+                className="w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-sky-700 dark:border-blue-300 !bg-white dark:!bg-[var(--surface-elevated)] dark:!text-white focus:ring-2 focus:ring-sky-700 dark:focus:ring-blue-300 focus:outline-none"
               />
             </div>
 
@@ -245,28 +245,39 @@ export default function MyFoodsPage() {
                     PaperProps: {
                       sx: {
                         bgcolor:
-                          resolvedTheme === "dark" ? "#323235" : undefined,
+                          resolvedTheme === "dark"
+                            ? "var(--surface-elevated)"
+                            : undefined,
                         backgroundImage: "none",
                         "& .MuiMenuItem-root": {
                           color: resolvedTheme === "dark" ? "white" : undefined,
                         },
                         "& .MuiMenuItem-root:hover": {
                           bgcolor:
-                            resolvedTheme === "dark" ? "#434e5d" : undefined,
+                            resolvedTheme === "dark"
+                              ? "var(--surface-tinted)"
+                              : undefined,
                         },
                         "& .MuiMenuItem-root.Mui-selected": {
                           bgcolor:
-                            resolvedTheme === "dark" ? "#93C5FD" : "#0369a1",
-                          color: resolvedTheme === "dark" ? "#111827" : "white",
+                            resolvedTheme === "dark"
+                              ? "var(--primary-accent-light)"
+                              : "#0369a1",
+                          color:
+                            resolvedTheme === "dark"
+                              ? "var(--button-primary-fg)"
+                              : "white",
                         },
                         "& .MuiMenuItem-root.Mui-selected:hover": {
                           bgcolor:
-                            resolvedTheme === "dark" ? "#93C5FD" : "#0369a1",
+                            resolvedTheme === "dark"
+                              ? "var(--primary-accent-light)"
+                              : "#0369a1",
                         },
                       },
                     },
                   }}
-                  className="!h-9 !text-sm !rounded-xl !bg-white dark:!bg-[#323235] dark:!text-white [&_.MuiOutlinedInput-notchedOutline]:!border-sky-700 dark:[&_.MuiOutlinedInput-notchedOutline]:!border-blue-300 [&:hover_.MuiOutlinedInput-notchedOutline]:!border-sky-700 dark:[&:hover_.MuiOutlinedInput-notchedOutline]:!border-blue-300 [&.Mui-focused_.MuiOutlinedInput-notchedOutline]:!border-sky-700 dark:[&.Mui-focused_.MuiOutlinedInput-notchedOutline]:!border-blue-300 [&_.MuiSelect-select]:!py-1.5"
+                  className="!h-9 !text-sm !rounded-xl !bg-white dark:!bg-[var(--surface-elevated)] dark:!text-white [&_.MuiOutlinedInput-notchedOutline]:!border-sky-700 dark:[&_.MuiOutlinedInput-notchedOutline]:!border-blue-300 [&:hover_.MuiOutlinedInput-notchedOutline]:!border-sky-700 dark:[&:hover_.MuiOutlinedInput-notchedOutline]:!border-blue-300 [&.Mui-focused_.MuiOutlinedInput-notchedOutline]:!border-sky-700 dark:[&.Mui-focused_.MuiOutlinedInput-notchedOutline]:!border-blue-300 [&_.MuiSelect-select]:!py-1.5"
                 >
                   {SORT_OPTIONS.map(({ value, label }) => (
                     <MenuItem key={value} value={value}>
@@ -280,7 +291,7 @@ export default function MyFoodsPage() {
         </div>
       ) : (
         /* ── Mobile: stacked layout ── */
-        <div className="flex flex-col gap-3 rounded-2xl bg-sky-100 dark:bg-[#434e5d] p-4">
+        <div className="flex flex-col gap-3 rounded-2xl bg-sky-100 dark:bg-[var(--surface-tinted)] p-4">
           {/* Location buttons — no label */}
           <div className="flex flex-row gap-2">
             {(Object.keys(LOCATION_LABELS) as LocationFilter[]).map((loc) => (
@@ -319,7 +330,7 @@ export default function MyFoodsPage() {
                 placeholder="Search meals..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-sky-700 dark:border-blue-300 !bg-white dark:!bg-[#323235] dark:!text-white focus:ring-2 focus:ring-sky-700 dark:focus:ring-blue-300 focus:outline-none"
+                className="w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-sky-700 dark:border-blue-300 !bg-white dark:!bg-[var(--surface-elevated)] dark:!text-white focus:ring-2 focus:ring-sky-700 dark:focus:ring-blue-300 focus:outline-none"
               />
             </div>
 
@@ -409,7 +420,7 @@ export default function MyFoodsPage() {
           </Typography>
 
           {filteredEntries.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-zinc-200 dark:border-zinc-600 bg-white/60 dark:bg-[#323235] px-6 py-16 text-center shadow-sm">
+            <div className="rounded-2xl border border-dashed border-zinc-200 dark:border-zinc-600 bg-white/60 dark:bg-[var(--surface-elevated)] px-6 py-16 text-center shadow-sm">
               <Typography variant="body1" fontWeight={500} color="text.primary">
                 No dishes found
               </Typography>

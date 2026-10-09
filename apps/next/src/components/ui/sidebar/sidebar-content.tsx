@@ -5,8 +5,9 @@ import {
   DarkMode as DarkModeIcon,
   DesktopWindows as DesktopWindowsIcon,
   Edit as EditIcon,
-  Feedback as FeedbackIcon,
-  Info as InfoIcon,
+  ContentPaste as FeedbackIcon,
+  HelpOutlineOutlined as HelpIcon,
+  InfoOutlined as InfoIcon,
   LightMode as LightModeIcon,
   Logout as LogoutIcon,
   Notifications as NotificationsIcon,
@@ -18,11 +19,12 @@ import { useTheme } from "next-themes";
 import type React from "react";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
-import { GoogleSignInButton } from "@/components/auth/google-sign-in";
+import { SignInButtons } from "@/components/auth/sign-in-buttons";
 import NotificationsPanel from "@/components/ui/notifications-panel";
 import { signOut, useSession } from "@/utils/auth-client";
 import { formatDietaryKey } from "@/utils/dietary";
 import { trpc } from "@/utils/trpc";
+import { cn } from "@/utils/tw";
 
 interface ProfileMenuContentProps {
   onClose: () => void;
@@ -52,13 +54,11 @@ export default function SidebarContent({
     { enabled: !!userId },
   );
 
-  if (!mounted) return null;
-
   const handleSignOut = async () => {
-    const savedTheme = localStorage.getItem("theme");
+    const userTheme = theme ?? localStorage.getItem("theme");
     await signOut();
-    if (savedTheme) {
-      localStorage.setItem("theme", savedTheme);
+    if (userTheme) {
+      localStorage.setItem("theme", userTheme);
     }
     window.location.href = "/";
   };
@@ -69,117 +69,118 @@ export default function SidebarContent({
 
   return (
     <Box
-      className="w-full h-full rounded-2xl bg-white dark:bg-[#323235] shadow-xl flex flex-col"
+      className={`w-full h-full rounded-2xl bg-white 
+        dark:bg-[var(--surface-elevated)] shadow-xl flex flex-col border-2 
+        border-gray-300 dark:border-zinc-700`}
       sx={{ border: 1, borderColor: "divider" }}
     >
       {/* Header */}
-      <div className="flex items-start justify-between px-5 pt-5">
-        <div className="flex items-center gap-3">
-          <Image
-            src={user?.image || "/peter.webp"}
-            alt="Profile"
-            width={44}
-            height={44}
-            className="rounded-full object-cover"
-          />
-          <div>
-            <Typography variant="body2" fontWeight={600} color="text.primary">
-              {user?.name || "Peter Anteater"}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {user?.email || "panteater@uci.edu"}
-            </Typography>
+      <div
+        className={cn(
+          "flex items-start justify-between px-5 border-b-2 border-gray-300 dark:border-zinc-700",
+          user ? "py-5" : "py-2",
+        )}
+      >
+        {user ? (
+          <div className="flex items-center gap-3">
+            <Image
+              src={user.image || "/peter.webp"}
+              alt="Profile"
+              width={44}
+              height={44}
+              className="rounded-full object-cover"
+            />
+            <div>
+              <Typography variant="body2" fontWeight={600} color="text.primary">
+                {user.name || "Peter Anteater"}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {user.email || "panteater@uci.edu"}
+              </Typography>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div />
+        )}
 
         <button
           type="button"
           onClick={onClose}
-          className="rounded-full p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
         >
-          <CloseIcon sx={{ fontSize: 18, color: "text.primary" }} />
+          <CloseIcon sx={{ fontSize: 20, color: "text.primary" }} />
         </button>
       </div>
 
       {/* Content */}
-      <div className="flex-1 px-5 pt-4 space-y-5">
-        {/* Dietary Preferences */}
-        <div>
-          <Typography variant="body2" fontWeight={600} color="primary" mb={1}>
-            Dietary Preferences
-          </Typography>
+      <div className="flex-1 px-5 p-4 space-y-5 border-b-2 border-gray-300 dark:border-zinc-700">
+        {/* Dietary Preferences (signed-in users only) */}
+        {user && (
+          <div>
+            <Typography className="text-sm font-bold text-sky-700 dark:text-blue-300 mb-2">
+              Dietary Preferences
+            </Typography>
 
-          <Typography
-            variant="caption"
-            fontWeight={600}
-            color="text.secondary"
-            display="block"
-            mb={0.5}
-          >
-            Restrictions:
-          </Typography>
+            <Typography className="text-xs font-semibold text-gray-500 dark:text-zinc-300 mb-1">
+              Restrictions:
+            </Typography>
 
-          <div className="flex flex-wrap gap-1.5 mb-3">
-            {preferences?.length ? (
-              preferences.map((pref) => (
-                <span
-                  key={pref}
-                  className="rounded-md border border-sky-700 bg-sky-100 px-2.5 py-0.5 text-xs text-sky-700 dark:border-blue-300 dark:text-blue-300 dark:bg-blue-300/20"
-                >
-                  {formatDietaryKey(pref)}
+            <div className="flex flex-wrap gap-1.5 mb-3">
+              {preferences?.length ? (
+                preferences.map((pref) => (
+                  <PrefBadge key={pref} type="restriction" text={pref} />
+                ))
+              ) : (
+                <span className="text-xs text-gray-400 dark:text-zinc-300">
+                  None
                 </span>
-              ))
-            ) : (
-              <span className="text-xs text-gray-400">None</span>
-            )}
-          </div>
+              )}
+            </div>
 
-          <Typography
-            variant="caption"
-            fontWeight={600}
-            color="text.secondary"
-            display="block"
-            mb={0.5}
-          >
-            Allergies:
-          </Typography>
-          <div className="flex flex-wrap gap-1.5">
-            {allergies?.length ? (
-              allergies.map((allergy) => (
-                <span
-                  key={allergy}
-                  className="rounded-md border border-sky-700 bg-sky-100 px-2.5 py-0.5 text-xs text-sky-700 dark:border-blue-300 dark:text-blue-300 dark:bg-blue-300/20"
-                >
-                  {formatDietaryKey(allergy)}
+            <Typography className="text-xs font-semibold text-gray-500 dark:text-zinc-300 mb-1">
+              Allergies:
+            </Typography>
+            <div className="flex flex-wrap gap-1.5">
+              {allergies?.length ? (
+                allergies.map((allergy) => (
+                  <PrefBadge key={allergy} type="allergy" text={allergy} />
+                ))
+              ) : (
+                <span className="text-xs text-gray-400 dark:text-zinc-300">
+                  None
                 </span>
-              ))
-            ) : (
-              <span className="text-xs text-gray-400">None</span>
-            )}
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Appearance */}
         <div>
-          <Typography variant="body2" fontWeight={600} color="primary" mb={1}>
+          <Typography className="text-sm font-bold text-sky-700 dark:text-blue-300 mb-2">
             Appearance
           </Typography>
 
-          <div className="flex rounded-lg border border-sky-700 dark:border-blue-300 overflow-hidden">
+          <div
+            className={`flex rounded-lg border border-sky-700 
+            dark:border-blue-300 overflow-hidden divide-x divide-sky-700 
+            dark:divide-blue-300`}
+          >
             <ThemeButton
-              active={theme === "light"}
+              active={mounted && theme === "light"}
               onClick={() => setTheme("light")}
               icon={<LightModeIcon fontSize="small" />}
               label="Light"
             />
+            <div className="w-px self-stretch border-l border-sky-700 relative z-10" />
             <ThemeButton
-              active={theme === "system"}
+              active={mounted && theme === "system"}
               onClick={() => setTheme("system")}
               icon={<DesktopWindowsIcon fontSize="small" />}
               label="Device"
             />
+            <div className="w-px self-stretch border-l border-sky-700 relative z-10" />
             <ThemeButton
-              active={theme === "dark"}
+              active={mounted && theme === "dark"}
               onClick={() => setTheme("dark")}
               icon={<DarkModeIcon fontSize="small" />}
               label="Dark"
@@ -195,10 +196,13 @@ export default function SidebarContent({
                 type="button"
                 disabled={!user}
                 onClick={() => setShowNotifications(true)}
-                className="w-full flex items-center gap-3 rounded-lg px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:dark:hover:bg-transparent"
+                className="w-full flex items-center gap-3 rounded-lg px-2 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:dark:hover:bg-transparent"
               >
                 <Box sx={{ color: "primary.main" }}>
-                  <NotificationsIcon fontSize="small" />
+                  <NotificationsIcon
+                    fontSize="small"
+                    sx={{ color: "hsl(var(--accent-primary))" }}
+                  />
                 </Box>
                 <Typography
                   variant="body2"
@@ -220,18 +224,17 @@ export default function SidebarContent({
                   onClose();
                   onEditPreferencesClick();
                 }}
-                className="w-full flex items-center gap-3 rounded-lg px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:dark:hover:bg-transparent"
+                className={`w-full flex items-center gap-3 rounded-lg px-2 py-2 
+                  text-sm text-gray-900 dark:text-white hover:bg-gray-100 
+                  dark:hover:bg-gray-700 disabled:opacity-50 
+                  disabled:cursor-not-allowed disabled:hover:bg-transparent 
+                  disabled:dark:hover:bg-transparent`}
               >
-                <Box sx={{ color: "primary.main" }}>
-                  <EditIcon fontSize="small" />
-                </Box>
-                <Typography
-                  variant="body2"
-                  fontWeight={500}
-                  color="text.primary"
-                >
-                  Edit Preferences
-                </Typography>
+                <EditIcon
+                  fontSize="small"
+                  sx={{ color: "hsl(var(--accent-primary))" }}
+                />
+                <span className="font-medium">Edit Preferences</span>
               </button>
             </span>
           </Tooltip>
@@ -239,7 +242,12 @@ export default function SidebarContent({
           <MenuLink
             href="/feedback"
             onClick={onClose}
-            icon={<FeedbackIcon fontSize="small" />}
+            icon={
+              <FeedbackIcon
+                fontSize="small"
+                sx={{ color: "hsl(var(--accent-primary))" }}
+              />
+            }
           >
             Feedback
           </MenuLink>
@@ -247,29 +255,47 @@ export default function SidebarContent({
           <MenuLink
             href="/about"
             onClick={onClose}
-            icon={<InfoIcon fontSize="small" />}
+            icon={
+              <InfoIcon
+                fontSize="small"
+                sx={{ color: "hsl(var(--accent-primary))" }}
+              />
+            }
           >
             About PeterPlate
+          </MenuLink>
+
+          <MenuLink
+            href="/about"
+            onClick={onClose}
+            icon={
+              <HelpIcon
+                fontSize="small"
+                sx={{ color: "hsl(var(--accent-primary))" }}
+              />
+            }
+          >
+            Onboarding Tutorial
           </MenuLink>
         </div>
       </div>
 
       {/* Sign out */}
 
-      <div className="px-5 pb-5 pt-3">
+      <div className="p-5">
         {user ? (
           <button
             type="button"
             onClick={handleSignOut}
-            className="w-full rounded-lg bg-sky-700 py-2.5 text-sm font-medium text-white hover:bg-sky-800 dark:bg-blue-300 dark:text-gray-900 dark:hover:bg-blue-400 flex items-center justify-center"
+            className={`w-full rounded-lg bg-sky-700 py-2.5 text-sm font-medium 
+              text-white hover:bg-sky-800 dark:bg-blue-300 dark:text-gray-900 
+              dark:hover:bg-blue-400 flex items-center justify-center`}
           >
-            <span className="inline-flex items-center gap-2">
-              <LogoutIcon fontSize="small" />
-              Sign Out
-            </span>
+            <LogoutIcon fontSize="small" />
+            Sign Out
           </button>
         ) : (
-          <GoogleSignInButton />
+          <SignInButtons />
         )}
       </div>
     </Box>
@@ -291,11 +317,12 @@ function ThemeButton({
     <button
       type="button"
       onClick={onClick}
-      className={`flex-1 flex items-center justify-center gap-1 py-2 text-xs font-medium transition-colors ${
-        active
-          ? "bg-sky-700 text-white dark:bg-blue-300 dark:text-gray-900"
-          : "text-gray-700 hover:bg-sky-100 dark:text-white dark:hover:bg-zinc-700"
-      }`}
+      className={cn(
+        `flex-1 flex items-center justify-center gap-1 py-1.5 text-xs font-medium transition-colors`,
+        active && "bg-sky-700 text-white dark:bg-blue-300 dark:text-gray-900",
+        !active &&
+          "text-gray-700 hover:bg-sky-100 dark:text-white dark:hover:bg-zinc-700 ",
+      )}
     >
       {icon}
       {label}
@@ -318,7 +345,8 @@ function MenuLink({
     <Link
       href={href}
       onClick={onClick}
-      className="flex items-center gap-3 rounded-lg px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+      className={`flex items-center gap-3 rounded-lg px-2 py-2 hover:bg-gray-100
+        dark:hover:bg-gray-700`}
     >
       <Box sx={{ color: "primary.main" }}>{icon}</Box>
       <Typography variant="body2" fontWeight={500} color="text.primary">
@@ -327,3 +355,23 @@ function MenuLink({
     </Link>
   );
 }
+
+const PrefBadge = ({
+  text,
+  type,
+}: {
+  text: string;
+  type: "restriction" | "allergy";
+}) => {
+  return (
+    <span
+      className={cn(
+        `rounded-md px-3 py-1 text-xs font-bold text-white`,
+        type === "restriction" && "bg-red-600",
+        type === "allergy" && "bg-orange-500",
+      )}
+    >
+      {formatDietaryKey(text)}
+    </span>
+  );
+};

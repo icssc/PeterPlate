@@ -10,6 +10,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "better-auth": "^1.3.34"
+    "better-auth": "^1.6.1"
   }
 }

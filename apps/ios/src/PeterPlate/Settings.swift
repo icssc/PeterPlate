@@ -8,11 +8,11 @@ struct Cookie {
 let gcmMessageIDKey = "00000000000" // update this with actual ID if using Firebase 
 
 // URL for first launch
-let rootUrl = URL(string: "https://www.peterplate.com")!
+let rootUrl = URL(string: "https://peterplate.com")!
 
 // allowed origin is for what we are sticking to pwa domain
 // This should also appear in Info.plist
-let allowedOrigins: [String] = ["www.peterplate.com"]
+let allowedOrigins: [String] = ["peterplate.com"]
 
 // IdP host for ICSSC. Not every path on this host should use ASWebAuthenticationSession —
 // only interactive OAuth/OIDC *authorize* requests. See

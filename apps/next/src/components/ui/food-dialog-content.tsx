@@ -85,7 +85,7 @@ export default function FoodDialogContent({
   const userId = useUserStore((s) => s.userId);
 
   return (
-    <div className="font-poppins flex flex-col max-h-[90vh] dark:bg-[#303035]">
+    <div className="font-poppins flex flex-col max-h-[90vh] dark:bg-[var(--surface-modal)]">
       {showImage ? (
         <Image
           src={dish.imageUrl as string}

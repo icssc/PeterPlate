@@ -67,7 +67,7 @@ const CalendarView = ({
     isSameMonth(currentDate, new Date());
 
   return (
-    <div className="border border-sky-700 dark:border-blue-300 p-4 rounded-lg bg-white dark:bg-[#27272A] transition-colors events-calendar-wrapper">
+    <div className="border border-sky-700 dark:border-blue-300 p-4 rounded-lg bg-white dark:bg-surface-scroll transition-colors events-calendar-wrapper">
       {/* CUSTOM TOOLBAR */}
       <div className="flex items-center justify-center">
         <div className="text-center flex items-center justify-center text-sky-700 dark:text-blue-300 font-medium">

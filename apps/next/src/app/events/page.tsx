@@ -145,7 +145,7 @@ const Events = () => {
             </div>
 
             {/* Filter Bar */}
-            <div className="flex flex-wrap gap-8 w-full bg-[#cce1ee] dark:bg-[#434e5d] border dark:border-zinc-700 rounded-lg p-5 pb-8 mt-4">
+            <div className="flex flex-wrap gap-8 w-full bg-[var(--calendar-today-bg)] dark:bg-[var(--surface-tinted)] border dark:border-zinc-700 rounded-lg p-5 pb-8 mt-4">
               <div className="flex flex-col gap-3">
                 <span className="text-sm font-medium text-slate-900 dark:text-white">
                   Event Type

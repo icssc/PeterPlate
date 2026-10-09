@@ -62,7 +62,7 @@ export default function TrackerHistoryDialog({
         },
         ".dark & .MuiDialog-paper": {
           backgroundImage: "none",
-          backgroundColor: "#303035",
+          backgroundColor: "var(--surface-modal)",
         },
       }}
     >

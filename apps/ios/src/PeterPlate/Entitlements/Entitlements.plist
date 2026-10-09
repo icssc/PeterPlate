@@ -6,8 +6,8 @@
 	<string>production</string>
 	<key>com.apple.developer.associated-domains</key>
 	<array>
-		<string>applinks:www.peterplate.com</string>
-		<string>webcredentials:www.peterplate.com</string>
+		<string>applinks:peterplate.com</string>
+		<string>webcredentials:peterplate.com</string>
 	</array>
 	<key>com.apple.security.app-sandbox</key>
 	<true/>

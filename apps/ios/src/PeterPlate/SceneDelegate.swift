@@ -47,7 +47,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             comps?.scheme = "https"
 
             if let url = comps?.url {
-                // Handle it inside our web view in a SPA-friendly way.
                 PeterPlate.webView.evaluateJavaScript("location.href = '\(url)'")
             }
         }

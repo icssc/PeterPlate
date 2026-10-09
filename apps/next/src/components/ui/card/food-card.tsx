@@ -2,20 +2,17 @@
 
 import { Restaurant, StarBorder } from "@mui/icons-material";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
-import { Card, CardContent, Dialog, Drawer, Typography } from "@mui/material";
+import { Card, CardContent, Typography } from "@mui/material";
 import type { DishWithRating } from "@peterplate/validators";
 import Image from "next/image";
 import React from "react";
-import { useSnackbarStore } from "@/context/useSnackbar";
 import { useUserStore } from "@/context/useUserStore";
-import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { getDietaryConflicts } from "@/utils/dietary";
 import { formatFoodName, getFoodIcon } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
 import { cn } from "@/utils/tw";
 import Favorite from "../favorite";
-import FoodDialogContent from "../food-dialog-content";
-import FoodDrawerContent from "../food-drawer-content";
+import FoodCardShell from "./food-card-shell";
 
 /** Handler for "Add to meal tracker" used by card, dialog, and drawer. */
 export type OnAddToMealTracker = (e: React.MouseEvent) => void;
@@ -117,25 +114,31 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
         ref={ref}
         {...divProps}
         className={cn(
-          "relative cursor-pointer border border-gray-300 hover:shadow-lg transition w-full dark:bg-[#303035]",
-          conflictsWithUserPrefs && "opacity-70",
+          "relative cursor-pointer border border-gray-300 dark:border-[#3F3F47] hover:shadow-lg transition w-full",
+          !conflictsWithUserPrefs && "bg-white dark:bg-[var(--surface-modal)]",
         )}
         sx={{
-          borderRadius: "12px",
-          border: 1,
+          borderRadius: "6px",
           backgroundImage: "none",
           boxShadow: "none",
           "&:hover": {
             boxShadow: "none",
           },
+          ...(conflictsWithUserPrefs && {
+            backgroundColor: "rgba(245, 158, 11, 0.2)",
+            opacity: 1,
+            ".dark &": {
+              backgroundColor: "rgba(255, 183, 103, 0.21)",
+            },
+          }),
         }}
       >
         <CardContent sx={{ padding: 0, "&:last-child": { paddingBottom: 0 } }}>
-          <div className="flex justify-between h-full w-full p-4 gap-4">
+          <div className={cn("flex h-full w-full", isCompact ? "p-3" : "p-4")}>
             <div
               className={cn(
-                "flex items-center gap-4 w-full",
-                isCompact && "justify-between",
+                "flex items-center w-full",
+                isCompact ? "gap-3" : "gap-4",
               )}
             >
               {!isCompact && showImage && dish.imageUrl && !imageError && (
@@ -154,13 +157,7 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                   color="primary"
                 />
               )}
-              <div
-                className={cn(
-                  "flex flex-col flex-1 min-w-0 gap-1",
-                  isCompact && "w-3/4",
-                  !isCompact && "md:w-full",
-                )}
-              >
+              <div className="flex flex-col flex-1 min-w-0 gap-1">
                 <Typography
                   color="primary"
                   className={cn(
@@ -177,49 +174,58 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                     />
                   )}
                 </Typography>
-                <div className="flex gap-2 items-center text-zinc-700 text-sm w-fit flex-shrink">
-                  <Typography
-                    noWrap
-                    color="text.primary"
-                    className="font-normal"
-                  >
-                    {dish.nutritionInfo.calories == null
-                      ? "-"
-                      : `${Math.round(dish.nutritionInfo.calories)} cal`}
-                  </Typography>
-                  <div className="flex gap-1 items-center text-zinc-500">
-                    <StarBorder
-                      className="w-4 h-4 stroke-zinc-500"
-                      strokeWidth={0.15}
+                <div className="flex items-center gap-2">
+                  <div className="flex flex-col flex-1 min-w-0 gap-1">
+                    <div className="flex gap-2 items-center text-zinc-700 text-sm w-fit flex-shrink">
+                      {!isCompact && (
+                        <Typography
+                          noWrap
+                          color="text.primary"
+                          className="font-normal"
+                        >
+                          {dish.nutritionInfo.calories == null
+                            ? "-"
+                            : `${Math.round(dish.nutritionInfo.calories)} cal`}
+                        </Typography>
+                      )}
+                      <div className="flex gap-1 items-center text-zinc-500">
+                        <StarBorder
+                          className="w-4 h-4 stroke-zinc-500"
+                          strokeWidth={0.15}
+                        />
+                        <p>
+                          {averageRating.toFixed(1)}&nbsp;
+                          {!isCompact && <span>({ratingCount})</span>}
+                        </p>
+                      </div>
+                    </div>
+                    <Typography
+                      noWrap
+                      color="text.primary"
+                      className={cn(
+                        "text-sm font-normal",
+                        !dish.description && "italic",
+                      )}
+                    >
+                      {dish.description
+                        ? dish.description
+                        : "No description available."}
+                    </Typography>
+                  </div>
+                  {/* Nudges the heart up so it looks visually centered */}
+                  <div className="shrink-0 pb-2">
+                    <Favorite
+                      dishId={dish.id}
+                      {...{
+                        isFavorited,
+                        favoriteDisabled,
+                        onToggleFavorite,
+                        restaurant,
+                      }}
                     />
-                    <p>
-                      {averageRating.toFixed(1)}&nbsp;
-                      {!isCompact && <span>({ratingCount})</span>}
-                    </p>
                   </div>
                 </div>
-                <Typography
-                  noWrap
-                  color="text.primary"
-                  className={cn(
-                    "text-sm font-normal",
-                    !dish.description && "italic",
-                  )}
-                >
-                  {dish.description
-                    ? dish.description
-                    : "No description available."}
-                </Typography>
               </div>
-              <Favorite
-                dishId={dish.id}
-                {...{
-                  isFavorited,
-                  favoriteDisabled,
-                  onToggleFavorite,
-                  restaurant,
-                }}
-              />
             </div>
           </div>
         </CardContent>
@@ -267,43 +273,9 @@ export default function FoodCard({
   className,
   ...dish
 }: FoodCardProps): React.JSX.Element {
-  const isDesktop = useMediaQuery("(min-width: 768px)");
-  const [open, setOpen] = React.useState(false);
-  const userId = useUserStore((s) => s.userId);
-
-  const utils = trpc.useUtils();
-  const { showSnackbar } = useSnackbarStore();
-
-  const logMealMutation = trpc.nutrition.logMeal.useMutation({
-    onSuccess: () => {
-      showSnackbar(`Added ${formatFoodName(dish.name)} to your log`, "success");
-      utils.nutrition.invalidate();
-    },
-    onError: (error) => {
-      console.error(error.message);
-    },
-  });
-
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-
-  const handleAddToMealTracker = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!userId) {
-      showSnackbar("Login to track meals!", "error");
-      return;
-    }
-    logMealMutation.mutate({
-      dishId: dish.id,
-      userId,
-      dishName: dish.name,
-      servings: 1,
-    });
-  };
-
-  if (isDesktop)
-    return (
-      <>
+  return (
+    <FoodCardShell dish={dish} restaurant={restaurant}>
+      {(handleOpen, handleAddToMealTracker) => (
         <FoodCardContent
           {...{
             dish,
@@ -317,85 +289,7 @@ export default function FoodCard({
           onAddToMealTracker={handleAddToMealTracker}
           onClick={handleOpen}
         />
-        <Dialog
-          open={open}
-          onClose={handleClose}
-          maxWidth={false}
-          slotProps={{
-            paper: {
-              sx: {
-                width: "460px",
-                maxWidth: "90vw",
-                maxHeight: "90vh",
-                margin: 2,
-                padding: 0,
-                overflow: "hidden",
-                display: "flex",
-                flexDirection: "column",
-                borderRadius: "16px",
-              },
-            },
-          }}
-        >
-          <FoodDialogContent
-            {...{ dish, restaurant }}
-            onAddToMealTracker={handleAddToMealTracker}
-            isAddingToMealTracker={logMealMutation.isPending}
-          />
-        </Dialog>
-      </>
-    );
-  else
-    return (
-      <>
-        <FoodCardContent
-          {...{
-            dish,
-            restaurant,
-            isFavorited,
-            onToggleFavorite,
-            isCompact,
-            className,
-          }}
-          favoriteDisabled={favoriteIsLoading}
-          onAddToMealTracker={handleAddToMealTracker}
-          onClick={handleOpen}
-        />
-        <Drawer
-          anchor="bottom"
-          open={open}
-          onClose={handleClose}
-          slotProps={{
-            paper: {
-              sx: {
-                width: "460px",
-                maxWidth: "90vw",
-                maxHeight: "85vh",
-                margin: 2,
-                padding: 0,
-                overflow: "hidden",
-                display: "flex",
-                flexDirection: "column",
-                borderRadius: "16px",
-              },
-            },
-          }}
-          sx={{
-            "& .MuiDrawer-paper": {
-              borderTopLeftRadius: "10px",
-              borderTopRightRadius: "10px",
-              marginTop: "96px",
-              height: "auto",
-              maxHeight: "85vh",
-            },
-          }}
-        >
-          <FoodDrawerContent
-            {...{ dish, restaurant }}
-            onAddToMealTracker={handleAddToMealTracker}
-            isAddingToMealTracker={logMealMutation.isPending}
-          />
-        </Drawer>
-      </>
-    );
+      )}
+    </FoodCardShell>
+  );
 }

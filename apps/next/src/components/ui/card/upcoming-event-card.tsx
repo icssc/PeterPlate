@@ -36,11 +36,12 @@ export default function UpcomingEventCard({
           </div>
         </div>
         <div className="mb-3 flex items-start gap-2 min-w-0 pr-0 md:pr-28">
-          <h3
-            className={`${titleSize} line-clamp-2 min-w-0 flex-1 whitespace-normal break-words font-bold leading-tight text-sky-700`}
+          <Typography
+            className={`${titleSize} line-clamp-2 min-w-0 flex-1 whitespace-normal break-words font-bold leading-tight `}
+            color="primary"
           >
             {event.title}
-          </h3>
+          </Typography>
         </div>
         <div className={spacing}>
           {event.start && (

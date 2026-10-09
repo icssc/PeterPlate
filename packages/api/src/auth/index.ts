@@ -1,6 +1,7 @@
 import { join } from "node:path";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { nextCookies } from "better-auth/next-js";
 import { genericOAuth } from "better-auth/plugins";
 import { config } from "dotenv";
 import * as schema from "../../../db/src/index";
@@ -18,24 +19,35 @@ const authSecret =
   process.env.BETTER_AUTH_SECRET ?? process.env.NEXT_PUBLIC_BETTER_AUTH_SECRET;
 if (!authSecret) throw new Error("BETTER_AUTH_SECRET is not set");
 
+// SST sets NEXT_PUBLIC_BASE_URL (see sst.config.ts, mirroring AntAlmanac).
+// BETTER_AUTH_URL is kept as a server-side alias for the same value.
+const baseURL =
+  process.env.NEXT_PUBLIC_BASE_URL ??
+  process.env.BETTER_AUTH_URL ??
+  "https://peterplate.com";
+
+const AUTH_PROVIDER_ID = "icssc";
+
 export const auth = betterAuth({
-  debug: process.env.NODE_ENV !== "production",
   secret: authSecret,
-  baseURL: process.env.NEXT_PUBLIC_BASE_URL ?? "https://www.peterplate.com",
-  // The iOS PWA shell (WKWebView) always sends Origin: https://www.peterplate.com
-  // because Settings.swift hardcodes rootUrl to that domain.  Better Auth builds
-  // its trusted-origins list from baseURL alone, so if NEXT_PUBLIC_BASE_URL is
-  // unset or points to a different host (e.g. the Vercel deploy URL), the
-  // origin check rejects every request that carries a cookie — which in the
-  // WKWebView is every request, because Swift injects the app-platform cookie
-  // via WKHTTPCookieStore.  Listing the production origin explicitly makes the
-  // iOS auth flow immune to baseURL misconfiguration.
-  trustedOrigins: [
-    "https://www.peterplate.com",
-    ...(process.env.NEXT_PUBLIC_BASE_URL
-      ? [process.env.NEXT_PUBLIC_BASE_URL]
-      : []),
-  ],
+  baseURL,
+  // The iOS PWA shell (WKWebView) sends Origin from Settings.swift rootUrl.
+  // auth.icssc.club only allows redirect URIs on the apex domain (peterplate.com),
+  // not www — baseURL and trustedOrigins must match deploy + iOS + IdP registration.
+  trustedOrigins: [baseURL],
+  account: {
+    accountLinking: {
+      enabled: true,
+      trustedProviders: [AUTH_PROVIDER_ID],
+      requireLocalEmailVerified: false,
+    },
+  },
+  session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60,
+    },
+  },
   user: {
     additionalFields: {
       hasOnboarded: {
@@ -47,44 +59,30 @@ export const auth = betterAuth({
   },
   plugins: [
     genericOAuth({
-      config: (() => {
-        const clientId = process.env.AUTH_CLIENT_ID || "peterplate-dev";
-        const discoveryUrl =
-          "https://auth.icssc.club/.well-known/openid-configuration";
-        const scopes = ["openid", "profile", "email"];
-        const mapProfileToUser = (profile: Record<string, string>) => ({
-          name: profile.name,
-          email: profile.email,
-          image: profile.picture,
-        });
-
-        return [
-          {
-            providerId: "icssc",
-            clientId,
-            discoveryUrl,
-            scopes,
-            pkce: true,
-            mapProfileToUser,
+      config: [
+        {
+          providerId: AUTH_PROVIDER_ID,
+          clientId: process.env.AUTH_CLIENT_ID || "peterplate-dev",
+          discoveryUrl:
+            "https://auth.icssc.club/.well-known/openid-configuration",
+          scopes: ["openid", "profile", "email"],
+          pkce: true,
+          mapProfileToUser: (profile: Record<string, string>) => {
+            const email = profile.email;
+            const name = profile.name ?? email?.split("@")[0] ?? "User";
+            return {
+              ...profile,
+              name,
+              email,
+              emailVerified: profile.emailVerified ?? Boolean(email),
+              image: profile.picture ?? profile.image,
+            };
           },
-          {
-            providerId: "icssc-native",
-            clientId,
-            discoveryUrl,
-            // Never fall back to localhost — if NEXT_PUBLIC_BASE_URL is unset the
-            // redirect_uri would be http://localhost:3000/auth/native, which
-            // (a) isn't registered with auth.icssc.club and
-            // (b) causes Swift's ASWebAuthenticationSession.start() to silently
-            //     return false because "localhost" doesn't match the Associated
-            //     Domains entitlement (applinks:www.peterplate.com).
-            redirectURI: `${process.env.NEXT_PUBLIC_BASE_URL ?? "https://www.peterplate.com"}/auth/native`,
-            scopes,
-            pkce: true,
-            mapProfileToUser,
-          },
-        ];
-      })(),
+        },
+      ],
     }),
+    // Required for Set-Cookie on OAuth callbacks in Next.js App Router (see AntAlmanac).
+    nextCookies(),
   ],
   database: drizzleAdapter(db, {
     provider: "pg",

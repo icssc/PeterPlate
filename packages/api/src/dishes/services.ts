@@ -14,7 +14,7 @@ export async function upsertDishesIfMissing(
   if (dishData.length === 0) return [];
 
   try {
-    const results = db
+    const results = await db
       .insert(dishes)
       .values(dishData)
       .onConflictDoNothing()
