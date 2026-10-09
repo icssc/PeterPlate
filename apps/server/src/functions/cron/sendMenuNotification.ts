@@ -14,6 +14,7 @@ import {
 
 import { logger } from "../../../logger";
 import { env } from "../env";
+import { pruneExpiredSubscription } from "./pruneExpiredSubscription";
 
 const TIMEZONE = "America/Los_Angeles";
 
@@ -113,7 +114,17 @@ export const main = async (_event, _context) => {
     }
 
     if (notificationMap.size === 0) {
-      logger.info("No subscribed users have favorited dishes serving today.");
+      logger.info(
+        {
+          date: todayStr,
+          favoritedDishIds: [...new Set(rows.map((r) => r.dishId))],
+          dishesServedToday: Array.from(servedByRestaurant.values()).reduce(
+            (sum, dishes) => sum + dishes.size,
+            0,
+          ),
+        },
+        "No subscribed users have favorited dishes serving today.",
+      );
       return;
     }
 
@@ -143,14 +154,8 @@ export const main = async (_event, _context) => {
 
           try {
             await webpush.sendNotification({ endpoint, keys }, payload);
-          } catch (error: any) {
-            // 410 Gone / 404 means the user revoked the subscription in their browser
-            if (error.statusCode === 410 || error.statusCode === 404) {
-              logger.info({ endpoint }, "Subscription expired, removing from DB...");
-              await db.delete(pushSubscriptions).where(eq(pushSubscriptions.endpoint, endpoint));
-            } else {
-              throw error;
-            }
+          } catch (error) {
+            await pruneExpiredSubscription(db, endpoint, error);
           }
         },
       ),

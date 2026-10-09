@@ -11,6 +11,7 @@ import {
 
 import { logger } from "../../../logger";
 import { env } from "../env";
+import { pruneExpiredSubscription } from "./pruneExpiredSubscription";
 
 webpush.setVapidDetails(
   "mailto:admin@peterplate.com",
@@ -78,15 +79,8 @@ export const main = async (_event, _context) => {
             { endpoint, keys: { p256dh, auth } },
             payload,
           );
-        } catch (error: any) {
-          if (error.statusCode === 410 || error.statusCode === 404) {
-            logger.info({ endpoint }, "Subscription expired, removing from DB...");
-            await db
-              .delete(pushSubscriptions)
-              .where(eq(pushSubscriptions.endpoint, endpoint));
-          } else {
-            throw error;
-          }
+        } catch (error) {
+          await pruneExpiredSubscription(db, endpoint, error);
         }
       }),
     );

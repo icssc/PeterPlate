@@ -151,9 +151,6 @@ export default function NotificationsPanel({ onBack }: { onBack: () => void }) {
     if (kind === "food") setDishNotifs(nextValue);
     else setEventNotifs(nextValue);
 
-    const nextDish = kind === "food" ? nextValue : prevDish;
-    const nextEvent = kind === "event" ? nextValue : prevEvent;
-
     setIsBusy(true);
     try {
       if (nextValue) {
@@ -182,14 +179,16 @@ export default function NotificationsPanel({ onBack }: { onBack: () => void }) {
           endpoint: subData.endpoint,
           p256dh: subData.p256dh,
           auth: subData.auth,
-          isSubscribedFoodFavorites: nextDish,
-          isSubscribedEvents: nextEvent,
+          ...(kind === "food"
+            ? { isSubscribedFoodFavorites: nextValue }
+            : { isSubscribedEvents: nextValue }),
         });
       } else {
         await updateSubscriptionMutation.mutateAsync({
           userId,
-          isSubscribedFoodFavorites: nextDish,
-          isSubscribedEvents: nextEvent,
+          ...(kind === "food"
+            ? { isSubscribedFoodFavorites: nextValue }
+            : { isSubscribedEvents: nextValue }),
         });
       }
 
