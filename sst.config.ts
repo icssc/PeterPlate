@@ -63,6 +63,16 @@ export default $config({
     const domain = getDomain();
     const clientId = getClientId();
 
+    /**
+     * Env shared by every server function. It requires VAPID keys.
+     */
+    const serverEnvironment = {
+      DATABASE_URL: process.env.DATABASE_URL!,
+      NEXT_PUBLIC_VAPID_PUBLIC_KEY: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
+      VAPID_PRIVATE_KEY: process.env.VAPID_PRIVATE_KEY!,
+      NODE_ENV: process.env.NODE_ENV || "development",
+    };
+
     const api = new sst.aws.ApiGatewayV2("Api", {
       cors: {
         allowOrigins: [
@@ -80,11 +90,10 @@ export default $config({
       handler: "apps/server/src/functions/trpc/handler.main",
       memory: "256 MB",
       environment: {
-        DATABASE_URL: process.env.DATABASE_URL!,
+        ...serverEnvironment,
         BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET!,
         BETTER_AUTH_URL: `https://${domain}`,
         AUTH_CLIENT_ID: clientId,
-        NODE_ENV: process.env.NODE_ENV || "development",
       },
     });
 
@@ -92,10 +101,7 @@ export default $config({
       schedule: "rate(1 minute)",
       job: {
         handler: "apps/server/src/functions/cron/testLog.main",
-        environment: {
-          DATABASE_URL: process.env.DATABASE_URL!,
-          NODE_ENV: process.env.NODE_ENV || "development",
-        },
+        environment: serverEnvironment,
       },
     });
 
@@ -104,12 +110,34 @@ export default $config({
       job: {
         handler: "apps/server/src/functions/cron/weekly.main",
         timeout: "10 minutes",
-        environment: {
-          DATABASE_URL: process.env.DATABASE_URL!,
-          NODE_ENV: process.env.NODE_ENV || "development",
-        },
+        environment: serverEnvironment,
       },
     });
+
+    // Production only: every staging stage shares the dev database, so
+    // per-stage crons would send dev subscribers one copy per open PR.
+    if ($app.stage === "production") {
+      // Once a day before lunch. The script covers every meal period, so a
+      // second run would repeat the same message.
+      new sst.aws.Cron("MenuNotifications", {
+        schedule: "cron(0 18 * * ? *)", // 11:00 AM PDT / 10:00 AM PST
+        job: {
+          handler: "apps/server/src/functions/cron/sendMenuNotification.main",
+          timeout: "5 minutes",
+          environment: serverEnvironment,
+        },
+      });
+
+      new sst.aws.Cron("EventNotifications", {
+        schedule: "cron(0 15 * * ? *)", // 8:00 AM PDT / 7:00 AM PST
+        job: {
+          handler:
+            "apps/server/src/functions/cron/sendEventNotifications.main",
+          timeout: "5 minutes",
+          environment: serverEnvironment,
+        },
+      });
+    }
 
     const site = new sst.aws.Nextjs("site", {
       path: "apps/next",
@@ -122,6 +150,8 @@ export default $config({
         NEXT_PUBLIC_BASE_URL: `https://${domain}`,
         DISCORD_WEBHOOK_URL: process.env.DISCORD_WEBHOOK_URL!,
         GOOGLE_APPS_SCRIPT_URL: process.env.GOOGLE_APPS_SCRIPT_URL!,
+        NEXT_PUBLIC_VAPID_PUBLIC_KEY:
+          process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
       },
       cachePolicy: "50ea56d0-b7b0-4bf7-9ab8-0f7f9a0d03d5",
       domain: {
