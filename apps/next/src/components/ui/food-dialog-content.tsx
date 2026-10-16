@@ -308,29 +308,44 @@ export default function FoodDialogContent({
               }}
             >
               <div className="px-4 pt-2 pb-6 shrink-0">
-                <button
+                <Box
+                  component="button"
                   type="button"
-                  disabled={true}
-                  className="w-full inline-flex h-[30px] justify-center items-center gap-0.5 rounded-md border border-gray-300 dark:border-zinc-600 bg-white dark:bg-transparent text-[12px] font-normal leading-[18px] text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-700 disabled:opacity-60"
+                  disabled
+                  className="w-full inline-flex h-[30px] justify-center items-center gap-0.5 rounded-md text-[12px] font-normal leading-[18px] disabled:opacity-60"
+                  sx={{
+                    bgcolor: "primary.main",
+                    color: "white",
+                    border: "none",
+                    fontFamily: "Poppins, sans-serif",
+                  }}
                 >
                   <Add sx={{ fontSize: 18, width: 18, height: 18 }} />
                   Add to Meal Tracker
-                </button>
+                </Box>
               </div>
             </Tooltip>
           )}
           {userId && onAddToMealTracker && (
             <div className="px-4 pt-2 pb-6 shrink-0">
-              <button
+              <Box
+                component="button"
                 type="button"
                 onClick={onAddToMealTracker}
                 disabled={isAddingToMealTracker}
-                className="w-full inline-flex h-[30px] justify-center items-center gap-0.5 rounded-md border border-gray-500 dark:border-zinc-300 bg-white dark:bg-transparent text-[12px] font-normal leading-[18px] text-zinc-500 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700 disabled:opacity-60"
-                style={{ fontFamily: "Poppins, sans-serif" }}
+                className="w-full inline-flex h-[30px] justify-center items-center gap-0.5 rounded-md text-[12px] font-normal leading-[18px] disabled:opacity-60"
+                sx={{
+                  bgcolor: "primary.main",
+                  color: "white",
+                  border: "none",
+                  cursor: "pointer",
+                  fontFamily: "Poppins, sans-serif",
+                  "&:hover:not(:disabled)": { bgcolor: "primary.dark" },
+                }}
               >
                 <Add sx={{ fontSize: 18, width: 18, height: 18 }} />
                 Add to Meal Tracker
-              </button>
+              </Box>
             </div>
           )}
         </DialogContent>

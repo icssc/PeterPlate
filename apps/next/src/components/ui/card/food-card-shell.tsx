@@ -101,20 +101,18 @@ export default function FoodCardShell({
           slotProps={{
             paper: {
               sx: {
-                ...sharedSx,
-                maxHeight: "85vh",
+                width: "100vw",
+                maxWidth: "100vw",
+                height: "80dvh",
+                maxHeight: "80dvh",
+                margin: 0,
+                padding: 0,
+                borderTopLeftRadius: "16px",
+                borderTopRightRadius: "16px",
+                overflow: "hidden",
                 display: "flex",
                 flexDirection: "column",
               },
-            },
-          }}
-          sx={{
-            "& .MuiDrawer-paper": {
-              borderTopLeftRadius: "10px",
-              borderTopRightRadius: "10px",
-              marginTop: "96px",
-              height: "auto",
-              maxHeight: "85vh",
             },
           }}
         >
@@ -123,6 +121,7 @@ export default function FoodCardShell({
             restaurant={restaurant}
             onAddToMealTracker={handleAddToMealTracker}
             isAddingToMealTracker={logMealMutation.isPending}
+            onClose={handleClose}
           />
         </Drawer>
       )}
