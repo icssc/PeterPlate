@@ -3,6 +3,7 @@
 import {
   Close as CloseIcon,
   DarkMode as DarkModeIcon,
+  DeleteOutline as DeleteIcon,
   DesktopWindows as DesktopWindowsIcon,
   Edit as EditIcon,
   ContentPaste as FeedbackIcon,
@@ -232,6 +233,19 @@ export default function SidebarContent({
           >
             About PeterPlate
           </MenuLink>
+
+          {user && (
+            <MenuLink
+              href="/delete-account"
+              onClick={onClose}
+              icon={
+                <DeleteIcon fontSize="small" sx={{ color: "error.main" }} />
+              }
+              color="error.main"
+            >
+              Delete Account
+            </MenuLink>
+          )}
         </div>
       </div>
 
@@ -289,11 +303,13 @@ function MenuLink({
   href,
   onClick,
   icon,
+  color = "text.primary",
   children,
 }: {
   href: string;
   onClick: () => void;
   icon: ReactNode;
+  color?: string;
   children: ReactNode;
 }) {
   return (
@@ -304,7 +320,7 @@ function MenuLink({
         dark:hover:bg-gray-700`}
     >
       <Box sx={{ color: "primary.main" }}>{icon}</Box>
-      <Typography variant="body2" fontWeight={500} color="text.primary">
+      <Typography variant="body2" fontWeight={500} color={color}>
         {children}
       </Typography>
     </Link>
