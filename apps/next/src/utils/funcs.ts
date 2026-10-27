@@ -537,18 +537,21 @@ export function getEventType(title: string): string {
 }
 
 /**
- * Scrolls to a station section while leaving room for the sticky restaurant controls.
+ * Scrolls to a station section while leaving room for the toolbar and sticky
+ * restaurant controls.
  */
 export function scrollToStation(stationId: string) {
   const section = document.getElementById(stationId);
   if (!section) return;
-  const controlsHeight =
-    document.getElementById("restaurant-controls")?.offsetHeight ?? 0;
+  const controls = document.getElementById("restaurant-controls");
+  const controlsBottom = controls
+    ? Number.parseFloat(getComputedStyle(controls).top) + controls.offsetHeight
+    : 0;
   window.scrollTo({
     top:
       section.getBoundingClientRect().top +
       window.scrollY -
-      controlsHeight -
+      controlsBottom -
       16,
     behavior: "smooth",
   });

@@ -17,6 +17,7 @@ export default function About() {
   return (
     <div className="flex flex-col">
       <Image
+        id="hero"
         className="object-cover w-full min-h-80 max-h-80"
         src="/uci.webp"
         alt="An Image of UCI's signage."
