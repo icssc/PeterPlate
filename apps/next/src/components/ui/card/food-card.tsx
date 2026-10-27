@@ -212,19 +212,18 @@ const FoodCardContent = React.forwardRef<HTMLDivElement, FoodCardContentProps>(
                         : "No description available."}
                     </Typography>
                   </div>
-                  {/* Nudges the heart up so it looks visually centered */}
-                  <div className="shrink-0 pb-2">
-                    <Favorite
-                      dishId={dish.id}
-                      {...{
-                        isFavorited,
-                        favoriteDisabled,
-                        onToggleFavorite,
-                        restaurant,
-                      }}
-                    />
-                  </div>
                 </div>
+              </div>
+              <div className="shrink-0">
+                <Favorite
+                  dishId={dish.id}
+                  {...{
+                    isFavorited,
+                    favoriteDisabled,
+                    onToggleFavorite,
+                    restaurant,
+                  }}
+                />
               </div>
             </div>
           </div>

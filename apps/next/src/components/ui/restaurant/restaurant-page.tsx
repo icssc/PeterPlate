@@ -55,7 +55,7 @@ export function RestaurantPage({
   return (
     <Box sx={{ bgcolor: "background.default", minHeight: "100vh" }}>
       {/* Hero image & mobile header */}
-      <div className="relative w-full h-[200px] md:h-[250px]">
+      <div id="hero" className="relative w-full h-[200px] md:h-[250px]">
         <Image
           src={hero.src}
           alt={hero.alt}

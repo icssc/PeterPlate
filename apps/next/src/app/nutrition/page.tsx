@@ -1,7 +1,7 @@
 "use client";
 
 import type { RouterOutputs } from "@api/index";
-import { Box, Typography } from "@mui/material";
+import { Box, CircularProgress, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import posthog from "posthog-js";
 import { useEffect, useMemo, useState } from "react";
@@ -335,7 +335,18 @@ export default function MealTracker() {
 
   const isMobile = useMediaQuery("(max-width: 768px)");
 
-  if (isLoading) return <div>Loading meals...</div>;
+  if (isLoading)
+    return (
+      <div className="w-full flex justify-center mt-12">
+        <CircularProgress
+          enableTrackSlot
+          variant="indeterminate"
+          color="primary"
+          size="5rem"
+          sx={{ circle: { strokeLinecap: "round" } }}
+        />
+      </div>
+    );
   if (error) return <div>Error loading meals</div>;
 
   return (
