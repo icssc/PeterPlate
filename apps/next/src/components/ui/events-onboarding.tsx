@@ -59,19 +59,24 @@ const MOBILE_SCROLL_OFFSET = 80;
 // Mobile has a list view in place of the grid, so it gets the grid tour
 const mobileListSteps: Step[] = [
   {
-    ...gridSteps[0],
-    target: "#tour-events-view-toggle-mobile",
-    scrollOffset: MOBILE_SCROLL_OFFSET,
-    placement: "bottom",
-  },
-  {
     ...gridSteps[1],
     target: "#tour-events-location-mobile",
+    content: "Use the location filter to find exactly what you're looking for!",
+    title: "Filter Events by Location",
     scrollOffset: MOBILE_SCROLL_OFFSET,
+  },
+  {
+    ...gridSteps[0],
+    target: "#tour-events-view-toggle-mobile",
+    content:
+      "Toggle between calendar and list view to see events in your preferred layout.",
+    scrollOffset: MOBILE_SCROLL_OFFSET,
+    placement: "bottom",
   },
 ];
 
 const mobileCalendarSteps: Step[] = [
+  ...mobileListSteps,
   {
     ...calendarSteps[0],
     scrollOffset: MOBILE_SCROLL_OFFSET,

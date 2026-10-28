@@ -46,15 +46,17 @@ export const CustomTooltip = ({
       </div>
 
       <div className="flex items-center justify-between mt-3">
-        <button
-          {...skipProps}
-          className="text-sm font-medium text-gray-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300 px-2 py-1 rounded"
-        >
-          Skip Tour
-        </button>
+        {index < size - 1 && (
+          <button
+            {...skipProps}
+            className="text-sm font-medium text-gray-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300 px-2 py-1 rounded"
+          >
+            Skip Tour
+          </button>
+        )}
         <button
           {...primaryProps}
-          className="bg-sky-700 dark:bg-blue-300 text-white dark:text-black font-medium text-sm px-4 py-2 rounded-lg"
+          className="ml-auto bg-sky-700 dark:bg-blue-300 text-white dark:text-black font-medium text-sm px-4 py-2 rounded-lg"
         >
           {index === size - 1 ? "Done" : "Next"}
         </button>
