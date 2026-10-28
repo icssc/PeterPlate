@@ -22,7 +22,7 @@ export const CustomTooltip = ({
   return (
     <div
       {...tooltipProps}
-      className="bg-white dark:bg-[#323235] p-5 rounded-lg shadow-xl w-72 flex flex-col gap-2 relative"
+      className="bg-white dark:bg-[#323235] p-5 rounded-lg shadow-xl w-80 flex flex-col gap-2 relative"
     >
       <button
         {...skipProps}
@@ -32,7 +32,7 @@ export const CustomTooltip = ({
         <Close fontSize="small" />
       </button>
 
-      <div className="text-xs text-zinc-500 font-medium tracking-wide uppercase">
+      <div className="text-xs text-zinc-500 font-medium">
         {index + 1} of {size}
       </div>
 
@@ -80,7 +80,7 @@ export default function TrackerOnboarding() {
         "Click the edit icon to set your daily nutrition goals for calories, protein, carbs, and fat.",
       title: "Set Your Goals",
       skipBeacon: true,
-      placement: "left",
+      placement: isDesktop ? "left-start" : "right",
     },
     {
       target: isDesktop ? "#tour-progress-desktop" : "#tour-progress-mobile",
@@ -88,7 +88,7 @@ export default function TrackerOnboarding() {
         "These widgets show your progress towards your daily nutrition goals.",
       title: "Track Your Progress",
       skipBeacon: true,
-      placement: "bottom",
+      placement: isDesktop ? "bottom" : "bottom-start",
     },
     {
       target: ".tour-suggested-card:first-of-type",
@@ -96,14 +96,14 @@ export default function TrackerOnboarding() {
         "Click the plus button to add the suggested food to your meal tracker.",
       title: "Add Suggested Foods",
       skipBeacon: true,
-      placement: isDesktop ? "right" : "top",
+      placement: isDesktop ? "right-end" : "top-end",
     },
     {
       target: "#tour-fab-search-btn",
       content: "Search and also view more foods to add to your tracker!",
       title: "View More Suggested Foods",
       skipBeacon: true,
-      placement: "left",
+      placement: "left-start",
     },
     {
       target: isDesktop ? "#tour-history-desktop" : "#tour-history-mobile",
@@ -111,7 +111,7 @@ export default function TrackerOnboarding() {
         "Click History to view past meal tracker days and track your progress over time.",
       title: "View Your History",
       skipBeacon: true,
-      placement: "left",
+      placement: "left-start",
     },
   ];
 
