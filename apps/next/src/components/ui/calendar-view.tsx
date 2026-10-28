@@ -63,6 +63,13 @@ const CalendarView = ({
 }: CalendarViewProps) => {
   if (isLoading || error || viewMode !== "calendar") return null;
 
+  // Tracks the days that have events so that the events tour can point to one
+  const eventDays = new Set(
+    calendarEvents.map((event) => event.start.toDateString()),
+  );
+  const dayPropGetter = (date: Date) =>
+    eventDays.has(date.toDateString()) ? { className: "tour-event-day" } : {};
+
   // Only page between the first and last months that have events
   const monthStart = startOfMonth(currentDate);
   const firstMonth = availableMonths[0];
@@ -112,6 +119,7 @@ const CalendarView = ({
           toolbar={false}
           selectable
           onSelectEvent={onSelectEvent}
+          dayPropGetter={dayPropGetter}
         />
       </div>
 

@@ -174,6 +174,8 @@ const MobileCalendarView = ({
                 }
               }}
               className={`flex flex-col items-center relative aspect-square justify-center text-sm ${
+                hasEvents && isCurrentMonth ? "tour-event-day" : ""
+              } ${
                 isCurrentMonth
                   ? "text-slate-900 dark:text-zinc-100"
                   : "text-slate-300 dark:text-zinc-600"

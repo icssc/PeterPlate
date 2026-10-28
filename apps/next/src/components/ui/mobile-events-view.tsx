@@ -8,9 +8,11 @@ import {
   Select,
   type SelectChangeEvent,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { EventWithType } from "@/app/events/page";
+import { useTourStore } from "@/context/useTourStore";
 import EventDetailsDrawer from "./event-details-drawer";
+import EventsOnboarding from "./events-onboarding";
 import MobileCalendarView from "./mobile-calendar-view";
 import MobileListView from "./mobile-list-view";
 import MonthPickerDrawer from "./month-picker-drawer";
@@ -51,6 +53,13 @@ const MobileEventsView = ({
   const [selectedDayEvents, setSelectedDayEvents] = useState<EventWithType[]>(
     [],
   );
+  const tourRunning = useTourStore((state) => state.activeTour === "events");
+  const tourLaunchId = useTourStore((state) => state.launchId);
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: re-run on every tour restart and view switch
+  useEffect(() => {
+    if (tourRunning) window.scrollTo({ top: 0 });
+  }, [tourRunning, tourLaunchId, mobileView]);
 
   const locationFormControlClasses =
     "w-36 [&_.MuiOutlinedInput-root]:h-[38px] [&_.MuiOutlinedInput-root]:rounded-lg [&_.MuiOutlinedInput-root]:bg-white [&_.MuiOutlinedInput-root]:text-[0.9rem] [&_.MuiOutlinedInput-root]:text-slate-900 [&_.MuiOutlinedInput-notchedOutline]:border-sky-700 [&_.MuiOutlinedInput-root:hover_.MuiOutlinedInput-notchedOutline]:border-sky-800 [&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-2 [&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-sky-700 dark:[&_.MuiOutlinedInput-root]:bg-transparent dark:[&_.MuiOutlinedInput-root]:text-zinc-100 dark:[&_.MuiOutlinedInput-notchedOutline]:!border-blue-300";
@@ -69,7 +78,10 @@ const MobileEventsView = ({
           Events
         </h1>
         <div className="flex items-center gap-3">
-          <FormControl className={locationFormControlClasses}>
+          <FormControl
+            id="tour-events-location-mobile"
+            className={locationFormControlClasses}
+          >
             <Select
               id="mobile-location-select"
               className={locationSelectClasses}
@@ -82,7 +94,10 @@ const MobileEventsView = ({
             </Select>
           </FormControl>
 
-          <div className="flex bg-white dark:bg-transparent border border-sky-700 dark:border-blue-300 rounded-lg overflow-hidden h-[38px]">
+          <div
+            id="tour-events-view-toggle-mobile"
+            className="flex bg-white dark:bg-transparent border border-sky-700 dark:border-blue-300 rounded-lg overflow-hidden h-[38px]"
+          >
             <button
               type="button"
               onClick={() => setMobileView("calendar")}
@@ -156,6 +171,8 @@ const MobileEventsView = ({
           setMonthPickerOpen(false);
         }}
       />
+
+      <EventsOnboarding viewMode={mobileView} />
 
       <EventDetailsDrawer
         selectedEventData={selectedEventData}
