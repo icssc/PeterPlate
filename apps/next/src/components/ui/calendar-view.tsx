@@ -137,6 +137,7 @@ const CalendarView = ({
             <EventDialogContent
               {...selectedEventData}
               key={`${selectedEventData.startTime}|${selectedEventData.endTime}`}
+              onClose={onCloseDetails}
             />
           )}
         </Dialog>

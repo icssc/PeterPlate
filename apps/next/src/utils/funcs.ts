@@ -5,7 +5,6 @@ import {
   foodIconKeywords,
   foodIcons,
   HallEnum,
-  numToMonth,
   preferredCategoryOrder,
 } from "./types";
 
@@ -157,33 +156,17 @@ function enhanceDescription(
 }
 
 /**
- * Appends the correct ordinal suffix to a day number (e.g., 1 -> "1st", 2 -> "2nd").
- * @param day The day of the month (1-31).
- * @returns The day number with its ordinal suffix.
+ * Formats the days an event runs, like "October 2 – 30, 2026", or "October 2, 2026" for one day.
+ * @param startDate The start date.
+ * @param endDate The end date.
+ * @returns A formatted date range.
  */
-function getDayWithSuffix(day: number): string {
-  if (day > 3 && day < 21) return `${day}th`; // for 4th to 20th
-  switch (day % 10) {
-    case 1:
-      return `${day}st`;
-    case 2:
-      return `${day}nd`;
-    case 3:
-      return `${day}rd`;
-    default:
-      return `${day}th`;
-  }
-}
-
-/**
- * Formats a date range into a string like "Jan. 1st, 10:00am-2:00pm".
- * @param startDate The start date and time.
- * @param endDate The end date and time.
- * @returns A formatted string representing the date and time range.
- */
-function dateToString(startDate: Date, endDate: Date): string {
-  const dayWithSuffix = getDayWithSuffix(startDate.getDate());
-  return `${numToMonth[startDate.getMonth()]} ${dayWithSuffix}, ${timeToString(startDate)}-${timeToString(endDate)}`;
+function dateRangeToString(startDate: Date, endDate: Date): string {
+  return new Intl.DateTimeFormat(undefined, {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  }).formatRange(startDate, endDate < startDate ? startDate : endDate);
 }
 
 /**
@@ -512,7 +495,7 @@ function getHallStatus(
 
 export {
   toTitleCase,
-  dateToString,
+  dateRangeToString,
   generateGCalLink,
   timeToString,
   enhanceDescription,
