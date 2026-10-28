@@ -22,7 +22,7 @@ export const CustomTooltip = ({
   return (
     <div
       {...tooltipProps}
-      className="bg-white dark:bg-[#323235] p-5 rounded-lg shadow-xl w-72 flex flex-col gap-2 relative"
+      className="bg-white dark:bg-[#323235] p-5 rounded-lg shadow-xl w-80 flex flex-col gap-2 relative"
     >
       <button
         {...skipProps}
@@ -32,7 +32,7 @@ export const CustomTooltip = ({
         <Close fontSize="small" />
       </button>
 
-      <div className="text-xs text-zinc-500 font-medium tracking-wide uppercase">
+      <div className="text-xs text-zinc-500 font-medium">
         {index + 1} of {size}
       </div>
 
@@ -134,13 +134,11 @@ export default function TrackerOnboarding() {
       scrollToFirstStep
       onEvent={handleEvent}
       tooltipComponent={CustomTooltip}
-      arrowComponent={() => null}
       options={{
         skipBeacon: true,
         overlayClickAction: false,
         blockTargetInteraction: false,
         zIndex: 1500,
-        offset: -18,
       }}
     />
   );
