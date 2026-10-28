@@ -47,18 +47,18 @@ export function RestaurantControls({
       id="restaurant-controls"
       className="sticky top-0 z-10 -mt-2 py-2 bg-background"
     >
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2 mb-2 flex-wrap">
-        {/* Desktop title */}
-        <RestaurantHeader isDesktop={isDesktop} hall={hall} />
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2 md:gap-x-3 mb-2 flex-wrap">
+        {/* Desktop title & status. Its large grow factor soaks up spare space
+            so the filters keep their natural width on one line, but fill the
+            column when they wrap below the title on narrower screens. */}
+        {isDesktop && (
+          <div className="flex items-center gap-2 grow-[999]">
+            <RestaurantHeader isDesktop={isDesktop} hall={hall} />
+            <DiningHallStatus status={derivedHallStatus} />
+          </div>
+        )}
 
-        <div className="flex flex-col gap-3 w-full md:w-auto md:flex-row md:items-center md:justify-end">
-          {/* Status badge — desktop only, shown next to filters */}
-          {isDesktop && (
-            <div>
-              <DiningHallStatus status={derivedHallStatus} />
-            </div>
-          )}
-
+        <div className="flex flex-col gap-3 w-full md:w-auto md:grow md:flex-row md:items-center md:justify-end">
           {/* Meal & date selectors */}
           <RestaurantFilters
             isDesktop={isDesktop}

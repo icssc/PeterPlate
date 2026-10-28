@@ -8,9 +8,11 @@ import {
   Select,
   type SelectChangeEvent,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { EventWithType } from "@/app/events/page";
+import { useTourStore } from "@/context/useTourStore";
 import EventDetailsDrawer from "./event-details-drawer";
+import EventsOnboarding from "./events-onboarding";
 import MobileCalendarView from "./mobile-calendar-view";
 import MobileListView from "./mobile-list-view";
 import MonthPickerDrawer from "./month-picker-drawer";
@@ -51,11 +53,18 @@ const MobileEventsView = ({
   const [selectedDayEvents, setSelectedDayEvents] = useState<EventWithType[]>(
     [],
   );
+  const tourRunning = useTourStore((state) => state.activeTour === "events");
+  const tourLaunchId = useTourStore((state) => state.launchId);
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: re-run on every tour restart and view switch
+  useEffect(() => {
+    if (tourRunning) window.scrollTo({ top: 0 });
+  }, [tourRunning, tourLaunchId, mobileView]);
 
   const locationFormControlClasses =
-    "w-36 [&_.MuiOutlinedInput-root]:h-[38px] [&_.MuiOutlinedInput-root]:rounded-lg [&_.MuiOutlinedInput-root]:bg-white [&_.MuiOutlinedInput-root]:text-[0.9rem] [&_.MuiOutlinedInput-root]:text-slate-900 [&_.MuiOutlinedInput-notchedOutline]:border-sky-700 [&_.MuiOutlinedInput-root:hover_.MuiOutlinedInput-notchedOutline]:border-sky-800 [&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-2 [&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-sky-700";
+    "w-36 [&_.MuiOutlinedInput-root]:h-[38px] [&_.MuiOutlinedInput-root]:rounded-lg [&_.MuiOutlinedInput-root]:bg-white [&_.MuiOutlinedInput-root]:text-[0.9rem] [&_.MuiOutlinedInput-root]:text-slate-900 [&_.MuiOutlinedInput-notchedOutline]:border-sky-700 [&_.MuiOutlinedInput-root:hover_.MuiOutlinedInput-notchedOutline]:border-sky-800 [&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-2 [&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-sky-700 dark:[&_.MuiOutlinedInput-root]:bg-transparent dark:[&_.MuiOutlinedInput-root]:text-zinc-100 dark:[&_.MuiOutlinedInput-notchedOutline]:!border-blue-300";
   const locationSelectClasses =
-    "[&_.MuiSelect-select]:!py-2 [&_.MuiSelect-select]:!pl-3 [&_.MuiSelect-select]:!pr-6 [&_.MuiSelect-icon]:right-1 [&_.MuiSelect-icon]:text-sky-700";
+    "[&_.MuiSelect-select]:!py-2 [&_.MuiSelect-select]:!pl-3 [&_.MuiSelect-select]:!pr-6 [&_.MuiSelect-icon]:right-1 [&_.MuiSelect-icon]:text-sky-700 dark:[&_.MuiSelect-icon]:text-zinc-100";
 
   const handleEventDrawerClose = () => {
     handleClose();
@@ -63,13 +72,16 @@ const MobileEventsView = ({
   };
 
   return (
-    <div className="flex flex-col h-screen w-full bg-white dark:bg-zinc-950 overflow-hidden font-sans">
-      <div className="flex flex-col px-4 pt-12 pb-4 bg-white dark:bg-zinc-950 z-20">
-        <h1 className="text-4xl font-bold text-sky-700 dark:text-sky-400 mb-4">
+    <div className="flex flex-col h-screen w-full bg-background overflow-hidden font-sans">
+      <div className="flex flex-col px-4 pt-12 pb-4 bg-background z-20">
+        <h1 className="text-4xl font-bold text-sky-700 dark:text-blue-300 mb-4">
           Events
         </h1>
         <div className="flex items-center gap-3">
-          <FormControl className={locationFormControlClasses}>
+          <FormControl
+            id="tour-events-location-mobile"
+            className={locationFormControlClasses}
+          >
             <Select
               id="mobile-location-select"
               className={locationSelectClasses}
@@ -82,26 +94,29 @@ const MobileEventsView = ({
             </Select>
           </FormControl>
 
-          <div className="flex bg-white dark:bg-zinc-900 border border-sky-700 dark:border-sky-500 rounded-lg overflow-hidden h-[38px]">
+          <div
+            id="tour-events-view-toggle-mobile"
+            className="flex bg-white dark:bg-transparent border border-sky-700 dark:border-blue-300 rounded-lg overflow-hidden h-[38px]"
+          >
             <button
               type="button"
               onClick={() => setMobileView("calendar")}
               className={`px-3 flex items-center justify-center transition-colors ${
                 mobileView === "calendar"
-                  ? "bg-sky-700 text-white"
-                  : "text-sky-700 hover:bg-sky-50 dark:hover:bg-zinc-800"
+                  ? "bg-sky-700 text-white dark:bg-blue-300 dark:text-zinc-900"
+                  : "text-sky-700 dark:text-blue-300 hover:bg-sky-50 dark:hover:bg-zinc-700"
               }`}
             >
               <CalendarTodayIcon fontSize="small" />
             </button>
-            <div className="w-[1px] bg-sky-700 dark:bg-sky-500 h-full" />
+            <div className="w-[1px] bg-sky-700 dark:bg-blue-300 h-full" />
             <button
               type="button"
               onClick={() => setMobileView("list")}
               className={`px-3 flex items-center justify-center transition-colors ${
                 mobileView === "list"
-                  ? "bg-sky-700 text-white"
-                  : "text-sky-700 hover:bg-sky-50 dark:hover:bg-zinc-800"
+                  ? "bg-sky-700 text-white dark:bg-blue-300 dark:text-zinc-900"
+                  : "text-sky-700 dark:text-blue-300 hover:bg-sky-50 dark:hover:bg-zinc-700"
               }`}
             >
               <MenuIcon fontSize="small" />
@@ -156,6 +171,8 @@ const MobileEventsView = ({
           setMonthPickerOpen(false);
         }}
       />
+
+      <EventsOnboarding viewMode={mobileView} />
 
       <EventDetailsDrawer
         selectedEventData={selectedEventData}

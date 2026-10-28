@@ -62,7 +62,6 @@ export function RestaurantFilters({
         "h-[40px] rounded-md border text-sm font-medium transition-all duration-200 w-full",
         userId === null &&
           "text-black/50 border-sky-700/50 dark:text-white/40 dark:border-blue-300/40",
-        isDesktop && "w-[240px]",
         showPreferencesOnly &&
           "bg-sky-700 text-white border-sky-700 shadow-md dark:bg-blue-300 dark:text-gray-900 dark:border-blue-300",
         !showPreferencesOnly &&
@@ -75,12 +74,16 @@ export function RestaurantFilters({
   );
 
   return (
+    // On desktop, items keep their natural widths on one line, and wrap and
+    // grow to fill the column when the sidebar leaves too little room.
     <div
       className={
-        isDesktop ? "flex flex-wrap gap-2" : "grid grid-cols-2 gap-3 w-full"
+        isDesktop
+          ? "flex flex-wrap grow gap-2"
+          : "grid grid-cols-2 gap-3 w-full"
       }
     >
-      <div className={isDesktop ? "w-52" : "w-full"}>
+      <div className={isDesktop ? "w-52 grow" : "w-full"}>
         <FormControl fullWidth size="small" variant="outlined">
           <InputLabel
             id="meal-select-label"
@@ -163,7 +166,7 @@ export function RestaurantFilters({
       </div>
 
       {calendarRange && (
-        <div className={isDesktop ? "w-[240px]" : "w-full"}>
+        <div className={isDesktop ? "w-[240px] grow" : "w-full"}>
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <DatePicker
               label="Select date"
@@ -228,7 +231,7 @@ export function RestaurantFilters({
         </div>
       )}
 
-      <div className={isDesktop ? undefined : "col-span-2"}>
+      <div className={isDesktop ? "w-[240px] grow" : "col-span-2"}>
         {!userId && (
           <Tooltip title="Log in to filter by preferences!" placement="top">
             {ShowPrefsButton}

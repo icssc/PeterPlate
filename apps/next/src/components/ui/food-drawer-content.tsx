@@ -1,8 +1,8 @@
 "use client"; // Need state for toggling nutrient visibility
 
-import { Add } from "@mui/icons-material";
+import { Add, Close, StarBorder } from "@mui/icons-material";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, IconButton, Typography } from "@mui/material";
 import type { RestaurantId } from "@peterplate/db";
 import type { DishWithRating } from "@peterplate/validators";
 import Image from "next/image";
@@ -15,6 +15,7 @@ import {
   formatNutrientValue,
   toTitleCase,
 } from "@/utils/funcs";
+import { trpc } from "@/utils/trpc";
 import { cn } from "@/utils/tw";
 import { nutrientToUnit } from "@/utils/types";
 import IngredientsDialog from "../ingredients-dialog";
@@ -27,11 +28,13 @@ export default function FoodDrawerContent({
   restaurant,
   onAddToMealTracker,
   isAddingToMealTracker = false,
+  onClose,
 }: {
   dish: DishWithRating;
   restaurant?: RestaurantId;
   onAddToMealTracker?: OnAddToMealTracker;
   isAddingToMealTracker?: boolean;
+  onClose?: () => void;
 }) {
   const violations = useDietaryConflicts(dish.dietRestriction);
   const [imageError, setImageError] = useState(false);
@@ -46,8 +49,13 @@ export default function FoodDrawerContent({
   const caloricInformationAvailable: boolean =
     dish.nutritionInfo.calories != null;
 
+  const { data: ratingData } = trpc.dish.getAverageRating.useQuery(
+    { dishId: dish.id },
+    { staleTime: 5 * 60 * 1000 },
+  );
+  const averageRating = ratingData?.averageRating ?? 0;
+
   // State to control nutrient visibility
-  const [showAllNutrients, setShowAllNutrients] = useState(false);
   const initialNutrients = [
     "calories",
     "totalFatG",
@@ -65,8 +73,23 @@ export default function FoodDrawerContent({
   ]);
 
   return (
-    <Box className="h-full max-h-[85vh] flex flex-col font-poppins min-h-0 dark:bg-[var(--surface-modal)]">
-      <Box className="pb-4 shrink-0">
+    <Box className="h-full flex flex-col font-poppins min-h-0 dark:bg-[var(--surface-modal)]">
+      <Box className="pb-4 shrink-0 relative">
+        {onClose && (
+          <IconButton
+            onClick={onClose}
+            aria-label="Close"
+            sx={{
+              position: "absolute",
+              top: 8,
+              right: 8,
+              zIndex: 1,
+              color: "black",
+            }}
+          >
+            <Close />
+          </IconButton>
+        )}
         {showImage ? (
           <Image
             src={dish.imageUrl as string}
@@ -101,8 +124,13 @@ export default function FoodDrawerContent({
           </div>
 
           <div className="flex flex-wrap items-center gap-2 text-zinc-500 dark:text-zinc-400">
-            <span className="whitespace-nowrap">
-              {restaurant ? `${toTitleCase(restaurant)} • ` : ""}
+            <span className="whitespace-nowrap flex items-center gap-1">
+              <StarBorder
+                className="w-4 h-4 stroke-zinc-400"
+                strokeWidth={1.5}
+              />
+              {averageRating.toFixed(1)}
+              {restaurant ? ` • ${toTitleCase(restaurant)}` : ""} •{" "}
               {!caloricInformationAvailable
                 ? "-"
                 : `${Math.round(dish.nutritionInfo.calories ?? 0)} cal`}
@@ -150,13 +178,13 @@ export default function FoodDrawerContent({
         </Box>
       </Box>
 
-      <Box className="flex-1 min-h-0 overflow-y-auto flex flex-col px-4">
+      <Box className="flex-1 min-h-0 overflow-y-auto flex flex-col px-4 pb-4">
         <Typography
           fontWeight={700}
           color="text.primary"
           className="text-2xl mb-2"
         >
-          Nutrients
+          Nutrition Facts
         </Typography>
         <Box
           className="grid grid-cols-2 gap-x-4 w-full px-2 mb-4 auto-rows-max"
@@ -174,16 +202,10 @@ export default function FoodDrawerContent({
                   nutrientKey,
                   value?.toString() ?? "",
                 );
-                const isInitial = initialNutrients.includes(nutrientKey); // Use nutrientKey here too for consistency
                 return (
                   <div
                     key={nutrientKey}
-                    className={cn(
-                      "grid grid-cols-subgrid col-span-2 transition-all duration-500 ease-in-out overflow-hidden", // Base styles for transition
-                      !isInitial && !showAllNutrients
-                        ? "max-h-0 opacity-0 py-0"
-                        : "max-h-8 opacity-100 py-0.5", // Conditional styles for collapse/expand
-                    )}
+                    className="grid grid-cols-subgrid col-span-2 py-0.5"
                   >
                     <strong
                       className={cn(
@@ -217,25 +239,7 @@ export default function FoodDrawerContent({
           </h2>
         )}
 
-        <Box className="mb-4 flex flex-col gap-2">
-          {caloricInformationAvailable && (
-            <Button
-              variant="outlined"
-              size="small"
-              className="w-full whitespace-nowrap border-input hover:bg-accent hover:text-accent-foreground text-sm font-medium h-8 rounded-md normal-case"
-              sx={{
-                borderColor: "hsl(var(--input))",
-                color: "inherit",
-                "&:hover": {
-                  borderColor: "hsl(var(--input))",
-                  backgroundColor: "hsl(var(--accent))",
-                },
-              }}
-              onClick={() => setShowAllNutrients(!showAllNutrients)}
-            >
-              {showAllNutrients ? "Show Less" : "Show More Nutrients"}
-            </Button>
-          )}
+        <Box className="flex flex-col gap-2">
           {ingredientsAvailable && (
             <IngredientsDialog
               name={dish.name}
@@ -255,17 +259,25 @@ export default function FoodDrawerContent({
       </Box>
 
       {onAddToMealTracker && (
-        <Box className="px-4 pt-2 pb-8 shrink-0">
-          <button
+        <Box className="px-4 py-4 shrink-0 border-t border-gray-300 bg-white dark:border-zinc-700 dark:bg-[var(--surface-modal)]">
+          <Box
+            component="button"
             type="button"
             onClick={onAddToMealTracker}
             disabled={isAddingToMealTracker}
-            className="w-full inline-flex h-[30px] justify-center items-center gap-0.5 rounded-md border border-gray-300 dark:border-zinc-600 bg-white dark:bg-transparent text-[12px] font-normal leading-[18px] text-zinc-500 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700 disabled:opacity-60"
-            style={{ fontFamily: "Poppins, sans-serif" }}
+            className="w-full inline-flex h-10 justify-center items-center gap-0.5 rounded-md text-[12px] font-medium leading-[18px] disabled:opacity-60"
+            sx={{
+              bgcolor: "primary.main",
+              color: "primary.contrastText",
+              border: "none",
+              cursor: "pointer",
+              fontFamily: "Poppins, sans-serif",
+              "&:hover:not(:disabled)": { bgcolor: "primary.dark" },
+            }}
           >
             <Add sx={{ fontSize: 18, width: 18, height: 18 }} />
             Add to Meal Tracker
-          </button>
+          </Box>
         </Box>
       )}
     </Box>

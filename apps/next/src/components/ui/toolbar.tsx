@@ -29,12 +29,33 @@ import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import type { MouseEvent } from "react";
 import { useEffect, useState } from "react";
-import { getTourForPath, useTourStore } from "@/context/useTourStore";
+import { type TourId, useTourStore } from "@/context/useTourStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useSession } from "@/utils/auth-client";
 import EditPreferencesContent from "./edit-preferences-content";
 import { WelcomeView } from "./onboarding";
 import SidebarContent from "./sidebar/sidebar-content";
+
+const TOURS_BY_PATH: Record<
+  string,
+  { id: TourId; label: string; requiresUser: boolean }
+> = {
+  "/nutrition": {
+    id: "nutrition",
+    label: "Tracker tutorial",
+    requiresUser: true,
+  },
+  "/events": {
+    id: "events",
+    label: "Events tutorial",
+    requiresUser: false,
+  },
+  "/my-foods": {
+    id: "my-foods",
+    label: "My Foods tutorial",
+    requiresUser: true,
+  },
+};
 
 export type CalendarRange = {
   earliest: Date;
@@ -221,10 +242,7 @@ export function DesktopToolbar(): React.JSX.Element {
   const { data: session, isPending } = useSession();
   const user = session?.user;
   const start = useTourStore((state) => state.start);
-  const tourId = getTourForPath(pathname);
-  const tutorialTitle = DESKTOP_TOOLBAR_ELEMENTS.find(
-    (element) => element.href === pathname,
-  )?.title;
+  const tour = TOURS_BY_PATH[pathname];
 
   return (
     <>
@@ -297,14 +315,14 @@ export function DesktopToolbar(): React.JSX.Element {
           </nav>
           <div className="flex-none flex items-center gap-4">
             <div className="flex-none flex items-center gap-4">
-              {pathname && tourId && (
-                <Tooltip title={`${tutorialTitle} Tutorial`}>
+              {tour && (
+                <Tooltip title={tour.label}>
                   <span>
                     <IconButton
-                      onClick={() => start(tourId)}
-                      disabled={!user || isPending}
-                      aria-label={`Start ${tutorialTitle} tutorial`}
-                      sx={{ color: "text.primary" }}
+                      onClick={() => start(tour.id)}
+                      disabled={tour.requiresUser && (!user || isPending)}
+                      aria-label={`Start ${tour.label.toLowerCase()}`}
+                      sx={{ color: isTransparent ? "white" : "text.primary" }}
                     >
                       <HelpOutline />
                     </IconButton>
@@ -484,10 +502,7 @@ function MobileToolbar(): React.JSX.Element {
   const [_editPreferencesExpanded, setEditPreferencesExpanded] =
     useState(false);
   const start = useTourStore((state) => state.start);
-  const tourId = getTourForPath(pathname);
-  const tutorialTitle = MOBILE_TOOLBAR_ELEMENTS.find(
-    (element) => element.href === pathname,
-  )?.title;
+  const tour = TOURS_BY_PATH[pathname];
 
   useEffect(() => {
     setIsMounted(true);
@@ -557,14 +572,14 @@ function MobileToolbar(): React.JSX.Element {
           {greeting}
         </span>
         <div className="flex-shrink-0 min-h-[44px] flex items-center justify-center gap-2">
-          {pathname && tourId && (
-            <Tooltip title={`${tutorialTitle} Tutorial`}>
+          {tour && (
+            <Tooltip title={tour.label}>
               <span>
                 <IconButton
-                  onClick={() => start(tourId)}
-                  disabled={!user || isPending}
-                  aria-label={`Start ${tutorialTitle} tutorial`}
-                  sx={{ color: "text.primary" }}
+                  onClick={() => start(tour.id)}
+                  disabled={tour.requiresUser && (!user || isPending)}
+                  aria-label={`Start ${tour.label.toLowerCase()}`}
+                  sx={{ color: isTransparent ? "white" : "text.primary" }}
                 >
                   <HelpOutline />
                 </IconButton>
