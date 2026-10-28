@@ -18,6 +18,7 @@ import {
   EVENT_CATEGORIES,
   type EventCategory,
 } from "@/utils/classifyEvent";
+import { isUpcomingEvent } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 
@@ -40,7 +41,8 @@ const Events = () => {
 
   const eventsWithType = useMemo<EventWithType[]>(
     () =>
-      [...(events ?? [])]
+      (events ?? [])
+        .filter(isUpcomingEvent)
         .sort((a, b) => a.start.getTime() - b.start.getTime())
         .map((event) => ({
           ...event,
@@ -331,6 +333,7 @@ const Events = () => {
               isLoading={isLoading}
               error={error}
               currentDate={currentDate}
+              availableMonths={availableMonths}
               calendarEvents={calendarEvents}
               selectedEventData={selectedEventData}
               onPreviousMonth={viewPreviousMonthsEvents}
