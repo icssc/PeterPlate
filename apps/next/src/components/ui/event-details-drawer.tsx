@@ -17,6 +17,7 @@ const EventDetailsDrawer = ({
   onClose,
 }: EventDetailsDrawerProps) => {
   const open = Boolean(selectedEventData) || selectedDayEvents.length > 0;
+  const isList = !selectedEventData && selectedDayEvents.length > 1;
 
   return (
     <Drawer
@@ -34,24 +35,27 @@ const EventDetailsDrawer = ({
       }}
       className="dark:[&_.MuiDrawer-paper]:!bg-zinc-950"
     >
-      <div className="relative w-full h-full flex flex-col overflow-y-auto">
-        {open && (
-          <button
-            type="button"
-            aria-label="Close"
-            className="absolute top-4 right-2 z-50 text-zinc-600 dark:text-zinc-300"
-            onClick={onClose}
-          >
-            <CloseIcon sx={{ fontSize: 24 }} />
-          </button>
-        )}
+      {open && (
+        <button
+          type="button"
+          aria-label="Close"
+          className="absolute top-4 right-2 z-50 text-zinc-600 dark:text-zinc-300"
+          onClick={onClose}
+        >
+          <CloseIcon sx={{ fontSize: 24 }} />
+        </button>
+      )}
 
+      {/* Scroll below the X so it stays put */}
+      <div
+        className={`w-full flex flex-col overflow-y-auto ${isList ? "mt-12" : ""}`}
+      >
         {selectedEventData ? (
           <EventDrawerContent {...selectedEventData} />
         ) : selectedDayEvents.length === 1 ? (
           <EventDrawerContent {...selectedDayEvents[0]} />
         ) : (
-          <div className="flex flex-col gap-4 p-4 pt-12 pb-10">
+          <div className="flex flex-col gap-4 px-4 pb-10">
             {selectedDayEvents.map((event, idx) => (
               <div
                 key={`event-drawer-${event.title}-${idx}`}

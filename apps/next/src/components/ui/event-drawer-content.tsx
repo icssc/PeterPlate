@@ -6,7 +6,7 @@ import type { Event } from "@peterplate/validators";
 import EventImage from "@/components/ui/event-image";
 import EventTypeBadge from "@/components/ui/event-type-badge";
 import { classifyEvent } from "@/utils/classifyEvent";
-import { timeToString, toTitleCase } from "@/utils/funcs";
+import { dateRangeToString, timeToString, toTitleCase } from "@/utils/funcs";
 
 /**
  * `EventDrawerContent` renders the detailed view of an event within a drawer (mobile view).
@@ -42,13 +42,7 @@ export default function EventDrawerContent(props: Event): React.JSX.Element {
         <div className="flex flex-col gap-2 text-sm text-zinc-500 dark:text-zinc-400 mt-1">
           <div className="flex gap-2 items-center">
             <CalendarTodayOutlinedIcon sx={{ fontSize: 16 }} />
-            <span>
-              {props.start.toLocaleDateString(undefined, {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </span>
+            <span>{dateRangeToString(props.start, props.end)}</span>
           </div>
           <div className="flex gap-2 items-center">
             <AccessTimeOutlinedIcon sx={{ fontSize: 16 }} />

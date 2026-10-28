@@ -1,7 +1,7 @@
 "use client";
 
 import Image, { type ImageProps } from "next/image";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const PLACEHOLDER_SRC = "/placeholder-event.png";
 
@@ -16,22 +16,19 @@ const PLACEHOLDER_SRC = "/placeholder-event.png";
 export default function EventImage({
   src,
   alt,
+  className,
   ...props
 }: Omit<ImageProps, "src"> & { src: string }) {
-  const resolvedSrc = src?.trim() ? src : PLACEHOLDER_SRC;
-  const [imgSrc, setImgSrc] = useState(resolvedSrc);
-
-  // Reset when the event (and therefore its image) changes.
-  useEffect(() => {
-    setImgSrc(resolvedSrc);
-  }, [resolvedSrc]);
+  const [failedSrc, setFailedSrc] = useState<string>();
+  const showPlaceholder = !src?.trim() || failedSrc === src;
 
   return (
     <Image
       {...props}
-      src={imgSrc}
+      src={showPlaceholder ? PLACEHOLDER_SRC : src}
       alt={alt}
-      onError={() => setImgSrc(PLACEHOLDER_SRC)}
+      className={`${className} aspect-[640/412] ${showPlaceholder ? "!object-cover" : ""}`}
+      onError={() => setFailedSrc(src)}
     />
   );
 }

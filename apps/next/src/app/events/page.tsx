@@ -193,6 +193,19 @@ const Events = () => {
                 <CalendarTodayIcon className="mr-1" sx={{ fontSize: 18 }} />
                 Calendar View
               </Button>
+
+              {viewMode === "calendar" && (
+                <div className="ml-auto flex items-center gap-4 text-sm text-slate-900 dark:text-white">
+                  <span className="flex items-center gap-1.5">
+                    <span className="size-4 rounded-[3px] border border-sky-700 bg-[var(--calendar-today-bg)] dark:border-blue-300 dark:bg-[var(--calendar-today-bg-dark)]" />
+                    Today
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="size-4 rounded-[3px] bg-sky-700 dark:bg-[var(--primary-accent-light)]" />
+                    Event
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Filter Bar */}
@@ -297,10 +310,10 @@ const Events = () => {
           {/* GRID DISPLAY: Map over the fetched events once loaded */}
           {!isLoading && !error && viewMode === "grid" && (
             <>
-              <Typography variant="body2" fontWeight={600} color="text.primary">
+              <p className="text-lg leading-6 text-black dark:text-white">
                 Showing {filteredEvents.length} event
                 {filteredEvents.length !== 1 ? "s" : ""}
-              </Typography>
+              </p>
 
               <div className="flex sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12 overflow-x-auto sm:overflow-visible pb-2 sm:pb-0">
                 {filteredEvents.map((event) => (
