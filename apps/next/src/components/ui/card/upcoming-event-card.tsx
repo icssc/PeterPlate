@@ -56,7 +56,7 @@ export default function UpcomingEventCard({
               <Box className="flex items-center gap-1.5">
                 <AccessTime style={{ fontSize: iconSize }} />
                 <Typography variant="caption" color="text.secondary">
-                  {timeToString(event.end)}
+                  {timeToString(event.start)}
                   {event.end ? ` - ${timeToString(event.end)}` : ""}
                 </Typography>
               </Box>

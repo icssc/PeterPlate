@@ -6,7 +6,7 @@ import { Typography } from "@mui/material";
 import Button from "@mui/material/Button";
 import type { SelectChangeEvent } from "@mui/material/Select";
 import type { Event } from "@peterplate/validators";
-import { addMonths, isFuture, subMonths } from "date-fns";
+import { addMonths, subMonths } from "date-fns";
 import { useCallback, useMemo, useState } from "react";
 import CalendarView from "@/components/ui/calendar-view";
 import EventCard from "@/components/ui/card/event-card";
@@ -18,6 +18,7 @@ import {
   EVENT_CATEGORIES,
   type EventCategory,
 } from "@/utils/classifyEvent";
+import { isUpcomingEvent } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 
@@ -41,7 +42,7 @@ const Events = () => {
   const eventsWithType = useMemo<EventWithType[]>(
     () =>
       (events ?? [])
-        .filter((event) => isFuture(event.end) || isFuture(event.start))
+        .filter(isUpcomingEvent)
         .sort((a, b) => a.start.getTime() - b.start.getTime())
         .map((event) => ({
           ...event,
@@ -332,6 +333,7 @@ const Events = () => {
               isLoading={isLoading}
               error={error}
               currentDate={currentDate}
+              availableMonths={availableMonths}
               calendarEvents={calendarEvents}
               selectedEventData={selectedEventData}
               onPreviousMonth={viewPreviousMonthsEvents}

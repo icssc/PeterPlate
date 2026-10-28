@@ -1,5 +1,6 @@
 import { Restaurant } from "@mui/icons-material";
 import type { DishWithRating, Event } from "@peterplate/validators";
+import { isFuture } from "date-fns";
 import {
   foodIconKeywords,
   foodIcons,
@@ -460,8 +461,14 @@ function getPopularDishes(
     .slice(0, numCards);
 }
 
+/** Whether an event hasn't ended yet. */
+export function isUpcomingEvent(event: Event) {
+  return isFuture(event.end) || isFuture(event.start);
+}
+
 export function sortedEvents(events: Event[], numCards: number) {
-  return [...(events ?? [])]
+  return (events ?? [])
+    .filter(isUpcomingEvent)
     .sort((event, nextEvent) => {
       const eventStartTime = event.start ? new Date(event.start).getTime() : 0;
       const nextEventStartTime = nextEvent.start
