@@ -65,7 +65,7 @@ export default function MyFoodsOnboarding() {
       options={{
         skipBeacon: true,
         overlayClickAction: false,
-        blockTargetInteraction: false,
+        blockTargetInteraction: true,
         zIndex: 1500,
       }}
     />

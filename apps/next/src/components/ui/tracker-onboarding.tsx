@@ -137,7 +137,7 @@ export default function TrackerOnboarding() {
       options={{
         skipBeacon: true,
         overlayClickAction: false,
-        blockTargetInteraction: false,
+        blockTargetInteraction: true,
         zIndex: 1500,
       }}
     />

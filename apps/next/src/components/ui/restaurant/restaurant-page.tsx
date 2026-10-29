@@ -1,10 +1,13 @@
 "use client";
 
 import type { AppRouter } from "@api/index";
-import { LocationOn } from "@mui/icons-material";
+import { LocationOn, SwapHorizOutlined } from "@mui/icons-material";
 import { Box, Container, Link, Typography } from "@mui/material";
 import type { TRPCClientErrorLike } from "@trpc/client";
 import Image from "next/image";
+import NextLink from "next/link";
+import { useEffect } from "react";
+import { useTourStore } from "@/context/useTourStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useRestaurantPage } from "@/hooks/useRestaurantPage";
 import { cn } from "@/utils/tw";
@@ -16,6 +19,7 @@ import {
 import { DiningHallStatus } from "../status";
 import { DishesView } from "./dishes-view";
 import { RestaurantControls } from "./restaurant-controls";
+import RestaurantOnboarding from "./restaurant-onboarding";
 import { Sidebar } from "./sidebar";
 import RestaurantSpinner from "./spinner";
 
@@ -27,6 +31,13 @@ export function RestaurantPage({
   hall,
 }: RestaurantPageProps): React.JSX.Element {
   const isDesktop = useMediaQuery("(min-width: 768px)");
+
+  useEffect(() => {
+    return () => {
+      const { activeTour, stop } = useTourStore.getState();
+      if (activeTour === "restaurant") stop();
+    };
+  }, []);
 
   const {
     hallData,
@@ -54,6 +65,7 @@ export function RestaurantPage({
 
   return (
     <Box sx={{ bgcolor: "background.default", minHeight: "100vh" }}>
+      <RestaurantOnboarding />
       {/* Hero image & mobile header */}
       <div className="relative w-full h-[200px] md:h-[250px]">
         <Image
@@ -96,6 +108,14 @@ export function RestaurantPage({
                 ? "4001 Mesa Rd, Irvine, CA 92617"
                 : "Middle Earth Community Irvine, CA 92697"}
             </Link>
+            <NextLink
+              id="tour-switch-hall"
+              href={hall === HallEnum.ANTEATERY ? "/brandywine" : "/anteatery"}
+              aria-label={`Switch to ${hall === HallEnum.ANTEATERY ? "Brandywine" : "Anteatery"}`}
+              className="absolute bottom-[19px] right-3.5 flex h-8 w-8 items-center justify-center rounded-md bg-white text-sky-700"
+            >
+              <SwapHorizOutlined />
+            </NextLink>
           </div>
         )}
       </div>

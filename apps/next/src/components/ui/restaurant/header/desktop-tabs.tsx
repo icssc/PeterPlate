@@ -50,7 +50,7 @@ export function DesktopTabs({
       )}
       {/* Card / compact view toggles */}
       <div className="flex justify-end mt-2">
-        <div className="flex gap-2">
+        <div id="tour-view-toggle-desktop" className="flex gap-2">
           <Button
             variant="outlined"
             size="small"

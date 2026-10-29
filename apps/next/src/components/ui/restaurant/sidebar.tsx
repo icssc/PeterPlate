@@ -28,13 +28,16 @@ interface SidebarProps {
 
 function SidebarSection({
   title,
+  id,
   children,
 }: {
   title: string;
+  id?: string;
   children: React.ReactNode;
 }) {
   return (
     <Paper
+      id={id}
       elevation={0}
       className="mb-4 overflow-hidden dark:bg-[var(--surface-modal)]"
       sx={{ border: 1, borderColor: "divider" }}
@@ -147,7 +150,7 @@ export function Sidebar({
       </SidebarSection>
 
       {/* Special Schedules card */}
-      <SidebarSection title="Special Schedules">
+      <SidebarSection title="Special Schedules" id="tour-special-schedules">
         {hallEvents.length > 0 ? (
           <div className="space-y-2">
             {hallEvents.map((event) => {

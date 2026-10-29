@@ -49,6 +49,14 @@ const TOURS_BY_PATH: Record<string, { id: TourId; label: string }> = {
     id: "my-foods",
     label: "My Foods tutorial",
   },
+  "/anteatery": {
+    id: "restaurant",
+    label: "Restaurant tutorial",
+  },
+  "/brandywine": {
+    id: "restaurant",
+    label: "Restaurant tutorial",
+  },
 };
 
 export type CalendarRange = {
