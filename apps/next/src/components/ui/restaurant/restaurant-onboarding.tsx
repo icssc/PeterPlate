@@ -55,7 +55,7 @@ export default function RestaurantOnboarding() {
         "Click the meal card to view its nutrition facts, add it to your meal tracker, or to rate the dish itself.",
       title: "View Food Content",
       skipBeacon: true,
-      placement: "bottom",
+      placement: "right",
     },
     {
       target: FAVORITE_TARGET,
@@ -64,7 +64,7 @@ export default function RestaurantOnboarding() {
         "Click the heart button to favorite dishes and see them in your My Foods page.",
       title: "Favorite Dishes",
       skipBeacon: true,
-      placement: "bottom",
+      placement: "right",
     },
     {
       target: "#tour-special-schedules",
@@ -144,7 +144,7 @@ export default function RestaurantOnboarding() {
       options={{
         skipBeacon: true,
         overlayClickAction: false,
-        blockTargetInteraction: false,
+        blockTargetInteraction: true,
         zIndex: 1500,
       }}
     />
