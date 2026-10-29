@@ -1,14 +1,15 @@
 import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
+import CloseIcon from "@mui/icons-material/Close";
 import PinDropOutlinedIcon from "@mui/icons-material/PinDropOutlined";
 import { Box, Button, DialogContent, Typography } from "@mui/material";
 import type { Event } from "@peterplate/validators";
-import Image from "next/image";
 import type React from "react";
+import EventImage from "@/components/ui/event-image";
 import EventTypeBadge from "@/components/ui/event-type-badge";
-import type { EventCategory } from "@/utils/classifyEvent";
+import { classifyEvent } from "@/utils/classifyEvent";
 import {
-  dateToString,
+  dateRangeToString,
   generateGCalLink,
   timeToString,
   toTitleCase,
@@ -25,20 +26,29 @@ import { HallEnum } from "@/utils/types";
  * @returns {JSX.Element} The rendered content for the event dialog.
  */
 // TODO: Add buttons to add to Google (see generateGCalLink), Apple Calendar, stream for calendar
-export default function EventDialogContent(
-  props: Event & { type: EventCategory },
-): React.JSX.Element {
+export default function EventDialogContent({
+  onClose,
+  ...props
+}: Event & { onClose: () => void }): React.JSX.Element {
   return (
     <Box className="dark:bg-[var(--surface-modal)]">
       <div className="relative">
-        <Image
+        <button
+          type="button"
+          aria-label="Close"
+          className="absolute top-3 right-3 z-10 flex rounded-full p-1 bg-white text-black dark:bg-[#313136] dark:text-white"
+          onClick={onClose}
+        >
+          <CloseIcon sx={{ fontSize: 20 }} />
+        </button>
+        <EventImage
           src={props.image}
           alt={`An image for an event "${props.title}" at ${props.restaurantId}.`}
           width={600}
           height={600}
           className="w-full object-contain"
         />
-        <EventTypeBadge type={props.type} />
+        <EventTypeBadge type={classifyEvent(props.title, props.description)} />
       </div>
       <DialogContent
         sx={{ padding: "20px 24px 24px !important" }}
@@ -53,17 +63,17 @@ export default function EventDialogContent(
           {props.title}
         </Typography>
         <Box
-          className="flex flex-wrap gap-x-2 gap-y-1 items-center text-zinc-500 dark:text-zinc-400"
+          className="flex flex-col gap-2 text-zinc-500 dark:text-zinc-400"
           id="event-card-subheader"
         >
-          <div className="flex gap-1 items-center whitespace-nowrap">
-            <AccessTimeOutlinedIcon fontSize="small" />
-            <p>{dateToString(props.start, props.end)}</p>
+          <div className="flex gap-2 items-center">
+            <CalendarTodayOutlinedIcon sx={{ fontSize: 16 }} />
+            <span>{dateRangeToString(props.start, props.end)}</span>
           </div>
           <div className="flex gap-2 items-center">
             <AccessTimeOutlinedIcon sx={{ fontSize: 16 }} />
             <span>
-              {timeToString(props.start)} - {timeToString(props.end)}
+              {timeToString(props.start)} – {timeToString(props.end)}
             </span>
           </div>
           <div className="flex gap-2 items-center">

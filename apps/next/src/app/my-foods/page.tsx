@@ -10,9 +10,11 @@ import {
 } from "@mui/material";
 import type { DishWithRating } from "@peterplate/validators";
 import { useTheme } from "next-themes";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import MyFoodsCard from "@/components/ui/card/my-foods-card";
+import MyFoodsOnboarding from "@/components/ui/my-foods-onboarding";
 import FoodCardSkeleton from "@/components/ui/skeleton/food-card-skeleton";
+import { useTourStore } from "@/context/useTourStore";
 import { useUserStore } from "@/context/useUserStore";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
@@ -146,11 +148,19 @@ export default function MyFoodsPage() {
   const isLoading = isLoadingFavorites || isLoadingRated || isLoadingDishes;
   const hasError = !!favoritesError || !!ratedError || !!dishesError;
 
+  useEffect(() => {
+    return () => {
+      const { activeTour, stop } = useTourStore.getState();
+      if (activeTour === "my-foods") stop();
+    };
+  }, []);
+
   return (
     <Box
       className={`mx-auto flex max-w-7xl flex-col gap-4 px-4 pb-8 ${isDesktop ? "pt-20" : ""} sm:px-6 lg:px-8`}
       sx={{ bgcolor: "background.default", minHeight: "100vh" }}
     >
+      {<MyFoodsOnboarding />}
       {/* Header */}
       <header className="space-y-1">
         <Typography color="primary" fontWeight={700} className="text-4xl mb-4">
@@ -175,7 +185,7 @@ export default function MyFoodsPage() {
             <Typography variant="body2" fontWeight={500} color="text.primary">
               Location
             </Typography>
-            <div className="flex flex-row gap-2">
+            <div id="tour-filter-foods-desktop" className="flex flex-row gap-2">
               {(Object.keys(LOCATION_LABELS) as LocationFilter[]).map((loc) => (
                 <button
                   key={loc}
@@ -202,7 +212,7 @@ export default function MyFoodsPage() {
 
           <div className="ml-auto flex flex-row flex-wrap items-center gap-3">
             {/* Search */}
-            <div className="relative w-64">
+            <div id="tour-search-foods-desktop" className="relative w-64">
               <svg
                 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-zinc-400 pointer-events-none"
                 fill="none"
@@ -224,7 +234,10 @@ export default function MyFoodsPage() {
             </div>
 
             {/* Sort */}
-            <div className="flex flex-col justify-end">
+            <div
+              id="tour-sort-foods-desktop"
+              className="flex flex-col justify-end"
+            >
               <FormControl
                 variant="outlined"
                 size="small"
@@ -293,7 +306,7 @@ export default function MyFoodsPage() {
         /* ── Mobile: stacked layout ── */
         <div className="flex flex-col gap-3 rounded-2xl bg-sky-100 dark:bg-[var(--surface-tinted)] p-4">
           {/* Location buttons — no label */}
-          <div className="flex flex-row gap-2">
+          <div id="tour-filter-foods-mobile" className="flex flex-row gap-2">
             {(Object.keys(LOCATION_LABELS) as LocationFilter[]).map((loc) => (
               <button
                 key={loc}
@@ -313,7 +326,7 @@ export default function MyFoodsPage() {
 
           {/* Search + filter icon */}
           <div className="flex flex-row gap-2 items-center">
-            <div className="relative flex-1">
+            <div id="tour-search-foods-mobile" className="relative flex-1">
               <svg
                 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-zinc-400 pointer-events-none"
                 fill="none"
@@ -336,6 +349,7 @@ export default function MyFoodsPage() {
 
             {/* Filter icon button */}
             <button
+              id="tour-sort-foods-mobile"
               type="button"
               aria-label="Toggle sort options"
               onClick={() => setShowMobileSort((v) => !v)}

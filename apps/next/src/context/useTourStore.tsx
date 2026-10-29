@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-export type TourId = "nutrition" | "restaurant";
+export type TourId = "nutrition" | "events" | "my-foods" | "restaurant";
 
 type TourState = {
   activeTour: TourId | null;

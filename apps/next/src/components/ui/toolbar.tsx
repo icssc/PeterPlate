@@ -36,24 +36,26 @@ import EditPreferencesContent from "./edit-preferences-content";
 import { WelcomeView } from "./onboarding";
 import SidebarContent from "./sidebar/sidebar-content";
 
-const TOURS_BY_PATH: Record<
-  string,
-  { id: TourId; label: string; requiresUser: boolean }
-> = {
+const TOURS_BY_PATH: Record<string, { id: TourId; label: string }> = {
   "/nutrition": {
     id: "nutrition",
     label: "Tracker tutorial",
-    requiresUser: true,
+  },
+  "/events": {
+    id: "events",
+    label: "Events tutorial",
+  },
+  "/my-foods": {
+    id: "my-foods",
+    label: "My Foods tutorial",
   },
   "/anteatery": {
     id: "restaurant",
     label: "Restaurant tutorial",
-    requiresUser: false,
   },
   "/brandywine": {
     id: "restaurant",
     label: "Restaurant tutorial",
-    requiresUser: false,
   },
 };
 
@@ -320,9 +322,8 @@ export function DesktopToolbar(): React.JSX.Element {
                   <span>
                     <IconButton
                       onClick={() => start(tour.id)}
-                      disabled={tour.requiresUser && (!user || isPending)}
                       aria-label={`Start ${tour.label.toLowerCase()}`}
-                      className="!text-white"
+                      sx={{ color: isTransparent ? "white" : "text.primary" }}
                     >
                       <HelpOutline />
                     </IconButton>
@@ -577,9 +578,8 @@ function MobileToolbar(): React.JSX.Element {
               <span>
                 <IconButton
                   onClick={() => start(tour.id)}
-                  disabled={tour.requiresUser && (!user || isPending)}
                   aria-label={`Start ${tour.label.toLowerCase()}`}
-                  className="!text-white"
+                  sx={{ color: isTransparent ? "white" : "text.primary" }}
                 >
                   <HelpOutline />
                 </IconButton>

@@ -366,7 +366,7 @@ export default function MealTracker() {
           </span>
           {/* History button - mobile only */}
           <div className="flex md:hidden">
-            {userId && (
+            {(userId || running) && (
               <TrackerHistory
                 tourId="tour-history-mobile"
                 onDateSelect={() => {}}
@@ -386,7 +386,7 @@ export default function MealTracker() {
             Keep track of your eating using our Nutrition Tracker! Add dishes to
             count them towards your totals!
           </Typography>
-          {userId && (
+          {(userId || running) && (
             <TrackerHistory
               tourId="tour-history-desktop"
               onDateSelect={() => {}}
@@ -418,9 +418,9 @@ export default function MealTracker() {
             fatGoal={goals?.fatGoal ?? 50}
           />
           <div className="relative mt-4 ml-auto">
-            {userId && (
+            {(userId || running) && (
               <NutritionGoals
-                userId={userId}
+                userId={userId ?? ""}
                 date={new Date().toISOString().split("T")[0]}
                 tourId="tour-edit-goals-desktop"
               />

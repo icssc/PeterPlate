@@ -115,11 +115,11 @@ const MobileCalendarView = ({
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      <div className="bg-[#0069A833] dark:bg-sky-950 rounded-2xl px-3 py-4 w-full mb-4">
+      <div className="bg-[var(--surface-tinted)] rounded-2xl px-3 py-4 w-full mb-4">
         <div className="flex items-center justify-between mb-4">
           <button
             type="button"
-            className="text-xl sm:text-2xl font-bold text-sky-700 dark:text-sky-400 focus:outline-none flex items-center gap-2"
+            className="text-xl sm:text-2xl font-bold text-sky-700 dark:text-blue-300 focus:outline-none flex items-center gap-2"
             onClick={onOpenMonthPicker}
           >
             {format(currentDate, "MMMM yyyy")}{" "}
@@ -174,13 +174,15 @@ const MobileCalendarView = ({
                 }
               }}
               className={`flex flex-col items-center relative aspect-square justify-center text-sm ${
+                hasEvents && isCurrentMonth ? "tour-event-day" : ""
+              } ${
                 isCurrentMonth
                   ? "text-slate-900 dark:text-zinc-100"
                   : "text-slate-300 dark:text-zinc-600"
               }`}
             >
               {isCurrentDate && (
-                <div className="absolute left-1/2 -translate-x-1/2 top-2 -bottom-6 w-10 rounded-lg bg-[#CCE1EE] dark:bg-sky-950 z-0" />
+                <div className="absolute left-1/2 -translate-x-1/2 top-2 -bottom-6 w-10 rounded-lg bg-[var(--surface-tinted)] z-0" />
               )}
               <div
                 className={`relative z-10 flex items-center justify-center w-8 h-8 rounded-full ${
@@ -194,7 +196,7 @@ const MobileCalendarView = ({
                   {eventsOnDay.slice(0, 3).map((event) => (
                     <div
                       key={`${event.title}-${String(event.start)}-${event.restaurantId}`}
-                      className="w-1.5 h-1.5 rounded-full bg-sky-700 dark:bg-sky-400"
+                      className="w-1.5 h-1.5 rounded-full bg-sky-700 dark:bg-blue-300"
                     />
                   ))}
                 </div>
