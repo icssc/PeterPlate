@@ -15,6 +15,20 @@ import EventDrawerContent from "../event-drawer-content";
 import OngoingBadge from "../ongoing-badge";
 
 type EventWithType = Event & { type: EventCategory };
+const isValidDate = (value: unknown): boolean => {
+  if (
+    value === null ||
+    value === undefined ||
+    value === "" ||
+    value === 0 ||
+    value === "0"
+  ) {
+    return false;
+  }
+
+  const date = new Date(value as string | number);
+  return !Number.isNaN(date.getTime()) && date.getTime() !== 0;
+};
 
 /**
  * Props for the {@link EventCardContent} component.
@@ -41,6 +55,8 @@ const EventCardContent = React.forwardRef<
   HTMLDivElement,
   EventCardContentProps
 >(({ props, ...divProps }, ref) => {
+  const hasValidDate = isValidDate(props.start) && isValidDate(props.end);
+
   return (
     <div ref={ref} {...divProps}>
       <Card
@@ -72,12 +88,18 @@ const EventCardContent = React.forwardRef<
           <div className="flex flex-col gap-2 text-sm text-zinc-500 dark:text-zinc-400 mt-1">
             <div className="flex gap-3 items-center">
               <CalendarTodayOutlinedIcon sx={{ fontSize: 16 }} />
-              <span>{dateRangeToString(props.start, props.end)}</span>
+              <span>
+                {hasValidDate
+                  ? dateRangeToString(props.start, props.end)
+                  : "TBD"}
+              </span>
             </div>
             <div className="flex gap-3 items-center">
               <AccessTime sx={{ fontSize: 16 }} />
               <span>
-                {timeToString(props.start)} – {timeToString(props.end)}
+                {hasValidDate
+                  ? `${timeToString(props.start)} - ${timeToString(props.end)}`
+                  : "TBD"}
               </span>
             </div>
             <div className="flex gap-3 items-center">

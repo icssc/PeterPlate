@@ -446,7 +446,21 @@ function getPopularDishes(
 
 /** Whether an event hasn't ended yet. */
 export function isUpcomingEvent(event: Event) {
-  return isFuture(event.end) || isFuture(event.start);
+  // Keep cards missing dates
+  const start = event.start ? new Date(event.start).getTime() : NaN;
+  const end = event.end ? new Date(event.end).getTime() : NaN;
+  const bothDatesMissing =
+    (!Number.isFinite(start) || start === 0) &&
+    (!Number.isFinite(end) || end === 0);
+
+  if (bothDatesMissing) {
+    return true;
+  }
+
+  return (
+    (Number.isFinite(start) && start > Date.now()) ||
+    (Number.isFinite(end) && end > Date.now())
+  );
 }
 
 export function sortedEvents(events: Event[], numCards: number) {
