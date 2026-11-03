@@ -45,7 +45,11 @@ const Events = () => {
     () =>
       (events ?? [])
         .filter(isUpcomingEvent)
-        .sort((a, b) => a.start.getTime() - b.start.getTime())
+        .sort((a, b) => {
+          const aTime = a.start?.getTime() || Infinity;
+          const bTime = b.start?.getTime() || Infinity;
+          return aTime === bTime ? 0 : aTime - bTime;
+        })
         .map((event) => ({
           ...event,
           eventType: classifyEvent(event.title, event.description),
