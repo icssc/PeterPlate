@@ -463,6 +463,23 @@ export function isUpcomingEvent(event: Event) {
   );
 }
 
+/** Whether an event's date is valid or not. **/
+export const isValidDate = (value: unknown): boolean => {
+  if (
+    value === null ||
+    value === undefined ||
+    value === "" ||
+    value === 0 ||
+    value === "0"
+  ) {
+    return false;
+  }
+
+  const date = new Date(value as string | number);
+
+  return !Number.isNaN(date.getTime()) && date.getTime() !== 0;
+};
+
 export function sortedEvents(events: Event[], numCards: number) {
   return (events ?? [])
     .filter(isUpcomingEvent)

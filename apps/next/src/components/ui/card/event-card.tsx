@@ -9,26 +9,17 @@ import EventImage from "@/components/ui/event-image";
 import EventTypeBadge from "@/components/ui/event-type-badge";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import type { EventCategory } from "@/utils/classifyEvent";
-import { dateRangeToString, timeToString, toTitleCase } from "@/utils/funcs";
+import {
+  dateRangeToString,
+  isValidDate,
+  timeToString,
+  toTitleCase,
+} from "@/utils/funcs";
 import EventDialogContent from "../event-dialog-content";
 import EventDrawerContent from "../event-drawer-content";
 import OngoingBadge from "../ongoing-badge";
 
 type EventWithType = Event & { type: EventCategory };
-const isValidDate = (value: unknown): boolean => {
-  if (
-    value === null ||
-    value === undefined ||
-    value === "" ||
-    value === 0 ||
-    value === "0"
-  ) {
-    return false;
-  }
-
-  const date = new Date(value as string | number);
-  return !Number.isNaN(date.getTime()) && date.getTime() !== 0;
-};
 
 /**
  * Props for the {@link EventCardContent} component.
