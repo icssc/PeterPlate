@@ -11,6 +11,7 @@ import { classifyEvent } from "@/utils/classifyEvent";
 import {
   dateRangeToString,
   generateGCalLink,
+  isValidDate,
   timeToString,
   toTitleCase,
 } from "@/utils/funcs";
@@ -30,6 +31,8 @@ export default function EventDialogContent({
   onClose,
   ...props
 }: Event & { onClose: () => void }): React.JSX.Element {
+  const hasValidDate = isValidDate(props.start) && isValidDate(props.end);
+
   return (
     <Box className="dark:bg-[var(--surface-modal)]">
       <div className="relative">
@@ -68,12 +71,17 @@ export default function EventDialogContent({
         >
           <div className="flex gap-2 items-center">
             <CalendarTodayOutlinedIcon sx={{ fontSize: 16 }} />
-            <span>{dateRangeToString(props.start, props.end)}</span>
+            <span>
+              {hasValidDate ? dateRangeToString(props.start, props.end) : "TBD"}
+            </span>
           </div>
+
           <div className="flex gap-2 items-center">
             <AccessTimeOutlinedIcon sx={{ fontSize: 16 }} />
             <span>
-              {timeToString(props.start)} – {timeToString(props.end)}
+              {hasValidDate
+                ? `${timeToString(props.start)} – ${timeToString(props.end)}`
+                : "TBD"}
             </span>
           </div>
           <div className="flex gap-2 items-center">
@@ -88,28 +96,30 @@ export default function EventDialogContent({
         >
           {props.description}
         </Typography>
-        <div className="w-full flex items-center justify-center pt-4">
-          <a
-            href={generateGCalLink(
-              props.title,
-              props.description,
-              props.restaurantId === "brandywine"
-                ? HallEnum.BRANDYWINE
-                : HallEnum.ANTEATERY,
-              props.start,
-            )}
-            rel="noreferrer"
-            target="_blank"
-          >
-            <Button
-              variant="contained"
-              className="[&_svg]:size-5 whitespace-nowrap"
-              startIcon={<CalendarTodayOutlinedIcon />}
+        {hasValidDate && (
+          <div className="w-full flex items-center justify-center pt-4">
+            <a
+              href={generateGCalLink(
+                props.title,
+                props.description,
+                props.restaurantId === "brandywine"
+                  ? HallEnum.BRANDYWINE
+                  : HallEnum.ANTEATERY,
+                props.start,
+              )}
+              rel="noreferrer"
+              target="_blank"
             >
-              Add to Google Calendar
-            </Button>
-          </a>
-        </div>
+              <Button
+                variant="contained"
+                className="[&_svg]:size-5 whitespace-nowrap"
+                startIcon={<CalendarTodayOutlinedIcon />}
+              >
+                Add to Google Calendar
+              </Button>
+            </a>
+          </div>
+        )}
       </DialogContent>
     </Box>
   );
