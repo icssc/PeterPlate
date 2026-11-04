@@ -116,7 +116,7 @@ const MobileListView = ({
                     onClick={onOpenMonthPicker}
                   >
                     {month.key === "TBD"
-                      ? "Date & Time TBD"
+                      ? "TBD"
                       : format(month.date, "MMMM yyyy")}{" "}
                     <span className="text-xs sm:text-sm">▼</span>
                   </button>
