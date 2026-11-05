@@ -1,6 +1,5 @@
 import type { Station } from "@api/index";
-import { GridView, Menu as MenuIcon } from "@mui/icons-material";
-import { Button, Tab, Tabs } from "@mui/material";
+import { Tab, Tabs } from "@mui/material";
 import { useRestaurantUIStore } from "@/context/useRestaurantUIStore";
 import { scrollToStation, toTitleCase } from "@/utils/funcs";
 
@@ -19,8 +18,6 @@ export function DesktopTabs({
 }: DesktopTabsProps) {
   const selectedStation = useRestaurantUIStore((s) => s.selectedStation);
   const setSelectedStation = useRestaurantUIStore((s) => s.setSelectedStation);
-  const isCompactView = useRestaurantUIStore((s) => s.isCompactView);
-  const setIsCompactView = useRestaurantUIStore((s) => s.setIsCompactView);
 
   if (!isDesktop) return null;
 
@@ -48,29 +45,6 @@ export function DesktopTabs({
           ))}
         </Tabs>
       )}
-      {/* Card / compact view toggles */}
-      <div className="flex justify-end mt-2">
-        <div id="tour-view-toggle-desktop" className="flex gap-2">
-          <Button
-            variant="outlined"
-            size="small"
-            type="button"
-            onClick={() => setIsCompactView(false)}
-            className={`!min-w-0 !w-10 !h-10 !p-0 !border-sky-700 dark:!border-blue-300 !normal-case ${!isCompactView ? "!bg-sky-700 !text-white hover:!bg-sky-700 dark:!bg-blue-300 dark:!text-gray-900" : "!bg-white !text-sky-700 hover:!bg-sky-50 dark:!bg-transparent dark:!text-white"}`}
-          >
-            <MenuIcon className="h-5 w-5" />
-          </Button>
-          <Button
-            variant="outlined"
-            size="small"
-            type="button"
-            onClick={() => setIsCompactView(true)}
-            className={`!min-w-0 !w-10 !h-10 !p-0 !border-sky-700 dark:!border-blue-300 !normal-case ${isCompactView ? "!bg-sky-700 !text-white hover:!bg-sky-700 dark:!bg-blue-300 dark:!text-gray-900" : "!bg-white !text-sky-700 hover:!bg-sky-50 dark:!bg-transparent dark:!text-white"}`}
-          >
-            <GridView className="h-5 w-5" />
-          </Button>
-        </div>
-      </div>
     </div>
   );
 }

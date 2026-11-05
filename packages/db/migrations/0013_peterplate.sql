@@ -1,0 +1,1 @@
+ALTER TABLE "users" ADD COLUMN "showSuitableDishesOnly" boolean DEFAULT false NOT NULL;
