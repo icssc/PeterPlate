@@ -149,7 +149,7 @@ export default function SidebarContent({
             </div>
 
             <div className="flex items-center justify-between mt-3">
-              <Typography className="text-xs font-medium text-gray-500 dark:text-zinc-300">
+              <Typography className="text-xs font-medium text-gray-900 dark:text-zinc-300">
                 Show Suitable Dishes Only
               </Typography>
               <Switch
