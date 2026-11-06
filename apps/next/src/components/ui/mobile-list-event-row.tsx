@@ -3,6 +3,7 @@
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import { format } from "date-fns";
 import type { EventWithType } from "@/app/events/page";
+import { hasEndTime } from "@/utils/funcs";
 
 interface MobileListEventRowProps {
   event: EventWithType;
@@ -18,7 +19,7 @@ const ROW_CLASSES = [
 
 const MobileListEventRow = ({ event, onClick }: MobileListEventRowProps) => {
   const startStr = format(new Date(event.start), "h:mm a");
-  const endStr = format(new Date(event.end), "h:mm a");
+  const endStr = hasEndTime(event) ? format(new Date(event.end), "h:mm a") : "";
   const locationLabel =
     event.restaurantId === "anteatery" ? "Anteatery" : "Brandywine";
 
@@ -36,7 +37,7 @@ const MobileListEventRow = ({ event, onClick }: MobileListEventRowProps) => {
       </div>
       <div className="flex flex-col items-end text-black dark:text-zinc-100">
         <span>{startStr}</span>
-        <span>{endStr}</span>
+        {endStr && <span>{endStr}</span>}
       </div>
     </button>
   );

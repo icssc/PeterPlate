@@ -449,6 +449,29 @@ export function isUpcomingEvent(event: Event) {
   return isFuture(event.end) || isFuture(event.start);
 }
 
+/**
+ * Whether the API gave an event an end time. A missing end time comes through
+ * as the epoch, because the schema coerces null to a Date.
+ */
+export function hasEndTime(event: Pick<Event, "start" | "end">) {
+  return event.end >= event.start;
+}
+
+/** "11:00am – 4:00pm", or only the start time when there's no end time. */
+export function eventTimeRangeToString(event: Pick<Event, "start" | "end">) {
+  return hasEndTime(event)
+    ? `${timeToString(event.start)} – ${timeToString(event.end)}`
+    : timeToString(event.start);
+}
+
+/** Options for the events page's Upcoming/Past toggle. */
+export const EVENT_TIMEFRAMES = [
+  { value: "upcoming", label: "Upcoming" },
+  { value: "past", label: "Past" },
+] as const;
+
+export type EventTimeframe = (typeof EVENT_TIMEFRAMES)[number]["value"];
+
 export function sortedEvents(events: Event[], numCards: number) {
   return (events ?? [])
     .filter(isUpcomingEvent)
