@@ -20,7 +20,12 @@ import {
   EVENT_CATEGORIES,
   type EventCategory,
 } from "@/utils/classifyEvent";
-import { isUpcomingEvent } from "@/utils/funcs";
+import {
+  EVENT_TIMEFRAMES,
+  type EventTimeframe,
+  hasEndTime,
+  isUpcomingEvent,
+} from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 
@@ -34,6 +39,7 @@ const Events = () => {
   const [selectedEventType, setSelectedEventType] = useState<
     "both" | EventCategory
   >("both");
+  const [timeframe, setTimeframe] = useState<EventTimeframe>("upcoming");
   const [viewMode, setViewMode] = useState<"grid" | "calendar">("grid");
   const [selectedEventData, setSelectedEventData] =
     useState<EventWithType | null>(null);
@@ -41,16 +47,28 @@ const Events = () => {
 
   const { data: events, isLoading, error } = trpc.event.upcoming.useQuery();
 
+  // Oldest first. The API returns past events too, so the Upcoming/Past
+  // toggle decides which side of "now" every view shows. Events without a
+  // date come through as the epoch and are skipped, since there's no day to
+  // show them on.
   const eventsWithType = useMemo<EventWithType[]>(
     () =>
       (events ?? [])
-        .filter(isUpcomingEvent)
+        .filter((event) => event.start.getTime() > 0)
         .sort((a, b) => a.start.getTime() - b.start.getTime())
         .map((event) => ({
           ...event,
           eventType: classifyEvent(event.title, event.description),
         })),
     [events],
+  );
+
+  const timeframeEvents = useMemo(
+    () =>
+      eventsWithType.filter(
+        (event) => isUpcomingEvent(event) === (timeframe === "upcoming"),
+      ),
+    [eventsWithType, timeframe],
   );
 
   const matchesFilters = useCallback(
@@ -66,8 +84,15 @@ const Events = () => {
   );
 
   const filteredEvents = useMemo(
-    () => eventsWithType.filter(matchesFilters),
-    [eventsWithType, matchesFilters],
+    () => timeframeEvents.filter(matchesFilters),
+    [timeframeEvents, matchesFilters],
+  );
+
+  // The grid lists past events newest first, so the most recent ones are on top
+  const gridEvents = useMemo(
+    () =>
+      timeframe === "past" ? [...filteredEvents].reverse() : filteredEvents,
+    [filteredEvents, timeframe],
   );
 
   // Months that have at least one event, so the mobile month picker only
@@ -93,7 +118,8 @@ const Events = () => {
       filteredEvents.map((event) => ({
         title: event.title,
         start: event.start,
-        end: event.end,
+        // The calendar skips events that end before they start
+        end: hasEndTime(event) ? event.end : event.start,
         resource: event,
         allDay: true,
       })),
@@ -123,6 +149,22 @@ const Events = () => {
 
   const handleClose = () => setSelectedEventData(null);
 
+  // Move the calendars to where the chosen events are: this month for
+  // upcoming events, or the month of the latest past event that matches the
+  // current filters
+  const handleTimeframeChange = (nextTimeframe: EventTimeframe) => {
+    if (nextTimeframe === timeframe) return;
+    setTimeframe(nextTimeframe);
+    const latestPastEvent = eventsWithType
+      .filter((event) => !isUpcomingEvent(event) && matchesFilters(event))
+      .at(-1);
+    setCurrentDate(
+      nextTimeframe === "past" && latestPastEvent
+        ? latestPastEvent.start
+        : new Date(),
+    );
+  };
+
   const viewNextMonthsEvents = () => {
     setCurrentDate(addMonths(currentDate, 1));
   };
@@ -141,8 +183,9 @@ const Events = () => {
         currentDate={currentDate}
         setCurrentDate={setCurrentDate}
         selectedDiningHall={selectedDiningHall}
+        timeframe={timeframe}
+        onTimeframeChange={handleTimeframeChange}
         filteredEvents={filteredEvents}
-        filteredUpcomingEvents={filteredEvents}
         selectedEventData={selectedEventData}
         isLoading={isLoading}
         error={error}
@@ -226,6 +269,28 @@ const Events = () => {
               id="tour-events-filters"
               className="flex flex-wrap gap-8 w-full bg-[var(--calendar-today-bg)] dark:bg-[var(--surface-tinted)] border dark:border-zinc-700 rounded-lg p-5 pb-8 mt-4"
             >
+              <div className="flex flex-col gap-3">
+                <span className="text-sm font-medium text-slate-900 dark:text-white">
+                  Time
+                </span>
+                <div className="flex flex-wrap gap-3">
+                  {EVENT_TIMEFRAMES.map(({ value, label }) => (
+                    <Button
+                      key={value}
+                      variant="outlined"
+                      size="small"
+                      onClick={() => handleTimeframeChange(value)}
+                      className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
+                        timeframe === value
+                          ? "!bg-sky-700 !text-white !border-sky-700 hover:!bg-sky-800 dark:!bg-blue-300 dark:!text-gray-900 dark:!border-blue-300 dark:hover:!bg-blue-400"
+                          : "!bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50 dark:!bg-transparent dark:!border-blue-300 dark:!text-white dark:hover:!bg-zinc-700"
+                      }`}
+                    >
+                      {label}
+                    </Button>
+                  ))}
+                </div>
+              </div>
               <div className="flex flex-col gap-3">
                 <span className="text-sm font-medium text-slate-900 dark:text-white">
                   Event Type
@@ -327,12 +392,12 @@ const Events = () => {
           {!isLoading && !error && viewMode === "grid" && (
             <>
               <p className="text-lg leading-6 text-black dark:text-white">
-                Showing {filteredEvents.length} event
-                {filteredEvents.length !== 1 ? "s" : ""}
+                Showing {gridEvents.length} {timeframe} event
+                {gridEvents.length !== 1 ? "s" : ""}
               </p>
 
               <div className="flex sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12 overflow-x-auto sm:overflow-visible pb-2 sm:pb-0">
-                {filteredEvents.map((event) => (
+                {gridEvents.map((event) => (
                   <EventCard
                     key={`${event.title}-${event.start}-${event.restaurantId}`}
                     {...event}
@@ -340,13 +405,13 @@ const Events = () => {
                   />
                 ))}
               </div>
-              {filteredEvents.length === 0 && (
+              {gridEvents.length === 0 && (
                 <Typography
                   variant="body1"
                   color="text.secondary"
                   className="text-center py-5"
                 >
-                  No events found :(
+                  No {timeframe} events found :(
                 </Typography>
               )}
             </>

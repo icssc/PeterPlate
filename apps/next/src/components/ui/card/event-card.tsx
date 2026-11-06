@@ -9,7 +9,11 @@ import EventImage from "@/components/ui/event-image";
 import EventTypeBadge from "@/components/ui/event-type-badge";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import type { EventCategory } from "@/utils/classifyEvent";
-import { dateRangeToString, timeToString, toTitleCase } from "@/utils/funcs";
+import {
+  dateRangeToString,
+  eventTimeRangeToString,
+  toTitleCase,
+} from "@/utils/funcs";
 import EventDialogContent from "../event-dialog-content";
 import EventDrawerContent from "../event-drawer-content";
 import OngoingBadge from "../ongoing-badge";
@@ -76,9 +80,7 @@ const EventCardContent = React.forwardRef<
             </div>
             <div className="flex gap-3 items-center">
               <AccessTime sx={{ fontSize: 16 }} />
-              <span>
-                {timeToString(props.start)} – {timeToString(props.end)}
-              </span>
+              <span>{eventTimeRangeToString(props)}</span>
             </div>
             <div className="flex gap-3 items-center">
               <PinDrop sx={{ fontSize: 16 }} />

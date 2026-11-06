@@ -11,6 +11,8 @@ interface MonthPickerDrawerProps {
   onSelectMonth: (year: number, monthIndex: number) => void;
   /** Months that have at least one event, used to populate the picker. */
   availableMonths: { year: number; monthIndex: number }[];
+  /** Shown when there are no months to pick from. */
+  emptyMessage: string;
 }
 
 const MONTHS = [
@@ -34,6 +36,7 @@ const MonthPickerDrawer = ({
   currentDate,
   onSelectMonth,
   availableMonths,
+  emptyMessage,
 }: MonthPickerDrawerProps) => {
   const currentYear = currentDate.getFullYear();
   const currentMonthIndex = currentDate.getMonth();
@@ -81,9 +84,7 @@ const MonthPickerDrawer = ({
 
         <div className="flex-1 overflow-y-auto mt-2 hide-scrollbar pb-24">
           {monthsByYear.length === 0 ? (
-            <p className="text-center text-zinc-500 py-10">
-              No upcoming events.
-            </p>
+            <p className="text-center text-zinc-500 py-10">{emptyMessage}</p>
           ) : (
             monthsByYear.map(({ year, months }) => (
               <div key={year} className="mb-6 last:mb-0">

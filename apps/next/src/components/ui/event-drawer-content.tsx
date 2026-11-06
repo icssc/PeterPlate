@@ -6,7 +6,11 @@ import type { Event } from "@peterplate/validators";
 import EventImage from "@/components/ui/event-image";
 import EventTypeBadge from "@/components/ui/event-type-badge";
 import { classifyEvent } from "@/utils/classifyEvent";
-import { dateRangeToString, timeToString, toTitleCase } from "@/utils/funcs";
+import {
+  dateRangeToString,
+  eventTimeRangeToString,
+  toTitleCase,
+} from "@/utils/funcs";
 
 /**
  * `EventDrawerContent` renders the detailed view of an event within a drawer (mobile view).
@@ -46,9 +50,7 @@ export default function EventDrawerContent(props: Event): React.JSX.Element {
           </div>
           <div className="flex gap-2 items-center">
             <AccessTimeOutlinedIcon sx={{ fontSize: 16 }} />
-            <span>
-              {timeToString(props.start)} – {timeToString(props.end)}
-            </span>
+            <span>{eventTimeRangeToString(props)}</span>
           </div>
           <div className="flex gap-2 items-center">
             <PinDropOutlinedIcon sx={{ fontSize: 16 }} />
