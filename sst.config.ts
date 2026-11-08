@@ -117,10 +117,10 @@ export default $config({
     // Production only: every staging stage shares the dev database, so
     // per-stage crons would send dev subscribers one copy per open PR.
     if ($app.stage === "production") {
-      // Once a day before lunch. The script covers every meal period, so a
+      // Once a day in the morning. The script covers every meal period, so a
       // second run would repeat the same message.
       new sst.aws.Cron("MenuNotifications", {
-        schedule: "cron(0 18 * * ? *)", // 11:00 AM PDT / 10:00 AM PST
+        schedule: "cron(0 15 * * ? *)", // 8:00 AM PDT / 7:00 AM PST
         job: {
           handler: "apps/server/src/functions/cron/sendMenuNotification.main",
           timeout: "5 minutes",
