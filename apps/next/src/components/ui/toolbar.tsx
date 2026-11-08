@@ -34,6 +34,9 @@ import { useTourStore } from "@/context/useTourStore";
 import { useHeroFade } from "@/hooks/useHeroFade";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useSession } from "@/utils/auth-client";
+import DeleteAccountContent, {
+  DELETE_ACCOUNT_CONFIRM_PARAM,
+} from "./delete-account-content";
 import EditPreferencesContent from "./edit-preferences-content";
 import { WelcomeView } from "./onboarding";
 import SidebarContent from "./sidebar/sidebar-content";
@@ -204,6 +207,7 @@ export function DesktopToolbar(): React.JSX.Element {
   const [editPreferencesSnackbarOpen, setEditPreferencesSnackbarOpen] =
     useState(false);
   const [editPreferencesExpanded, setEditPreferencesExpanded] = useState(false);
+  const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
 
   const handleProfileOpen = (event: MouseEvent<HTMLElement>) => {
     setProfileAnchor(event.currentTarget);
@@ -223,9 +227,21 @@ export function DesktopToolbar(): React.JSX.Element {
     setEditPreferencesOpen(false);
     setEditPreferencesSnackbarOpen(true);
   };
+  const handleDeleteAccountOpen = () => {
+    setDeleteAccountOpen(true);
+  };
+  const handleDeleteAccountClose = () => {
+    setDeleteAccountOpen(false);
+  };
   const { data: session, isPending } = useSession();
   const user = session?.user;
   const start = useTourStore((state) => state.start);
+
+  // Reopens at the confirm step after signing in again.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.has(DELETE_ACCOUNT_CONFIRM_PARAM)) setDeleteAccountOpen(true);
+  }, []);
 
   return (
     <>
@@ -410,6 +426,7 @@ export function DesktopToolbar(): React.JSX.Element {
         <SidebarContent
           onClose={handleProfileClose}
           onEditPreferencesClick={handleEditPreferencesOpen}
+          onDeleteAccountClick={handleDeleteAccountOpen}
         />
       </Menu>
 
@@ -473,6 +490,18 @@ export function DesktopToolbar(): React.JSX.Element {
         </Drawer>
       )}
 
+      <Dialog
+        open={deleteAccountOpen && !!user}
+        onClose={handleDeleteAccountClose}
+        maxWidth={false}
+        PaperProps={{
+          className:
+            "w-[500px] max-w-[90vw] m-2 p-0 overflow-hidden flex flex-col rounded-[12px] bg-white shadow-[0_4px_20px_0_var(--text-muted-soft)] dark:bg-[var(--surface-dialog)] dark:border-[3px] dark:border-[var(--button-disabled-bg)] dark:shadow-none",
+        }}
+      >
+        <DeleteAccountContent onClose={handleDeleteAccountClose} />
+      </Dialog>
+
       <Snackbar
         open={editPreferencesSnackbarOpen}
         autoHideDuration={4000}
@@ -507,10 +536,17 @@ function MobileToolbar(): React.JSX.Element {
     useState(false);
   const [_editPreferencesExpanded, setEditPreferencesExpanded] =
     useState(false);
+  const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
   const start = useTourStore((state) => state.start);
 
   useEffect(() => {
     setIsMounted(true);
+  }, []);
+
+  // Reopens at the confirm step after signing in again.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.has(DELETE_ACCOUNT_CONFIRM_PARAM)) setDeleteAccountOpen(true);
   }, []);
 
   const handleProfileOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -534,6 +570,15 @@ function MobileToolbar(): React.JSX.Element {
   const handleEditPreferencesSaved = () => {
     setEditPreferencesOpen(false);
     setEditPreferencesSnackbarOpen(true);
+  };
+
+  const handleDeleteAccountOpen = () => {
+    setProfileAnchor(null);
+    setDeleteAccountOpen(true);
+  };
+
+  const handleDeleteAccountClose = () => {
+    setDeleteAccountOpen(false);
   };
 
   const diningHref =
@@ -730,6 +775,7 @@ function MobileToolbar(): React.JSX.Element {
         <SidebarContent
           onClose={handleProfileClose}
           onEditPreferencesClick={handleEditPreferencesOpen}
+          onDeleteAccountClick={handleDeleteAccountOpen}
         />
       </Drawer>
 
@@ -762,6 +808,20 @@ function MobileToolbar(): React.JSX.Element {
           onSaved={handleEditPreferencesSaved}
           onExpandChange={setEditPreferencesExpanded}
         />
+      </Drawer>
+
+      <Drawer
+        anchor="bottom"
+        open={deleteAccountOpen && !!user}
+        onClose={handleDeleteAccountClose}
+        slotProps={{
+          paper: {
+            className:
+              "p-0 overflow-hidden rounded-t-[10px] mt-[96px] h-auto max-h-[85vh] flex flex-col min-h-0 bg-white dark:bg-[var(--surface-dialog)] dark:border-[3px] dark:border-[var(--button-disabled-bg)] dark:border-b-0 dark:rounded-t-[12px]",
+          },
+        }}
+      >
+        <DeleteAccountContent onClose={handleDeleteAccountClose} />
       </Drawer>
 
       <Snackbar

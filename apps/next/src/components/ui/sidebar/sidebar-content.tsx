@@ -28,11 +28,13 @@ import { cn } from "@/utils/tw";
 interface ProfileMenuContentProps {
   onClose: () => void;
   onEditPreferencesClick: () => void;
+  onDeleteAccountClick: () => void;
 }
 
 export default function SidebarContent({
   onClose,
   onEditPreferencesClick,
+  onDeleteAccountClick,
 }: ProfileMenuContentProps): React.JSX.Element | null {
   const { data: session } = useSession();
   const user = session?.user;
@@ -235,16 +237,20 @@ export default function SidebarContent({
           </MenuLink>
 
           {user && (
-            <MenuLink
-              href="/delete-account"
-              onClick={onClose}
-              icon={
-                <DeleteIcon fontSize="small" sx={{ color: "error.main" }} />
-              }
-              color="error.main"
+            <button
+              type="button"
+              onClick={() => {
+                onClose();
+                onDeleteAccountClick();
+              }}
+              className={`w-full flex items-center gap-3 rounded-lg px-2 py-2
+                hover:bg-gray-100 dark:hover:bg-gray-700`}
             >
-              Delete Account
-            </MenuLink>
+              <DeleteIcon fontSize="small" sx={{ color: "error.main" }} />
+              <Typography variant="body2" fontWeight={500} color="error.main">
+                Delete Account
+              </Typography>
+            </button>
           )}
         </div>
       </div>
@@ -303,13 +309,11 @@ function MenuLink({
   href,
   onClick,
   icon,
-  color = "text.primary",
   children,
 }: {
   href: string;
   onClick: () => void;
   icon: ReactNode;
-  color?: string;
   children: ReactNode;
 }) {
   return (
@@ -320,7 +324,7 @@ function MenuLink({
         dark:hover:bg-gray-700`}
     >
       <Box sx={{ color: "primary.main" }}>{icon}</Box>
-      <Typography variant="body2" fontWeight={500} color={color}>
+      <Typography variant="body2" fontWeight={500} color="text.primary">
         {children}
       </Typography>
     </Link>
