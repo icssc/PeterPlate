@@ -28,6 +28,10 @@ interface RestaurantUIState {
   isDatePickerOpen: boolean;
   setIsDatePickerOpen: (isOpen: boolean) => void;
 
+  // Mobile filters (collapsed to a date/meal summary row by default)
+  isFiltersExpanded: boolean;
+  setIsFiltersExpanded: (isExpanded: boolean) => void;
+
   // Mobile drawers
   isMenuDrawerOpen: boolean;
   setIsMenuDrawerOpen: (isOpen: boolean) => void;
@@ -50,6 +54,9 @@ export const useRestaurantUIStore = create<RestaurantUIState>()((set) => ({
 
   isDatePickerOpen: false,
   setIsDatePickerOpen: (isOpen) => set({ isDatePickerOpen: isOpen }),
+
+  isFiltersExpanded: false,
+  setIsFiltersExpanded: (isExpanded) => set({ isFiltersExpanded: isExpanded }),
 
   isMenuDrawerOpen: false,
   setIsMenuDrawerOpen: (isOpen) => set({ isMenuDrawerOpen: isOpen }),

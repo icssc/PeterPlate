@@ -3,10 +3,10 @@ import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined
 import PinDropOutlinedIcon from "@mui/icons-material/PinDropOutlined";
 import { Box, Typography } from "@mui/material";
 import type { Event } from "@peterplate/validators";
-import Image from "next/image";
+import EventImage from "@/components/ui/event-image";
 import EventTypeBadge from "@/components/ui/event-type-badge";
 import { classifyEvent } from "@/utils/classifyEvent";
-import { timeToString, toTitleCase } from "@/utils/funcs";
+import { dateRangeToString, timeToString, toTitleCase } from "@/utils/funcs";
 
 /**
  * `EventDrawerContent` renders the detailed view of an event within a drawer (mobile view).
@@ -21,7 +21,7 @@ export default function EventDrawerContent(props: Event): React.JSX.Element {
   return (
     <Box className="dark:bg-[var(--surface-modal)]">
       <div className="relative">
-        <Image
+        <EventImage
           src={props.image}
           alt={`An image for an event "${props.title}" at ${props.restaurantId}.`}
           width={600}
@@ -42,13 +42,7 @@ export default function EventDrawerContent(props: Event): React.JSX.Element {
         <div className="flex flex-col gap-2 text-sm text-zinc-500 dark:text-zinc-400 mt-1">
           <div className="flex gap-2 items-center">
             <CalendarTodayOutlinedIcon sx={{ fontSize: 16 }} />
-            <span>
-              {props.start.toLocaleDateString(undefined, {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </span>
+            <span>{dateRangeToString(props.start, props.end)}</span>
           </div>
           <div className="flex gap-2 items-center">
             <AccessTimeOutlinedIcon sx={{ fontSize: 16 }} />

@@ -30,7 +30,7 @@ import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import type { MouseEvent } from "react";
 import { useEffect, useState } from "react";
-import { useTourStore } from "@/context/useTourStore";
+import { type TourId, useTourStore } from "@/context/useTourStore";
 import { useHeroFade } from "@/hooks/useHeroFade";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useSession } from "@/utils/auth-client";
@@ -40,6 +40,29 @@ import DeleteAccountContent, {
 import EditPreferencesContent from "./edit-preferences-content";
 import { WelcomeView } from "./onboarding";
 import SidebarContent from "./sidebar/sidebar-content";
+
+const TOURS_BY_PATH: Record<string, { id: TourId; label: string }> = {
+  "/nutrition": {
+    id: "nutrition",
+    label: "Tracker tutorial",
+  },
+  "/events": {
+    id: "events",
+    label: "Events tutorial",
+  },
+  "/my-foods": {
+    id: "my-foods",
+    label: "My Foods tutorial",
+  },
+  "/anteatery": {
+    id: "restaurant",
+    label: "Restaurant tutorial",
+  },
+  "/brandywine": {
+    id: "restaurant",
+    label: "Restaurant tutorial",
+  },
+};
 
 export type CalendarRange = {
   earliest: Date;
@@ -236,6 +259,7 @@ export function DesktopToolbar(): React.JSX.Element {
   const { data: session, isPending } = useSession();
   const user = session?.user;
   const start = useTourStore((state) => state.start);
+  const tour = TOURS_BY_PATH[pathname];
 
   // Reopens at the confirm step after signing in again.
   useEffect(() => {
@@ -331,14 +355,13 @@ export function DesktopToolbar(): React.JSX.Element {
           </nav>
           <div className="flex-none flex items-center gap-4">
             <div className="flex-none flex items-center gap-4">
-              {pathname === "/nutrition" && (
-                <Tooltip title="Tracker tutorial">
+              {tour && (
+                <Tooltip title={tour.label}>
                   <span>
                     <IconButton
-                      onClick={() => start("nutrition")}
-                      disabled={!user || isPending}
-                      aria-label="Start tracker tutorial"
-                      sx={{ color: "text.primary" }}
+                      onClick={() => start(tour.id)}
+                      aria-label={`Start ${tour.label.toLowerCase()}`}
+                      sx={{ color: isTransparent ? "white" : "text.primary" }}
                     >
                       <HelpOutline />
                     </IconButton>
@@ -538,6 +561,7 @@ function MobileToolbar(): React.JSX.Element {
     useState(false);
   const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
   const start = useTourStore((state) => state.start);
+  const tour = TOURS_BY_PATH[pathname];
 
   useEffect(() => {
     setIsMounted(true);
@@ -629,14 +653,13 @@ function MobileToolbar(): React.JSX.Element {
           {greeting}
         </span>
         <div className="flex-shrink-0 min-h-[44px] flex items-center justify-center gap-2">
-          {pathname === "/nutrition" && (
-            <Tooltip title="Tracker tutorial">
+          {tour && (
+            <Tooltip title={tour.label}>
               <span>
                 <IconButton
-                  onClick={() => start("nutrition")}
-                  disabled={!user || isPending}
-                  aria-label="Start tracker tutorial"
-                  sx={{ color: "text.primary" }}
+                  onClick={() => start(tour.id)}
+                  aria-label={`Start ${tour.label.toLowerCase()}`}
+                  sx={{ color: isTransparent ? "white" : "text.primary" }}
                 >
                   <HelpOutline />
                 </IconButton>

@@ -1,6 +1,6 @@
 "use client";
 
-import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
 import { format } from "date-fns";
 import type { EventWithType } from "@/app/events/page";
 
@@ -10,10 +10,10 @@ interface MobileListEventRowProps {
 }
 
 const ROW_CLASSES = [
-  "flex flex-row justify-between items-center",
-  "py-2 px-3 text-left w-full",
-  "border-b last:border-0 border-slate-100 dark:border-zinc-800",
-  "hover:bg-slate-50 dark:hover:bg-zinc-900/50 transition-colors",
+  "flex flex-row items-center gap-3",
+  "py-2 text-left w-full",
+  "border-b last:border-0 border-slate-200 dark:border-zinc-600",
+  "hover:bg-slate-50 dark:hover:bg-zinc-700/40 transition-colors",
 ].join(" ");
 
 const MobileListEventRow = ({ event, onClick }: MobileListEventRowProps) => {
@@ -24,16 +24,17 @@ const MobileListEventRow = ({ event, onClick }: MobileListEventRowProps) => {
 
   return (
     <button type="button" className={ROW_CLASSES} onClick={onClick}>
-      <div className="flex flex-col">
-        <span className="font-medium text-black dark:text-zinc-200">
+      <span className="self-stretch w-1 rounded-full bg-sky-700 dark:bg-blue-300" />
+      <div className="flex flex-col flex-1">
+        <span className="font-medium text-black dark:text-zinc-100">
           {event.title}
         </span>
-        <span className="text-gray-500 flex items-center mt-0.5">
-          <LocationOnOutlinedIcon sx={{ fontSize: 14 }} className="mr-0.5" />
+        <span className="text-gray-500 dark:text-zinc-400 flex items-center mt-0.5">
+          <LocationOnIcon sx={{ fontSize: 16 }} className="mr-1" />
           {locationLabel}
         </span>
       </div>
-      <div className="flex flex-col items-end text-sm text-black dark:text-zinc-400">
+      <div className="flex flex-col items-end text-black dark:text-zinc-100">
         <span>{startStr}</span>
         <span>{endStr}</span>
       </div>

@@ -10,7 +10,7 @@ import {
   useRestaurantStore,
 } from "@/context/useRestaurantStore";
 import { useRestaurantUIStore } from "@/context/useRestaurantUIStore";
-import { isSameDay } from "@/utils/funcs";
+import { isSameDay, isUpcomingEvent } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
 import type { HallStatusEnum } from "@/utils/types";
 import { HallEnum } from "@/utils/types";
@@ -117,7 +117,7 @@ export function useRestaurantPage(hall: HallEnum): UseRestaurantPageResult {
   const hallEvents = useMemo(
     () =>
       [...upcomingEvents]
-        .filter((e) => e.restaurantId === restaurantId)
+        .filter((e) => e.restaurantId === restaurantId && isUpcomingEvent(e))
         .sort(
           (a, b) =>
             (a.start ? new Date(a.start).getTime() : 0) -

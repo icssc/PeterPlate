@@ -8,7 +8,7 @@ import {
   format,
   getDay,
   isAfter,
-  isSameMonth,
+  isBefore,
   parse,
   startOfMonth,
   startOfWeek,
@@ -38,6 +38,7 @@ interface CalendarViewProps {
   isLoading?: boolean;
   error?: any;
   currentDate: Date;
+  availableMonths: { year: number; monthIndex: number }[];
   calendarEvents: any[];
   selectedEventData: any | null;
   onPreviousMonth: () => void;
@@ -52,6 +53,7 @@ const CalendarView = ({
   isLoading,
   error,
   currentDate,
+  availableMonths,
   calendarEvents,
   selectedEventData,
   onPreviousMonth,
@@ -61,10 +63,23 @@ const CalendarView = ({
 }: CalendarViewProps) => {
   if (isLoading || error || viewMode !== "calendar") return null;
 
-  // Logic to disable the "next" button if viewing current or future months
-  const isFutureOrCurrent =
-    isAfter(startOfMonth(currentDate), startOfMonth(new Date())) ||
-    isSameMonth(currentDate, new Date());
+  // Tracks the days that have events so that the events tour can point to one
+  const eventDays = new Set(
+    calendarEvents.map((event) => event.start.toDateString()),
+  );
+  const dayPropGetter = (date: Date) =>
+    eventDays.has(date.toDateString()) ? { className: "tour-event-day" } : {};
+
+  // Only page between the first and last months that have events
+  const monthStart = startOfMonth(currentDate);
+  const firstMonth = availableMonths[0];
+  const lastMonth = availableMonths[availableMonths.length - 1];
+  const atFirstMonth =
+    !firstMonth ||
+    !isAfter(monthStart, new Date(firstMonth.year, firstMonth.monthIndex));
+  const atLastMonth =
+    !lastMonth ||
+    !isBefore(monthStart, new Date(lastMonth.year, lastMonth.monthIndex));
 
   return (
     <div className="border border-sky-700 dark:border-blue-300 p-4 rounded-lg bg-white dark:bg-surface-scroll transition-colors events-calendar-wrapper">
@@ -72,19 +87,19 @@ const CalendarView = ({
       <div className="flex items-center justify-center">
         <div className="text-center flex items-center justify-center text-sky-700 dark:text-blue-300 font-medium">
           <ArrowBackIosIcon
-            className="mb-6 mr-4 cursor-pointer"
-            onClick={onPreviousMonth}
+            className={`mb-6 mr-4 ${
+              atFirstMonth ? "opacity-30 cursor-not-allowed" : "cursor-pointer"
+            }`}
+            onClick={atFirstMonth ? undefined : onPreviousMonth}
           />
           <span className="inline-block mb-6 text-3xl">
             {format(currentDate, "MMMM yyyy")}
           </span>
           <ArrowForwardIosIcon
             className={`mb-6 ml-4 ${
-              isFutureOrCurrent
-                ? "opacity-30 cursor-not-allowed"
-                : "cursor-pointer"
+              atLastMonth ? "opacity-30 cursor-not-allowed" : "cursor-pointer"
             }`}
-            onClick={isFutureOrCurrent ? undefined : onNextMonth}
+            onClick={atLastMonth ? undefined : onNextMonth}
           />
         </div>
       </div>
@@ -104,6 +119,7 @@ const CalendarView = ({
           toolbar={false}
           selectable
           onSelectEvent={onSelectEvent}
+          dayPropGetter={dayPropGetter}
         />
       </div>
 
@@ -129,6 +145,7 @@ const CalendarView = ({
             <EventDialogContent
               {...selectedEventData}
               key={`${selectedEventData.startTime}|${selectedEventData.endTime}`}
+              onClose={onCloseDetails}
             />
           )}
         </Dialog>

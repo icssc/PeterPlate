@@ -7,17 +7,20 @@ import Button from "@mui/material/Button";
 import type { SelectChangeEvent } from "@mui/material/Select";
 import type { Event } from "@peterplate/validators";
 import { addMonths, subMonths } from "date-fns";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import CalendarView from "@/components/ui/calendar-view";
 import EventCard from "@/components/ui/card/event-card";
+import EventsOnboarding from "@/components/ui/events-onboarding";
 import MobileEventsView from "@/components/ui/mobile-events-view";
 import EventCardSkeleton from "@/components/ui/skeleton/event-card-skeleton";
+import { useTourStore } from "@/context/useTourStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import {
   classifyEvent,
   EVENT_CATEGORIES,
   type EventCategory,
 } from "@/utils/classifyEvent";
+import { isUpcomingEvent } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 
@@ -40,7 +43,8 @@ const Events = () => {
 
   const eventsWithType = useMemo<EventWithType[]>(
     () =>
-      [...(events ?? [])]
+      (events ?? [])
+        .filter(isUpcomingEvent)
         .sort((a, b) => a.start.getTime() - b.start.getTime())
         .map((event) => ({
           ...event,
@@ -97,6 +101,13 @@ const Events = () => {
   );
 
   const isDesktop = useMediaQuery("(min-width: 768px)");
+
+  useEffect(() => {
+    return () => {
+      const { activeTour, stop } = useTourStore.getState();
+      if (activeTour === "events") stop();
+    };
+  }, []);
 
   const handleLocationChange = (
     event: SelectChangeEvent<"both" | "anteatery" | "brandywine">,
@@ -164,39 +175,57 @@ const Events = () => {
                 View:
               </span>
 
-              {/* Grid View Button */}
-              <Button
-                onClick={() => setViewMode("grid")}
-                variant="outlined"
-                size="small"
-                className={`!px-4 !py-1 flex items-center justify-center !normal-case ${
-                  viewMode === "grid"
-                    ? "!bg-sky-700 !text-white !border-sky-700 hover:!bg-sky-800 dark:!bg-blue-300 dark:!text-gray-900 dark:!border-blue-300 dark:hover:!bg-blue-400"
-                    : "!bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50 dark:!bg-transparent dark:!border-blue-300 dark:!text-white dark:hover:!bg-zinc-700"
-                }`}
-              >
-                <GridOnIcon className="mr-1" sx={{ fontSize: 18 }} />
-                Grid View
-              </Button>
+              <div id="tour-events-view-toggle" className="flex gap-2">
+                {/* Grid View Button */}
+                <Button
+                  onClick={() => setViewMode("grid")}
+                  variant="outlined"
+                  size="small"
+                  className={`!px-4 !py-1 flex items-center justify-center !normal-case ${
+                    viewMode === "grid"
+                      ? "!bg-sky-700 !text-white !border-sky-700 hover:!bg-sky-800 dark:!bg-blue-300 dark:!text-gray-900 dark:!border-blue-300 dark:hover:!bg-blue-400"
+                      : "!bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50 dark:!bg-transparent dark:!border-blue-300 dark:!text-white dark:hover:!bg-zinc-700"
+                  }`}
+                >
+                  <GridOnIcon className="mr-1" sx={{ fontSize: 18 }} />
+                  Grid View
+                </Button>
 
-              {/* Calendar View Button */}
-              <Button
-                onClick={() => setViewMode("calendar")}
-                variant="outlined"
-                size="small"
-                className={`!px-4 !py-1 flex items-center justify-center !normal-case ${
-                  viewMode === "calendar"
-                    ? "!bg-sky-700 !text-white !border-sky-700 hover:!bg-sky-800 dark:!bg-blue-300 dark:!text-gray-900 dark:!border-blue-300 dark:hover:!bg-blue-400"
-                    : "!bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50 dark:!bg-transparent dark:!border-blue-300 dark:!text-white dark:hover:!bg-zinc-700"
-                }`}
-              >
-                <CalendarTodayIcon className="mr-1" sx={{ fontSize: 18 }} />
-                Calendar View
-              </Button>
+                {/* Calendar View Button */}
+                <Button
+                  onClick={() => setViewMode("calendar")}
+                  variant="outlined"
+                  size="small"
+                  className={`!px-4 !py-1 flex items-center justify-center !normal-case ${
+                    viewMode === "calendar"
+                      ? "!bg-sky-700 !text-white !border-sky-700 hover:!bg-sky-800 dark:!bg-blue-300 dark:!text-gray-900 dark:!border-blue-300 dark:hover:!bg-blue-400"
+                      : "!bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50 dark:!bg-transparent dark:!border-blue-300 dark:!text-white dark:hover:!bg-zinc-700"
+                  }`}
+                >
+                  <CalendarTodayIcon className="mr-1" sx={{ fontSize: 18 }} />
+                  Calendar View
+                </Button>
+              </div>
+
+              {viewMode === "calendar" && (
+                <div className="ml-auto flex items-center gap-4 text-sm text-slate-900 dark:text-white">
+                  <span className="flex items-center gap-1.5">
+                    <span className="size-4 rounded-[3px] border border-sky-700 bg-[var(--calendar-today-bg)] dark:border-blue-300 dark:bg-[var(--calendar-today-bg-dark)]" />
+                    Today
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="size-4 rounded-[3px] bg-sky-700 dark:bg-[var(--primary-accent-light)]" />
+                    Event
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Filter Bar */}
-            <div className="flex flex-wrap gap-8 w-full bg-[var(--calendar-today-bg)] dark:bg-[var(--surface-tinted)] border dark:border-zinc-700 rounded-lg p-5 pb-8 mt-4">
+            <div
+              id="tour-events-filters"
+              className="flex flex-wrap gap-8 w-full bg-[var(--calendar-today-bg)] dark:bg-[var(--surface-tinted)] border dark:border-zinc-700 rounded-lg p-5 pb-8 mt-4"
+            >
               <div className="flex flex-col gap-3">
                 <span className="text-sm font-medium text-slate-900 dark:text-white">
                   Event Type
@@ -297,10 +326,10 @@ const Events = () => {
           {/* GRID DISPLAY: Map over the fetched events once loaded */}
           {!isLoading && !error && viewMode === "grid" && (
             <>
-              <Typography variant="body2" fontWeight={600} color="text.primary">
+              <p className="text-lg leading-6 text-black dark:text-white">
                 Showing {filteredEvents.length} event
                 {filteredEvents.length !== 1 ? "s" : ""}
-              </Typography>
+              </p>
 
               <div className="flex sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12 overflow-x-auto sm:overflow-visible pb-2 sm:pb-0">
                 {filteredEvents.map((event) => (
@@ -331,6 +360,7 @@ const Events = () => {
               isLoading={isLoading}
               error={error}
               currentDate={currentDate}
+              availableMonths={availableMonths}
               calendarEvents={calendarEvents}
               selectedEventData={selectedEventData}
               onPreviousMonth={viewPreviousMonthsEvents}
@@ -341,6 +371,7 @@ const Events = () => {
           )}
         </div>
       </div>
+      <EventsOnboarding viewMode={viewMode} />
     </div>
   );
 };

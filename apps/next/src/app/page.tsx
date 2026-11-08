@@ -143,6 +143,7 @@ function DesktopHome(): React.JSX.Element {
   const { data: events } = trpc.event.upcoming.useQuery(undefined, {
     staleTime: 5 * 60 * 1000,
   });
+  const upcomingEvents = sortedEvents(events ?? [], 4);
 
   // Get hall information
   const brandywineStatus = getHallStatus(brandywineData?.periods ?? []);
@@ -271,12 +272,12 @@ function DesktopHome(): React.JSX.Element {
               ))}
             </div>
           )}
-          {!isLoading && events && events.length === 0 && (
+          {!isLoading && events && upcomingEvents.length === 0 && (
             <Typography color="text.secondary">No upcoming events.</Typography>
           )}
-          {events && events.length > 0 && (
+          {upcomingEvents.length > 0 && (
             <div className="grid grid-cols-4 gap-4">
-              {sortedEvents(events, 4).map((event, idx) => (
+              {upcomingEvents.map((event, idx) => (
                 <UpcomingEventCard
                   key={`${event.title}-${idx}`}
                   event={event}
@@ -311,6 +312,7 @@ function MobileHome(): React.JSX.Element {
   const { data: events } = trpc.event.upcoming.useQuery(undefined, {
     staleTime: 5 * 60 * 1000,
   });
+  const upcomingEvents = sortedEvents(events ?? [], 3);
 
   // Get hall information
   const brandywineStatus = getHallStatus(brandywineData?.periods);
@@ -435,13 +437,13 @@ function MobileHome(): React.JSX.Element {
               <ChevronRight color="primary" style={{ fontSize: 16 }} />
             </Link>
           </div>
-          {!events || events.length === 0 ? (
+          {upcomingEvents.length === 0 ? (
             <Typography variant="body2" color="text.secondary">
               No upcoming events.
             </Typography>
           ) : (
             <div className="flex gap-3 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              {sortedEvents(events, 3).map((event, idx) => (
+              {upcomingEvents.map((event, idx) => (
                 <UpcomingEventCard
                   key={`${event.title}-${idx}`}
                   event={event}

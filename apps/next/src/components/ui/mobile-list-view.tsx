@@ -97,12 +97,12 @@ const MobileListView = ({
             }}
             className="flex flex-col"
           >
-            <div className="sticky top-0 z-10 bg-white dark:bg-zinc-950 py-2">
-              <div className="bg-[#CCE1EE] dark:bg-sky-950 rounded-2xl px-4 py-4 w-full mx-auto">
+            <div className="sticky top-0 z-10 bg-background py-2">
+              <div className="bg-[var(--surface-tinted)] rounded-2xl px-4 py-4 w-full mx-auto">
                 <div className="flex items-center justify-between">
                   <button
                     type="button"
-                    className="text-xl sm:text-2xl font-bold text-sky-700 dark:text-sky-400 focus:outline-none flex items-center gap-2"
+                    className="text-xl sm:text-2xl font-bold text-sky-700 dark:text-blue-300 focus:outline-none flex items-center gap-2"
                     onClick={onOpenMonthPicker}
                   >
                     {format(month.date, "MMMM yyyy")}{" "}
@@ -130,20 +130,20 @@ const MobileListView = ({
                 return (
                   <div
                     key={day.date.toISOString()}
-                    className="flex flex-col gap-3"
+                    className="flex flex-col gap-1"
                   >
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-zinc-600">
                       <h3 className="font-semibold text-black dark:text-zinc-100">
                         {format(day.date, "EEEE - MMMM d, yyyy")}
                       </h3>
                       {isToday && (
-                        <span className="bg-sky-700 text-white text-[10px] font-bold px-2 py-0.5 rounded">
+                        <span className="bg-sky-700 text-white dark:bg-blue-300 dark:text-zinc-900 text-sm px-2 py-0.5 rounded-md">
                           Today
                         </span>
                       )}
                     </div>
 
-                    <div className="flex flex-col gap-0 border-l-[3px] border-sky-700 dark:border-sky-500 ml-1">
+                    <div className="flex flex-col">
                       {day.events.map((event, idx) => (
                         <MobileListEventRow
                           key={`${event.title}-${String(event.start)}-${event.restaurantId || idx}`}
