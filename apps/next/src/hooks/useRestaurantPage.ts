@@ -15,6 +15,22 @@ import { trpc } from "@/utils/trpc";
 import type { HallStatusEnum } from "@/utils/types";
 import { HallEnum } from "@/utils/types";
 
+const normalizeStationName = (name: string) =>
+  name.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+/** Stations that don't rotate; shown after the rotating ones. */
+const NON_ROTATING_STATIONS: Record<"anteatery" | "brandywine", Set<string>> = {
+  // Names as returned by CampusDish, normalized.
+  brandywine: new Set(
+    ["Hearth/Pizza", "Ember/Grill", "Honeycakes/Bakery"].map(
+      normalizeStationName,
+    ),
+  ),
+  anteatery: new Set(
+    ["Sizzle Grill", "Bakery", "Oven"].map(normalizeStationName),
+  ),
+};
+
 /**
  * Returns the current meal period key for a given date by checking which period
  * window the date falls within. Falls back to the first period if none match.
@@ -182,7 +198,13 @@ export function useRestaurantPage(hall: HallEnum): UseRestaurantPageResult {
     [hallData, selectedPeriod],
   );
 
-  const stations: Station[] = currentMenu?.stations ?? [];
+  // Rotating stations come first; the fixed (non-rotating) ones go last.
+  const stations: Station[] = useMemo(() => {
+    const all = currentMenu?.stations ?? [];
+    const fixed = NON_ROTATING_STATIONS[restaurantId];
+    const isFixed = (s: Station) => fixed.has(normalizeStationName(s.name));
+    return [...all.filter((s) => !isFixed(s)), ...all.filter(isFixed)];
+  }, [currentMenu, restaurantId]);
 
   // --- Auto-select station ---
   useEffect(() => {
