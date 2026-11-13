@@ -7,7 +7,7 @@ import { betterAuth } from "better-auth/minimal";
 import { nextCookies } from "better-auth/next-js";
 import { genericOAuth } from "better-auth/plugins";
 
-import { AUTH_PROVIDER_ID } from "@/lib/auth-constants";
+import { AUTH_PROVIDER_ID, SESSION_FRESH_AGE } from "@/lib/auth-constants";
 import type { AuthAdditionalData } from "@/lib/auth-types";
 import { getSafeAuthRedirectPath } from "@/lib/auth-utils";
 
@@ -41,8 +41,15 @@ export const auth = betterAuth({
       enabled: true,
       maxAge: 5 * 60,
     },
+    // Account deletion requires a sign-in this recent.
+    freshAge: SESSION_FRESH_AGE,
   },
   user: {
+    deleteUser: {
+      enabled: true,
+      // TODO: When auth.icssc.club adds account deletion, call it from a
+      // beforeDelete hook to revoke Sign in with Apple tokens and end ICSSC sessions.
+    },
     additionalFields: {
       hasOnboarded: {
         type: "boolean",

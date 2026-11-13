@@ -3,6 +3,7 @@
 import {
   Close as CloseIcon,
   DarkMode as DarkModeIcon,
+  DeleteOutline as DeleteIcon,
   DesktopWindows as DesktopWindowsIcon,
   Edit as EditIcon,
   ContentPaste as FeedbackIcon,
@@ -29,11 +30,13 @@ import { cn } from "@/utils/tw";
 interface ProfileMenuContentProps {
   onClose: () => void;
   onEditPreferencesClick: () => void;
+  onDeleteAccountClick: () => void;
 }
 
 export default function SidebarContent({
   onClose,
   onEditPreferencesClick,
+  onDeleteAccountClick,
 }: ProfileMenuContentProps): React.JSX.Element | null {
   const { data: session } = useSession();
   const user = session?.user;
@@ -264,6 +267,23 @@ export default function SidebarContent({
           >
             About PeterPlate
           </MenuLink>
+
+          {user && (
+            <button
+              type="button"
+              onClick={() => {
+                onClose();
+                onDeleteAccountClick();
+              }}
+              className={`w-full flex items-center gap-3 rounded-lg px-2 py-2
+                hover:bg-gray-100 dark:hover:bg-gray-700`}
+            >
+              <DeleteIcon fontSize="small" sx={{ color: "error.main" }} />
+              <Typography variant="body2" fontWeight={500} color="error.main">
+                Delete Account
+              </Typography>
+            </button>
+          )}
         </div>
       </div>
 
