@@ -11,6 +11,8 @@ interface MobileListViewProps {
   currentDate: Date;
   onDateChange: (date: Date) => void;
   filteredEvents: EventWithType[];
+  /** Shown when there are no events to list. */
+  emptyMessage: string;
   onOpenMonthPicker: () => void;
   onSelectEvent: (event: EventWithType) => void;
 }
@@ -29,6 +31,7 @@ interface MonthGroup {
 const MobileListView = ({
   currentDate,
   filteredEvents,
+  emptyMessage,
   onOpenMonthPicker,
   onSelectEvent,
 }: MobileListViewProps) => {
@@ -87,7 +90,7 @@ const MobileListView = ({
   return (
     <div className="flex flex-col flex-1 px-4 mt-2 mb-20 overflow-y-auto">
       {monthGroups.length === 0 ? (
-        <p className="text-center text-zinc-500 py-10">No upcoming events.</p>
+        <p className="text-center text-zinc-500 py-10">{emptyMessage}</p>
       ) : (
         monthGroups.map((month) => (
           <div

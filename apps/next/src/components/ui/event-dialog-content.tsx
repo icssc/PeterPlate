@@ -10,8 +10,8 @@ import EventTypeBadge from "@/components/ui/event-type-badge";
 import { classifyEvent } from "@/utils/classifyEvent";
 import {
   dateRangeToString,
+  eventTimeRangeToString,
   generateGCalLink,
-  timeToString,
   toTitleCase,
 } from "@/utils/funcs";
 import { HallEnum } from "@/utils/types";
@@ -72,9 +72,7 @@ export default function EventDialogContent({
           </div>
           <div className="flex gap-2 items-center">
             <AccessTimeOutlinedIcon sx={{ fontSize: 16 }} />
-            <span>
-              {timeToString(props.start)} – {timeToString(props.end)}
-            </span>
+            <span>{eventTimeRangeToString(props)}</span>
           </div>
           <div className="flex gap-2 items-center">
             <PinDropOutlinedIcon sx={{ fontSize: 16 }} />

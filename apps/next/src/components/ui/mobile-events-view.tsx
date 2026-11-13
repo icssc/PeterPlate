@@ -11,6 +11,7 @@ import {
 import { useEffect, useState } from "react";
 import type { EventWithType } from "@/app/events/page";
 import { useTourStore } from "@/context/useTourStore";
+import { EVENT_TIMEFRAMES, type EventTimeframe } from "@/utils/funcs";
 import EventDetailsDrawer from "./event-details-drawer";
 import EventsOnboarding from "./events-onboarding";
 import MobileCalendarView from "./mobile-calendar-view";
@@ -22,10 +23,11 @@ interface MobileEventsViewProps {
   handleLocationChange: (
     event: SelectChangeEvent<"both" | "anteatery" | "brandywine">,
   ) => void;
+  timeframe: EventTimeframe;
+  onTimeframeChange: (timeframe: EventTimeframe) => void;
   isLoading: boolean;
   error: { message: string } | null;
   filteredEvents: EventWithType[];
-  filteredUpcomingEvents: EventWithType[];
   currentDate: Date;
   setCurrentDate: (date: Date) => void;
   selectedEventData: EventWithType | null;
@@ -37,10 +39,11 @@ interface MobileEventsViewProps {
 const MobileEventsView = ({
   selectedDiningHall,
   handleLocationChange,
+  timeframe,
+  onTimeframeChange,
   isLoading,
   error,
   filteredEvents,
-  filteredUpcomingEvents,
   currentDate,
   setCurrentDate,
   selectedEventData,
@@ -71,12 +74,38 @@ const MobileEventsView = ({
     setSelectedDayEvents([]);
   };
 
+  const emptyMessage = `No ${timeframe} events.`;
+
   return (
     <div className="flex flex-col h-screen w-full bg-background overflow-hidden font-sans">
       <div className="flex flex-col px-4 pt-12 pb-4 bg-background z-20">
-        <h1 className="text-4xl font-bold text-sky-700 dark:text-blue-300 mb-4">
-          Events
-        </h1>
+        <div className="flex items-center justify-between gap-3 mb-4">
+          <h1 className="text-4xl font-bold text-sky-700 dark:text-blue-300">
+            Events
+          </h1>
+          <div
+            id="tour-events-timeframe-mobile"
+            className="flex bg-white dark:bg-transparent border border-sky-700 dark:border-blue-300 rounded-lg overflow-hidden h-[38px]"
+          >
+            {EVENT_TIMEFRAMES.map(({ value, label }, idx) => (
+              <button
+                key={value}
+                type="button"
+                aria-pressed={timeframe === value}
+                onClick={() => onTimeframeChange(value)}
+                className={`px-3 text-sm font-medium transition-colors ${
+                  idx > 0 ? "border-l border-sky-700 dark:border-blue-300" : ""
+                } ${
+                  timeframe === value
+                    ? "bg-sky-700 text-white dark:bg-blue-300 dark:text-zinc-900"
+                    : "text-sky-700 dark:text-blue-300 hover:bg-sky-50 dark:hover:bg-zinc-700"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
         <div className="flex items-center gap-3">
           <FormControl
             id="tour-events-location-mobile"
@@ -153,7 +182,8 @@ const MobileEventsView = ({
           <MobileListView
             currentDate={currentDate}
             onDateChange={setCurrentDate}
-            filteredEvents={filteredUpcomingEvents}
+            filteredEvents={filteredEvents}
+            emptyMessage={emptyMessage}
             onOpenMonthPicker={() => setMonthPickerOpen(true)}
             onSelectEvent={(evtInfo) =>
               handleSelectEvent({ resource: evtInfo })
@@ -166,6 +196,7 @@ const MobileEventsView = ({
         onClose={() => setMonthPickerOpen(false)}
         currentDate={currentDate}
         availableMonths={availableMonths}
+        emptyMessage={emptyMessage}
         onSelectMonth={(year, monthIndex) => {
           setCurrentDate(new Date(year, monthIndex, 1));
           setMonthPickerOpen(false);

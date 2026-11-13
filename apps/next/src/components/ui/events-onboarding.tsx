@@ -17,7 +17,7 @@ const gridSteps: Step[] = [
   {
     target: "#tour-events-filters",
     content:
-      "Use event type and location filters to find exactly what you're looking for!",
+      "Switch between upcoming and past events, and use event type and location filters to find exactly what you're looking for!",
     title: "Filter Events",
     skipBeacon: true,
     placement: "bottom",
@@ -58,6 +58,13 @@ const MOBILE_SCROLL_OFFSET = 80;
 
 // Mobile has a list view in place of the grid, so it gets the grid tour
 const mobileListSteps: Step[] = [
+  {
+    ...gridSteps[1],
+    target: "#tour-events-timeframe-mobile",
+    content: "Switch between upcoming events and past events.",
+    title: "Upcoming or Past",
+    scrollOffset: MOBILE_SCROLL_OFFSET,
+  },
   {
     ...gridSteps[1],
     target: "#tour-events-location-mobile",
