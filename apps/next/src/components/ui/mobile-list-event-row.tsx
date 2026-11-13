@@ -3,6 +3,7 @@
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import { format } from "date-fns";
 import type { EventWithType } from "@/app/events/page";
+import { isValidDate } from "@/utils/funcs";
 
 interface MobileListEventRowProps {
   event: EventWithType;
@@ -17,8 +18,11 @@ const ROW_CLASSES = [
 ].join(" ");
 
 const MobileListEventRow = ({ event, onClick }: MobileListEventRowProps) => {
-  const startStr = format(new Date(event.start), "h:mm a");
-  const endStr = format(new Date(event.end), "h:mm a");
+  const hasValidDate = isValidDate(event.start) && isValidDate(event.end);
+  const startStr = hasValidDate
+    ? format(new Date(event.start), "h:mm a")
+    : "TBD";
+  const endStr = hasValidDate ? format(new Date(event.end), "h:mm a") : "TBD";
   const locationLabel =
     event.restaurantId === "anteatery" ? "Anteatery" : "Brandywine";
 

@@ -20,7 +20,7 @@ import {
   EVENT_CATEGORIES,
   type EventCategory,
 } from "@/utils/classifyEvent";
-import { isUpcomingEvent } from "@/utils/funcs";
+import { isUpcomingEvent, isValidDate } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 
@@ -45,7 +45,11 @@ const Events = () => {
     () =>
       (events ?? [])
         .filter(isUpcomingEvent)
-        .sort((a, b) => a.start.getTime() - b.start.getTime())
+        .sort((a, b) => {
+          const aTime = a.start?.getTime() || Infinity;
+          const bTime = b.start?.getTime() || Infinity;
+          return aTime === bTime ? 0 : aTime - bTime;
+        })
         .map((event) => ({
           ...event,
           eventType: classifyEvent(event.title, event.description),
@@ -76,6 +80,9 @@ const Events = () => {
     const seen = new Set<string>();
     const months: { year: number; monthIndex: number }[] = [];
     for (const event of filteredEvents) {
+      if (!isValidDate(event.start) || !isValidDate(event.end)) {
+        continue;
+      }
       const year = event.start.getFullYear();
       const monthIndex = event.start.getMonth();
       const key = `${year}-${monthIndex}`;

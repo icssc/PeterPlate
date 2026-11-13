@@ -5,6 +5,7 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { format, isSameDay, startOfDay } from "date-fns";
 import { useEffect, useMemo, useRef } from "react";
 import type { EventWithType } from "@/app/events/page";
+import { isValidDate } from "@/utils/funcs";
 import MobileListEventRow from "./mobile-list-event-row";
 
 interface MobileListViewProps {
@@ -16,6 +17,7 @@ interface MobileListViewProps {
 }
 
 interface DayGroup {
+  key: string;
   date: Date;
   events: EventWithType[];
 }
@@ -50,24 +52,32 @@ const MobileListView = ({
     const months: Record<string, MonthGroup> = {};
     sorted.forEach((event) => {
       const start = new Date(event.start);
-      const monthKey = format(start, "yyyy-MM");
+      const hasValidDate = isValidDate(event.start) && isValidDate(event.end);
+      const monthKey = hasValidDate ? format(start, "yyyy-MM") : "TBD";
       if (!months[monthKey]) {
         months[monthKey] = { key: monthKey, date: start, days: [] };
       }
-      const dayKey = format(startOfDay(start), "yyyy-MM-dd");
-      const existingDay = months[monthKey].days.find(
-        (d) => format(d.date, "yyyy-MM-dd") === dayKey,
-      );
+      const dayKey = hasValidDate
+        ? format(startOfDay(start), "yyyy-MM-dd")
+        : "TBD";
+      const existingDay = months[monthKey].days.find((d) => d.key === dayKey);
       if (existingDay) {
         existingDay.events.push(event);
       } else {
-        months[monthKey].days.push({ date: start, events: [event] });
+        months[monthKey].days.push({
+          key: dayKey,
+          date: hasValidDate ? start : new Date(0),
+          events: [event],
+        });
       }
     });
 
-    return Object.values(months).sort(
-      (a, b) => a.date.getTime() - b.date.getTime(),
-    );
+    return Object.values(months).sort((a, b) => {
+      if (a.key === "TBD") return 1;
+      if (b.key === "TBD") return -1;
+
+      return a.date.getTime() - b.date.getTime();
+    });
   }, [filteredEvents]);
 
   const scrollToMonth = (offset: number) => (currentKey: string) => {
@@ -105,7 +115,9 @@ const MobileListView = ({
                     className="text-xl sm:text-2xl font-bold text-sky-700 dark:text-blue-300 focus:outline-none flex items-center gap-2"
                     onClick={onOpenMonthPicker}
                   >
-                    {format(month.date, "MMMM yyyy")}{" "}
+                    {month.key === "TBD"
+                      ? "TBD"
+                      : format(month.date, "MMMM yyyy")}{" "}
                     <span className="text-xs sm:text-sm">▼</span>
                   </button>
                   <div className="flex items-center gap-5">
@@ -126,15 +138,15 @@ const MobileListView = ({
 
             <div className="flex flex-col gap-6 mt-2 mb-4">
               {month.days.map((day) => {
-                const isToday = isSameDay(day.date, new Date());
+                const isToday =
+                  day.key !== "TBD" && isSameDay(day.date, new Date());
                 return (
-                  <div
-                    key={day.date.toISOString()}
-                    className="flex flex-col gap-1"
-                  >
+                  <div key={day.key} className="flex flex-col gap-1">
                     <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-zinc-600">
                       <h3 className="font-semibold text-black dark:text-zinc-100">
-                        {format(day.date, "EEEE - MMMM d, yyyy")}
+                        {day.key === "TBD"
+                          ? "Date TBD"
+                          : format(day.date, "EEEE - MMMM d, yyyy")}
                       </h3>
                       {isToday && (
                         <span className="bg-sky-700 text-white dark:bg-blue-300 dark:text-zinc-900 text-sm px-2 py-0.5 rounded-md">

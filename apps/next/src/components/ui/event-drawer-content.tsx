@@ -6,7 +6,12 @@ import type { Event } from "@peterplate/validators";
 import EventImage from "@/components/ui/event-image";
 import EventTypeBadge from "@/components/ui/event-type-badge";
 import { classifyEvent } from "@/utils/classifyEvent";
-import { dateRangeToString, timeToString, toTitleCase } from "@/utils/funcs";
+import {
+  dateRangeToString,
+  isValidDate,
+  timeToString,
+  toTitleCase,
+} from "@/utils/funcs";
 
 /**
  * `EventDrawerContent` renders the detailed view of an event within a drawer (mobile view).
@@ -18,6 +23,8 @@ import { dateRangeToString, timeToString, toTitleCase } from "@/utils/funcs";
  * @returns {JSX.Element} The rendered content for the event drawer.
  */
 export default function EventDrawerContent(props: Event): React.JSX.Element {
+  const hasValidDate = isValidDate(props.start) && isValidDate(props.end);
+
   return (
     <Box className="dark:bg-[var(--surface-modal)]">
       <div className="relative">
@@ -42,12 +49,16 @@ export default function EventDrawerContent(props: Event): React.JSX.Element {
         <div className="flex flex-col gap-2 text-sm text-zinc-500 dark:text-zinc-400 mt-1">
           <div className="flex gap-2 items-center">
             <CalendarTodayOutlinedIcon sx={{ fontSize: 16 }} />
-            <span>{dateRangeToString(props.start, props.end)}</span>
+            <span>
+              {hasValidDate ? dateRangeToString(props.start, props.end) : "TBD"}
+            </span>
           </div>
           <div className="flex gap-2 items-center">
             <AccessTimeOutlinedIcon sx={{ fontSize: 16 }} />
             <span>
-              {timeToString(props.start)} – {timeToString(props.end)}
+              {hasValidDate
+                ? `${timeToString(props.start)} - ${timeToString(props.end)}`
+                : "TBD"}
             </span>
           </div>
           <div className="flex gap-2 items-center">
