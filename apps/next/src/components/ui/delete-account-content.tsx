@@ -12,6 +12,8 @@ import { authClient, signOut, useSession } from "@/utils/auth-client";
 // Added to the return URL so the dialog reopens at the confirm step after signing in again.
 export const DELETE_ACCOUNT_CONFIRM_PARAM = "deleteAccount";
 
+export const ACCOUNT_DELETED_KEY = "accountDeleted";
+
 type DeleteAccountContentProps = {
   onClose: () => void;
 };
@@ -65,7 +67,7 @@ export default function DeleteAccountContent({
       return;
     }
 
-    window.alert("Your account has been deleted.");
+    sessionStorage.setItem(ACCOUNT_DELETED_KEY, "1");
     await signOut();
   };
 
