@@ -12,6 +12,7 @@ import {
   dateRangeToString,
   eventTimeRangeToString,
   generateGCalLink,
+  isUpcomingEvent,
   toTitleCase,
 } from "@/utils/funcs";
 import { HallEnum } from "@/utils/types";
@@ -86,28 +87,30 @@ export default function EventDialogContent({
         >
           {props.description}
         </Typography>
-        <div className="w-full flex items-center justify-center pt-4">
-          <a
-            href={generateGCalLink(
-              props.title,
-              props.description,
-              props.restaurantId === "brandywine"
-                ? HallEnum.BRANDYWINE
-                : HallEnum.ANTEATERY,
-              props.start,
-            )}
-            rel="noreferrer"
-            target="_blank"
-          >
-            <Button
-              variant="contained"
-              className="[&_svg]:size-5 whitespace-nowrap"
-              startIcon={<CalendarTodayOutlinedIcon />}
+        {isUpcomingEvent(props) && (
+          <div className="w-full flex items-center justify-center pt-4">
+            <a
+              href={generateGCalLink(
+                props.title,
+                props.description,
+                props.restaurantId === "brandywine"
+                  ? HallEnum.BRANDYWINE
+                  : HallEnum.ANTEATERY,
+                props.start,
+              )}
+              rel="noreferrer"
+              target="_blank"
             >
-              Add to Google Calendar
-            </Button>
-          </a>
-        </div>
+              <Button
+                variant="contained"
+                className="[&_svg]:size-5 whitespace-nowrap"
+                startIcon={<CalendarTodayOutlinedIcon />}
+              >
+                Add to Google Calendar
+              </Button>
+            </a>
+          </div>
+        )}
       </DialogContent>
     </Box>
   );
