@@ -22,6 +22,7 @@ import {
   Snackbar,
   Tooltip,
   Typography,
+  useScrollTrigger,
 } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
@@ -30,8 +31,12 @@ import { useTheme } from "next-themes";
 import type { MouseEvent } from "react";
 import { useEffect, useState } from "react";
 import { type TourId, useTourStore } from "@/context/useTourStore";
+import { useHeroFade } from "@/hooks/useHeroFade";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useSession } from "@/utils/auth-client";
+import DeleteAccountContent, {
+  DELETE_ACCOUNT_CONFIRM_PARAM,
+} from "./delete-account-content";
 import EditPreferencesContent from "./edit-preferences-content";
 import { WelcomeView } from "./onboarding";
 import SidebarContent from "./sidebar/sidebar-content";
@@ -134,7 +139,8 @@ const MOBILE_TOOLBAR_ELEMENTS: ToolbarElement[] = [
   },
 ];
 
-// Routes on which the toolbar should remain transparent
+// Routes on which the toolbar stays fixed: clear over the hero image, then
+// solid once the image has scrolled under it
 const TRANSPARENT_PAGES = ["/about", "/brandywine", "/anteatery"];
 
 function ToolbarDropdown({
@@ -212,7 +218,9 @@ function ToolbarDropdown({
 export function DesktopToolbar(): React.JSX.Element {
   const { resolvedTheme } = useTheme();
   const pathname = usePathname();
-  const isTransparent = TRANSPARENT_PAGES.includes(pathname);
+  const isTransparentPage = TRANSPARENT_PAGES.includes(pathname);
+  const heroFade = useHeroFade(isTransparentPage);
+  const isTransparent = isTransparentPage && heroFade < 0.5;
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   const [profileAnchor, setProfileAnchor] = useState<null | HTMLElement>(null);
@@ -222,6 +230,7 @@ export function DesktopToolbar(): React.JSX.Element {
   const [editPreferencesSnackbarOpen, setEditPreferencesSnackbarOpen] =
     useState(false);
   const [editPreferencesExpanded, setEditPreferencesExpanded] = useState(false);
+  const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
 
   const handleProfileOpen = (event: MouseEvent<HTMLElement>) => {
     setProfileAnchor(event.currentTarget);
@@ -241,25 +250,53 @@ export function DesktopToolbar(): React.JSX.Element {
     setEditPreferencesOpen(false);
     setEditPreferencesSnackbarOpen(true);
   };
+  const handleDeleteAccountOpen = () => {
+    setDeleteAccountOpen(true);
+  };
+  const handleDeleteAccountClose = () => {
+    setDeleteAccountOpen(false);
+  };
   const { data: session, isPending } = useSession();
   const user = session?.user;
   const start = useTourStore((state) => state.start);
   const tour = TOURS_BY_PATH[pathname];
 
+  // Reopens at the confirm step after signing in again.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.has(DELETE_ACCOUNT_CONFIRM_PARAM)) setDeleteAccountOpen(true);
+  }, []);
+
   return (
     <>
       <AppBar
-        position={isTransparent ? "absolute" : "sticky"}
+        position={isTransparentPage ? "fixed" : "sticky"}
         className={`shadow-none ${
-          isTransparent
-            ? "bg-transparent bg-gradient-to-b from-black/70 to-black/0"
+          isTransparentPage
+            ? "bg-transparent"
             : "bg-white dark:bg-[var(--surface-elevated)]"
         }`}
         sx={{
           backgroundImage: "none",
-          ...(!isTransparent && { borderBottom: 1, borderColor: "divider" }),
+          ...((!isTransparentPage || heroFade === 1) && {
+            borderBottom: 1,
+            borderColor: "divider",
+          }),
         }}
       >
+        {/* Fades from the gradient to solid as the hero scrolls under it */}
+        {isTransparentPage && (
+          <>
+            <div
+              className="absolute inset-0 -z-10 bg-gradient-to-b from-black/70 to-black/0"
+              style={{ opacity: 1 - heroFade }}
+            />
+            <div
+              className="absolute inset-0 -z-10 bg-white dark:bg-[var(--surface-elevated)]"
+              style={{ opacity: heroFade }}
+            />
+          </>
+        )}
         <MuiToolbar className="justify-between px-4 py-1 group">
           <div className="flex-none flex items-center">
             <Link href="/" className="flex items-center gap-2">
@@ -278,6 +315,7 @@ export function DesktopToolbar(): React.JSX.Element {
                     isTransparent && resolvedTheme === "light"
                       ? "white"
                       : "primary.main",
+                  transition: "color 300ms",
                 }}
               >
                 PeterPlate
@@ -411,6 +449,7 @@ export function DesktopToolbar(): React.JSX.Element {
         <SidebarContent
           onClose={handleProfileClose}
           onEditPreferencesClick={handleEditPreferencesOpen}
+          onDeleteAccountClick={handleDeleteAccountOpen}
         />
       </Menu>
 
@@ -474,6 +513,18 @@ export function DesktopToolbar(): React.JSX.Element {
         </Drawer>
       )}
 
+      <Dialog
+        open={deleteAccountOpen && !!user}
+        onClose={handleDeleteAccountClose}
+        maxWidth={false}
+        PaperProps={{
+          className:
+            "w-[500px] max-w-[90vw] m-2 p-0 overflow-hidden flex flex-col rounded-[12px] bg-white shadow-[0_4px_20px_0_var(--text-muted-soft)] dark:bg-[var(--surface-dialog)] dark:border-[3px] dark:border-[var(--button-disabled-bg)] dark:shadow-none",
+        }}
+      >
+        <DeleteAccountContent onClose={handleDeleteAccountClose} />
+      </Dialog>
+
       <Snackbar
         open={editPreferencesSnackbarOpen}
         autoHideDuration={4000}
@@ -490,7 +541,13 @@ export function DesktopToolbar(): React.JSX.Element {
 
 function MobileToolbar(): React.JSX.Element {
   const pathname = usePathname();
-  const isTransparent = TRANSPARENT_PAGES.includes(pathname);
+  const isTransparentPage = TRANSPARENT_PAGES.includes(pathname);
+  const isScrolled = useScrollTrigger({
+    disableHysteresis: true,
+    threshold: 0,
+  });
+  const heroFade = useHeroFade(isTransparentPage);
+  const isTransparent = isTransparentPage && heroFade < 0.5;
   const [profileAnchor, setProfileAnchor] = useState<null | HTMLElement>(null);
   const profileOpen = Boolean(profileAnchor);
   const [welcomeOpen, setWelcomeOpen] = useState(false);
@@ -502,11 +559,18 @@ function MobileToolbar(): React.JSX.Element {
     useState(false);
   const [_editPreferencesExpanded, setEditPreferencesExpanded] =
     useState(false);
+  const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
   const start = useTourStore((state) => state.start);
   const tour = TOURS_BY_PATH[pathname];
 
   useEffect(() => {
     setIsMounted(true);
+  }, []);
+
+  // Reopens at the confirm step after signing in again.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.has(DELETE_ACCOUNT_CONFIRM_PARAM)) setDeleteAccountOpen(true);
   }, []);
 
   const handleProfileOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -530,6 +594,15 @@ function MobileToolbar(): React.JSX.Element {
   const handleEditPreferencesSaved = () => {
     setEditPreferencesOpen(false);
     setEditPreferencesSnackbarOpen(true);
+  };
+
+  const handleDeleteAccountOpen = () => {
+    setProfileAnchor(null);
+    setDeleteAccountOpen(true);
+  };
+
+  const handleDeleteAccountClose = () => {
+    setDeleteAccountOpen(false);
   };
 
   const diningHref =
@@ -558,17 +631,24 @@ function MobileToolbar(): React.JSX.Element {
       {/* Sticky top header bar */}
       <div
         className={`top-0 z-50 w-full px-4 py-2.5 flex items-center justify-between ${
-          isTransparent
-            ? "absolute bg-transparent"
-            : "sticky bg-white dark:bg-surface-scroll"
+          isTransparentPage ? "fixed" : "sticky bg-white dark:bg-surface-scroll"
         }`}
       >
+        {/* Fades to solid as the hero scrolls under it */}
+        {isTransparentPage && (
+          <div
+            className="absolute inset-0 -z-10 bg-white dark:bg-surface-scroll"
+            style={{ opacity: heroFade }}
+          />
+        )}
+        {/* Hidden until the bar is solid, so the hall name on the hero image
+            never shows through behind it */}
         <span
-          className={`text-[15px] font-semibold truncate pr-2 ${
+          className={`text-[15px] font-semibold truncate pr-2 transition duration-150 ${
             isTransparent
               ? "text-white"
               : "text-neutral-800 dark:text-neutral-100"
-          }`}
+          } ${isTransparentPage && isScrolled && heroFade < 1 ? "opacity-0" : ""}`}
         >
           {greeting}
         </span>
@@ -621,11 +701,11 @@ function MobileToolbar(): React.JSX.Element {
               >
                 <LoginIcon
                   style={{ fontSize: 30 }}
-                  className={
+                  className={`transition-colors duration-300 ${
                     isTransparent
                       ? "text-white"
                       : "text-sky-700 dark:text-blue-300"
-                  }
+                  }`}
                 />
               </IconButton>
               <IconButton
@@ -636,11 +716,11 @@ function MobileToolbar(): React.JSX.Element {
               >
                 <MenuIcon
                   style={{ fontSize: 30 }}
-                  className={
+                  className={`transition-colors duration-300 ${
                     isTransparent
                       ? "text-white"
                       : "text-neutral-800 dark:text-neutral-100"
-                  }
+                  }`}
                 />
               </IconButton>
             </>
@@ -718,6 +798,7 @@ function MobileToolbar(): React.JSX.Element {
         <SidebarContent
           onClose={handleProfileClose}
           onEditPreferencesClick={handleEditPreferencesOpen}
+          onDeleteAccountClick={handleDeleteAccountOpen}
         />
       </Drawer>
 
@@ -750,6 +831,20 @@ function MobileToolbar(): React.JSX.Element {
           onSaved={handleEditPreferencesSaved}
           onExpandChange={setEditPreferencesExpanded}
         />
+      </Drawer>
+
+      <Drawer
+        anchor="bottom"
+        open={deleteAccountOpen && !!user}
+        onClose={handleDeleteAccountClose}
+        slotProps={{
+          paper: {
+            className:
+              "p-0 overflow-hidden rounded-t-[10px] mt-[96px] h-auto max-h-[85vh] flex flex-col min-h-0 bg-white dark:bg-[var(--surface-dialog)] dark:border-[3px] dark:border-[var(--button-disabled-bg)] dark:border-b-0 dark:rounded-t-[12px]",
+          },
+        }}
+      >
+        <DeleteAccountContent onClose={handleDeleteAccountClose} />
       </Drawer>
 
       <Snackbar

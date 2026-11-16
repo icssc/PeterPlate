@@ -1,5 +1,5 @@
 {
-  "id": "37b8f4c6-89a3-4fbd-9335-18400fd6c2a5",
+  "id": "97132362-750c-4907-aa28-577e27aae262",
   "prevId": "2d2f94ff-35b9-4f25-9806-6c8a051b516b",
   "version": "7",
   "dialect": "postgresql",
@@ -426,6 +426,65 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.push_subscriptions": {
+      "name": "push_subscriptions",
+      "schema": "",
+      "columns": {
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "endpoint": {
+          "name": "endpoint",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "p256dh": {
+          "name": "p256dh",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "auth": {
+          "name": "auth",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "push_subscriptions_user_id_users_id_fk": {
+          "name": "push_subscriptions_user_id_users_id_fk",
+          "tableFrom": "push_subscriptions",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "push_subscriptions_endpoint_unique": {
+          "name": "push_subscriptions_endpoint_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "endpoint"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.ratings": {
       "name": "ratings",
       "schema": "",
@@ -543,13 +602,6 @@
         },
         "hasOnboarded": {
           "name": "hasOnboarded",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        },
-        "showSuitableDishesOnly": {
-          "name": "showSuitableDishesOnly",
           "type": "boolean",
           "primaryKey": false,
           "notNull": true,
