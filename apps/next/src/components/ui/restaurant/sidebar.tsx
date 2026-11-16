@@ -17,6 +17,7 @@ import {
   BRANDYWINE_MAP_LINK_URL,
   HallEnum,
 } from "@/utils/types";
+import { TodayEvents } from "./today-events";
 
 interface SidebarProps {
   displayDate: Date;
@@ -64,6 +65,8 @@ export function Sidebar({
 }: SidebarProps) {
   return (
     <div className="w-full md:basis-[325px] md:max-w-[325px] md:min-h-[740px]">
+      <TodayEvents events={hallEvents} />
+
       {/* Hours of operation card */}
       <SidebarSection title={"Hours of Operation"}>
         <Typography variant="body2" fontWeight={600} className="mb-3 pb-2">

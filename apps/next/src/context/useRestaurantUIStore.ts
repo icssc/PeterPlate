@@ -20,10 +20,6 @@ interface RestaurantUIState {
   isCompactView: boolean;
   setIsCompactView: (isCompact: boolean) => void;
 
-  // Preferences filter
-  showPreferencesOnly: boolean;
-  setShowPreferencesOnly: (show: boolean) => void;
-
   // Date picker open state
   isDatePickerOpen: boolean;
   setIsDatePickerOpen: (isOpen: boolean) => void;
@@ -48,9 +44,6 @@ export const useRestaurantUIStore = create<RestaurantUIState>()((set) => ({
 
   isCompactView: false,
   setIsCompactView: (isCompact) => set({ isCompactView: isCompact }),
-
-  showPreferencesOnly: false,
-  setShowPreferencesOnly: (show) => set({ showPreferencesOnly: show }),
 
   isDatePickerOpen: false,
   setIsDatePickerOpen: (isOpen) => set({ isDatePickerOpen: isOpen }),

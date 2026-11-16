@@ -44,7 +44,7 @@ export default function SidebarContent({
   const userId = user?.id;
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const { showSuitableDishesOnly, setShowSuitableDishesOnly } =
+  const { showSuitableDishesOnly, isPending, setShowSuitableDishesOnly } =
     useShowSuitableDishesOnly();
   const [showNotifications, setShowNotifications] = useState(false);
 
@@ -62,11 +62,11 @@ export default function SidebarContent({
 
   const handleSignOut = async () => {
     const userTheme = theme ?? localStorage.getItem("theme");
-    await signOut();
-    if (userTheme) {
-      localStorage.setItem("theme", userTheme);
-    }
-    window.location.href = "/";
+    await signOut({
+      onBeforeRedirect: () => {
+        if (userTheme) localStorage.setItem("theme", userTheme);
+      },
+    });
   };
 
   if (showNotifications) {
@@ -164,6 +164,7 @@ export default function SidebarContent({
               </Typography>
               <Switch
                 checked={showSuitableDishesOnly}
+                disabled={isPending}
                 onChange={(e) => setShowSuitableDishesOnly(e.target.checked)}
                 color="primary"
                 slotProps={{

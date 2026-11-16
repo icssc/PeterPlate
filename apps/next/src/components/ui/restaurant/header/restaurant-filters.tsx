@@ -151,7 +151,7 @@ export function RestaurantFilters({
             <DatePicker
               label="Select date"
               value={selectedDate || null}
-              format="MM/dd/yyyy (EEE)"
+              format={isDesktop ? "MM/dd/yyyy (EEE)" : undefined}
               onChange={(newValue) => handleDateSelect(newValue || undefined)}
               minDate={calendarRange.earliest}
               maxDate={calendarRange.latest}
@@ -212,7 +212,7 @@ export function RestaurantFilters({
         </div>
       )}
 
-      {/* Card / compact view toggles — desktop only (mobile has its own) */}
+      {/* Card / compact view toggles (desktop only; mobile has its own) */}
       {isDesktop && (
         <div id="tour-view-toggle-desktop" className="flex shrink-0 gap-2">
           <Button

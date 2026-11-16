@@ -728,13 +728,14 @@ function MobileToolbar(): React.JSX.Element {
         </div>
       </div>
 
-      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-[520px]">
+      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-1.75rem)] max-w-[520px]">
+        {/* Less top padding because icons have built-in space above them */}
         <div
           className="
-            rounded-[28px]
-            px-4 py-3
+            rounded-3xl
+            px-4 pt-3.5 pb-4
             shadow-lg
-            bg-gradient-to-b from-sky-700 to-sky-900 dark:from-[var(--gradient-from)] dark:to-[var(--gradient-to)]
+            bg-gradient-to-b from-[#2b65a0] to-[#225281] dark:from-[var(--gradient-from)] dark:to-[var(--gradient-to)]
           "
         >
           <div className="flex items-center justify-between">
@@ -754,25 +755,16 @@ function MobileToolbar(): React.JSX.Element {
                     w-[64px]
                     gap-1
                     transition
-                    ${active ? "opacity-100" : "opacity-85 hover:opacity-100"}
+                    ${active ? "text-white dark:!text-[var(--nav-active-text)]" : "text-[#c1e5fb] hover:text-white dark:text-white dark:opacity-85 dark:hover:opacity-100"}
                   `}
                 >
-                  <div
-                    style={{
-                      fontSize: 20,
-                      color: "white",
-                      opacity: active ? 1 : 0.9,
-                    }}
-                    className={
-                      active ? "dark:!text-[var(--nav-active-text)]" : ""
-                    }
-                  >
+                  <div className="flex" style={{ fontSize: 20 }}>
                     {element.icon}
                   </div>
                   <span
                     className={`
-                      text-[12px] leading-none text-white
-                      ${active ? "font-semibold dark:!text-[var(--nav-active-text)]" : "font-medium"}
+                      text-[10px] leading-none
+                      ${active ? "font-semibold" : "font-medium"}
                     `}
                   >
                     {element.title}

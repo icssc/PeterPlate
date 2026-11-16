@@ -1,10 +1,11 @@
 import type { Station } from "@api/index";
 import { MoreHoriz } from "@mui/icons-material";
-import { IconButton, Typography } from "@mui/material";
+import { Chip, IconButton, Typography } from "@mui/material";
 import type { DishWithRating, Event } from "@peterplate/validators";
 import { DiningHallStatus } from "@/components/ui/status";
 import type { CalendarRange } from "@/components/ui/toolbar";
 import { useRestaurantUIStore } from "@/context/useRestaurantUIStore";
+import { useShowSuitableDishesOnly } from "@/hooks/useShowSuitableDishesOnly";
 import { toTitleCase } from "@/utils/funcs";
 import type { HallEnum, HallStatusEnum } from "@/utils/types";
 import { DesktopTabs } from "./header/desktop-tabs";
@@ -51,6 +52,8 @@ export function RestaurantControls({
   );
   const selectedPeriod = useRestaurantUIStore((s) => s.selectedPeriod);
   const showFilters = isDesktop || isFiltersExpanded;
+  const { showSuitableDishesOnly, setShowSuitableDishesOnly } =
+    useShowSuitableDishesOnly();
 
   return (
     // Sticky while scrolling
@@ -99,6 +102,17 @@ export function RestaurantControls({
           id="tour-filters-mobile"
           className="flex flex-col gap-3 w-full md:w-auto md:grow md:flex-row md:items-center md:justify-end"
         >
+          {/* Shown even with mobile filters collapsed, since the setting persists */}
+          {showSuitableDishesOnly && (
+            <Chip
+              label="Suitable dishes only"
+              color="primary"
+              variant="outlined"
+              onDelete={() => setShowSuitableDishesOnly(false)}
+              className="self-start ml-3 md:self-auto md:ml-0"
+            />
+          )}
+
           {/* Meal & date selectors */}
           {showFilters && (
             <RestaurantFilters
@@ -125,7 +139,7 @@ export function RestaurantControls({
         </div>
       </div>
 
-      {/* Station tabs & card/compact view toggles (desktop only) */}
+      {/* Station tabs (desktop only) */}
       <DesktopTabs
         isDesktop={isDesktop}
         isLoading={isLoading}
