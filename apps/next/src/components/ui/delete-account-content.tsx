@@ -59,7 +59,10 @@ export default function DeleteAccountContent({
   const handleDelete = async () => {
     setError(null);
     setIsWorking(true);
-    const { error: deleteError } = await authClient.deleteUser();
+    // deleteUser throws on a network failure instead of returning an error.
+    const { error: deleteError } = await authClient
+      .deleteUser()
+      .catch((error: unknown) => ({ error }));
     if (deleteError) {
       console.error("Error deleting account", deleteError);
       setError("Couldn't delete your account. Please try again.");
@@ -109,7 +112,7 @@ export default function DeleteAccountContent({
 
       <div className="px-[18px] pt-2 pb-[29.5px]">
         <h2 className={sectionHeading}>
-          {isConfirmStep ? "Are you sure?" : "Delete Account"}
+          {isConfirmStep ? "Are you sure?" : "Confirm it's you"}
         </h2>
         <p className={`${sectionDescription} mt-1`}>
           This permanently deletes the PeterPlate account for{" "}
@@ -118,7 +121,7 @@ export default function DeleteAccountContent({
         </p>
         {!isConfirmStep && (
           <p className={`${sectionDescription} mt-2`}>
-            To continue, sign in again to confirm it&apos;s you.
+            To continue, sign in again.
           </p>
         )}
         {error && (
@@ -131,7 +134,7 @@ export default function DeleteAccountContent({
         )}
       </div>
 
-      <footer className="shrink-0 w-full px-[18px] grid grid-cols-2 gap-[7px] h-[49px] md:mx-auto md:w-[464px] md:px-0 md:flex md:justify-between md:items-center md:gap-0 bg-white dark:bg-[var(--surface-dialog)] rounded-b-[12px]">
+      <footer className="shrink-0 w-full px-[18px] grid grid-cols-2 gap-[7px] h-[49px] md:flex md:justify-between md:items-center md:gap-0 bg-white dark:bg-[var(--surface-dialog)] rounded-b-[12px]">
         <Button
           variant="outlined"
           size="small"
