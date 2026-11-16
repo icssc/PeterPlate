@@ -13,7 +13,7 @@ import {
   Logout as LogoutIcon,
   Notifications as NotificationsIcon,
 } from "@mui/icons-material";
-import { Box, Tooltip, Typography } from "@mui/material";
+import { Box, Switch, Tooltip, Typography } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
 import { useTheme } from "next-themes";
@@ -22,6 +22,7 @@ import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { SignInButtons } from "@/components/auth/sign-in-buttons";
 import NotificationsPanel from "@/components/ui/notifications-panel";
+import { useShowSuitableDishesOnly } from "@/hooks/useShowSuitableDishesOnly";
 import { signOut, useSession } from "@/utils/auth-client";
 import { formatDietaryKey } from "@/utils/dietary";
 import { trpc } from "@/utils/trpc";
@@ -43,6 +44,8 @@ export default function SidebarContent({
   const userId = user?.id;
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const { showSuitableDishesOnly, isPending, setShowSuitableDishesOnly } =
+    useShowSuitableDishesOnly();
   const [showNotifications, setShowNotifications] = useState(false);
 
   useEffect(() => setMounted(true), []);
@@ -59,11 +62,11 @@ export default function SidebarContent({
 
   const handleSignOut = async () => {
     const userTheme = theme ?? localStorage.getItem("theme");
-    await signOut();
-    if (userTheme) {
-      localStorage.setItem("theme", userTheme);
-    }
-    window.location.href = "/";
+    await signOut({
+      onBeforeRedirect: () => {
+        if (userTheme) localStorage.setItem("theme", userTheme);
+      },
+    });
   };
 
   if (showNotifications) {
@@ -153,6 +156,21 @@ export default function SidebarContent({
                   None
                 </span>
               )}
+            </div>
+
+            <div className="flex items-center justify-between mt-3">
+              <Typography className="text-xs font-medium text-gray-900 dark:text-zinc-300">
+                Show Suitable Dishes Only
+              </Typography>
+              <Switch
+                checked={showSuitableDishesOnly}
+                disabled={isPending}
+                onChange={(e) => setShowSuitableDishesOnly(e.target.checked)}
+                color="primary"
+                slotProps={{
+                  input: { "aria-label": "Show suitable dishes only" },
+                }}
+              />
             </div>
           </div>
         )}

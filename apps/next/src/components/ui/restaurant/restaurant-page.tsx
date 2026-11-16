@@ -22,6 +22,7 @@ import { RestaurantControls } from "./restaurant-controls";
 import RestaurantOnboarding from "./restaurant-onboarding";
 import { Sidebar } from "./sidebar";
 import RestaurantSpinner from "./spinner";
+import { TodayEvents } from "./today-events";
 
 interface RestaurantPageProps {
   hall: HallEnum;
@@ -144,6 +145,9 @@ export function RestaurantPage({
               stations={stations}
               hallEvents={hallEvents}
             />
+
+            {/* On desktop this sits in the sidebar instead */}
+            {!isDesktop && <TodayEvents events={hallEvents} />}
 
             <div className="w-full">
               <DishesView
