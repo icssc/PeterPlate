@@ -18,18 +18,34 @@ import { HallEnum } from "@/utils/types";
 const normalizeStationName = (name: string) =>
   name.toLowerCase().replace(/[^a-z0-9]/g, "");
 
-/** Stations that don't rotate; shown after the rotating ones. */
-const NON_ROTATING_STATIONS: Record<"anteatery" | "brandywine", Set<string>> = {
-  // Names as returned by CampusDish, normalized.
-  brandywine: new Set(
-    ["Hearth/Pizza", "Ember/Grill", "Honeycakes/Bakery"].map(
-      normalizeStationName,
-    ),
-  ),
-  anteatery: new Set(
-    ["Sizzle Grill", "Bakery", "Oven"].map(normalizeStationName),
-  ),
+/**
+ * Stations shown first, in this order. A station matches the first keyword its
+ * normalized name contains (CampusDish names like "Ember/Grill" or "The Farm
+ * Stand/ Deli" are matched by substring). Unlisted stations follow, in API order.
+ */
+const STATION_PRIORITY: Record<"anteatery" | "brandywine", string[]> = {
+  brandywine: [
+    "Grubb",
+    "Crossroads",
+    "Twisted Root",
+    "Ember",
+    "Hearth",
+    "Farm Stand",
+  ].map(normalizeStationName),
+  anteatery: [
+    "Fire And Ice",
+    "Noodle Bar",
+    "Twisted Root",
+    "Grill",
+    "Oven",
+  ].map(normalizeStationName),
 };
+
+function stationRank(name: string, priority: string[]): number {
+  const n = normalizeStationName(name);
+  const i = priority.findIndex((key) => n.includes(key));
+  return i === -1 ? priority.length : i;
+}
 
 /**
  * Returns the current meal period key for a given date by checking which period
@@ -198,12 +214,12 @@ export function useRestaurantPage(hall: HallEnum): UseRestaurantPageResult {
     [hallData, selectedPeriod],
   );
 
-  // Rotating stations come first; the fixed (non-rotating) ones go last.
+  // Order stations by the per-restaurant priority list (stable sort).
   const stations: Station[] = useMemo(() => {
-    const all = currentMenu?.stations ?? [];
-    const fixed = NON_ROTATING_STATIONS[restaurantId];
-    const isFixed = (s: Station) => fixed.has(normalizeStationName(s.name));
-    return [...all.filter((s) => !isFixed(s)), ...all.filter(isFixed)];
+    const priority = STATION_PRIORITY[restaurantId];
+    return [...(currentMenu?.stations ?? [])].sort(
+      (x, y) => stationRank(x.name, priority) - stationRank(y.name, priority),
+    );
   }, [currentMenu, restaurantId]);
 
   // --- Auto-select station ---
