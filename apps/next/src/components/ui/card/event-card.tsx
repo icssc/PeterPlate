@@ -12,6 +12,7 @@ import type { EventCategory } from "@/utils/classifyEvent";
 import {
   dateRangeToString,
   eventTimeRangeToString,
+  isHappeningToday,
   toTitleCase,
 } from "@/utils/funcs";
 import EventDialogContent from "../event-dialog-content";
@@ -45,10 +46,14 @@ const EventCardContent = React.forwardRef<
   HTMLDivElement,
   EventCardContentProps
 >(({ props, ...divProps }, ref) => {
+  const happeningToday = isHappeningToday(props);
+
   return (
     <div ref={ref} {...divProps}>
       <Card
-        className="cursor-pointer hover:shadow-lg transition h-full min-w-[280px] sm:min-w-0 dark:bg-[var(--surface-modal)] dark:shadow-none"
+        className={`cursor-pointer hover:shadow-lg transition h-full min-w-[280px] sm:min-w-0 dark:bg-[var(--surface-modal)] dark:shadow-none ${
+          happeningToday ? "ring-2 ring-sky-700 dark:ring-blue-300" : ""
+        }`}
         sx={{
           borderRadius: "16px",
           backgroundImage: "none",
@@ -64,6 +69,11 @@ const EventCardContent = React.forwardRef<
               height={300}
               className="w-full object-contain"
             />
+            {happeningToday && (
+              <span className="absolute top-2 left-2 rounded-full bg-sky-700 px-3 py-0.5 text-sm font-medium text-white dark:bg-blue-300 dark:text-zinc-900">
+                Today
+              </span>
+            )}
             <EventTypeBadge type={props.type} />
           </div>
         </div>

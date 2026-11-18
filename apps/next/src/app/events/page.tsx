@@ -32,6 +32,19 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 /** An event plus the category we derive from its title and description. */
 export type EventWithType = Event & { eventType: EventCategory };
 
+const LOCATION_FILTERS = [
+  { value: "both", label: "All Locations" },
+  { value: "brandywine", label: "Brandywine" },
+  { value: "anteatery", label: "Anteatery" },
+] as const;
+
+const filterButtonClasses = (selected: boolean) =>
+  `!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
+    selected
+      ? "!bg-sky-700 !text-white !border-sky-700 hover:!bg-sky-800 dark:!bg-blue-300 dark:!text-gray-900 dark:!border-blue-300 dark:hover:!bg-blue-400"
+      : "!bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50 dark:!bg-transparent dark:!border-blue-300 dark:!text-white dark:hover:!bg-zinc-700"
+  }`;
+
 const Events = () => {
   const [selectedDiningHall, setSelectedDiningHall] = useState<
     "both" | "anteatery" | "brandywine"
@@ -45,7 +58,11 @@ const Events = () => {
     useState<EventWithType | null>(null);
   const [currentDate, setCurrentDate] = useState(new Date());
 
-  const { data: events, isLoading, error } = trpc.event.upcoming.useQuery();
+  const {
+    data: events,
+    isLoading,
+    error,
+  } = trpc.event.upcomingAndPast.useQuery();
 
   // Oldest first. The API returns past events too, so the Upcoming/Past
   // toggle decides which side of "now" every view shows. Events without a
@@ -253,8 +270,12 @@ const Events = () => {
               {viewMode === "calendar" && (
                 <div className="ml-auto flex items-center gap-4 text-sm text-slate-900 dark:text-white">
                   <span className="flex items-center gap-1.5">
-                    <span className="size-4 rounded-[3px] border border-sky-700 bg-[var(--calendar-today-bg)] dark:border-blue-300 dark:bg-[var(--calendar-today-bg-dark)]" />
+                    <span className="size-4 rounded-[5px] border-2 border-sky-700 bg-[var(--calendar-today-bg)] dark:border-blue-300 dark:bg-[var(--calendar-today-bg-dark)]" />
                     Today
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="h-4 w-6 rounded-full border border-sky-700 bg-[var(--surface-tinted)] dark:border-blue-300" />
+                    Multi-day
                   </span>
                   <span className="flex items-center gap-1.5">
                     <span className="size-4 rounded-[3px] bg-sky-700 dark:bg-[var(--primary-accent-light)]" />
@@ -273,21 +294,25 @@ const Events = () => {
                 <span className="text-sm font-medium text-slate-900 dark:text-white">
                   Time
                 </span>
-                <div className="flex flex-wrap gap-3">
-                  {EVENT_TIMEFRAMES.map(({ value, label }) => (
-                    <Button
+                <div className="flex h-[31px] overflow-hidden rounded-full border border-sky-700 bg-white dark:border-blue-300 dark:bg-transparent">
+                  {EVENT_TIMEFRAMES.map(({ value, label }, idx) => (
+                    <button
                       key={value}
-                      variant="outlined"
-                      size="small"
+                      type="button"
+                      aria-pressed={timeframe === value}
                       onClick={() => handleTimeframeChange(value)}
-                      className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
+                      className={`px-5 text-sm transition-colors ${
+                        idx > 0
+                          ? "border-l border-sky-700 dark:border-blue-300"
+                          : ""
+                      } ${
                         timeframe === value
-                          ? "!bg-sky-700 !text-white !border-sky-700 hover:!bg-sky-800 dark:!bg-blue-300 dark:!text-gray-900 dark:!border-blue-300 dark:hover:!bg-blue-400"
-                          : "!bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50 dark:!bg-transparent dark:!border-blue-300 dark:!text-white dark:hover:!bg-zinc-700"
+                          ? "bg-sky-700 text-white dark:bg-blue-300 dark:text-gray-900"
+                          : "text-slate-900 hover:bg-sky-50 dark:text-white dark:hover:bg-zinc-700"
                       }`}
                     >
                       {label}
-                    </Button>
+                    </button>
                   ))}
                 </div>
               </div>
@@ -300,33 +325,25 @@ const Events = () => {
                     variant="outlined"
                     size="small"
                     onClick={() => setSelectedEventType("both")}
-                    className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
-                      selectedEventType === "both"
-                        ? "!bg-sky-700 !text-white !border-sky-700 hover:!bg-sky-800 dark:!bg-blue-300 dark:!text-gray-900 dark:!border-blue-300 dark:hover:!bg-blue-400"
-                        : "!bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50 dark:!bg-transparent dark:!border-blue-300 dark:!text-white dark:hover:!bg-zinc-700"
-                    }`}
+                    className={filterButtonClasses(
+                      selectedEventType === "both",
+                    )}
                   >
                     All Events
                   </Button>
-                  {EVENT_CATEGORIES.map((category) => {
-                    const isSelected = selectedEventType === category;
-
-                    return (
-                      <Button
-                        key={category}
-                        variant="outlined"
-                        size="small"
-                        onClick={() => setSelectedEventType(category)}
-                        className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
-                          isSelected
-                            ? "!bg-sky-700 dark:!bg-sky-400 !text-white !border-sky-700 dark:!border-sky-400 hover:!bg-sky-800 dark:hover:!bg-sky-500"
-                            : "!bg-white dark:!bg-zinc-800 !border-sky-700 dark:!border-sky-400 !text-slate-900 dark:!text-zinc-100 hover:!bg-sky-50 dark:hover:!bg-zinc-700"
-                        }`}
-                      >
-                        {category}
-                      </Button>
-                    );
-                  })}
+                  {EVENT_CATEGORIES.map((category) => (
+                    <Button
+                      key={category}
+                      variant="outlined"
+                      size="small"
+                      onClick={() => setSelectedEventType(category)}
+                      className={filterButtonClasses(
+                        selectedEventType === category,
+                      )}
+                    >
+                      {category}
+                    </Button>
+                  ))}
                 </div>
               </div>
               <div className="flex flex-col gap-3">
@@ -334,42 +351,19 @@ const Events = () => {
                   Location
                 </span>
                 <div className="flex flex-wrap gap-3">
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={() => setSelectedDiningHall("both")}
-                    className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
-                      selectedDiningHall === "both"
-                        ? "!bg-sky-700 !text-white !border-sky-700 hover:!bg-sky-800 dark:!bg-blue-300 dark:!text-gray-900 dark:!border-blue-300 dark:hover:!bg-blue-400"
-                        : "!bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50 dark:!bg-transparent dark:!border-blue-300 dark:!text-white dark:hover:!bg-zinc-700"
-                    }`}
-                  >
-                    All Locations
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={() => setSelectedDiningHall("brandywine")}
-                    className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
-                      selectedDiningHall === "brandywine"
-                        ? "!bg-sky-700 !text-white !border-sky-700 hover:!bg-sky-800 dark:!bg-blue-300 dark:!text-gray-900 dark:!border-blue-300 dark:hover:!bg-blue-400"
-                        : "!bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50 dark:!bg-transparent dark:!border-blue-300 dark:!text-white dark:hover:!bg-zinc-700"
-                    }`}
-                  >
-                    Brandywine
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={() => setSelectedDiningHall("anteatery")}
-                    className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
-                      selectedDiningHall === "anteatery"
-                        ? "!bg-sky-700 !text-white !border-sky-700 hover:!bg-sky-800 dark:!bg-blue-300 dark:!text-gray-900 dark:!border-blue-300 dark:hover:!bg-blue-400"
-                        : "!bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50 dark:!bg-transparent dark:!border-blue-300 dark:!text-white dark:hover:!bg-zinc-700"
-                    }`}
-                  >
-                    Anteatery
-                  </Button>
+                  {LOCATION_FILTERS.map(({ value, label }) => (
+                    <Button
+                      key={value}
+                      variant="outlined"
+                      size="small"
+                      onClick={() => setSelectedDiningHall(value)}
+                      className={filterButtonClasses(
+                        selectedDiningHall === value,
+                      )}
+                    >
+                      {label}
+                    </Button>
+                  ))}
                 </div>
               </div>
             </div>

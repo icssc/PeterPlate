@@ -4,17 +4,24 @@ import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import Dialog from "@mui/material/Dialog";
 import Drawer from "@mui/material/Drawer";
+import type { Event } from "@peterplate/validators";
 import {
   format,
   getDay,
   isAfter,
   isBefore,
+  isSameDay,
+  isToday,
   parse,
   startOfMonth,
   startOfWeek,
 } from "date-fns";
 import { enUS } from "date-fns/locale";
-import { Calendar, dateFnsLocalizer } from "react-big-calendar";
+import {
+  Calendar,
+  type DateHeaderProps,
+  dateFnsLocalizer,
+} from "react-big-calendar";
 import EventDialogContent from "./event-dialog-content";
 import EventDrawerContent from "./event-drawer-content";
 // @ts-expect-error
@@ -31,6 +38,33 @@ const localizer = dateFnsLocalizer({
   getDay,
   locales,
 });
+
+const TODAY_CLASSES =
+  "rounded-full bg-sky-700 text-white dark:bg-blue-300 dark:text-gray-900";
+
+/** The date number in each cell. Today also gets a "Today" pill. */
+const DateHeader = ({ date, label, onDrillDown }: DateHeaderProps) => {
+  const today = isToday(date);
+
+  return (
+    <div className={today ? "flex items-center justify-between" : ""}>
+      {today && (
+        <span
+          className={`${TODAY_CLASSES} px-2.5 text-xs font-semibold leading-5`}
+        >
+          Today
+        </span>
+      )}
+      <button
+        type="button"
+        className={`rbc-button-link ${today ? `${TODAY_CLASSES} size-6` : ""}`}
+        onClick={onDrillDown}
+      >
+        {label}
+      </button>
+    </div>
+  );
+};
 
 interface CalendarViewProps {
   isDesktop: boolean;
@@ -69,6 +103,8 @@ const CalendarView = ({
   );
   const dayPropGetter = (date: Date) =>
     eventDays.has(date.toDateString()) ? { className: "tour-event-day" } : {};
+  const eventPropGetter = (event: Pick<Event, "start" | "end">) =>
+    isSameDay(event.start, event.end) ? {} : { className: "multi-day-event" };
 
   // Only page between the first and last months that have events
   const monthStart = startOfMonth(currentDate);
@@ -105,7 +141,7 @@ const CalendarView = ({
       </div>
 
       {/* MAIN CALENDAR */}
-      <div className="dark:[&_.rbc-today]:!bg-sky-900/30 dark:[&_.rbc-header]:!border-zinc-700">
+      <div className="dark:[&_.rbc-header]:!border-zinc-700">
         <Calendar
           localizer={localizer}
           events={calendarEvents}
@@ -120,6 +156,9 @@ const CalendarView = ({
           selectable
           onSelectEvent={onSelectEvent}
           dayPropGetter={dayPropGetter}
+          eventPropGetter={eventPropGetter}
+          formats={{ dateFormat: "d" }}
+          components={{ month: { dateHeader: DateHeader } }}
         />
       </div>
 

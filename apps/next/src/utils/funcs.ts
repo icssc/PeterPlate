@@ -1,6 +1,6 @@
 import { Restaurant } from "@mui/icons-material";
 import type { DishWithRating, Event } from "@peterplate/validators";
-import { isFuture } from "date-fns";
+import { isFuture, isToday, startOfDay } from "date-fns";
 import {
   foodIconKeywords,
   foodIcons,
@@ -455,6 +455,15 @@ export function isUpcomingEvent(event: Event) {
  */
 export function hasEndTime(event: Pick<Event, "start" | "end">) {
   return event.end >= event.start;
+}
+
+/** Whether an event is on today, counting multi-day events that run through today. */
+export function isHappeningToday(event: Pick<Event, "start" | "end">) {
+  if (isToday(event.start)) return true;
+  const todayStart = startOfDay(new Date());
+  return (
+    hasEndTime(event) && event.start < todayStart && event.end >= todayStart
+  );
 }
 
 /** "11:00am – 4:00pm", or only the start time when there's no end time. */

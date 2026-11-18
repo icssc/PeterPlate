@@ -12,4 +12,13 @@ describe("getEvents", () => {
   );
 
   apiTest.todo("gets no events if no events are happening today or later");
+
+  apiTest(
+    "gets past events along with upcoming ones",
+    async ({ api, expect }) => {
+      const results = await api.event.upcomingAndPast();
+
+      expect(results.some((event) => event.start < new Date())).toBe(true);
+    },
+  );
 });

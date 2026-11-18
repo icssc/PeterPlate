@@ -184,6 +184,7 @@ const MobileEventsView = ({
             onDateChange={setCurrentDate}
             filteredEvents={filteredEvents}
             emptyMessage={emptyMessage}
+            showToday={timeframe === "upcoming"}
             onOpenMonthPicker={() => setMonthPickerOpen(true)}
             onSelectEvent={(evtInfo) =>
               handleSelectEvent({ resource: evtInfo })
