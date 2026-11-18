@@ -1,0 +1,21 @@
+apps/next                                |  WARN  The field "pnpm.overrides" was found in /Users/samikabhatkar/Downloads/workspace/ZotMeal/apps/next/package.json. This will not take effect. You should configure "pnpm.overrides" at the root of the workspace instead.
+
+> @peterplate/api@0.1.0 with-env /Users/samikabhatkar/Downloads/workspace/ZotMeal/packages/api
+> dotenv -e ../../.env -- "tsx" "src/restaurants/services.benchmark.ts" "5"
+
+date=2026-11-18 iterations=5
+
+brandywine #1 current: restaurants   696ms → today   962ms → dishes×3  3312ms | proposed (48 dishes, 1 batch)   583ms | service (AAPI+DB)   951ms
+brandywine #2 current: restaurants   265ms → today   455ms → dishes×3  1190ms | proposed (48 dishes, 1 batch)   619ms | service (AAPI+DB)   522ms
+brandywine #3 current: restaurants   204ms → today   406ms → dishes×3  1111ms | proposed (48 dishes, 1 batch)   526ms | service (AAPI+DB)   609ms
+brandywine #4 current: restaurants   203ms → today   401ms → dishes×3  1044ms | proposed (48 dishes, 1 batch)   576ms | service (AAPI+DB)   489ms
+brandywine #5 current: restaurants   212ms → today   390ms → dishes×3  1056ms | proposed (48 dishes, 1 batch)   494ms | service (AAPI+DB)   532ms
+brandywine median  current  1111ms | proposed   576ms | service   532ms
+
+anteatery  #1 current: restaurants   509ms → today   819ms → dishes×5  2342ms | proposed (37 dishes, 1 batch)   485ms | service (AAPI+DB)   500ms
+anteatery  #2 current: restaurants   191ms → today   388ms → dishes×5  1150ms | proposed (37 dishes, 1 batch)   507ms | service (AAPI+DB)   523ms
+anteatery  #3 current: restaurants   284ms → today   497ms → dishes×5  1229ms | proposed (37 dishes, 1 batch)   490ms | service (AAPI+DB)   520ms
+anteatery  #4 current: restaurants   212ms → today   403ms → dishes×5  1160ms | proposed (37 dishes, 1 batch)   617ms | service (AAPI+DB)   516ms
+anteatery  #5 current: restaurants   400ms → today   604ms → dishes×5  1333ms | proposed (37 dishes, 1 batch)   635ms | service (AAPI+DB)   504ms
+anteatery  median  current  1229ms | proposed   507ms | service   516ms
+

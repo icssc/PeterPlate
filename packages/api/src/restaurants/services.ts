@@ -37,32 +37,32 @@ export async function getRestaurantByDate(
   db: Drizzle,
   date: Date,
 ): Promise<FormattedRestaurantInfo> {
-  const restarauntReq = await fetch(
-    `${AAPI_DINING_ROUTE}/restaurants?id=${restaurant}`,
-  );
-
   const dateString = date.toLocaleDateString("en-CA", {
     timeZone: "America/Los_Angeles",
   });
-  const dishReq = await fetch(
-    `${AAPI_DINING_ROUTE}/restaurantToday?id=${restaurant}&date=${dateString}`,
-  );
 
-  console.log(
-    `${AAPI_DINING_ROUTE}/restaurantToday?id=${restaurant}&date=${dateString}`,
-  );
+  // CHANGE 1: these two calls don't depend on each other, so run them at the same time.
+  const [restarauntReq, dishReq] = await Promise.all([
+    fetch(`${AAPI_DINING_ROUTE}/restaurants?id=${restaurant}`),
+    fetch(
+      `${AAPI_DINING_ROUTE}/restaurantToday?id=${restaurant}&date=${dateString}`,
+    ),
+  ]);
+
   if (!(restarauntReq.ok && dishReq.ok))
     throw new TRPCError({
       code: "BAD_REQUEST",
       message: `Could not reach restaurants endpoint: ${!restarauntReq.ok ? restarauntReq.statusText : " "}${dishReq.statusText}`,
     });
 
-  const restaurantParsed = getRestaurantsResponseSchema.safeParse(
-    await restarauntReq.json(),
-  );
-  const dishParsed = getStateForRestaurantOnDayResponseSchema.safeParse(
-    await dishReq.json(),
-  );
+  const [restaurantJson, dishJson] = await Promise.all([
+    restarauntReq.json(),
+    dishReq.json(),
+  ]);
+  const restaurantParsed =
+    getRestaurantsResponseSchema.safeParse(restaurantJson);
+  const dishParsed =
+    getStateForRestaurantOnDayResponseSchema.safeParse(dishJson);
 
   if (!(restaurantParsed.success && dishParsed.success))
     throw new TRPCError({
@@ -83,36 +83,29 @@ export async function getRestaurantByDate(
     ),
   );
 
-  const periods = await Promise.all(
-    validPeriods.map(async (period) => {
-      // 1. Collect all unique IDs for the entire period first
-      const allDishIdsInPeriod = [
-        ...new Set(Object.values(period.stationToDishes).flat()),
-      ];
+  // CHANGE 2: one dish call for every period instead of one call per period.
+  // Periods share many dishes (e.g. 65 IDs -> 48 unique for Brandywine).
+  const allDishIds = [
+    ...new Set(
+      validPeriods.flatMap((period) =>
+        Object.values(period.stationToDishes).flat(),
+      ),
+    ),
+  ];
+  const allDishes = allDishIds.length ? await getDishes(allDishIds, db) : [];
+  const dishesLookup = new Map(allDishes.map((d) => [d.id, d]));
 
-      // 2. Single batch fetch for the whole period
-      const allDishesInPeriod = await getDishes(allDishIdsInPeriod, db);
-
-      // 3. Map them back to their stations
-      const dishesLookup = new Map(allDishesInPeriod.map((d) => [d.id, d]));
-
-      const stations = Object.entries(period.stationToDishes).map(
-        ([sId, dIds]) => ({
-          name: stationIdToName.get(Number.parseInt(sId, 10)) ?? "UNKNOWN",
-          dishes: dIds
-            .map((id) => dishesLookup.get(id))
-            .filter(Boolean) as DishWithRating[],
-        }),
-      );
-
-      return {
-        name: period.name,
-        startTime: period.startTime ?? "",
-        endTime: period.endTime ?? "",
-        stations,
-      };
-    }),
-  );
+  const periods = validPeriods.map((period) => ({
+    name: period.name,
+    startTime: period.startTime ?? "",
+    endTime: period.endTime ?? "",
+    stations: Object.entries(period.stationToDishes).map(([sId, dIds]) => ({
+      name: stationIdToName.get(Number.parseInt(sId, 10)) ?? "UNKNOWN",
+      dishes: dIds
+        .map((id) => dishesLookup.get(id))
+        .filter(Boolean) as DishWithRating[],
+    })),
+  }));
 
   return {
     name: restaurant,
