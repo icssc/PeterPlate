@@ -20,12 +20,30 @@ import {
   EVENT_CATEGORIES,
   type EventCategory,
 } from "@/utils/classifyEvent";
-import { isUpcomingEvent } from "@/utils/funcs";
+import {
+  EVENT_TIMEFRAMES,
+  type EventTimeframe,
+  hasEndTime,
+  isUpcomingEvent,
+} from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 
 /** An event plus the category we derive from its title and description. */
 export type EventWithType = Event & { eventType: EventCategory };
+
+const LOCATION_FILTERS = [
+  { value: "both", label: "All Locations" },
+  { value: "brandywine", label: "Brandywine" },
+  { value: "anteatery", label: "Anteatery" },
+] as const;
+
+const filterButtonClasses = (selected: boolean) =>
+  `!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
+    selected
+      ? "!bg-sky-700 !text-white !border-sky-700 hover:!bg-sky-800 dark:!bg-blue-300 dark:!text-gray-900 dark:!border-blue-300 dark:hover:!bg-blue-400"
+      : "!bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50 dark:!bg-transparent dark:!border-blue-300 dark:!text-white dark:hover:!bg-zinc-700"
+  }`;
 
 const Events = () => {
   const [selectedDiningHall, setSelectedDiningHall] = useState<
@@ -34,23 +52,40 @@ const Events = () => {
   const [selectedEventType, setSelectedEventType] = useState<
     "both" | EventCategory
   >("both");
+  const [timeframe, setTimeframe] = useState<EventTimeframe>("upcoming");
   const [viewMode, setViewMode] = useState<"grid" | "calendar">("grid");
   const [selectedEventData, setSelectedEventData] =
     useState<EventWithType | null>(null);
   const [currentDate, setCurrentDate] = useState(new Date());
 
-  const { data: events, isLoading, error } = trpc.event.upcoming.useQuery();
+  const {
+    data: events,
+    isLoading,
+    error,
+  } = trpc.event.upcomingAndPast.useQuery();
 
+  // Oldest first. The API returns past events too, so the Upcoming/Past
+  // toggle decides which side of "now" every view shows. Events without a
+  // date come through as the epoch and are skipped, since there's no day to
+  // show them on.
   const eventsWithType = useMemo<EventWithType[]>(
     () =>
       (events ?? [])
-        .filter(isUpcomingEvent)
+        .filter((event) => event.start.getTime() > 0)
         .sort((a, b) => a.start.getTime() - b.start.getTime())
         .map((event) => ({
           ...event,
           eventType: classifyEvent(event.title, event.description),
         })),
     [events],
+  );
+
+  const timeframeEvents = useMemo(
+    () =>
+      eventsWithType.filter(
+        (event) => isUpcomingEvent(event) === (timeframe === "upcoming"),
+      ),
+    [eventsWithType, timeframe],
   );
 
   const matchesFilters = useCallback(
@@ -66,8 +101,15 @@ const Events = () => {
   );
 
   const filteredEvents = useMemo(
-    () => eventsWithType.filter(matchesFilters),
-    [eventsWithType, matchesFilters],
+    () => timeframeEvents.filter(matchesFilters),
+    [timeframeEvents, matchesFilters],
+  );
+
+  // The grid lists past events newest first, so the most recent ones are on top
+  const gridEvents = useMemo(
+    () =>
+      timeframe === "past" ? [...filteredEvents].reverse() : filteredEvents,
+    [filteredEvents, timeframe],
   );
 
   // Months that have at least one event, so the mobile month picker only
@@ -93,7 +135,8 @@ const Events = () => {
       filteredEvents.map((event) => ({
         title: event.title,
         start: event.start,
-        end: event.end,
+        // The calendar skips events that end before they start
+        end: hasEndTime(event) ? event.end : event.start,
         resource: event,
         allDay: true,
       })),
@@ -123,6 +166,22 @@ const Events = () => {
 
   const handleClose = () => setSelectedEventData(null);
 
+  // Move the calendars to where the chosen events are: this month for
+  // upcoming events, or the month of the latest past event that matches the
+  // current filters
+  const handleTimeframeChange = (nextTimeframe: EventTimeframe) => {
+    if (nextTimeframe === timeframe) return;
+    setTimeframe(nextTimeframe);
+    const latestPastEvent = eventsWithType
+      .filter((event) => !isUpcomingEvent(event) && matchesFilters(event))
+      .at(-1);
+    setCurrentDate(
+      nextTimeframe === "past" && latestPastEvent
+        ? latestPastEvent.start
+        : new Date(),
+    );
+  };
+
   const viewNextMonthsEvents = () => {
     setCurrentDate(addMonths(currentDate, 1));
   };
@@ -141,8 +200,9 @@ const Events = () => {
         currentDate={currentDate}
         setCurrentDate={setCurrentDate}
         selectedDiningHall={selectedDiningHall}
+        timeframe={timeframe}
+        onTimeframeChange={handleTimeframeChange}
         filteredEvents={filteredEvents}
-        filteredUpcomingEvents={filteredEvents}
         selectedEventData={selectedEventData}
         isLoading={isLoading}
         error={error}
@@ -210,8 +270,12 @@ const Events = () => {
               {viewMode === "calendar" && (
                 <div className="ml-auto flex items-center gap-4 text-sm text-slate-900 dark:text-white">
                   <span className="flex items-center gap-1.5">
-                    <span className="size-4 rounded-[3px] border border-sky-700 bg-[var(--calendar-today-bg)] dark:border-blue-300 dark:bg-[var(--calendar-today-bg-dark)]" />
+                    <span className="size-4 rounded-[5px] border-2 border-sky-700 bg-[var(--calendar-today-bg)] dark:border-blue-300 dark:bg-[var(--calendar-today-bg-dark)]" />
                     Today
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="h-4 w-6 rounded-full border border-sky-700 bg-[var(--surface-tinted)] dark:border-blue-300" />
+                    Multi-day
                   </span>
                   <span className="flex items-center gap-1.5">
                     <span className="size-4 rounded-[3px] bg-sky-700 dark:bg-[var(--primary-accent-light)]" />
@@ -228,6 +292,32 @@ const Events = () => {
             >
               <div className="flex flex-col gap-3">
                 <span className="text-sm font-medium text-slate-900 dark:text-white">
+                  Time
+                </span>
+                <div className="flex h-[31px] overflow-hidden rounded-full border border-sky-700 bg-white dark:border-blue-300 dark:bg-transparent">
+                  {EVENT_TIMEFRAMES.map(({ value, label }, idx) => (
+                    <button
+                      key={value}
+                      type="button"
+                      aria-pressed={timeframe === value}
+                      onClick={() => handleTimeframeChange(value)}
+                      className={`px-5 text-sm transition-colors ${
+                        idx > 0
+                          ? "border-l border-sky-700 dark:border-blue-300"
+                          : ""
+                      } ${
+                        timeframe === value
+                          ? "bg-sky-700 text-white dark:bg-blue-300 dark:text-gray-900"
+                          : "text-slate-900 hover:bg-sky-50 dark:text-white dark:hover:bg-zinc-700"
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="flex flex-col gap-3">
+                <span className="text-sm font-medium text-slate-900 dark:text-white">
                   Event Type
                 </span>
                 <div className="flex flex-wrap gap-3">
@@ -235,33 +325,25 @@ const Events = () => {
                     variant="outlined"
                     size="small"
                     onClick={() => setSelectedEventType("both")}
-                    className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
-                      selectedEventType === "both"
-                        ? "!bg-sky-700 !text-white !border-sky-700 hover:!bg-sky-800 dark:!bg-blue-300 dark:!text-gray-900 dark:!border-blue-300 dark:hover:!bg-blue-400"
-                        : "!bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50 dark:!bg-transparent dark:!border-blue-300 dark:!text-white dark:hover:!bg-zinc-700"
-                    }`}
+                    className={filterButtonClasses(
+                      selectedEventType === "both",
+                    )}
                   >
                     All Events
                   </Button>
-                  {EVENT_CATEGORIES.map((category) => {
-                    const isSelected = selectedEventType === category;
-
-                    return (
-                      <Button
-                        key={category}
-                        variant="outlined"
-                        size="small"
-                        onClick={() => setSelectedEventType(category)}
-                        className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
-                          isSelected
-                            ? "!bg-sky-700 dark:!bg-sky-400 !text-white !border-sky-700 dark:!border-sky-400 hover:!bg-sky-800 dark:hover:!bg-sky-500"
-                            : "!bg-white dark:!bg-zinc-800 !border-sky-700 dark:!border-sky-400 !text-slate-900 dark:!text-zinc-100 hover:!bg-sky-50 dark:hover:!bg-zinc-700"
-                        }`}
-                      >
-                        {category}
-                      </Button>
-                    );
-                  })}
+                  {EVENT_CATEGORIES.map((category) => (
+                    <Button
+                      key={category}
+                      variant="outlined"
+                      size="small"
+                      onClick={() => setSelectedEventType(category)}
+                      className={filterButtonClasses(
+                        selectedEventType === category,
+                      )}
+                    >
+                      {category}
+                    </Button>
+                  ))}
                 </div>
               </div>
               <div className="flex flex-col gap-3">
@@ -269,42 +351,19 @@ const Events = () => {
                   Location
                 </span>
                 <div className="flex flex-wrap gap-3">
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={() => setSelectedDiningHall("both")}
-                    className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
-                      selectedDiningHall === "both"
-                        ? "!bg-sky-700 !text-white !border-sky-700 hover:!bg-sky-800 dark:!bg-blue-300 dark:!text-gray-900 dark:!border-blue-300 dark:hover:!bg-blue-400"
-                        : "!bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50 dark:!bg-transparent dark:!border-blue-300 dark:!text-white dark:hover:!bg-zinc-700"
-                    }`}
-                  >
-                    All Locations
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={() => setSelectedDiningHall("brandywine")}
-                    className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
-                      selectedDiningHall === "brandywine"
-                        ? "!bg-sky-700 !text-white !border-sky-700 hover:!bg-sky-800 dark:!bg-blue-300 dark:!text-gray-900 dark:!border-blue-300 dark:hover:!bg-blue-400"
-                        : "!bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50 dark:!bg-transparent dark:!border-blue-300 dark:!text-white dark:hover:!bg-zinc-700"
-                    }`}
-                  >
-                    Brandywine
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={() => setSelectedDiningHall("anteatery")}
-                    className={`!px-4 !py-1 flex items-center justify-center !normal-case !text-sm !font-thin ${
-                      selectedDiningHall === "anteatery"
-                        ? "!bg-sky-700 !text-white !border-sky-700 hover:!bg-sky-800 dark:!bg-blue-300 dark:!text-gray-900 dark:!border-blue-300 dark:hover:!bg-blue-400"
-                        : "!bg-white !border-sky-700 !text-slate-900 hover:!bg-sky-50 dark:!bg-transparent dark:!border-blue-300 dark:!text-white dark:hover:!bg-zinc-700"
-                    }`}
-                  >
-                    Anteatery
-                  </Button>
+                  {LOCATION_FILTERS.map(({ value, label }) => (
+                    <Button
+                      key={value}
+                      variant="outlined"
+                      size="small"
+                      onClick={() => setSelectedDiningHall(value)}
+                      className={filterButtonClasses(
+                        selectedDiningHall === value,
+                      )}
+                    >
+                      {label}
+                    </Button>
+                  ))}
                 </div>
               </div>
             </div>
@@ -327,12 +386,12 @@ const Events = () => {
           {!isLoading && !error && viewMode === "grid" && (
             <>
               <p className="text-lg leading-6 text-black dark:text-white">
-                Showing {filteredEvents.length} event
-                {filteredEvents.length !== 1 ? "s" : ""}
+                Showing {gridEvents.length} {timeframe} event
+                {gridEvents.length !== 1 ? "s" : ""}
               </p>
 
               <div className="flex sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12 overflow-x-auto sm:overflow-visible pb-2 sm:pb-0">
-                {filteredEvents.map((event) => (
+                {gridEvents.map((event) => (
                   <EventCard
                     key={`${event.title}-${event.start}-${event.restaurantId}`}
                     {...event}
@@ -340,13 +399,13 @@ const Events = () => {
                   />
                 ))}
               </div>
-              {filteredEvents.length === 0 && (
+              {gridEvents.length === 0 && (
                 <Typography
                   variant="body1"
                   color="text.secondary"
                   className="text-center py-5"
                 >
-                  No events found :(
+                  No {timeframe} events found :(
                 </Typography>
               )}
             </>

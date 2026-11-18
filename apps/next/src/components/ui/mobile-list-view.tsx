@@ -5,12 +5,17 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { format, isSameDay, startOfDay } from "date-fns";
 import { useEffect, useMemo, useRef } from "react";
 import type { EventWithType } from "@/app/events/page";
+import { isHappeningToday } from "@/utils/funcs";
 import MobileListEventRow from "./mobile-list-event-row";
 
 interface MobileListViewProps {
   currentDate: Date;
   onDateChange: (date: Date) => void;
   filteredEvents: EventWithType[];
+  /** Shown when there are no events to list. */
+  emptyMessage: string;
+  /** Give today a row even when nothing is on that day. */
+  showToday: boolean;
   onOpenMonthPicker: () => void;
   onSelectEvent: (event: EventWithType) => void;
 }
@@ -29,6 +34,8 @@ interface MonthGroup {
 const MobileListView = ({
   currentDate,
   filteredEvents,
+  emptyMessage,
+  showToday,
   onOpenMonthPicker,
   onSelectEvent,
 }: MobileListViewProps) => {
@@ -65,10 +72,30 @@ const MobileListView = ({
       }
     });
 
+    // Multi-day events that started earlier but still run today count as today too
+    const todayStart = startOfDay(new Date());
+    const ongoing = sorted.filter(
+      (event) => !isSameDay(event.start, todayStart) && isHappeningToday(event),
+    );
+    if (ongoing.length > 0 || (showToday && sorted.length > 0)) {
+      const monthKey = format(todayStart, "yyyy-MM");
+      if (!months[monthKey]) {
+        months[monthKey] = { key: monthKey, date: todayStart, days: [] };
+      }
+      const { days } = months[monthKey];
+      let todayGroup = days.find((day) => isSameDay(day.date, todayStart));
+      if (!todayGroup) {
+        todayGroup = { date: todayStart, events: [] };
+        days.push(todayGroup);
+        days.sort((a, b) => a.date.getTime() - b.date.getTime());
+      }
+      todayGroup.events.unshift(...ongoing);
+    }
+
     return Object.values(months).sort(
       (a, b) => a.date.getTime() - b.date.getTime(),
     );
-  }, [filteredEvents]);
+  }, [filteredEvents, showToday]);
 
   const scrollToMonth = (offset: number) => (currentKey: string) => {
     const idx = monthGroups.findIndex((m) => m.key === currentKey);
@@ -87,7 +114,7 @@ const MobileListView = ({
   return (
     <div className="flex flex-col flex-1 px-4 mt-2 mb-20 overflow-y-auto">
       {monthGroups.length === 0 ? (
-        <p className="text-center text-zinc-500 py-10">No upcoming events.</p>
+        <p className="text-center text-zinc-500 py-10">{emptyMessage}</p>
       ) : (
         monthGroups.map((month) => (
           <div
@@ -130,20 +157,29 @@ const MobileListView = ({
                 return (
                   <div
                     key={day.date.toISOString()}
-                    className="flex flex-col gap-1"
+                    className={`flex flex-col gap-1 ${
+                      isToday
+                        ? "px-4 py-3 rounded-2xl bg-[var(--surface-tinted)] ring-2 ring-inset ring-sky-700 dark:ring-blue-300"
+                        : ""
+                    }`}
                   >
                     <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-zinc-600">
                       <h3 className="font-semibold text-black dark:text-zinc-100">
                         {format(day.date, "EEEE - MMMM d, yyyy")}
                       </h3>
                       {isToday && (
-                        <span className="bg-sky-700 text-white dark:bg-blue-300 dark:text-zinc-900 text-sm px-2 py-0.5 rounded-md">
+                        <span className="bg-sky-700 text-white dark:bg-blue-300 dark:text-zinc-900 text-sm font-medium px-3 py-0.5 rounded-full">
                           Today
                         </span>
                       )}
                     </div>
 
                     <div className="flex flex-col">
+                      {day.events.length === 0 && (
+                        <p className="py-2 text-sm text-zinc-500 dark:text-zinc-400">
+                          No upcoming events today.
+                        </p>
+                      )}
                       {day.events.map((event, idx) => (
                         <MobileListEventRow
                           key={`${event.title}-${String(event.start)}-${event.restaurantId || idx}`}

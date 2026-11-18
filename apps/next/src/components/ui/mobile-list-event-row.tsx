@@ -1,8 +1,9 @@
 "use client";
 
 import LocationOnIcon from "@mui/icons-material/LocationOn";
-import { format } from "date-fns";
+import { format, isSameDay, isSameMonth } from "date-fns";
 import type { EventWithType } from "@/app/events/page";
+import { hasEndTime } from "@/utils/funcs";
 
 interface MobileListEventRowProps {
   event: EventWithType;
@@ -18,9 +19,14 @@ const ROW_CLASSES = [
 
 const MobileListEventRow = ({ event, onClick }: MobileListEventRowProps) => {
   const startStr = format(new Date(event.start), "h:mm a");
-  const endStr = format(new Date(event.end), "h:mm a");
+  const endStr = hasEndTime(event) ? format(new Date(event.end), "h:mm a") : "";
   const locationLabel =
     event.restaurantId === "anteatery" ? "Anteatery" : "Brandywine";
+  const endFormat = isSameMonth(event.start, event.end) ? "d" : "MMM d";
+  const dateRange =
+    hasEndTime(event) && !isSameDay(event.start, event.end)
+      ? ` · ${format(event.start, "MMM d")} – ${format(event.end, endFormat)}`
+      : "";
 
   return (
     <button type="button" className={ROW_CLASSES} onClick={onClick}>
@@ -32,11 +38,12 @@ const MobileListEventRow = ({ event, onClick }: MobileListEventRowProps) => {
         <span className="text-gray-500 dark:text-zinc-400 flex items-center mt-0.5">
           <LocationOnIcon sx={{ fontSize: 16 }} className="mr-1" />
           {locationLabel}
+          {dateRange}
         </span>
       </div>
       <div className="flex flex-col items-end text-black dark:text-zinc-100">
         <span>{startStr}</span>
-        <span>{endStr}</span>
+        {endStr && <span>{endStr}</span>}
       </div>
     </button>
   );

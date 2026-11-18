@@ -182,11 +182,13 @@ const MobileCalendarView = ({
               }`}
             >
               {isCurrentDate && (
-                <div className="absolute left-1/2 -translate-x-1/2 top-2 -bottom-6 w-10 rounded-lg bg-[var(--surface-tinted)] z-0" />
+                <div className="absolute left-1/2 -translate-x-1/2 top-2 -bottom-6 w-10 rounded-full bg-[var(--surface-tinted)] ring-2 ring-inset ring-sky-700 dark:ring-blue-300 z-0" />
               )}
               <div
                 className={`relative z-10 flex items-center justify-center w-8 h-8 rounded-full ${
-                  isCurrentDate ? "font-semibold" : ""
+                  isCurrentDate
+                    ? "font-semibold bg-sky-700 text-white dark:bg-blue-300 dark:text-zinc-900"
+                    : ""
                 }`}
               >
                 {format(date, "d")}
