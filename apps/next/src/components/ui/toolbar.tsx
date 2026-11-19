@@ -388,7 +388,7 @@ export function DesktopToolbar(): React.JSX.Element {
                   aria-label="Open profile menu"
                 >
                   <Image
-                    src={user.image || "/default-avatar.png"}
+                    src={user.image || "/peter.webp"}
                     alt={user.name || "User profile"}
                     width={40}
                     height={40}
@@ -684,7 +684,7 @@ function MobileToolbar(): React.JSX.Element {
               aria-label="Open profile menu"
             >
               <Image
-                src={user.image || "/default-avatar.png"}
+                src={user.image || "/peter.webp"}
                 alt={user.name || "User profile"}
                 width={36}
                 height={36}

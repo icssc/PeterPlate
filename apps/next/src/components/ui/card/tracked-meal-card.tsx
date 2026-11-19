@@ -12,6 +12,7 @@ import Image from "next/image";
 import React from "react";
 import FoodDialogContent from "@/components/ui/food-dialog-content";
 import FoodDrawerContent from "@/components/ui/food-drawer-content";
+import LoadingSpinner from "@/components/ui/loading-spinner";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { getFoodIcon } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
@@ -339,8 +340,8 @@ export default function TrackedMealCard({
           {fullDish ? (
             <FoodDialogContent dish={fullDish} />
           ) : (
-            <div className="p-4">
-              {isLoading ? "Loading..." : "Dish not found"}
+            <div className="flex justify-center p-6">
+              {isLoading ? <LoadingSpinner size="3rem" /> : "Dish not found"}
             </div>
           )}
         </Dialog>
@@ -394,8 +395,8 @@ export default function TrackedMealCard({
         {fullDish ? (
           <FoodDrawerContent dish={fullDish} />
         ) : (
-          <div className="p-4">
-            {isLoading ? "Loading..." : "Dish not found"}
+          <div className="flex justify-center p-6">
+            {isLoading ? <LoadingSpinner size="3rem" /> : "Dish not found"}
           </div>
         )}
       </Drawer>

@@ -2,7 +2,7 @@
 
 import type { AppRouter } from "@api/index";
 import { LocationOn, SwapHorizOutlined } from "@mui/icons-material";
-import { Box, Container, Link, Typography } from "@mui/material";
+import { Box, Link, Typography } from "@mui/material";
 import type { TRPCClientErrorLike } from "@trpc/client";
 import Image from "next/image";
 import NextLink from "next/link";
@@ -16,6 +16,7 @@ import {
   BRANDYWINE_MAP_LINK_URL,
   HallEnum,
 } from "@/utils/types";
+import PageContainer from "../page-container";
 import { DiningHallStatus } from "../status";
 import { DishesView } from "./dishes-view";
 import { RestaurantControls } from "./restaurant-controls";
@@ -122,11 +123,7 @@ export function RestaurantPage({
       </div>
 
       {/* Main content container */}
-      <Container
-        maxWidth={false}
-        disableGutters
-        className="mt-4 pb-[50px] mx-auto w-full max-w-[1600px] px-2 md:px-8"
-      >
+      <PageContainer className="pt-4 pb-[50px]">
         <div className="flex flex-col md:flex-row items-start gap-3">
           {/* Left column: menu controls & dishes */}
           <div className="w-full flex-1 md:min-h-[740px] min-w-0 flex flex-col">
@@ -172,7 +169,7 @@ export function RestaurantPage({
             />
           )}
         </div>
-      </Container>
+      </PageContainer>
     </Box>
   );
 }

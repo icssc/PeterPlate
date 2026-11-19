@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import FoodCard from "@/components/ui/card/food-card";
+import PageContainer from "@/components/ui/page-container";
 import FoodCardSkeleton from "@/components/ui/skeleton/food-card-skeleton";
 import { useSnackbarStore } from "@/context/useSnackbar";
 import { useUserStore } from "@/context/useUserStore";
@@ -35,7 +36,7 @@ export default function MyFavoritesPage() {
   const hasFavorites = favorites.length > 0;
 
   return (
-    <div className="mx-auto flex max-w-4xl flex-col gap-8 px-4 pb-16 pt-24 sm:px-6 lg:px-8">
+    <PageContainer className="flex flex-col gap-8">
       <header className="space-y-2">
         <h1 className="text-3xl font-semibold tracking-tight">My Favorites</h1>
         <p className="text-sm text-zinc-500">
@@ -81,6 +82,6 @@ export default function MyFavoritesPage() {
             </p>
           </div>
         ))}{" "}
-    </div>
+    </PageContainer>
   );
 }

@@ -12,6 +12,7 @@ import CalendarView from "@/components/ui/calendar-view";
 import EventCard from "@/components/ui/card/event-card";
 import EventsOnboarding from "@/components/ui/events-onboarding";
 import MobileEventsView from "@/components/ui/mobile-events-view";
+import PageContainer from "@/components/ui/page-container";
 import EventCardSkeleton from "@/components/ui/skeleton/event-card-skeleton";
 import { useTourStore } from "@/context/useTourStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
@@ -218,8 +219,8 @@ const Events = () => {
     <div className="max-w-full h-screen ">
       <div className="fixed top-0 left-0 w-full h-16 bg-sky-700/30 dark:bg-sky-900/40 z-0" />
       <div className="z-0 flex flex-col h-full overflow-x-hidden">
-        <div
-          className="flex flex-col gap-4 justify-center w-full p-5 pt-16 sm:px-12 sm:py-8 sm:pt-20"
+        <PageContainer
+          className="flex flex-col gap-4 justify-center"
           id="event-scroll"
         >
           <div>
@@ -428,7 +429,7 @@ const Events = () => {
               onCloseDetails={handleClose}
             />
           )}
-        </div>
+        </PageContainer>
       </div>
       <EventsOnboarding viewMode={viewMode} />
     </div>

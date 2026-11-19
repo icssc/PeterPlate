@@ -1,17 +1,19 @@
 "use client";
 
 import type { RouterOutputs } from "@api/index";
-import { Box, CircularProgress, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import posthog from "posthog-js";
 import { useEffect, useMemo, useState } from "react";
 import SearchMealCard from "@/components/ui/card/search-meal-card";
 import TrackedMealCard from "@/components/ui/card/tracked-meal-card";
+import LoadingSpinner from "@/components/ui/loading-spinner";
 import MealSearchDialog from "@/components/ui/meal-search";
 import MobileCalorieCard from "@/components/ui/mobile-calorie-card";
 import MobileNutritionBars from "@/components/ui/mobile-nutrition-bars";
 import NutritionBreakdown from "@/components/ui/nutrition-breakdown";
 import NutritionGoals from "@/components/ui/nutrition-goals";
+import PageContainer from "@/components/ui/page-container";
 import TrackerHistory from "@/components/ui/tracker-history";
 import TrackerHistoryDialog from "@/components/ui/tracker-history-dialog";
 import TrackerHistoryDrawer from "@/components/ui/tracker-history-drawer";
@@ -338,29 +340,20 @@ export default function MealTracker() {
   if (isLoading)
     return (
       <div className="w-full flex justify-center mt-12">
-        <CircularProgress
-          enableTrackSlot
-          variant="indeterminate"
-          color="primary"
-          size="5rem"
-          sx={{ circle: { strokeLinecap: "round" } }}
-        />
+        <LoadingSpinner />
       </div>
     );
   if (error) return <div>Error loading meals</div>;
 
   return (
-    <Box
-      sx={{ bgcolor: "background.default", minHeight: "100vh" }}
-      className="p-2 md:p-8 mt-2 md:mt-12"
-    >
-      <div className="px-2 md:px-8">
+    <PageContainer>
+      <div>
         {<TrackerOnboarding />}
         <Typography
           variant="h5"
           fontWeight={700}
           color="primary"
-          className="text-2xl md:text-3xl flex items-center justify-between"
+          className="text-4xl flex items-center justify-between"
         >
           <span className="flex items-center gap-2 flex-nowrap whitespace-nowrap">
             Tracker
@@ -599,6 +592,6 @@ export default function MealTracker() {
           })
         }
       />
-    </Box>
+    </PageContainer>
   );
 }

@@ -78,7 +78,7 @@ const MobileEventsView = ({
 
   return (
     <div className="flex flex-col h-screen w-full bg-background overflow-hidden font-sans">
-      <div className="flex flex-col px-4 pt-12 pb-4 bg-background z-20">
+      <div className="flex flex-col px-4 pt-6 pb-4 bg-background z-20">
         <div className="flex items-center justify-between gap-3 mb-4">
           <h1 className="text-4xl font-bold text-sky-700 dark:text-blue-300">
             Events
