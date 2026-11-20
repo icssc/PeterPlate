@@ -31,16 +31,20 @@ export function DesktopTabs({
             scrollToStation(val);
             setSelectedStation(val);
           }}
-          className="flex w-full overflow-x-auto no-scrollbar !bg-primary-accent/20 dark:!bg-[var(--desktop-tabs-bg)] !rounded-lg !p-2 [&_.MuiTabs-flexContainer]:justify-between [&_.MuiTabs-flexContainer]:gap-2 [&_.MuiTabs-indicator]:hidden"
           variant="scrollable"
-          scrollButtons={false}
+          scrollButtons="auto"
+          slotProps={{
+            startScrollButtonIcon: { fontSize: "medium" },
+            endScrollButtonIcon: { fontSize: "medium" },
+          }}
+          className="h-[52px] w-full rounded-lg bg-primary-accent/20 px-2 dark:bg-[var(--desktop-tabs-bg)] [&_.MuiTabs-flexContainer]:h-full [&_.MuiTabs-flexContainer]:justify-between [&_.MuiTabs-flexContainer]:gap-10 [&_.MuiTabs-indicator]:!bg-sky-700 dark:[&_.MuiTabs-indicator]:!bg-blue-300 [&_.MuiTabScrollButton-root]:!text-slate-600 dark:[&_.MuiTabScrollButton-root]:!text-slate-300 [&_.MuiTabScrollButton-root.Mui-disabled]:!opacity-30"
         >
           {stations.map((station) => (
             <Tab
               key={station.name}
               value={station.name.toLowerCase()}
               label={toTitleCase(station.name)}
-              className="!rounded !border !border-transparent !bg-transparent !px-4 !py-1.5 !text-sm !font-medium !text-black dark:!text-white !normal-case !min-h-0 aria-selected:!bg-white dark:aria-selected:!bg-white aria-selected:!text-slate-900 dark:aria-selected:!text-gray-900 aria-selected:!border-slate-200 dark:aria-selected:!border-slate-200 aria-selected:!shadow-sm"
+              className="!whitespace-nowrap !max-w-none !px-4!text-base !font-medium !text-black dark:!text-white !normal-case !min-h-0 aria-selected:!text-sky-700 dark:aria-selected:!text-blue-300"
             />
           ))}
         </Tabs>

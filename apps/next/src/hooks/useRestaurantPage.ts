@@ -15,6 +15,38 @@ import { trpc } from "@/utils/trpc";
 import type { HallStatusEnum } from "@/utils/types";
 import { HallEnum } from "@/utils/types";
 
+const normalizeStationName = (name: string) =>
+  name.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+/**
+ * Stations shown first, in this order. A station matches the first keyword its
+ * normalized name contains (CampusDish names like "Ember/Grill" or "The Farm
+ * Stand/ Deli" are matched by substring). Unlisted stations follow, in API order.
+ */
+const STATION_PRIORITY: Record<"anteatery" | "brandywine", string[]> = {
+  brandywine: [
+    "Grubb",
+    "Crossroads",
+    "Twisted Root",
+    "Ember",
+    "Hearth",
+    "Farm Stand",
+  ].map(normalizeStationName),
+  anteatery: [
+    "Fire And Ice",
+    "Noodle Bar",
+    "Twisted Root",
+    "Grill",
+    "Oven",
+  ].map(normalizeStationName),
+};
+
+function stationRank(name: string, priority: string[]): number {
+  const n = normalizeStationName(name);
+  const i = priority.findIndex((key) => n.includes(key));
+  return i === -1 ? priority.length : i;
+}
+
 /**
  * Returns the current meal period key for a given date by checking which period
  * window the date falls within. Falls back to the first period if none match.
@@ -182,7 +214,13 @@ export function useRestaurantPage(hall: HallEnum): UseRestaurantPageResult {
     [hallData, selectedPeriod],
   );
 
-  const stations: Station[] = currentMenu?.stations ?? [];
+  // Order stations by the per-restaurant priority list (stable sort).
+  const stations: Station[] = useMemo(() => {
+    const priority = STATION_PRIORITY[restaurantId];
+    return [...(currentMenu?.stations ?? [])].sort(
+      (x, y) => stationRank(x.name, priority) - stationRank(y.name, priority),
+    );
+  }, [currentMenu, restaurantId]);
 
   // --- Auto-select station ---
   useEffect(() => {
