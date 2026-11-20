@@ -3,6 +3,7 @@
 import {
   Close as CloseIcon,
   DarkMode as DarkModeIcon,
+  DeleteOutline as DeleteIcon,
   DesktopWindows as DesktopWindowsIcon,
   Edit as EditIcon,
   ContentPaste as FeedbackIcon,
@@ -10,8 +11,9 @@ import {
   InfoOutlined as InfoIcon,
   LightMode as LightModeIcon,
   Logout as LogoutIcon,
+  Notifications as NotificationsIcon,
 } from "@mui/icons-material";
-import { Box, Tooltip, Typography } from "@mui/material";
+import { Box, Switch, Tooltip, Typography } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
 import { useTheme } from "next-themes";
@@ -19,6 +21,8 @@ import type React from "react";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { SignInButtons } from "@/components/auth/sign-in-buttons";
+import NotificationsPanel from "@/components/ui/notifications-panel";
+import { useShowSuitableDishesOnly } from "@/hooks/useShowSuitableDishesOnly";
 import { signOut, useSession } from "@/utils/auth-client";
 import { formatDietaryKey } from "@/utils/dietary";
 import { trpc } from "@/utils/trpc";
@@ -27,17 +31,22 @@ import { cn } from "@/utils/tw";
 interface ProfileMenuContentProps {
   onClose: () => void;
   onEditPreferencesClick: () => void;
+  onDeleteAccountClick: () => void;
 }
 
 export default function SidebarContent({
   onClose,
   onEditPreferencesClick,
+  onDeleteAccountClick,
 }: ProfileMenuContentProps): React.JSX.Element | null {
   const { data: session } = useSession();
   const user = session?.user;
   const userId = user?.id;
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const { showSuitableDishesOnly, isPending, setShowSuitableDishesOnly } =
+    useShowSuitableDishesOnly();
+  const [showNotifications, setShowNotifications] = useState(false);
 
   useEffect(() => setMounted(true), []);
 
@@ -53,12 +62,16 @@ export default function SidebarContent({
 
   const handleSignOut = async () => {
     const userTheme = theme ?? localStorage.getItem("theme");
-    await signOut();
-    if (userTheme) {
-      localStorage.setItem("theme", userTheme);
-    }
-    window.location.href = "/";
+    await signOut({
+      onBeforeRedirect: () => {
+        if (userTheme) localStorage.setItem("theme", userTheme);
+      },
+    });
   };
+
+  if (showNotifications) {
+    return <NotificationsPanel onBack={() => setShowNotifications(false)} />;
+  }
 
   return (
     <Box
@@ -144,6 +157,21 @@ export default function SidebarContent({
                 </span>
               )}
             </div>
+
+            <div className="flex items-center justify-between mt-3">
+              <Typography className="text-xs font-medium text-gray-900 dark:text-zinc-300">
+                Show Suitable Dishes Only
+              </Typography>
+              <Switch
+                checked={showSuitableDishesOnly}
+                disabled={isPending}
+                onChange={(e) => setShowSuitableDishesOnly(e.target.checked)}
+                color="primary"
+                slotProps={{
+                  input: { "aria-label": "Show suitable dishes only" },
+                }}
+              />
+            </div>
           </div>
         )}
 
@@ -183,6 +211,31 @@ export default function SidebarContent({
 
         {/* Links */}
         <div className="space-y-1">
+          <Tooltip title={!user ? "Please login to enable notifications." : ""}>
+            <span className="block">
+              <button
+                type="button"
+                disabled={!user}
+                onClick={() => setShowNotifications(true)}
+                className="w-full flex items-center gap-3 rounded-lg px-2 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:dark:hover:bg-transparent"
+              >
+                <Box sx={{ color: "primary.main" }}>
+                  <NotificationsIcon
+                    fontSize="small"
+                    sx={{ color: "hsl(var(--accent-primary))" }}
+                  />
+                </Box>
+                <Typography
+                  variant="body2"
+                  fontWeight={500}
+                  color="text.primary"
+                >
+                  Notifications
+                </Typography>
+              </button>
+            </span>
+          </Tooltip>
+
           <Tooltip title={!user ? "Please login to edit preferences." : ""}>
             <span className="block">
               <button
@@ -232,6 +285,23 @@ export default function SidebarContent({
           >
             About PeterPlate
           </MenuLink>
+
+          {user && (
+            <button
+              type="button"
+              onClick={() => {
+                onClose();
+                onDeleteAccountClick();
+              }}
+              className={`w-full flex items-center gap-3 rounded-lg px-2 py-2
+                hover:bg-gray-100 dark:hover:bg-gray-700`}
+            >
+              <DeleteIcon fontSize="small" sx={{ color: "error.main" }} />
+              <Typography variant="body2" fontWeight={500} color="error.main">
+                Delete Account
+              </Typography>
+            </button>
+          )}
         </div>
       </div>
 

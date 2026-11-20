@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import DishesInfo from "@/components/ui/dishes-info";
 import { useRestaurantUIStore } from "@/context/useRestaurantUIStore";
 import { useUserStore } from "@/context/useUserStore";
+import { useShowSuitableDishesOnly } from "@/hooks/useShowSuitableDishesOnly";
 import { getDietaryConflicts } from "@/utils/dietary";
 import { toTitleCase } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
@@ -25,9 +26,7 @@ export function DishesView({
   hallData,
 }: DishesViewProps) {
   const isCompactView = useRestaurantUIStore((s) => s.isCompactView);
-  const showPreferencesOnly = useRestaurantUIStore(
-    (s) => s.showPreferencesOnly,
-  );
+  const { showSuitableDishesOnly } = useShowSuitableDishesOnly();
 
   const errorMessage =
     error?.message ??
@@ -47,7 +46,7 @@ export function DishesView({
     return new Map(
       stations.map((station) => [
         station.name,
-        showPreferencesOnly && allergies && preferences
+        showSuitableDishesOnly && allergies && preferences
           ? station.dishes.filter(
               (dish) =>
                 getDietaryConflicts(
@@ -59,7 +58,7 @@ export function DishesView({
           : station.dishes,
       ]),
     );
-  }, [stations, showPreferencesOnly, preferences, allergies]);
+  }, [stations, showSuitableDishesOnly, preferences, allergies]);
 
   return (
     <div className="w-full">

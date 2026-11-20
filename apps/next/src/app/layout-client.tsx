@@ -7,6 +7,7 @@ import posthog from "posthog-js";
 import { useEffect, useState } from "react";
 import superjson from "superjson";
 import { ThemeProvider } from "@/components/theme-provider";
+import { ACCOUNT_DELETED_KEY } from "@/components/ui/delete-account-content";
 import Toolbar from "@/components/ui/toolbar";
 import { DateProvider } from "@/context/date-context";
 import { useSnackbarStore } from "@/context/useSnackbar";
@@ -79,7 +80,14 @@ export function RootClient({ children }: { children: React.ReactNode }) {
 }
 
 function GlobalSnackbar() {
-  const { open, message, severity, closeSnackbar } = useSnackbarStore();
+  const { open, message, severity, showSnackbar, closeSnackbar } =
+    useSnackbarStore();
+
+  useEffect(() => {
+    if (!sessionStorage.getItem(ACCOUNT_DELETED_KEY)) return;
+    sessionStorage.removeItem(ACCOUNT_DELETED_KEY);
+    showSnackbar("Your account has been deleted.", "success");
+  }, [showSnackbar]);
 
   return (
     <Snackbar open={open} autoHideDuration={4000} onClose={closeSnackbar}>
