@@ -1,6 +1,6 @@
 import { Restaurant } from "@mui/icons-material";
 import type { DishWithRating, Event } from "@peterplate/validators";
-import { isFuture } from "date-fns";
+import { isFuture, isToday, startOfDay } from "date-fns";
 import {
   foodIconKeywords,
   foodIcons,
@@ -480,6 +480,38 @@ export const isValidDate = (value: unknown): boolean => {
   return !Number.isNaN(date.getTime()) && date.getTime() !== 0;
 };
 
+/**
+ * Whether the API gave an event an end time. A missing end time comes through
+ * as the epoch, because the schema coerces null to a Date.
+ */
+export function hasEndTime(event: Pick<Event, "start" | "end">) {
+  return event.end >= event.start;
+}
+
+/** Whether an event is on today, counting multi-day events that run through today. */
+export function isHappeningToday(event: Pick<Event, "start" | "end">) {
+  if (isToday(event.start)) return true;
+  const todayStart = startOfDay(new Date());
+  return (
+    hasEndTime(event) && event.start < todayStart && event.end >= todayStart
+  );
+}
+
+/** "11:00am – 4:00pm", or only the start time when there's no end time. */
+export function eventTimeRangeToString(event: Pick<Event, "start" | "end">) {
+  return hasEndTime(event)
+    ? `${timeToString(event.start)} – ${timeToString(event.end)}`
+    : timeToString(event.start);
+}
+
+/** Options for the events page's Upcoming/Past toggle. */
+export const EVENT_TIMEFRAMES = [
+  { value: "upcoming", label: "Upcoming" },
+  { value: "past", label: "Past" },
+] as const;
+
+export type EventTimeframe = (typeof EVENT_TIMEFRAMES)[number]["value"];
+
 export function sortedEvents(events: Event[], numCards: number) {
   return (events ?? [])
     .filter(isUpcomingEvent)
@@ -558,18 +590,21 @@ export function getEventType(title: string): string {
 }
 
 /**
- * Scrolls to a station section while leaving room for the sticky restaurant controls.
+ * Scrolls to a station section while leaving room for the toolbar and sticky
+ * restaurant controls.
  */
 export function scrollToStation(stationId: string) {
   const section = document.getElementById(stationId);
   if (!section) return;
-  const controlsHeight =
-    document.getElementById("restaurant-controls")?.offsetHeight ?? 0;
+  const controls = document.getElementById("restaurant-controls");
+  const controlsBottom = controls
+    ? Number.parseFloat(getComputedStyle(controls).top) + controls.offsetHeight
+    : 0;
   window.scrollTo({
     top:
       section.getBoundingClientRect().top +
       window.scrollY -
-      controlsHeight -
+      controlsBottom -
       16,
     behavior: "smooth",
   });

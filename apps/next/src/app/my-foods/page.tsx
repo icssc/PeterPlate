@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  Box,
   FormControl,
   InputLabel,
   MenuItem,
@@ -13,6 +12,7 @@ import { useTheme } from "next-themes";
 import { useEffect, useMemo, useState } from "react";
 import MyFoodsCard from "@/components/ui/card/my-foods-card";
 import MyFoodsOnboarding from "@/components/ui/my-foods-onboarding";
+import PageContainer from "@/components/ui/page-container";
 import FoodCardSkeleton from "@/components/ui/skeleton/food-card-skeleton";
 import { useTourStore } from "@/context/useTourStore";
 import { useUserStore } from "@/context/useUserStore";
@@ -156,10 +156,7 @@ export default function MyFoodsPage() {
   }, []);
 
   return (
-    <Box
-      className={`mx-auto flex max-w-7xl flex-col gap-4 px-4 pb-8 ${isDesktop ? "pt-20" : ""} sm:px-6 lg:px-8`}
-      sx={{ bgcolor: "background.default", minHeight: "100vh" }}
-    >
+    <PageContainer className="flex flex-col gap-4">
       {<MyFoodsOnboarding />}
       {/* Header */}
       <header className="space-y-1">
@@ -463,6 +460,6 @@ export default function MyFoodsPage() {
           )}
         </>
       )}
-    </Box>
+    </PageContainer>
   );
 }

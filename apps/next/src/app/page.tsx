@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import PopularDishCard from "@/components/ui/card/popular-dish-card";
 import UpcomingEventCard from "@/components/ui/card/upcoming-event-card";
 import OnboardingDialog from "@/components/ui/onboarding";
+import PageContainer from "@/components/ui/page-container";
 import { useDate } from "@/context/date-context";
 import { useUserStore } from "@/context/useUserStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
@@ -183,7 +184,7 @@ function DesktopHome(): React.JSX.Element {
 
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
+      <PageContainer className="space-y-8">
         <Typography className="text-2xl sm:text-3xl font-bold" gutterBottom>
           See what's on the menu today!
         </Typography>
@@ -286,7 +287,7 @@ function DesktopHome(): React.JSX.Element {
             </div>
           )}
         </section>
-      </div>
+      </PageContainer>
     </Box>
   );
 }
@@ -352,7 +353,7 @@ function MobileHome(): React.JSX.Element {
 
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-3">
+      <PageContainer className="space-y-3">
         {/* ── Dining Halls ── */}
         <section>
           <Typography className="text-1xl font-bold mb-2" color="primary">
@@ -453,7 +454,7 @@ function MobileHome(): React.JSX.Element {
             </div>
           )}
         </section>
-      </div>
+      </PageContainer>
     </Box>
   );
 }

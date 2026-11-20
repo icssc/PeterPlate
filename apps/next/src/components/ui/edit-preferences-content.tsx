@@ -2,10 +2,11 @@
 
 import CheckIcon from "@mui/icons-material/Check";
 import EditIcon from "@mui/icons-material/Edit";
-import { Button, CircularProgress, ToggleButton, Tooltip } from "@mui/material";
+import { Button, ToggleButton, Tooltip } from "@mui/material";
 import type { UserAllergy, UserDietaryPreference } from "@peterplate/db";
 import posthog from "posthog-js";
 import { useEffect, useRef, useState } from "react";
+import LoadingSpinner from "@/components/ui/loading-spinner";
 import { useSession } from "@/utils/auth-client";
 import { trpc } from "@/utils/trpc";
 
@@ -189,7 +190,7 @@ export default function EditPreferencesContent({
   if (loadingAllergies || loadingPrefs) {
     return (
       <div className="flex h-64 w-full items-center justify-center bg-white dark:bg-[var(--surface-dialog)]">
-        <CircularProgress />
+        <LoadingSpinner size="3rem" />
       </div>
     );
   }
