@@ -10,10 +10,9 @@ import EventTypeBadge from "@/components/ui/event-type-badge";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import type { EventCategory } from "@/utils/classifyEvent";
 import {
-  dateRangeToString,
+  eventDateRangeToString,
   eventTimeRangeToString,
   isHappeningToday,
-  isValidDate,
   toTitleCase,
 } from "@/utils/funcs";
 import EventDialogContent from "../event-dialog-content";
@@ -47,7 +46,6 @@ const EventCardContent = React.forwardRef<
   HTMLDivElement,
   EventCardContentProps
 >(({ props, ...divProps }, ref) => {
-  const hasValidDate = isValidDate(props.start) && isValidDate(props.end);
   const happeningToday = isHappeningToday(props);
 
   return (
@@ -88,17 +86,11 @@ const EventCardContent = React.forwardRef<
           <div className="flex flex-col gap-2 text-sm text-zinc-500 dark:text-zinc-400 mt-1">
             <div className="flex gap-3 items-center">
               <CalendarTodayOutlinedIcon sx={{ fontSize: 16 }} />
-              <span>
-                {hasValidDate
-                  ? dateRangeToString(props.start, props.end)
-                  : "TBD"}
-              </span>
+              <span>{eventDateRangeToString(props)}</span>
             </div>
             <div className="flex gap-3 items-center">
               <AccessTime sx={{ fontSize: 16 }} />
-              <span>
-                {hasValidDate ? eventTimeRangeToString(props) : "TBD"}
-              </span>
+              <span>{eventTimeRangeToString(props)}</span>
             </div>
             <div className="flex gap-3 items-center">
               <PinDrop sx={{ fontSize: 16 }} />

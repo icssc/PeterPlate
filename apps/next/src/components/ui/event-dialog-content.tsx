@@ -9,7 +9,7 @@ import EventImage from "@/components/ui/event-image";
 import EventTypeBadge from "@/components/ui/event-type-badge";
 import { classifyEvent } from "@/utils/classifyEvent";
 import {
-  dateRangeToString,
+  eventDateRangeToString,
   eventTimeRangeToString,
   generateGCalLink,
   isUpcomingEvent,
@@ -32,8 +32,6 @@ export default function EventDialogContent({
   onClose,
   ...props
 }: Event & { onClose: () => void }): React.JSX.Element {
-  const hasValidDate = isValidDate(props.start) && isValidDate(props.end);
-
   return (
     <Box className="dark:bg-[var(--surface-modal)]">
       <div className="relative">
@@ -72,14 +70,11 @@ export default function EventDialogContent({
         >
           <div className="flex gap-2 items-center">
             <CalendarTodayOutlinedIcon sx={{ fontSize: 16 }} />
-            <span>
-              {hasValidDate ? dateRangeToString(props.start, props.end) : "TBD"}
-            </span>
+            <span>{eventDateRangeToString(props)}</span>
           </div>
-
           <div className="flex gap-2 items-center">
             <AccessTimeOutlinedIcon sx={{ fontSize: 16 }} />
-            <span>{hasValidDate ? eventTimeRangeToString(props) : "TBD"}</span>
+            <span>{eventTimeRangeToString(props)}</span>
           </div>
           <div className="flex gap-2 items-center">
             <PinDropOutlinedIcon sx={{ fontSize: 16 }} />
@@ -93,7 +88,7 @@ export default function EventDialogContent({
         >
           {props.description}
         </Typography>
-        {hasValidDate && isUpcomingEvent(props) && (
+        {isValidDate(props.start) && isUpcomingEvent(props) && (
           <div className="w-full flex items-center justify-center pt-4">
             <a
               href={generateGCalLink(

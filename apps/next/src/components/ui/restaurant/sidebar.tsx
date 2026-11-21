@@ -9,7 +9,7 @@ import {
   Typography,
 } from "@mui/material";
 import type React from "react";
-import { formatOpenCloseTime, toTitleCase } from "@/utils/funcs";
+import { formatOpenCloseTime, isValidDate, toTitleCase } from "@/utils/funcs";
 import {
   ANTEATERY_MAP_EMBED_URL,
   ANTEATERY_MAP_LINK_URL,
@@ -157,8 +157,13 @@ export function Sidebar({
         {hallEvents.length > 0 ? (
           <div className="space-y-2">
             {hallEvents.map((event) => {
-              const start = event.start ? new Date(event.start) : null;
-              const end = event.end ? new Date(event.end) : null;
+              // Use whichever date is known when the other is missing
+              const start = new Date(
+                isValidDate(event.start) ? event.start : event.end,
+              );
+              const end = new Date(
+                isValidDate(event.end) ? event.end : event.start,
+              );
               const now = new Date();
               const isActive = start && end && now >= start && now <= end;
               const dateRange =

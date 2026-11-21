@@ -446,21 +446,7 @@ function getPopularDishes(
 
 /** Whether an event hasn't ended yet. */
 export function isUpcomingEvent(event: Event) {
-  // Keep cards missing dates
-  const start = event.start ? new Date(event.start).getTime() : NaN;
-  const end = event.end ? new Date(event.end).getTime() : NaN;
-  const bothDatesMissing =
-    (!Number.isFinite(start) || start === 0) &&
-    (!Number.isFinite(end) || end === 0);
-
-  if (bothDatesMissing) {
-    return true;
-  }
-
-  return (
-    (Number.isFinite(start) && start > Date.now()) ||
-    (Number.isFinite(end) && end > Date.now())
-  );
+  return isFuture(event.end) || isFuture(event.start);
 }
 
 /** Whether an event's date is valid or not. **/
@@ -497,8 +483,19 @@ export function isHappeningToday(event: Pick<Event, "start" | "end">) {
   );
 }
 
-/** "11:00am – 4:00pm", or only the start time when there's no end time. */
+/** "October 2 – 30, 2026", only the day that's known, or "TBD" with neither. */
+export function eventDateRangeToString(event: Pick<Event, "start" | "end">) {
+  const firstDay = isValidDate(event.start) ? event.start : event.end;
+  return isValidDate(firstDay) ? dateRangeToString(firstDay, event.end) : "TBD";
+}
+
+/** "11:00am – 4:00pm", only the time that's known, or "TBD" with neither. */
 export function eventTimeRangeToString(event: Pick<Event, "start" | "end">) {
+  if (!isValidDate(event.start)) {
+    return isValidDate(event.end)
+      ? `Ends at ${timeToString(event.end)}`
+      : "TBD";
+  }
   return hasEndTime(event)
     ? `${timeToString(event.start)} – ${timeToString(event.end)}`
     : timeToString(event.start);

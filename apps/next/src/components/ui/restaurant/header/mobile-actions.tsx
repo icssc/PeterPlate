@@ -20,7 +20,7 @@ import {
 } from "@mui/material";
 import type { DishWithRating, Event } from "@peterplate/validators";
 import { useRestaurantUIStore } from "@/context/useRestaurantUIStore";
-import { scrollToStation, toTitleCase } from "@/utils/funcs";
+import { isValidDate, scrollToStation, toTitleCase } from "@/utils/funcs";
 import { cn } from "@/utils/tw";
 
 interface MobileActionsProps {
@@ -163,8 +163,13 @@ export function MobileActions({
             <div className="p-4 overflow-y-auto">
               {hallEvents.length > 0 ? (
                 hallEvents.map((event) => {
-                  const start = event.start ? new Date(event.start) : null;
-                  const end = event.end ? new Date(event.end) : null;
+                  // Use whichever date is known when the other is missing
+                  const start = new Date(
+                    isValidDate(event.start) ? event.start : event.end,
+                  );
+                  const end = new Date(
+                    isValidDate(event.end) ? event.end : event.start,
+                  );
                   const now = new Date();
                   const isActive = start && end && now >= start && now <= end;
                   const dateRange =
