@@ -10,7 +10,7 @@ import EventTypeBadge from "@/components/ui/event-type-badge";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import type { EventCategory } from "@/utils/classifyEvent";
 import {
-  dateRangeToString,
+  eventDateRangeToString,
   eventTimeRangeToString,
   isHappeningToday,
   toTitleCase,
@@ -86,7 +86,7 @@ const EventCardContent = React.forwardRef<
           <div className="flex flex-col gap-2 text-sm text-zinc-500 dark:text-zinc-400 mt-1">
             <div className="flex gap-3 items-center">
               <CalendarTodayOutlinedIcon sx={{ fontSize: 16 }} />
-              <span>{dateRangeToString(props.start, props.end)}</span>
+              <span>{eventDateRangeToString(props)}</span>
             </div>
             <div className="flex gap-3 items-center">
               <AccessTime sx={{ fontSize: 16 }} />

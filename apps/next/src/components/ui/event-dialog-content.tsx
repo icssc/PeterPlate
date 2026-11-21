@@ -9,10 +9,11 @@ import EventImage from "@/components/ui/event-image";
 import EventTypeBadge from "@/components/ui/event-type-badge";
 import { classifyEvent } from "@/utils/classifyEvent";
 import {
-  dateRangeToString,
+  eventDateRangeToString,
   eventTimeRangeToString,
   generateGCalLink,
   isUpcomingEvent,
+  isValidDate,
   toTitleCase,
 } from "@/utils/funcs";
 import { HallEnum } from "@/utils/types";
@@ -69,7 +70,7 @@ export default function EventDialogContent({
         >
           <div className="flex gap-2 items-center">
             <CalendarTodayOutlinedIcon sx={{ fontSize: 16 }} />
-            <span>{dateRangeToString(props.start, props.end)}</span>
+            <span>{eventDateRangeToString(props)}</span>
           </div>
           <div className="flex gap-2 items-center">
             <AccessTimeOutlinedIcon sx={{ fontSize: 16 }} />
@@ -87,7 +88,7 @@ export default function EventDialogContent({
         >
           {props.description}
         </Typography>
-        {isUpcomingEvent(props) && (
+        {isValidDate(props.start) && isUpcomingEvent(props) && (
           <div className="w-full flex items-center justify-center pt-4">
             <a
               href={generateGCalLink(

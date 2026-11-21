@@ -3,7 +3,11 @@ import { Box, Card, Dialog, Typography } from "@mui/material";
 import type { Event } from "@peterplate/validators";
 import { useState } from "react";
 import { classifyEvent } from "@/utils/classifyEvent";
-import { dateRangeToString, timeToString, toTitleCase } from "@/utils/funcs";
+import {
+  eventDateRangeToString,
+  eventTimeRangeToString,
+  toTitleCase,
+} from "@/utils/funcs";
 import EventDialogContent from "../event-dialog-content";
 import EventTypeBadge from "../event-type-badge";
 
@@ -48,14 +52,13 @@ export default function UpcomingEventCard({
               <Box className="flex items-center gap-1.5">
                 <CalendarMonth style={{ fontSize: iconSize }} />
                 <Typography variant="caption" color="text.secondary">
-                  {dateRangeToString(event.start, event.end)}
+                  {eventDateRangeToString(event)}
                 </Typography>
               </Box>
               <Box className="flex items-center gap-1.5">
                 <AccessTime style={{ fontSize: iconSize }} />
                 <Typography variant="caption" color="text.secondary">
-                  {timeToString(event.start)}
-                  {event.end ? ` - ${timeToString(event.end)}` : ""}
+                  {eventTimeRangeToString(event)}
                 </Typography>
               </Box>
             </>

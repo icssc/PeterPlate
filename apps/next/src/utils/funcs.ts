@@ -449,6 +449,23 @@ export function isUpcomingEvent(event: Event) {
   return isFuture(event.end) || isFuture(event.start);
 }
 
+/** Whether an event's date is valid or not. **/
+export const isValidDate = (value: unknown): boolean => {
+  if (
+    value === null ||
+    value === undefined ||
+    value === "" ||
+    value === 0 ||
+    value === "0"
+  ) {
+    return false;
+  }
+
+  const date = new Date(value as string | number);
+
+  return !Number.isNaN(date.getTime()) && date.getTime() !== 0;
+};
+
 /**
  * Whether the API gave an event an end time. A missing end time comes through
  * as the epoch, because the schema coerces null to a Date.
@@ -466,8 +483,19 @@ export function isHappeningToday(event: Pick<Event, "start" | "end">) {
   );
 }
 
-/** "11:00am – 4:00pm", or only the start time when there's no end time. */
+/** "October 2 – 30, 2026", only the day that's known, or "TBD" with neither. */
+export function eventDateRangeToString(event: Pick<Event, "start" | "end">) {
+  const firstDay = isValidDate(event.start) ? event.start : event.end;
+  return isValidDate(firstDay) ? dateRangeToString(firstDay, event.end) : "TBD";
+}
+
+/** "11:00am – 4:00pm", only the time that's known, or "TBD" with neither. */
 export function eventTimeRangeToString(event: Pick<Event, "start" | "end">) {
+  if (!isValidDate(event.start)) {
+    return isValidDate(event.end)
+      ? `Ends at ${timeToString(event.end)}`
+      : "TBD";
+  }
   return hasEndTime(event)
     ? `${timeToString(event.start)} – ${timeToString(event.end)}`
     : timeToString(event.start);
