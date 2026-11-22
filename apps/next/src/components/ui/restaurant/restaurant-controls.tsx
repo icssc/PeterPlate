@@ -1,7 +1,12 @@
 import type { Station } from "@api/index";
+import { MoreHoriz } from "@mui/icons-material";
+import { Chip, IconButton, Typography } from "@mui/material";
 import type { DishWithRating, Event } from "@peterplate/validators";
 import { DiningHallStatus } from "@/components/ui/status";
 import type { CalendarRange } from "@/components/ui/toolbar";
+import { useRestaurantUIStore } from "@/context/useRestaurantUIStore";
+import { useShowSuitableDishesOnly } from "@/hooks/useShowSuitableDishesOnly";
+import { toTitleCase } from "@/utils/funcs";
 import type { HallEnum, HallStatusEnum } from "@/utils/types";
 import { DesktopTabs } from "./header/desktop-tabs";
 import { MobileActions } from "./header/mobile-actions";
@@ -41,49 +46,106 @@ export function RestaurantControls({
   stations,
   hallEvents,
 }: RestaurantControlsProps) {
-  return (
-    <>
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2 mb-2 flex-wrap md:flex-nowrap">
-        {/* Desktop title */}
-        <RestaurantHeader isDesktop={isDesktop} hall={hall} />
+  const isFiltersExpanded = useRestaurantUIStore((s) => s.isFiltersExpanded);
+  const setIsFiltersExpanded = useRestaurantUIStore(
+    (s) => s.setIsFiltersExpanded,
+  );
+  const selectedPeriod = useRestaurantUIStore((s) => s.selectedPeriod);
+  const showFilters = isDesktop || isFiltersExpanded;
+  const { showSuitableDishesOnly, setShowSuitableDishesOnly } =
+    useShowSuitableDishesOnly();
 
-        <div className="flex flex-col gap-3 w-full md:w-auto md:flex-row md:items-center md:justify-end">
-          {/* Status badge — desktop only, shown next to filters */}
-          {isDesktop && (
-            <div>
-              <DiningHallStatus status={derivedHallStatus} />
+  return (
+    // Sticky while scrolling
+    <div
+      id="restaurant-controls"
+      className="sticky top-16 z-10 -mt-4 pt-4 pb-2 bg-background"
+    >
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2 md:gap-x-3 mb-2 flex-wrap">
+        {/* Desktop title & status. Its large grow factor soaks up spare space
+            so the filters keep their natural width on one line, but fill the
+            column when they wrap below the title on narrower screens. */}
+        {isDesktop && (
+          <div className="flex items-center gap-2 grow-[999]">
+            <RestaurantHeader isDesktop={isDesktop} hall={hall} />
+            <DiningHallStatus status={derivedHallStatus} />
+          </div>
+        )}
+
+        {/* Mobile summary row — the button expands the filters below */}
+        {!isDesktop && (
+          <div className="flex w-full items-center justify-between px-3">
+            <div className="flex items-baseline gap-4 text-sky-700 dark:text-blue-300">
+              <Typography variant="h6" fontWeight={700} component="span">
+                {selectedDate
+                  ? `${selectedDate.toLocaleDateString("en-US")} (${selectedDate.toLocaleDateString("en-US", { weekday: "short" })})`
+                  : ""}
+              </Typography>
+              <Typography variant="body1" component="span">
+                {toTitleCase(selectedPeriod)}
+              </Typography>
             </div>
+            <IconButton
+              id="tour-expand-filters"
+              onClick={() => setIsFiltersExpanded(!isFiltersExpanded)}
+              aria-label={isFiltersExpanded ? "Hide filters" : "Show filters"}
+              aria-expanded={isFiltersExpanded}
+              size="small"
+              className="!text-sky-700 dark:!text-blue-300"
+            >
+              <MoreHoriz />
+            </IconButton>
+          </div>
+        )}
+
+        <div
+          id="tour-filters-mobile"
+          className="flex flex-col gap-3 w-full md:w-auto md:grow md:flex-row md:items-center md:justify-end"
+        >
+          {/* Shown even with mobile filters collapsed, since the setting persists */}
+          {showSuitableDishesOnly && (
+            <Chip
+              label="Suitable dishes only"
+              color="primary"
+              variant="outlined"
+              onDelete={() => setShowSuitableDishesOnly(false)}
+              className="self-start ml-3 md:self-auto md:ml-0"
+            />
           )}
 
           {/* Meal & date selectors */}
-          <RestaurantFilters
-            isDesktop={isDesktop}
-            periods={periods}
-            availablePeriodTimes={availablePeriodTimes}
-            selectedDate={selectedDate}
-            handleDateSelect={handleDateSelect}
-            calendarRange={calendarRange}
-          />
+          {showFilters && (
+            <RestaurantFilters
+              isDesktop={isDesktop}
+              periods={periods}
+              availablePeriodTimes={availablePeriodTimes}
+              selectedDate={selectedDate}
+              handleDateSelect={handleDateSelect}
+              calendarRange={calendarRange}
+            />
+          )}
 
-          {/* Menu / schedule popovers & view-toggle (mobile only) */}
-          <MobileActions
-            isDesktop={isDesktop}
-            isLoading={isLoading}
-            isError={isError}
-            dishes={dishes}
-            stations={stations}
-            hallEvents={hallEvents}
-          />
+          {/* Menu / schedule drawers & view-toggle (mobile only) */}
+          {showFilters && (
+            <MobileActions
+              isDesktop={isDesktop}
+              isLoading={isLoading}
+              isError={isError}
+              dishes={dishes}
+              stations={stations}
+              hallEvents={hallEvents}
+            />
+          )}
         </div>
       </div>
 
-      {/* Station tabs & card/compact view toggles (desktop only) */}
+      {/* Station tabs (desktop only) */}
       <DesktopTabs
         isDesktop={isDesktop}
         isLoading={isLoading}
         isError={isError}
         stations={stations}
       />
-    </>
+    </div>
   );
 }

@@ -3,6 +3,8 @@
 import { GitHub, Language } from "@mui/icons-material";
 import Image from "next/image";
 import Contributor from "@/components/ui/contributor";
+import LoadingSpinner from "@/components/ui/loading-spinner";
+import PageContainer from "@/components/ui/page-container";
 import { Button } from "@/components/ui/shadcn/button";
 import { trpc } from "@/utils/trpc";
 
@@ -17,19 +19,20 @@ export default function About() {
   return (
     <div className="flex flex-col">
       <Image
+        id="hero"
         className="object-cover w-full min-h-80 max-h-80"
         src="/uci.webp"
         alt="An Image of UCI's signage."
         width={2000}
         height={2000}
       />
-      <div
-        className="flex flex-col md:flex-row p-8 gap-6 max-w-100 dark:text-zinc-200"
+      <PageContainer
+        className="flex flex-col md:flex-row gap-6 dark:text-zinc-200"
         id="about-content"
       >
         <div className="flex flex-col" id="about-text">
           <div className="flex gap-4 items-center mb-2" id="about-header">
-            <h1 className="text-3xl font-bold" id="about-title">
+            <h1 className="text-4xl font-bold" id="about-title">
               About{" "}
               <span className="text-sky-700 dark:text-sky-400">PeterPlate</span>
             </h1>
@@ -61,11 +64,7 @@ export default function About() {
                 Our Lovely Contributors
               </h1>
               <div className="flex flex-wrap gap-2" id="contributor-grid">
-                {isLoading && (
-                  <p className="text-sm text-zinc-400 dark:text-zinc-500">
-                    Loading contributors...
-                  </p>
-                )}
+                {isLoading && <LoadingSpinner size="2rem" />}
                 {!isLoading && isError && (
                   <p className="text-sm text-red-500 dark:text-red-400 text-center">
                     Error occurred while fetching contributors: {error?.message}
@@ -136,7 +135,7 @@ export default function About() {
             </div>
           </div>
         </div>
-      </div>
+      </PageContainer>
     </div>
   );
 }

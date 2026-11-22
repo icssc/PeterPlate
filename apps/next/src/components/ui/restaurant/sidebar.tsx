@@ -9,7 +9,7 @@ import {
   Typography,
 } from "@mui/material";
 import type React from "react";
-import { formatOpenCloseTime, toTitleCase } from "@/utils/funcs";
+import { formatOpenCloseTime, isValidDate, toTitleCase } from "@/utils/funcs";
 import {
   ANTEATERY_MAP_EMBED_URL,
   ANTEATERY_MAP_LINK_URL,
@@ -17,6 +17,7 @@ import {
   BRANDYWINE_MAP_LINK_URL,
   HallEnum,
 } from "@/utils/types";
+import { TodayEvents } from "./today-events";
 
 interface SidebarProps {
   displayDate: Date;
@@ -28,13 +29,16 @@ interface SidebarProps {
 
 function SidebarSection({
   title,
+  id,
   children,
 }: {
   title: string;
+  id?: string;
   children: React.ReactNode;
 }) {
   return (
     <Paper
+      id={id}
       elevation={0}
       className="mb-4 overflow-hidden dark:bg-[var(--surface-modal)]"
       sx={{ border: 1, borderColor: "divider" }}
@@ -61,6 +65,8 @@ export function Sidebar({
 }: SidebarProps) {
   return (
     <div className="w-full md:basis-[325px] md:max-w-[325px] md:min-h-[740px]">
+      <TodayEvents events={hallEvents} />
+
       {/* Hours of operation card */}
       <SidebarSection title={"Hours of Operation"}>
         <Typography variant="body2" fontWeight={600} className="mb-3 pb-2">
@@ -147,12 +153,17 @@ export function Sidebar({
       </SidebarSection>
 
       {/* Special Schedules card */}
-      <SidebarSection title="Special Schedules">
+      <SidebarSection title="Special Schedules" id="tour-special-schedules">
         {hallEvents.length > 0 ? (
           <div className="space-y-2">
             {hallEvents.map((event) => {
-              const start = event.start ? new Date(event.start) : null;
-              const end = event.end ? new Date(event.end) : null;
+              // Use whichever date is known when the other is missing
+              const start = new Date(
+                isValidDate(event.start) ? event.start : event.end,
+              );
+              const end = new Date(
+                isValidDate(event.end) ? event.end : event.start,
+              );
               const now = new Date();
               const isActive = start && end && now >= start && now <= end;
               const dateRange =

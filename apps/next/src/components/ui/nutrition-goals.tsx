@@ -9,9 +9,10 @@ import { trpc } from "@/utils/trpc";
 interface Props {
   userId: string;
   date?: string;
+  tourId?: string;
 }
 
-export default function NutritionGoals({ userId, date }: Props) {
+export default function NutritionGoals({ userId, date, tourId }: Props) {
   const isMobile = useMediaQuery("(max-width: 768px)");
   const utils = trpc.useUtils();
 
@@ -200,6 +201,7 @@ export default function NutritionGoals({ userId, date }: Props) {
   return (
     <div className="relative mt-4" ref={containerRef}>
       <Button
+        id={tourId}
         onClick={() => setOpen(!open)}
         variant="contained"
         className="!bg-sky-700 !text-white hover:!bg-sky-800 !rounded-lg !min-w-0 !p-1 md:!p-2 dark:!bg-blue-300 dark:!text-gray-900 dark:hover:!bg-blue-400"

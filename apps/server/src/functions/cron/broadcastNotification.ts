@@ -14,7 +14,6 @@ export const main = async (evt, _context) => {
   });
 
   const event = EventSchema.parse(evt.body);
-  console.log("Broadcasting event notification");
 
   const expo = new Expo({
     accessToken: process.env.EXPO_ACCESS_TOKEN,

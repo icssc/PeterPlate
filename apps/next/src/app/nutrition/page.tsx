@@ -1,21 +1,25 @@
 "use client";
 
 import type { RouterOutputs } from "@api/index";
-import { Box, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import posthog from "posthog-js";
 import { useEffect, useMemo, useState } from "react";
 import SearchMealCard from "@/components/ui/card/search-meal-card";
 import TrackedMealCard from "@/components/ui/card/tracked-meal-card";
+import LoadingSpinner from "@/components/ui/loading-spinner";
 import MealSearchDialog from "@/components/ui/meal-search";
 import MobileCalorieCard from "@/components/ui/mobile-calorie-card";
 import MobileNutritionBars from "@/components/ui/mobile-nutrition-bars";
 import NutritionBreakdown from "@/components/ui/nutrition-breakdown";
 import NutritionGoals from "@/components/ui/nutrition-goals";
+import PageContainer from "@/components/ui/page-container";
 import TrackerHistory from "@/components/ui/tracker-history";
 import TrackerHistoryDialog from "@/components/ui/tracker-history-dialog";
 import TrackerHistoryDrawer from "@/components/ui/tracker-history-drawer";
+import TrackerOnboarding from "@/components/ui/tracker-onboarding";
 import { useSnackbarStore } from "@/context/useSnackbar";
+import { useTourStore } from "@/context/useTourStore";
 import { useUserStore } from "@/context/useUserStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { trpc } from "@/utils/trpc";
@@ -34,11 +38,48 @@ type DisplayDish = {
   } | null;
 };
 
+// Mock meals for Joyride spotlight when history is empty
+const dummyMeals = [
+  {
+    id: "dummy-1",
+    name: "Chicken Teriyaki",
+    calories: 300,
+    protein: 25,
+    carbs: 20,
+    fat: 10,
+  },
+  {
+    id: "dummy-2",
+    name: "White Rice",
+    calories: 200,
+    protein: 4,
+    carbs: 45,
+    fat: 0.5,
+  },
+  {
+    id: "dummy-3",
+    name: "Steamed Broccoli",
+    calories: 50,
+    protein: 3,
+    carbs: 10,
+    fat: 0.5,
+  },
+];
+
 export default function MealTracker() {
   const utils = trpc.useUtils();
   const router = useRouter();
   const { userId, isInitialized } = useUserStore();
+  const running = useTourStore((state) => state.activeTour === "nutrition");
+
   const { showSnackbar } = useSnackbarStore();
+
+  useEffect(() => {
+    return () => {
+      const { activeTour, stop } = useTourStore.getState();
+      if (activeTour === "nutrition") stop();
+    };
+  }, []);
 
   useEffect(() => {
     if (!isInitialized) return;
@@ -181,18 +222,19 @@ export default function MealTracker() {
 
   // suggested meals memo
   const suggestedMeals = useMemo(() => {
-    if (!meals) return [];
     const servingCounts: Record<string, number> = {};
     const latestByDish: Record<string, LoggedMealWithNutrition> = {};
 
-    for (const meal of meals) {
-      if (!meal.dishId) continue;
-      servingCounts[meal.dishId] =
-        (servingCounts[meal.dishId] ?? 0) + (meal.servings ?? 1);
-      if (!latestByDish[meal.dishId]) latestByDish[meal.dishId] = meal;
+    if (meals) {
+      for (const meal of meals) {
+        if (!meal.dishId) continue;
+        servingCounts[meal.dishId] =
+          (servingCounts[meal.dishId] ?? 0) + (meal.servings ?? 1);
+        if (!latestByDish[meal.dishId]) latestByDish[meal.dishId] = meal;
+      }
     }
 
-    return Object.entries(servingCounts)
+    const calculated = Object.entries(servingCounts)
       .filter(([, total]) => total >= 1)
       .sort(([, a], [, b]) => b - a)
       .map(([dishId]) => {
@@ -206,7 +248,26 @@ export default function MealTracker() {
           servings: 1,
         };
       });
-  }, [meals]);
+
+    // Use mock meals when tour is running and user has no meal history
+    if (running && calculated.length === 0) {
+      return dummyMeals.map((d) => ({
+        id: `fallback-${d.id}`,
+        dishId: d.id,
+        dishName: d.name,
+        servings: 1,
+        calories: d.calories,
+        protein: d.protein,
+        carbs: d.carbs,
+        fat: d.fat,
+        eatenAt: new Date(),
+        userId: userId ?? "",
+        createdAt: new Date(),
+      }));
+    }
+
+    return calculated;
+  }, [meals, userId, running]);
 
   const visibleMeals = selectedDay?.items ?? [];
   const countedMeals = visibleMeals.filter(
@@ -276,20 +337,23 @@ export default function MealTracker() {
 
   const isMobile = useMediaQuery("(max-width: 768px)");
 
-  if (isLoading) return <div>Loading meals...</div>;
+  if (isLoading)
+    return (
+      <div className="w-full flex justify-center mt-12">
+        <LoadingSpinner />
+      </div>
+    );
   if (error) return <div>Error loading meals</div>;
 
   return (
-    <Box
-      sx={{ bgcolor: "background.default", minHeight: "100vh" }}
-      className="p-2 md:p-8 mt-2 md:mt-12"
-    >
-      <div className="px-2 md:px-8">
+    <PageContainer>
+      <div>
+        {<TrackerOnboarding />}
         <Typography
           variant="h5"
           fontWeight={700}
           color="primary"
-          className="text-2xl md:text-3xl flex items-center justify-between"
+          className="text-4xl flex items-center justify-between"
         >
           <span className="flex items-center gap-2 flex-nowrap whitespace-nowrap">
             Tracker
@@ -306,8 +370,9 @@ export default function MealTracker() {
           </span>
           {/* History button - mobile only */}
           <div className="flex md:hidden">
-            {userId && (
+            {(userId || running) && (
               <TrackerHistory
+                tourId="tour-history-mobile"
                 onDateSelect={() => {}}
                 onDayClick={(date) => {
                   setHistoryDate(date);
@@ -325,8 +390,9 @@ export default function MealTracker() {
             Keep track of your eating using our Nutrition Tracker! Add dishes to
             count them towards your totals!
           </Typography>
-          {userId && (
+          {(userId || running) && (
             <TrackerHistory
+              tourId="tour-history-desktop"
               onDateSelect={() => {}}
               onDayClick={(date) => {
                 setHistoryDate(date);
@@ -338,36 +404,39 @@ export default function MealTracker() {
         </div>
 
         {/* Desktop: NutritionBreakdown */}
-        <div className="hidden md:flex items-start gap-4">
-          {mealsGroupedByDay.length === 0 ? (
-            <div>No meals logged recently.</div>
-          ) : (
-            <NutritionBreakdown
-              mealsEaten={countedMeals.map((m) => ({
-                ...m,
-                calories: toNum(m.calories),
-                protein: toNum(m.protein),
-                carbs: toNum(m.carbs),
-                fat: toNum(m.fat),
-              }))}
-              calorieGoal={goals?.calorieGoal ?? 2000}
-              proteinGoal={goals?.proteinGoal ?? 75}
-              carbGoal={goals?.carbGoal ?? 250}
-              fatGoal={goals?.fatGoal ?? 50}
-            />
-          )}
+        <div
+          id="tour-progress-desktop"
+          className="hidden md:flex items-start gap-4 mt-6"
+        >
+          <NutritionBreakdown
+            mealsEaten={countedMeals.map((m) => ({
+              ...m,
+              calories: toNum(m.calories),
+              protein: toNum(m.protein),
+              carbs: toNum(m.carbs),
+              fat: toNum(m.fat),
+            }))}
+            calorieGoal={goals?.calorieGoal ?? 2000}
+            proteinGoal={goals?.proteinGoal ?? 75}
+            carbGoal={goals?.carbGoal ?? 250}
+            fatGoal={goals?.fatGoal ?? 50}
+          />
           <div className="relative mt-4 ml-auto">
-            {userId && (
+            {(userId || running) && (
               <NutritionGoals
-                userId={userId}
+                userId={userId ?? ""}
                 date={new Date().toISOString().split("T")[0]}
+                tourId="tour-edit-goals-desktop"
               />
             )}
           </div>
         </div>
 
         {/* Mobile: MobileCalorieCard + MobileNutritionBars */}
-        <div className="flex md:hidden flex-col gap-4 mt-4 w-full">
+        <div
+          id="tour-progress-mobile"
+          className="flex md:hidden flex-col gap-4 mt-4 w-full"
+        >
           <MobileCalorieCard
             mealsEaten={countedMeals.map((m) => ({
               ...m,
@@ -476,30 +545,33 @@ export default function MealTracker() {
               <Typography
                 variant="body2"
                 color="text.secondary"
-                className="mt-2"
+                className="mt-2 tour-suggested-card:first-of-type"
               >
-                Dishes from the past week logged 5+ times will appear here.
+                Dishes you logged in the past week will appear here. Start
+                logging to see them!
               </Typography>
             ) : (
               suggestedMeals.map((meal) => (
-                <SearchMealCard
-                  key={meal.dishId}
-                  dish={dishDisplayMap.get(meal.dishId)}
-                  meal={meal}
-                  isUnavailable={isUnavailable(meal.dishId)}
-                  onAdd={(meal, servings) =>
-                    logMeal.mutate({
-                      userId: userId ?? "",
-                      dishId: meal.dishId ?? "",
-                      dishName:
-                        "dishName" in meal && typeof meal.dishName === "string"
-                          ? meal.dishName
-                          : "",
-                      servings,
-                      eatenAt: new Date(),
-                    })
-                  }
-                />
+                <div key={meal.dishId} className="tour-suggested-card">
+                  <SearchMealCard
+                    dish={dishDisplayMap.get(meal.dishId)}
+                    meal={meal}
+                    isUnavailable={isUnavailable(meal.dishId)}
+                    onAdd={(meal, servings) =>
+                      logMeal.mutate({
+                        userId: userId ?? "",
+                        dishId: meal.dishId ?? "",
+                        dishName:
+                          "dishName" in meal &&
+                          typeof meal.dishName === "string"
+                            ? meal.dishName
+                            : "",
+                        servings,
+                        eatenAt: new Date(),
+                      })
+                    }
+                  />
+                </div>
               ))
             )}
           </div>
@@ -520,6 +592,6 @@ export default function MealTracker() {
           })
         }
       />
-    </Box>
+    </PageContainer>
   );
 }

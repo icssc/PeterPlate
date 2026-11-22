@@ -2,8 +2,9 @@
 // spinner.tsx
 // A loading spinner for the restaurant page.
 
-import { CircularProgress, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import { useEffect, useState } from "react";
+import LoadingSpinner from "@/components/ui/loading-spinner";
 
 const MESSAGES = [
   "Loading menu",
@@ -32,13 +33,7 @@ export default function RestaurantSpinner() {
 
   return (
     <div className="w-full flex flex-col gap-4 justify-center items-center mt-12">
-      <CircularProgress
-        enableTrackSlot
-        variant="indeterminate"
-        color="primary"
-        size="5rem"
-        sx={{ circle: { strokeLinecap: "round" } }}
-      />
+      <LoadingSpinner />
       <Typography color="primary" className="md:text-xl text-md font-bold">
         {MESSAGES[loadMessageIdx]}...
       </Typography>

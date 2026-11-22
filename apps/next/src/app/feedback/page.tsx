@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 import type { FeedbackFormData } from "@peterplate/validators";
 import { useState } from "react";
+import PageContainer from "@/components/ui/page-container";
 
 const DARK_MODE_SELECTOR = ".dark &";
 
@@ -357,506 +358,510 @@ export default function FeedbackForm() {
       sx={{
         minHeight: "100vh",
         background: "linear-gradient(180deg, #ffffff 0%, #abcde2 136.47%)",
-        py: 4,
-        px: 2,
         [DARK_MODE_SELECTOR]: {
           background:
             "linear-gradient(180deg, #27272A 19.9%, rgba(142, 197, 255, 0.40) 141.17%)",
         },
       }}
     >
-      <Box
-        component="form"
-        onSubmit={handleSubmit}
-        encType="multipart/form-data"
-        className="max-w-3xl mx-auto space-y-6 mt-12"
-      >
-        <Box sx={sectionCardSx}>
-          <Typography
-            variant="h4"
-            sx={{
-              fontWeight: 600,
-              color: "#020618",
-              mb: 1,
-              [DARK_MODE_SELECTOR]: {
-                color: "#fafafa",
-              },
-            }}
-          >
-            PeterPlate Feedback Form
-          </Typography>
-          <Typography
-            sx={{
-              fontSize: "18px",
-              fontWeight: 500,
-              color: "#4a5565",
-              mb: 2,
-              [DARK_MODE_SELECTOR]: {
-                color: "#8EC5FF",
-              },
-            }}
-          >
-            Help Us Improve PeterPlate
-          </Typography>
-          <Typography
-            sx={{
-              fontSize: "14px",
-              color: "#6a7282",
-              mb: 3,
-              lineHeight: 1.5,
-              [DARK_MODE_SELECTOR]: {
-                color: "rgba(255,255,255,0.7)",
-              },
-            }}
-          >
-            We would love to hear your thoughts on PeterPlate. Your feedback
-            helps us improve the platform experience, fix issues, and create
-            features that better support our users.
-          </Typography>
-
-          <Box>
-            <Box
+      <PageContainer>
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          encType="multipart/form-data"
+          className="max-w-3xl mx-auto space-y-6"
+        >
+          <Box sx={sectionCardSx}>
+            <Typography
+              variant="h4"
               sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
+                fontWeight: 600,
+                color: "#020618",
                 mb: 1,
-              }}
-            >
-              <Typography
-                sx={{
-                  fontSize: "12px",
-                  color: "#4a5565",
-                  fontWeight: 500,
-                  [DARK_MODE_SELECTOR]: {
-                    color: "rgba(255,255,255,0.78)",
-                  },
-                }}
-              >
-                Form Progress
-              </Typography>
-              <Typography
-                sx={{
-                  fontSize: "12px",
-                  color: "#0069a8",
-                  fontWeight: 500,
-                  [DARK_MODE_SELECTOR]: {
-                    color: "#8EC5FF",
-                  },
-                }}
-              >
-                {progress}%
-              </Typography>
-            </Box>
-            <Box
-              sx={{
-                width: "100%",
-                height: "8px",
-                bgcolor: "#e5e7eb",
-                borderRadius: "100px",
-                overflow: "hidden",
                 [DARK_MODE_SELECTOR]: {
-                  bgcolor: "rgba(255,255,255,0.14)",
+                  color: "#fafafa",
                 },
               }}
             >
+              PeterPlate Feedback Form
+            </Typography>
+            <Typography
+              sx={{
+                fontSize: "18px",
+                fontWeight: 500,
+                color: "#4a5565",
+                mb: 2,
+                [DARK_MODE_SELECTOR]: {
+                  color: "#8EC5FF",
+                },
+              }}
+            >
+              Help Us Improve PeterPlate
+            </Typography>
+            <Typography
+              sx={{
+                fontSize: "14px",
+                color: "#6a7282",
+                mb: 3,
+                lineHeight: 1.5,
+                [DARK_MODE_SELECTOR]: {
+                  color: "rgba(255,255,255,0.7)",
+                },
+              }}
+            >
+              We would love to hear your thoughts on PeterPlate. Your feedback
+              helps us improve the platform experience, fix issues, and create
+              features that better support our users.
+            </Typography>
+
+            <Box>
               <Box
                 sx={{
-                  height: "100%",
-                  width: `${progress}%`,
-                  bgcolor: "#0069a8",
-                  transition: "width 0.3s ease",
-                  [DARK_MODE_SELECTOR]: {
-                    bgcolor: "#8EC5FF",
-                  },
-                }}
-              />
-            </Box>
-          </Box>
-        </Box>
-
-        <Box sx={sectionCardSx}>
-          <Typography variant="h6" sx={sectionTitleSx}>
-            Personal Information
-          </Typography>
-
-          <Box sx={{ mb: 3 }}>
-            <FormLabel sx={labelSx}>
-              Full Name <span style={{ color: "#fb2c36" }}>*</span>
-            </FormLabel>
-            <TextField
-              fullWidth
-              placeholder="Enter your full name"
-              value={formData.fullName}
-              onChange={(e) => handleInputChange("fullName", e.target.value)}
-              variant="outlined"
-              size="small"
-              sx={inputSx}
-            />
-          </Box>
-
-          <Box sx={{ mb: 3 }}>
-            <FormLabel sx={labelSx}>
-              Email Address <span style={{ color: "#fb2c36" }}>*</span>
-            </FormLabel>
-            <TextField
-              fullWidth
-              placeholder="your.email@example.com"
-              type="email"
-              value={formData.email}
-              onChange={(e) => handleInputChange("email", e.target.value)}
-              variant="outlined"
-              size="small"
-              sx={inputSx}
-            />
-          </Box>
-
-          <FormControl>
-            <FormLabel sx={{ ...labelSx, mb: 1.5 }}>
-              Would it be okay for our team to follow up with you if needed?{" "}
-              <span style={{ color: "#fb2c36" }}>*</span>
-            </FormLabel>
-            <RadioGroup
-              row
-              value={formData.allowFollowUp ? "yes" : "no"}
-              onChange={(e) =>
-                handleInputChange("allowFollowUp", e.target.value === "yes")
-              }
-            >
-              <FormControlLabel
-                value="yes"
-                control={<Radio sx={radioSx} />}
-                label="Yes"
-                sx={radioLabelSx}
-              />
-              <FormControlLabel
-                value="no"
-                control={<Radio sx={radioSx} />}
-                label="No"
-                sx={radioLabelSx}
-              />
-            </RadioGroup>
-          </FormControl>
-        </Box>
-
-        <Box sx={sectionCardSx}>
-          <Typography variant="h6" sx={sectionTitleSx}>
-            Feedback Details
-          </Typography>
-
-          <Box sx={{ mb: 3 }}>
-            <FormLabel sx={labelSx}>
-              What type of feedback would you like to share?{" "}
-              <span style={{ color: "#fb2c36" }}>*</span>
-            </FormLabel>
-            <Select
-              fullWidth
-              value={formData.feedbackType}
-              onChange={(e) =>
-                handleInputChange("feedbackType", e.target.value)
-              }
-              displayEmpty
-              size="small"
-              sx={selectSx}
-              MenuProps={{ PaperProps: { sx: menuPaperSx } }}
-            >
-              <MenuItem value="">Select feedback type</MenuItem>
-              <MenuItem value="bug">Bug Report</MenuItem>
-              <MenuItem value="feature">Feature Request</MenuItem>
-              <MenuItem value="improvement">Improvement Suggestion</MenuItem>
-              <MenuItem value="other">Other</MenuItem>
-            </Select>
-          </Box>
-
-          <Box>
-            <FormLabel sx={labelSx}>
-              Please describe your feedback in detail.{" "}
-              <span style={{ color: "#fb2c36" }}>*</span>
-            </FormLabel>
-            <TextField
-              fullWidth
-              multiline
-              rows={6}
-              placeholder="Please provide as much detail as possible..."
-              value={formData.feedbackDescription}
-              onChange={(e) =>
-                handleInputChange("feedbackDescription", e.target.value)
-              }
-              variant="outlined"
-              sx={inputSx}
-              slotProps={{
-                htmlInput: {
-                  maxLength: 1000,
-                },
-              }}
-            />
-            <Box sx={{ textAlign: "right", mt: 1 }}>
-              <Typography
-                sx={{
-                  fontSize: "12px",
-                  color: "#6a7282",
-                  [DARK_MODE_SELECTOR]: {
-                    color: "rgba(255,255,255,0.55)",
-                  },
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  mb: 1,
                 }}
               >
-                {charCounts.feedbackDescription}/1000
-              </Typography>
-            </Box>
-          </Box>
-        </Box>
-
-        <Box sx={sectionCardSx}>
-          <Typography variant="h6" sx={sectionTitleSx}>
-            Additional Information
-          </Typography>
-
-          <Box sx={{ mb: 3 }}>
-            <FormLabel sx={{ ...labelSx, mb: 1.5 }}>
-              How would you rate your overall experience with PeterPlate so far?{" "}
-              <span style={{ color: "#fb2c36" }}>*</span>
-            </FormLabel>
-            <Box
-              sx={{
-                display: "grid",
-                gridTemplateColumns: "repeat(5, 1fr)",
-                gap: 1.5,
-              }}
-            >
-              {[1, 2, 3, 4, 5].map((rating) => (
-                <Button
-                  key={rating}
-                  type="button"
-                  onClick={() => handleInputChange("experienceRating", rating)}
-                  sx={ratingButtonSx(formData.experienceRating === rating)}
+                <Typography
+                  sx={{
+                    fontSize: "12px",
+                    color: "#4a5565",
+                    fontWeight: 500,
+                    [DARK_MODE_SELECTOR]: {
+                      color: "rgba(255,255,255,0.78)",
+                    },
+                  }}
                 >
-                  {rating}
-                </Button>
-              ))}
-            </Box>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                mt: 1,
-                px: 0.5,
-              }}
-            >
-              <Typography
+                  Form Progress
+                </Typography>
+                <Typography
+                  sx={{
+                    fontSize: "12px",
+                    color: "#0069a8",
+                    fontWeight: 500,
+                    [DARK_MODE_SELECTOR]: {
+                      color: "#8EC5FF",
+                    },
+                  }}
+                >
+                  {progress}%
+                </Typography>
+              </Box>
+              <Box
                 sx={{
-                  fontSize: "11px",
-                  color: "#6a7282",
+                  width: "100%",
+                  height: "8px",
+                  bgcolor: "#e5e7eb",
+                  borderRadius: "100px",
+                  overflow: "hidden",
                   [DARK_MODE_SELECTOR]: {
-                    color: "rgba(255,255,255,0.55)",
+                    bgcolor: "rgba(255,255,255,0.14)",
                   },
                 }}
               >
-                Very Poor
-              </Typography>
-              <Typography
-                sx={{
-                  fontSize: "11px",
-                  color: "#6a7282",
-                  [DARK_MODE_SELECTOR]: {
-                    color: "rgba(255,255,255,0.55)",
-                  },
-                }}
-              >
-                Excellent
-              </Typography>
+                <Box
+                  sx={{
+                    height: "100%",
+                    width: `${progress}%`,
+                    bgcolor: "#0069a8",
+                    transition: "width 0.3s ease",
+                    [DARK_MODE_SELECTOR]: {
+                      bgcolor: "#8EC5FF",
+                    },
+                  }}
+                />
+              </Box>
             </Box>
           </Box>
 
-          <FormControl sx={{ mb: 3 }}>
-            <FormLabel sx={{ ...labelSx, mb: 1.5 }}>
-              Were you able to complete what you intended to do in the platform?{" "}
-              <span style={{ color: "#fb2c36" }}>*</span>
-            </FormLabel>
-            <RadioGroup
-              row
-              value={formData.completionStatus}
-              onChange={(e) =>
-                handleInputChange("completionStatus", e.target.value)
-              }
-            >
-              <FormControlLabel
-                value="yes"
-                control={<Radio sx={radioSx} />}
-                label="Yes"
-                sx={radioLabelSx}
-              />
-              <FormControlLabel
-                value="partially"
-                control={<Radio sx={radioSx} />}
-                label="Partially"
-                sx={radioLabelSx}
-              />
-              <FormControlLabel
-                value="no"
-                control={<Radio sx={radioSx} />}
-                label="No"
-                sx={radioLabelSx}
-              />
-            </RadioGroup>
-          </FormControl>
+          <Box sx={sectionCardSx}>
+            <Typography variant="h6" sx={sectionTitleSx}>
+              Personal Information
+            </Typography>
 
-          <Box sx={{ mb: 3 }}>
-            <FormLabel sx={labelSx}>
-              What device are you using? (optional)
-            </FormLabel>
-            <Select
-              fullWidth
-              value={formData.deviceType}
-              onChange={(e) => handleInputChange("deviceType", e.target.value)}
-              displayEmpty
-              size="small"
-              sx={selectSx}
-              MenuProps={{ PaperProps: { sx: menuPaperSx } }}
-            >
-              <MenuItem value="">Select device type</MenuItem>
-              <MenuItem value="desktop">Desktop</MenuItem>
-              <MenuItem value="mobile">Mobile</MenuItem>
-              <MenuItem value="tablet">Tablet</MenuItem>
-            </Select>
+            <Box sx={{ mb: 3 }}>
+              <FormLabel sx={labelSx}>
+                Full Name <span style={{ color: "#fb2c36" }}>*</span>
+              </FormLabel>
+              <TextField
+                fullWidth
+                placeholder="Enter your full name"
+                value={formData.fullName}
+                onChange={(e) => handleInputChange("fullName", e.target.value)}
+                variant="outlined"
+                size="small"
+                sx={inputSx}
+              />
+            </Box>
+
+            <Box sx={{ mb: 3 }}>
+              <FormLabel sx={labelSx}>
+                Email Address <span style={{ color: "#fb2c36" }}>*</span>
+              </FormLabel>
+              <TextField
+                fullWidth
+                placeholder="your.email@example.com"
+                type="email"
+                value={formData.email}
+                onChange={(e) => handleInputChange("email", e.target.value)}
+                variant="outlined"
+                size="small"
+                sx={inputSx}
+              />
+            </Box>
+
+            <FormControl>
+              <FormLabel sx={{ ...labelSx, mb: 1.5 }}>
+                Would it be okay for our team to follow up with you if needed?{" "}
+                <span style={{ color: "#fb2c36" }}>*</span>
+              </FormLabel>
+              <RadioGroup
+                row
+                value={formData.allowFollowUp ? "yes" : "no"}
+                onChange={(e) =>
+                  handleInputChange("allowFollowUp", e.target.value === "yes")
+                }
+              >
+                <FormControlLabel
+                  value="yes"
+                  control={<Radio sx={radioSx} />}
+                  label="Yes"
+                  sx={radioLabelSx}
+                />
+                <FormControlLabel
+                  value="no"
+                  control={<Radio sx={radioSx} />}
+                  label="No"
+                  sx={radioLabelSx}
+                />
+              </RadioGroup>
+            </FormControl>
           </Box>
 
-          <Box sx={{ mb: 3 }}>
-            <FormLabel sx={labelSx}>
-              Upload a screenshot or supporting file (optional)
-            </FormLabel>
-            <Button
-              component="label"
-              variant="outlined"
-              fullWidth
-              sx={{
-                py: 1.5,
-                border: "2px dashed #d1d5dc",
-                color: "#6a7282",
-                textTransform: "capitalize",
-                bgcolor: "rgba(255,255,255,0.6)",
-                "&:hover": {
-                  border: "2px dashed #0069a8",
-                  bgcolor: "#f8fafc",
-                },
-                [DARK_MODE_SELECTOR]: {
-                  borderColor: "#71717a",
-                  bgcolor: "rgba(63,63,71,0.4)",
-                  color: "rgba(255,255,255,0.72)",
+          <Box sx={sectionCardSx}>
+            <Typography variant="h6" sx={sectionTitleSx}>
+              Feedback Details
+            </Typography>
+
+            <Box sx={{ mb: 3 }}>
+              <FormLabel sx={labelSx}>
+                What type of feedback would you like to share?{" "}
+                <span style={{ color: "#fb2c36" }}>*</span>
+              </FormLabel>
+              <Select
+                fullWidth
+                value={formData.feedbackType}
+                onChange={(e) =>
+                  handleInputChange("feedbackType", e.target.value)
+                }
+                displayEmpty
+                size="small"
+                sx={selectSx}
+                MenuProps={{ PaperProps: { sx: menuPaperSx } }}
+              >
+                <MenuItem value="">Select feedback type</MenuItem>
+                <MenuItem value="bug">Bug Report</MenuItem>
+                <MenuItem value="feature">Feature Request</MenuItem>
+                <MenuItem value="improvement">Improvement Suggestion</MenuItem>
+                <MenuItem value="other">Other</MenuItem>
+              </Select>
+            </Box>
+
+            <Box>
+              <FormLabel sx={labelSx}>
+                Please describe your feedback in detail.{" "}
+                <span style={{ color: "#fb2c36" }}>*</span>
+              </FormLabel>
+              <TextField
+                fullWidth
+                multiline
+                rows={6}
+                placeholder="Please provide as much detail as possible..."
+                value={formData.feedbackDescription}
+                onChange={(e) =>
+                  handleInputChange("feedbackDescription", e.target.value)
+                }
+                variant="outlined"
+                sx={inputSx}
+                slotProps={{
+                  htmlInput: {
+                    maxLength: 1000,
+                  },
+                }}
+              />
+              <Box sx={{ textAlign: "right", mt: 1 }}>
+                <Typography
+                  sx={{
+                    fontSize: "12px",
+                    color: "#6a7282",
+                    [DARK_MODE_SELECTOR]: {
+                      color: "rgba(255,255,255,0.55)",
+                    },
+                  }}
+                >
+                  {charCounts.feedbackDescription}/1000
+                </Typography>
+              </Box>
+            </Box>
+          </Box>
+
+          <Box sx={sectionCardSx}>
+            <Typography variant="h6" sx={sectionTitleSx}>
+              Additional Information
+            </Typography>
+
+            <Box sx={{ mb: 3 }}>
+              <FormLabel sx={{ ...labelSx, mb: 1.5 }}>
+                How would you rate your overall experience with PeterPlate so
+                far? <span style={{ color: "#fb2c36" }}>*</span>
+              </FormLabel>
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(5, 1fr)",
+                  gap: 1.5,
+                }}
+              >
+                {[1, 2, 3, 4, 5].map((rating) => (
+                  <Button
+                    key={rating}
+                    type="button"
+                    onClick={() =>
+                      handleInputChange("experienceRating", rating)
+                    }
+                    sx={ratingButtonSx(formData.experienceRating === rating)}
+                  >
+                    {rating}
+                  </Button>
+                ))}
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  mt: 1,
+                  px: 0.5,
+                }}
+              >
+                <Typography
+                  sx={{
+                    fontSize: "11px",
+                    color: "#6a7282",
+                    [DARK_MODE_SELECTOR]: {
+                      color: "rgba(255,255,255,0.55)",
+                    },
+                  }}
+                >
+                  Very Poor
+                </Typography>
+                <Typography
+                  sx={{
+                    fontSize: "11px",
+                    color: "#6a7282",
+                    [DARK_MODE_SELECTOR]: {
+                      color: "rgba(255,255,255,0.55)",
+                    },
+                  }}
+                >
+                  Excellent
+                </Typography>
+              </Box>
+            </Box>
+
+            <FormControl sx={{ mb: 3 }}>
+              <FormLabel sx={{ ...labelSx, mb: 1.5 }}>
+                Were you able to complete what you intended to do in the
+                platform? <span style={{ color: "#fb2c36" }}>*</span>
+              </FormLabel>
+              <RadioGroup
+                row
+                value={formData.completionStatus}
+                onChange={(e) =>
+                  handleInputChange("completionStatus", e.target.value)
+                }
+              >
+                <FormControlLabel
+                  value="yes"
+                  control={<Radio sx={radioSx} />}
+                  label="Yes"
+                  sx={radioLabelSx}
+                />
+                <FormControlLabel
+                  value="partially"
+                  control={<Radio sx={radioSx} />}
+                  label="Partially"
+                  sx={radioLabelSx}
+                />
+                <FormControlLabel
+                  value="no"
+                  control={<Radio sx={radioSx} />}
+                  label="No"
+                  sx={radioLabelSx}
+                />
+              </RadioGroup>
+            </FormControl>
+
+            <Box sx={{ mb: 3 }}>
+              <FormLabel sx={labelSx}>
+                What device are you using? (optional)
+              </FormLabel>
+              <Select
+                fullWidth
+                value={formData.deviceType}
+                onChange={(e) =>
+                  handleInputChange("deviceType", e.target.value)
+                }
+                displayEmpty
+                size="small"
+                sx={selectSx}
+                MenuProps={{ PaperProps: { sx: menuPaperSx } }}
+              >
+                <MenuItem value="">Select device type</MenuItem>
+                <MenuItem value="desktop">Desktop</MenuItem>
+                <MenuItem value="mobile">Mobile</MenuItem>
+                <MenuItem value="tablet">Tablet</MenuItem>
+              </Select>
+            </Box>
+
+            <Box sx={{ mb: 3 }}>
+              <FormLabel sx={labelSx}>
+                Upload a screenshot or supporting file (optional)
+              </FormLabel>
+              <Button
+                component="label"
+                variant="outlined"
+                fullWidth
+                sx={{
+                  py: 1.5,
+                  border: "2px dashed #d1d5dc",
+                  color: "#6a7282",
+                  textTransform: "capitalize",
+                  bgcolor: "rgba(255,255,255,0.6)",
                   "&:hover": {
-                    borderColor: "#8EC5FF",
-                    bgcolor: "rgba(142,197,255,0.12)",
+                    border: "2px dashed #0069a8",
+                    bgcolor: "#f8fafc",
                   },
-                },
-              }}
-            >
-              {formData.supportingFile
-                ? "Replace uploaded file"
-                : "Click to upload file"}
-              <input
-                hidden
-                type="file"
-                accept="image/*,.pdf"
-                onChange={handleFileChange}
+                  [DARK_MODE_SELECTOR]: {
+                    borderColor: "#71717a",
+                    bgcolor: "rgba(63,63,71,0.4)",
+                    color: "rgba(255,255,255,0.72)",
+                    "&:hover": {
+                      borderColor: "#8EC5FF",
+                      bgcolor: "rgba(142,197,255,0.12)",
+                    },
+                  },
+                }}
+              >
+                {formData.supportingFile
+                  ? "Replace uploaded file"
+                  : "Click to upload file"}
+                <input
+                  hidden
+                  type="file"
+                  accept="image/*,.pdf"
+                  onChange={handleFileChange}
+                />
+              </Button>
+              <Typography
+                sx={{
+                  mt: 1,
+                  fontSize: "12px",
+                  color: formData.supportingFile ? "#0069a8" : "#6a7282",
+                  [DARK_MODE_SELECTOR]: {
+                    color: formData.supportingFile
+                      ? "#8EC5FF"
+                      : "rgba(255,255,255,0.55)",
+                  },
+                }}
+              >
+                {formData.supportingFile
+                  ? `Selected file: ${formData.supportingFile.name}`
+                  : "Attach a screenshot, image, or PDF to provide extra context."}
+              </Typography>
+            </Box>
+
+            <Box>
+              <FormLabel sx={labelSx}>
+                Any additional comments or suggestions? (optional)
+              </FormLabel>
+              <TextField
+                fullWidth
+                multiline
+                rows={6}
+                placeholder="Any other thoughts you'd like to share..."
+                value={formData.additionalComments}
+                onChange={(e) =>
+                  handleInputChange("additionalComments", e.target.value)
+                }
+                variant="outlined"
+                sx={inputSx}
+                slotProps={{
+                  htmlInput: {
+                    maxLength: 1000,
+                  },
+                }}
               />
+              <Box sx={{ textAlign: "right", mt: 1 }}>
+                <Typography
+                  sx={{
+                    fontSize: "12px",
+                    color: "#6a7282",
+                    [DARK_MODE_SELECTOR]: {
+                      color: "rgba(255,255,255,0.55)",
+                    },
+                  }}
+                >
+                  {charCounts.additionalComments}/1000
+                </Typography>
+              </Box>
+            </Box>
+          </Box>
+
+          <Box sx={{ textAlign: "center", pb: 4 }}>
+            {error && (
+              <Box
+                sx={{
+                  mb: 2,
+                  p: 2,
+                  bgcolor: "#fee2e2",
+                  border: "1px solid #fecaca",
+                  borderRadius: 1.5,
+                  color: "#dc2626",
+                  [DARK_MODE_SELECTOR]: {
+                    bgcolor: "rgba(127,29,29,0.28)",
+                    borderColor: "rgba(248,113,113,0.5)",
+                    color: "#fecaca",
+                  },
+                }}
+              >
+                <Typography sx={{ fontSize: "14px" }}>{error}</Typography>
+              </Box>
+            )}
+            <Button
+              type="submit"
+              variant="contained"
+              disabled={isLoading}
+              sx={primaryButtonSx}
+            >
+              {isLoading ? "Submitting..." : "Submit Feedback"}
             </Button>
             <Typography
               sx={{
-                mt: 1,
-                fontSize: "12px",
-                color: formData.supportingFile ? "#0069a8" : "#6a7282",
+                fontSize: "15px",
+                color: "#4a5565",
+                mt: 2,
                 [DARK_MODE_SELECTOR]: {
-                  color: formData.supportingFile
-                    ? "#8EC5FF"
-                    : "rgba(255,255,255,0.55)",
+                  color: "rgba(255,255,255,0.68)",
                 },
               }}
             >
-              {formData.supportingFile
-                ? `Selected file: ${formData.supportingFile.name}`
-                : "Attach a screenshot, image, or PDF to provide extra context."}
+              By submitting to this form, you agree to let us use your feedback
+              to improve PeterPlate.
             </Typography>
           </Box>
-
-          <Box>
-            <FormLabel sx={labelSx}>
-              Any additional comments or suggestions? (optional)
-            </FormLabel>
-            <TextField
-              fullWidth
-              multiline
-              rows={6}
-              placeholder="Any other thoughts you'd like to share..."
-              value={formData.additionalComments}
-              onChange={(e) =>
-                handleInputChange("additionalComments", e.target.value)
-              }
-              variant="outlined"
-              sx={inputSx}
-              slotProps={{
-                htmlInput: {
-                  maxLength: 1000,
-                },
-              }}
-            />
-            <Box sx={{ textAlign: "right", mt: 1 }}>
-              <Typography
-                sx={{
-                  fontSize: "12px",
-                  color: "#6a7282",
-                  [DARK_MODE_SELECTOR]: {
-                    color: "rgba(255,255,255,0.55)",
-                  },
-                }}
-              >
-                {charCounts.additionalComments}/1000
-              </Typography>
-            </Box>
-          </Box>
         </Box>
-
-        <Box sx={{ textAlign: "center", pb: 4 }}>
-          {error && (
-            <Box
-              sx={{
-                mb: 2,
-                p: 2,
-                bgcolor: "#fee2e2",
-                border: "1px solid #fecaca",
-                borderRadius: 1.5,
-                color: "#dc2626",
-                [DARK_MODE_SELECTOR]: {
-                  bgcolor: "rgba(127,29,29,0.28)",
-                  borderColor: "rgba(248,113,113,0.5)",
-                  color: "#fecaca",
-                },
-              }}
-            >
-              <Typography sx={{ fontSize: "14px" }}>{error}</Typography>
-            </Box>
-          )}
-          <Button
-            type="submit"
-            variant="contained"
-            disabled={isLoading}
-            sx={primaryButtonSx}
-          >
-            {isLoading ? "Submitting..." : "Submit Feedback"}
-          </Button>
-          <Typography
-            sx={{
-              fontSize: "15px",
-              color: "#4a5565",
-              mt: 2,
-              [DARK_MODE_SELECTOR]: {
-                color: "rgba(255,255,255,0.68)",
-              },
-            }}
-          >
-            By submitting to this form, you agree to let us use your feedback to
-            improve PeterPlate.
-          </Typography>
-        </Box>
-      </Box>
+      </PageContainer>
     </Box>
   );
 }

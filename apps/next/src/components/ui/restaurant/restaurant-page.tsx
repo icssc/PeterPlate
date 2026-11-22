@@ -1,10 +1,13 @@
 "use client";
 
 import type { AppRouter } from "@api/index";
-import { LocationOn } from "@mui/icons-material";
-import { Box, Container, Link, Typography } from "@mui/material";
+import { LocationOn, SwapHorizOutlined } from "@mui/icons-material";
+import { Box, Link, Typography } from "@mui/material";
 import type { TRPCClientErrorLike } from "@trpc/client";
 import Image from "next/image";
+import NextLink from "next/link";
+import { useEffect } from "react";
+import { useTourStore } from "@/context/useTourStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useRestaurantPage } from "@/hooks/useRestaurantPage";
 import { cn } from "@/utils/tw";
@@ -13,11 +16,14 @@ import {
   BRANDYWINE_MAP_LINK_URL,
   HallEnum,
 } from "@/utils/types";
+import PageContainer from "../page-container";
 import { DiningHallStatus } from "../status";
 import { DishesView } from "./dishes-view";
 import { RestaurantControls } from "./restaurant-controls";
+import RestaurantOnboarding from "./restaurant-onboarding";
 import { Sidebar } from "./sidebar";
 import RestaurantSpinner from "./spinner";
+import { TodayEvents } from "./today-events";
 
 interface RestaurantPageProps {
   hall: HallEnum;
@@ -28,6 +34,13 @@ export function RestaurantPage({
 }: RestaurantPageProps): React.JSX.Element {
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
+  useEffect(() => {
+    return () => {
+      const { activeTour, stop } = useTourStore.getState();
+      if (activeTour === "restaurant") stop();
+    };
+  }, []);
+
   const {
     hallData,
     isLoading,
@@ -35,7 +48,6 @@ export function RestaurantPage({
     error,
     hallEvents,
     periods,
-    activeStation,
     stations,
     dishes,
     calendarRange,
@@ -55,8 +67,9 @@ export function RestaurantPage({
 
   return (
     <Box sx={{ bgcolor: "background.default", minHeight: "100vh" }}>
+      <RestaurantOnboarding />
       {/* Hero image & mobile header */}
-      <div className="relative w-full h-[200px] md:h-[250px]">
+      <div id="hero" className="relative w-full h-[200px] md:h-[250px]">
         <Image
           src={hero.src}
           alt={hero.alt}
@@ -97,16 +110,20 @@ export function RestaurantPage({
                 ? "4001 Mesa Rd, Irvine, CA 92617"
                 : "Middle Earth Community Irvine, CA 92697"}
             </Link>
+            <NextLink
+              id="tour-switch-hall"
+              href={hall === HallEnum.ANTEATERY ? "/brandywine" : "/anteatery"}
+              aria-label={`Switch to ${hall === HallEnum.ANTEATERY ? "Brandywine" : "Anteatery"}`}
+              className="absolute bottom-[19px] right-3.5 flex h-8 w-8 items-center justify-center rounded-md bg-white text-sky-700"
+            >
+              <SwapHorizOutlined />
+            </NextLink>
           </div>
         )}
       </div>
 
       {/* Main content container */}
-      <Container
-        maxWidth={false}
-        disableGutters
-        className="mt-4 pb-[50px] mx-auto w-full max-w-[1600px] px-2 md:px-8"
-      >
+      <PageContainer className="pt-4 pb-[50px]">
         <div className="flex flex-col md:flex-row items-start gap-3">
           {/* Left column: menu controls & dishes */}
           <div className="w-full flex-1 md:min-h-[740px] min-w-0 flex flex-col">
@@ -126,10 +143,12 @@ export function RestaurantPage({
               hallEvents={hallEvents}
             />
 
+            {/* On desktop this sits in the sidebar instead */}
+            {!isDesktop && <TodayEvents events={hallEvents} />}
+
             <div className="w-full">
               <DishesView
                 stations={stations}
-                activeStation={activeStation}
                 isLoading={isLoading}
                 isError={isError}
                 error={error as TRPCClientErrorLike<AppRouter> | null}
@@ -150,7 +169,7 @@ export function RestaurantPage({
             />
           )}
         </div>
-      </Container>
+      </PageContainer>
     </Box>
   );
 }

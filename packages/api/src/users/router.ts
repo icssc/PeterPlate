@@ -66,9 +66,34 @@ const onboardProcedure = publicProcedure
     }
   });
 
+const setShowSuitableDishesOnlyProcedure = publicProcedure
+  .input(z.object({ id: z.string(), value: z.boolean() }))
+  .mutation(async ({ ctx: { db }, input }) => {
+    const result = await db
+      .update(users)
+      .set({
+        showSuitableDishesOnly: input.value,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, input.id))
+      .returning()
+      .catch((e) => {
+        console.error(e);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "error updating user setting",
+        });
+      });
+
+    if (result.length === 0)
+      throw new TRPCError({ code: "NOT_FOUND", message: "user not found" });
+  });
+
 export const userRouter = createTRPCRouter({
   get: getUserProcedure,
   upsert: upsertUserProcedure,
   onboard: onboardProcedure,
+  /** Save whether the user only wants to see dishes that suit their preferences/allergies */
+  setShowSuitableDishesOnly: setShowSuitableDishesOnlyProcedure,
   getUserRating: getUserRatingProcedure,
 });

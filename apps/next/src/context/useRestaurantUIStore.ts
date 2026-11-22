@@ -20,19 +20,19 @@ interface RestaurantUIState {
   isCompactView: boolean;
   setIsCompactView: (isCompact: boolean) => void;
 
-  // Preferences filter
-  showPreferencesOnly: boolean;
-  setShowPreferencesOnly: (show: boolean) => void;
-
   // Date picker open state
   isDatePickerOpen: boolean;
   setIsDatePickerOpen: (isOpen: boolean) => void;
 
-  // Popover anchors (not serialisable — not persisted)
-  menuAnchor: HTMLElement | null;
-  setMenuAnchor: (el: HTMLElement | null) => void;
-  scheduleAnchor: HTMLElement | null;
-  setScheduleAnchor: (el: HTMLElement | null) => void;
+  // Mobile filters (collapsed to a date/meal summary row by default)
+  isFiltersExpanded: boolean;
+  setIsFiltersExpanded: (isExpanded: boolean) => void;
+
+  // Mobile drawers
+  isMenuDrawerOpen: boolean;
+  setIsMenuDrawerOpen: (isOpen: boolean) => void;
+  isScheduleDrawerOpen: boolean;
+  setIsScheduleDrawerOpen: (isOpen: boolean) => void;
 }
 
 export const useRestaurantUIStore = create<RestaurantUIState>()((set) => ({
@@ -45,15 +45,15 @@ export const useRestaurantUIStore = create<RestaurantUIState>()((set) => ({
   isCompactView: false,
   setIsCompactView: (isCompact) => set({ isCompactView: isCompact }),
 
-  showPreferencesOnly: false,
-  setShowPreferencesOnly: (show) => set({ showPreferencesOnly: show }),
-
   isDatePickerOpen: false,
   setIsDatePickerOpen: (isOpen) => set({ isDatePickerOpen: isOpen }),
 
-  menuAnchor: null,
-  setMenuAnchor: (el) => set({ menuAnchor: el }),
+  isFiltersExpanded: false,
+  setIsFiltersExpanded: (isExpanded) => set({ isFiltersExpanded: isExpanded }),
 
-  scheduleAnchor: null,
-  setScheduleAnchor: (el) => set({ scheduleAnchor: el }),
+  isMenuDrawerOpen: false,
+  setIsMenuDrawerOpen: (isOpen) => set({ isMenuDrawerOpen: isOpen }),
+
+  isScheduleDrawerOpen: false,
+  setIsScheduleDrawerOpen: (isOpen) => set({ isScheduleDrawerOpen: isOpen }),
 }));

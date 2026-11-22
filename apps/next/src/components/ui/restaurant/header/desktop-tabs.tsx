@@ -1,8 +1,7 @@
 import type { Station } from "@api/index";
-import { GridView, Menu as MenuIcon } from "@mui/icons-material";
-import { Button, Tab, Tabs } from "@mui/material";
+import { Tab, Tabs } from "@mui/material";
 import { useRestaurantUIStore } from "@/context/useRestaurantUIStore";
-import { toTitleCase } from "@/utils/funcs";
+import { scrollToStation, toTitleCase } from "@/utils/funcs";
 
 interface DesktopTabsProps {
   isDesktop: boolean;
@@ -19,8 +18,6 @@ export function DesktopTabs({
 }: DesktopTabsProps) {
   const selectedStation = useRestaurantUIStore((s) => s.selectedStation);
   const setSelectedStation = useRestaurantUIStore((s) => s.setSelectedStation);
-  const isCompactView = useRestaurantUIStore((s) => s.isCompactView);
-  const setIsCompactView = useRestaurantUIStore((s) => s.setIsCompactView);
 
   if (!isDesktop) return null;
 
@@ -31,54 +28,27 @@ export function DesktopTabs({
           value={selectedStation || false}
           onChange={(_event, value: string) => {
             const val = value || "";
-            if (isCompactView) {
-              const element = document.getElementById(val);
-              if (element) {
-                element.scrollIntoView({
-                  behavior: "smooth",
-                  block: "start",
-                });
-              }
-            }
+            scrollToStation(val);
             setSelectedStation(val);
           }}
-          className="flex w-full overflow-x-auto no-scrollbar !bg-primary-accent/20 dark:!bg-[var(--desktop-tabs-bg)] !rounded-lg !p-2 [&_.MuiTabs-flexContainer]:justify-between [&_.MuiTabs-flexContainer]:gap-2 [&_.MuiTabs-indicator]:hidden"
           variant="scrollable"
-          scrollButtons={false}
+          scrollButtons="auto"
+          slotProps={{
+            startScrollButtonIcon: { fontSize: "medium" },
+            endScrollButtonIcon: { fontSize: "medium" },
+          }}
+          className="h-[52px] w-full rounded-lg bg-primary-accent/20 px-2 dark:bg-[var(--desktop-tabs-bg)] [&_.MuiTabs-flexContainer]:h-full [&_.MuiTabs-flexContainer]:justify-between [&_.MuiTabs-flexContainer]:gap-10 [&_.MuiTabs-indicator]:!bg-sky-700 dark:[&_.MuiTabs-indicator]:!bg-blue-300 [&_.MuiTabScrollButton-root]:!text-slate-600 dark:[&_.MuiTabScrollButton-root]:!text-slate-300 [&_.MuiTabScrollButton-root.Mui-disabled]:!opacity-30"
         >
           {stations.map((station) => (
             <Tab
               key={station.name}
               value={station.name.toLowerCase()}
               label={toTitleCase(station.name)}
-              className="!rounded !border !border-transparent !bg-transparent !px-4 !py-1.5 !text-sm !font-medium !text-black dark:!text-white !normal-case !min-h-0 aria-selected:!bg-white dark:aria-selected:!bg-white aria-selected:!text-slate-900 dark:aria-selected:!text-gray-900 aria-selected:!border-slate-200 dark:aria-selected:!border-slate-200 aria-selected:!shadow-sm"
+              className="!whitespace-nowrap !max-w-none !px-4!text-base !font-medium !text-black dark:!text-white !normal-case !min-h-0 aria-selected:!text-sky-700 dark:aria-selected:!text-blue-300"
             />
           ))}
         </Tabs>
       )}
-      {/* Card / compact view toggles */}
-      <div className="flex justify-end mt-2">
-        <div className="flex gap-2">
-          <Button
-            variant="outlined"
-            size="small"
-            type="button"
-            onClick={() => setIsCompactView(false)}
-            className={`!min-w-0 !w-10 !h-10 !p-0 !border-sky-700 dark:!border-blue-300 !normal-case ${!isCompactView ? "!bg-sky-700 !text-white hover:!bg-sky-700 dark:!bg-blue-300 dark:!text-gray-900" : "!bg-white !text-sky-700 hover:!bg-sky-50 dark:!bg-transparent dark:!text-white"}`}
-          >
-            <MenuIcon className="h-5 w-5" />
-          </Button>
-          <Button
-            variant="outlined"
-            size="small"
-            type="button"
-            onClick={() => setIsCompactView(true)}
-            className={`!min-w-0 !w-10 !h-10 !p-0 !border-sky-700 dark:!border-blue-300 !normal-case ${isCompactView ? "!bg-sky-700 !text-white hover:!bg-sky-700 dark:!bg-blue-300 dark:!text-gray-900" : "!bg-white !text-sky-700 hover:!bg-sky-50 dark:!bg-transparent dark:!text-white"}`}
-          >
-            <GridView className="h-5 w-5" />
-          </Button>
-        </div>
-      </div>
     </div>
   );
 }
