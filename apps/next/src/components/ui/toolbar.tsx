@@ -42,6 +42,10 @@ import { WelcomeView } from "./onboarding";
 import SidebarContent from "./sidebar/sidebar-content";
 
 const TOURS_BY_PATH: Record<string, { id: TourId; label: string }> = {
+  "/": {
+    id: "home",
+    label: "Home page tutorial",
+  },
   "/nutrition": {
     id: "nutrition",
     label: "Tracker tutorial",
@@ -75,6 +79,7 @@ export type CalendarRange = {
 type ToolbarElement = {
   /* The display name of the link */
   title: string;
+  tourId?: string;
   /* If present, will hyperlink to the href */
   href?: string;
   /* If present, will create a dropdown of each of the children */
@@ -86,6 +91,7 @@ type ToolbarElement = {
 const DESKTOP_TOOLBAR_ELEMENTS: ToolbarElement[] = [
   {
     title: "Dining Halls",
+    tourId: "tour-home-dining",
     children: [
       {
         title: "Brandywine",
@@ -99,14 +105,17 @@ const DESKTOP_TOOLBAR_ELEMENTS: ToolbarElement[] = [
   },
   {
     title: "Events",
+    tourId: "tour-home-events",
     href: "/events",
   },
   {
     title: "My Foods",
+    tourId: "tour-home-my-foods",
     href: "/my-foods",
   },
   {
     title: "Tracker",
+    tourId: "tour-home-tracker",
     href: "/nutrition",
   },
 ];
@@ -119,21 +128,25 @@ const MOBILE_TOOLBAR_ELEMENTS: ToolbarElement[] = [
   },
   {
     title: "Dining",
+    tourId: "tour-home-dining",
     href: "/brandywine", // defaults to brandywine for now, we'd need to add anteatery
     icon: <RestaurantRoundedIcon />,
   },
   {
     title: "Events",
+    tourId: "tour-home-events",
     href: "/events",
     icon: <InsertInvitation />,
   },
   {
     title: "My Foods",
+    tourId: "tour-home-my-foods",
     href: "/my-foods",
     icon: <FavoriteBorder />,
   },
   {
     title: "Tracker",
+    tourId: "tour-home-tracker",
     href: "/nutrition",
     icon: <ListAltRoundedIcon />,
   },
@@ -166,6 +179,7 @@ function ToolbarDropdown({
   return (
     <>
       <Button
+        id={element.tourId}
         onClick={handleClick}
         endIcon={<ArrowDropDownIcon fontSize="small" />}
         className={`capitalize text-[20px] !font-medium bg-transparent ${
@@ -338,6 +352,7 @@ export function DesktopToolbar(): React.JSX.Element {
               return (
                 <Button
                   key={element.title}
+                  id={element.tourId}
                   component={Link}
                   href={element.href || "#"}
                   className={`normal-case text-[20px] !font-medium ${
@@ -359,6 +374,7 @@ export function DesktopToolbar(): React.JSX.Element {
                 <Tooltip title={tour.label}>
                   <span>
                     <IconButton
+                      id="tour-help-desktop"
                       onClick={() => start(tour.id)}
                       aria-label={`Start ${tour.label.toLowerCase()}`}
                       sx={{ color: isTransparent ? "white" : "text.primary" }}
@@ -657,6 +673,7 @@ function MobileToolbar(): React.JSX.Element {
             <Tooltip title={tour.label}>
               <span>
                 <IconButton
+                  id="tour-help-mobile"
                   onClick={() => start(tour.id)}
                   aria-label={`Start ${tour.label.toLowerCase()}`}
                   sx={{ color: isTransparent ? "white" : "text.primary" }}
@@ -749,6 +766,7 @@ function MobileToolbar(): React.JSX.Element {
               return (
                 <Link
                   key={element.title}
+                  id={element.tourId}
                   href={effectiveHref}
                   className={`
                     flex flex-col items-center justify-center

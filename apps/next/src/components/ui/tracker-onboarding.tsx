@@ -22,7 +22,7 @@ export const CustomTooltip = ({
   return (
     <div
       {...tooltipProps}
-      className="bg-white dark:bg-[#323235] p-5 rounded-lg shadow-xl w-80 flex flex-col gap-2 relative"
+      className="bg-white dark:bg-[#323235] p-5 rounded-lg shadow-xl w-80 max-w-[calc(100vw-2rem)] flex flex-col gap-2 relative"
     >
       <button
         {...skipProps}
