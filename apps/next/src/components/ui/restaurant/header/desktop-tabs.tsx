@@ -1,5 +1,6 @@
 import type { Station } from "@api/index";
 import { Tab, Tabs } from "@mui/material";
+import { useRef } from "react";
 import { useRestaurantUIStore } from "@/context/useRestaurantUIStore";
 import { scrollToStation, toTitleCase } from "@/utils/funcs";
 
@@ -13,32 +14,49 @@ interface DesktopTabsProps {
 // Width of the edge fade set in the Tabs className.
 const FADE_PX = 40;
 
-// Scroll a clicked tab out of the edge fade. MUI first scrolls a partly hidden
-// tab only to the edge, so wait for that to finish before moving it on.
-function scrollPastFade(tab: Element, framesLeft = 60, waited = false) {
+// Scroll a clicked tab out of the edge fade, selecting it once it is fully in
+// view. Selecting a cut-off tab makes MUI first scroll it only to the edge.
+// Returns a function that cancels the pending selection.
+function scrollPastFade(tab: Element, select: () => void) {
   const scroller = tab.closest(".MuiTabs-scroller");
-  if (!scroller) return;
-  const t = tab.getBoundingClientRect();
-  const s = scroller.getBoundingClientRect();
-  if (t.left < s.left - 1 || t.right > s.right + 1) {
-    if (framesLeft > 0)
-      requestAnimationFrame(() => scrollPastFade(tab, framesLeft - 1, true));
-    return;
+  if (!scroller) {
+    select();
+    return () => {};
   }
-  if (waited) {
-    // The tab reaches the edge in MUI's last few frames; let them finish.
-    setTimeout(() => scrollPastFade(tab), 100);
-    return;
-  }
-  const delta =
-    t.left < s.left + FADE_PX
-      ? t.left - s.left - FADE_PX
-      : Math.max(0, t.right - s.right + FADE_PX);
-  if (delta)
-    scroller.scrollTo({
-      left: scroller.scrollLeft + delta,
-      behavior: "smooth",
-    });
+  // How far the tab sticks out past each side of the scroller.
+  const overhang = () => {
+    const tabRect = tab.getBoundingClientRect();
+    const scrollerRect = scroller.getBoundingClientRect();
+    return {
+      left: scrollerRect.left - tabRect.left,
+      right: tabRect.right - scrollerRect.right,
+    };
+  };
+  const { left, right } = overhang();
+  const target = Math.min(
+    Math.max(
+      0,
+      scroller.scrollLeft +
+        (left > -FADE_PX ? -left - FADE_PX : Math.max(0, right + FADE_PX)),
+    ),
+    scroller.scrollWidth - scroller.clientWidth,
+  );
+  scroller.scrollTo({ left: target, behavior: "smooth" });
+
+  let frame = 0;
+  let framesLeft = 60;
+  const selectInView = () => {
+    const { left, right } = overhang();
+    if (
+      (left <= 0 && right <= 0) ||
+      Math.abs(scroller.scrollLeft - target) < 1 ||
+      framesLeft-- === 0
+    )
+      select();
+    else frame = requestAnimationFrame(selectInView);
+  };
+  selectInView();
+  return () => cancelAnimationFrame(frame);
 }
 
 export function DesktopTabs({
@@ -49,6 +67,7 @@ export function DesktopTabs({
 }: DesktopTabsProps) {
   const selectedStation = useRestaurantUIStore((s) => s.selectedStation);
   const setSelectedStation = useRestaurantUIStore((s) => s.setSelectedStation);
+  const cancelSelect = useRef<() => void>(undefined);
 
   if (!isDesktop) return null;
 
@@ -60,8 +79,10 @@ export function DesktopTabs({
           onChange={(event, value: string) => {
             const val = value || "";
             scrollToStation(val);
-            setSelectedStation(val);
-            scrollPastFade(event.currentTarget);
+            cancelSelect.current?.();
+            cancelSelect.current = scrollPastFade(event.currentTarget, () =>
+              setSelectedStation(val),
+            );
           }}
           variant="scrollable"
           scrollButtons
