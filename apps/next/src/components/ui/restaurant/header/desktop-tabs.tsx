@@ -10,6 +10,37 @@ interface DesktopTabsProps {
   stations: Station[];
 }
 
+// Width of the edge fade set in the Tabs className.
+const FADE_PX = 40;
+
+// Scroll a clicked tab out of the edge fade. MUI first scrolls a partly hidden
+// tab only to the edge, so wait for that to finish before moving it on.
+function scrollPastFade(tab: Element, framesLeft = 60, waited = false) {
+  const scroller = tab.closest(".MuiTabs-scroller");
+  if (!scroller) return;
+  const t = tab.getBoundingClientRect();
+  const s = scroller.getBoundingClientRect();
+  if (t.left < s.left - 1 || t.right > s.right + 1) {
+    if (framesLeft > 0)
+      requestAnimationFrame(() => scrollPastFade(tab, framesLeft - 1, true));
+    return;
+  }
+  if (waited) {
+    // The tab reaches the edge in MUI's last few frames; let them finish.
+    setTimeout(() => scrollPastFade(tab), 100);
+    return;
+  }
+  const delta =
+    t.left < s.left + FADE_PX
+      ? t.left - s.left - FADE_PX
+      : Math.max(0, t.right - s.right + FADE_PX);
+  if (delta)
+    scroller.scrollTo({
+      left: scroller.scrollLeft + delta,
+      behavior: "smooth",
+    });
+}
+
 export function DesktopTabs({
   isDesktop,
   isLoading,
@@ -26,10 +57,11 @@ export function DesktopTabs({
       {!isLoading && !isError && stations.length > 0 && (
         <Tabs
           value={selectedStation || false}
-          onChange={(_event, value: string) => {
+          onChange={(event, value: string) => {
             const val = value || "";
             scrollToStation(val);
             setSelectedStation(val);
+            scrollPastFade(event.currentTarget);
           }}
           variant="scrollable"
           scrollButtons
