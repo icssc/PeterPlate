@@ -32,6 +32,8 @@ export function SignInButton({
     try {
       const authUrl = await getSignInUrl(provider, {
         returnUrl: `${window.location.pathname}${window.location.search}${window.location.hash}`,
+        // Without this, ICSSC auth reuses any existing session and ignores the chosen provider.
+        authorizationUrlParams: { prompt: "consent" },
       });
       window.location.href = authUrl;
     } catch (error) {

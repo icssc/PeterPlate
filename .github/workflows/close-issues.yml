@@ -1,0 +1,39 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/SchemaStore/schemastore/master/src/schemas/json/github-workflow.json
+---
+name: Close linked issues
+
+# GitHub only auto-closes issues on merges into the default branch (main), so close them on merges into dev.
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - dev
+
+permissions:
+  issues: write
+  pull-requests: read
+
+jobs:
+  close-issues:
+    if: github.event.pull_request.merged
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Close issues referenced with closing keywords
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const { body, number } = context.payload.pull_request;
+            // One keyword covers a whole list: "Closes #1, #2 and #3".
+            const lists = (body ?? "").matchAll(/\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?):?\s+#\d+\b(?:[ \t]*,?[ \t]*(?:(?:and|&)[ \t]*)?#\d+\b)*/gi);
+            const issues = new Set([...lists].flatMap(([list]) => list.match(/\d+/g)).map(Number));
+
+            for (const issue_number of issues) {
+              const { data: issue } = await github.rest.issues.get({ ...context.repo, issue_number });
+              if (issue.pull_request || issue.state === "closed") continue;
+
+              await github.rest.issues.createComment({ ...context.repo, issue_number, body: `Closed by #${number}, merged into dev.` });
+              await github.rest.issues.update({ ...context.repo, issue_number, state: "closed", state_reason: "completed" });
+            }
