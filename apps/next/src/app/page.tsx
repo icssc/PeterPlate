@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 
 import PopularDishCard from "@/components/ui/card/popular-dish-card";
 import UpcomingEventCard from "@/components/ui/card/upcoming-event-card";
+import HomeOnboarding from "@/components/ui/home-onboarding";
 import OnboardingDialog from "@/components/ui/onboarding";
 import PageContainer from "@/components/ui/page-container";
 import { useDate } from "@/context/date-context";
@@ -118,6 +119,7 @@ export default function Home() {
   return (
     <>
       {showOnboardDialog && <OnboardingDialog />}
+      <HomeOnboarding />
       {isDesktop ? <DesktopHome /> : <MobileHome />}
     </>
   );
