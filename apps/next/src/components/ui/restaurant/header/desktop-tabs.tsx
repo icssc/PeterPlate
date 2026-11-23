@@ -1,14 +1,62 @@
 import type { Station } from "@api/index";
-import { GridView, Menu as MenuIcon } from "@mui/icons-material";
-import { Button, Tab, Tabs } from "@mui/material";
+import { Tab, Tabs } from "@mui/material";
+import { useRef } from "react";
 import { useRestaurantUIStore } from "@/context/useRestaurantUIStore";
-import { toTitleCase } from "@/utils/funcs";
+import { scrollToStation, toTitleCase } from "@/utils/funcs";
 
 interface DesktopTabsProps {
   isDesktop: boolean;
   isLoading: boolean;
   isError: boolean;
   stations: Station[];
+}
+
+// Width of the edge fade set in the Tabs className.
+const FADE_PX = 40;
+
+// Scroll a clicked tab out of the edge fade, selecting it once it is fully in
+// view. Selecting a cut-off tab makes MUI first scroll it only to the edge.
+// Returns a function that cancels the pending selection.
+function scrollPastFade(tab: Element, select: () => void) {
+  const scroller = tab.closest(".MuiTabs-scroller");
+  if (!scroller) {
+    select();
+    return () => {};
+  }
+  // How far the tab sticks out past each side of the scroller.
+  const overhang = () => {
+    const tabRect = tab.getBoundingClientRect();
+    const scrollerRect = scroller.getBoundingClientRect();
+    return {
+      left: scrollerRect.left - tabRect.left,
+      right: tabRect.right - scrollerRect.right,
+    };
+  };
+  const { left, right } = overhang();
+  const target = Math.min(
+    Math.max(
+      0,
+      scroller.scrollLeft +
+        (left > -FADE_PX ? -left - FADE_PX : Math.max(0, right + FADE_PX)),
+    ),
+    scroller.scrollWidth - scroller.clientWidth,
+  );
+  scroller.scrollTo({ left: target, behavior: "smooth" });
+
+  let frame = 0;
+  let framesLeft = 60;
+  const selectInView = () => {
+    const { left, right } = overhang();
+    if (
+      (left <= 0 && right <= 0) ||
+      Math.abs(scroller.scrollLeft - target) < 1 ||
+      framesLeft-- === 0
+    )
+      select();
+    else frame = requestAnimationFrame(selectInView);
+  };
+  selectInView();
+  return () => cancelAnimationFrame(frame);
 }
 
 export function DesktopTabs({
@@ -19,8 +67,7 @@ export function DesktopTabs({
 }: DesktopTabsProps) {
   const selectedStation = useRestaurantUIStore((s) => s.selectedStation);
   const setSelectedStation = useRestaurantUIStore((s) => s.setSelectedStation);
-  const isCompactView = useRestaurantUIStore((s) => s.isCompactView);
-  const setIsCompactView = useRestaurantUIStore((s) => s.setIsCompactView);
+  const cancelSelect = useRef<() => void>(undefined);
 
   if (!isDesktop) return null;
 
@@ -29,56 +76,28 @@ export function DesktopTabs({
       {!isLoading && !isError && stations.length > 0 && (
         <Tabs
           value={selectedStation || false}
-          onChange={(_event, value: string) => {
+          onChange={(event, value: string) => {
             const val = value || "";
-            if (isCompactView) {
-              const element = document.getElementById(val);
-              if (element) {
-                element.scrollIntoView({
-                  behavior: "smooth",
-                  block: "start",
-                });
-              }
-            }
-            setSelectedStation(val);
+            scrollToStation(val);
+            cancelSelect.current?.();
+            cancelSelect.current = scrollPastFade(event.currentTarget, () =>
+              setSelectedStation(val),
+            );
           }}
-          className="flex w-full overflow-x-auto no-scrollbar !bg-primary-accent/20 dark:!bg-[var(--desktop-tabs-bg)] !rounded-lg !p-2 [&_.MuiTabs-flexContainer]:justify-between [&_.MuiTabs-flexContainer]:gap-2 [&_.MuiTabs-indicator]:hidden"
           variant="scrollable"
-          scrollButtons={false}
+          scrollButtons
+          className="h-[42px] min-h-0 w-full rounded-md bg-primary-accent/20 dark:bg-[var(--desktop-tabs-bg)] [&_.MuiTabs-flexContainer]:h-full [&_.MuiTabs-flexContainer]:justify-between [&_.MuiTabs-indicator]:!bg-[var(--primary-accent-hex)] dark:[&_.MuiTabs-indicator]:!bg-[var(--primary-accent-light)] [&_.MuiTabScrollButton-root]:!text-black dark:[&_.MuiTabScrollButton-root]:!text-slate-300 [&_.MuiTabScrollButton-root.Mui-disabled]:!opacity-[0.26] [&_.MuiTabs-scroller]:[mask-image:linear-gradient(to_right,transparent,black_var(--fade-l,0px),black_calc(100%_-_var(--fade-r,0px)),transparent)] [&_.MuiTabScrollButton-root:not(.Mui-disabled)~.MuiTabs-scroller]:[--fade-l:40px] [&_.MuiTabs-scroller:has(+.MuiTabScrollButton-root:not(.Mui-disabled))]:[--fade-r:40px]"
         >
           {stations.map((station) => (
             <Tab
               key={station.name}
               value={station.name.toLowerCase()}
               label={toTitleCase(station.name)}
-              className="!rounded !border !border-transparent !bg-transparent !px-4 !py-1.5 !text-sm !font-medium !text-black dark:!text-white !normal-case !min-h-0 aria-selected:!bg-white dark:aria-selected:!bg-white aria-selected:!text-slate-900 dark:aria-selected:!text-gray-900 aria-selected:!border-slate-200 dark:aria-selected:!border-slate-200 aria-selected:!shadow-sm"
+              className="!whitespace-nowrap !max-w-none !min-w-0 !px-3 !tracking-[0.4px] !font-medium !text-black dark:!text-white !normal-case !min-h-0 aria-selected:!font-semibold aria-selected:!text-[var(--primary-accent-hex)] dark:aria-selected:!text-[var(--primary-accent-light)]"
             />
           ))}
         </Tabs>
       )}
-      {/* Card / compact view toggles */}
-      <div className="flex justify-end mt-2">
-        <div className="flex gap-2">
-          <Button
-            variant="outlined"
-            size="small"
-            type="button"
-            onClick={() => setIsCompactView(false)}
-            className={`!min-w-0 !w-10 !h-10 !p-0 !border-sky-700 dark:!border-blue-300 !normal-case ${!isCompactView ? "!bg-sky-700 !text-white hover:!bg-sky-700 dark:!bg-blue-300 dark:!text-gray-900" : "!bg-white !text-sky-700 hover:!bg-sky-50 dark:!bg-transparent dark:!text-white"}`}
-          >
-            <MenuIcon className="h-5 w-5" />
-          </Button>
-          <Button
-            variant="outlined"
-            size="small"
-            type="button"
-            onClick={() => setIsCompactView(true)}
-            className={`!min-w-0 !w-10 !h-10 !p-0 !border-sky-700 dark:!border-blue-300 !normal-case ${isCompactView ? "!bg-sky-700 !text-white hover:!bg-sky-700 dark:!bg-blue-300 dark:!text-gray-900" : "!bg-white !text-sky-700 hover:!bg-sky-50 dark:!bg-transparent dark:!text-white"}`}
-          >
-            <GridView className="h-5 w-5" />
-          </Button>
-        </div>
-      </div>
     </div>
   );
 }

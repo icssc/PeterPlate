@@ -38,7 +38,6 @@ export async function addDietaryPreferences(
     );
 
     const results = await Promise.all(upsertPromises);
-    console.log(`Successfully synced ${results.length} preferences.`);
   } catch (error) {
     console.error("Failed to save dietary preferences.");
   }

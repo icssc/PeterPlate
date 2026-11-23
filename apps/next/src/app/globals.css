@@ -1,3 +1,5 @@
+@layer theme, base, mui, components, utilities;
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -178,6 +180,51 @@ body {
   background-color: var(--surface-modal) !important;
 }
 
+/* Calendar spacing: padded cells, inset chips, smaller text */
+.events-calendar-wrapper .rbc-header {
+  padding: 8px 0;
+}
+
+.events-calendar-wrapper .rbc-date-cell {
+  padding: 6px 8px 2px;
+  font-size: 0.875rem;
+}
+
+.events-calendar-wrapper .rbc-row-segment {
+  padding: 0 6px 3px;
+}
+
+.events-calendar-wrapper .rbc-event {
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
+/* Multi-day events: an outlined ribbon instead of a solid bar */
+.events-calendar-wrapper .rbc-event.multi-day-event {
+  border-radius: 9999px;
+  font-weight: 500;
+  background-color: var(--surface-tinted) !important;
+  box-shadow: inset 0 0 0 1px var(--donut-calories-value);
+  color: var(--donut-calories-value) !important;
+}
+
+.dark .events-calendar-wrapper .rbc-event.multi-day-event {
+  box-shadow: inset 0 0 0 1px var(--primary-accent-light);
+  color: var(--primary-accent-light) !important;
+}
+
+.events-calendar-wrapper .rbc-event.multi-day-event.rbc-event-continues-prior {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.events-calendar-wrapper .rbc-event.multi-day-event.rbc-event-continues-after {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
 /* Light mode calendar borders */
 .events-calendar-wrapper .rbc-month-view,
 .events-calendar-wrapper .rbc-day-bg+.rbc-day-bg,
@@ -194,13 +241,24 @@ body {
   border-color: var(--primary-accent-light) !important;
 }
 
-/* Today's date highlight */
-.events-calendar-wrapper .rbc-today {
-  background-color: var(--calendar-today-bg) !important;
+/* Today's date highlight: a rounded card inset in the cell */
+.events-calendar-wrapper .rbc-day-bg.rbc-today {
+  position: relative;
+  background-color: transparent !important;
 }
 
-.dark .events-calendar-wrapper .rbc-day-bg.rbc-today {
-  background-color: var(--calendar-today-bg-dark) !important;
+.events-calendar-wrapper .rbc-day-bg.rbc-today::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border: 2px solid var(--donut-calories-value);
+  border-radius: 14px;
+  background-color: var(--calendar-today-bg);
+}
+
+.dark .events-calendar-wrapper .rbc-day-bg.rbc-today::after {
+  border-color: var(--primary-accent-light);
+  background-color: var(--calendar-today-bg-dark);
 }
 
 /* Date picker light mode */

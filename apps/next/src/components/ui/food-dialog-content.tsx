@@ -1,8 +1,15 @@
 "use client"; // Need state for toggling nutrient visibility
 
-import { Add, StarBorder } from "@mui/icons-material";
+import { Add, Close, StarBorder } from "@mui/icons-material";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
-import { Box, Button, DialogContent, Tooltip, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  DialogContent,
+  IconButton,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import type { DishWithRating } from "@peterplate/validators";
 import Image from "next/image";
 import { useState } from "react";
@@ -43,14 +50,15 @@ export default function FoodDialogContent({
   restaurant,
   onAddToMealTracker,
   isAddingToMealTracker = false,
+  onClose,
 }: {
   dish: DishWithRating;
   restaurant?: "brandywine" | "anteatery";
   onAddToMealTracker?: OnAddToMealTracker;
   isAddingToMealTracker?: boolean;
+  onClose?: () => void;
 }) {
   const violations = useDietaryConflicts(dish.dietRestriction);
-  const [showAllNutrients, setShowAllNutrients] = useState(false);
   const [imageError, setImageError] = useState(false);
   const showImage =
     typeof dish.imageUrl === "string" &&
@@ -86,24 +94,41 @@ export default function FoodDialogContent({
 
   return (
     <div className="font-poppins flex flex-col max-h-[90vh] dark:bg-[var(--surface-modal)]">
-      {showImage ? (
-        <Image
-          src={dish.imageUrl as string}
-          alt={formatFoodName(dish.name)}
-          width={800}
-          height={160}
-          className="w-full h-40 object-cover"
-          onError={() => setImageError(true)}
-        />
-      ) : (
-        <Image
-          src={"/zm-card-header.webp"}
-          alt={"An image of PeterPlate's logo."}
-          width={1200}
-          height={700}
-          className="w-full h-40 object-cover"
-        />
-      )}
+      <div className="relative shrink-0">
+        {onClose && (
+          <IconButton
+            onClick={onClose}
+            aria-label="Close"
+            sx={{
+              position: "absolute",
+              top: 8,
+              right: 8,
+              zIndex: 1,
+              color: "black",
+            }}
+          >
+            <Close />
+          </IconButton>
+        )}
+        {showImage ? (
+          <Image
+            src={dish.imageUrl as string}
+            alt={formatFoodName(dish.name)}
+            width={800}
+            height={160}
+            className="w-full h-40 object-cover"
+            onError={() => setImageError(true)}
+          />
+        ) : (
+          <Image
+            src={"/zm-card-header.webp"}
+            alt={"An image of PeterPlate's logo."}
+            width={1200}
+            height={700}
+            className="w-full h-40 object-cover"
+          />
+        )}
+      </div>
       <div className="max-w-lg mx-auto w-full flex-1 min-h-0 flex flex-col">
         <DialogContent
           sx={{
@@ -188,7 +213,7 @@ export default function FoodDialogContent({
                   className="px-4"
                   sx={{ fontSize: "1.5rem" }}
                 >
-                  Nutrients
+                  Nutrition Facts
                 </Typography>
                 <Box
                   className="grid grid-cols-2 gap-x-4 w-full px-4 mb-4"
@@ -207,19 +232,10 @@ export default function FoodDialogContent({
                           nutrientKey,
                           value?.toString() ?? "0",
                         );
-                        const isInitial =
-                          initialNutrients.includes(nutrientKey); // Use nutrientKey here too for consistency
                         return (
                           <div
                             key={nutrientKey}
-                            className={cn(
-                              "grid grid-cols-subgrid col-span-2",
-                              "transition-all duration-500 ease-in-out",
-                              "overflow-hidden dark:text-zinc-300",
-                              !isInitial && !showAllNutrients
-                                ? "max-h-0 opacity-0 py-0"
-                                : "max-h-8 opacity-100 py-0.5",
-                            )}
+                            className="grid grid-cols-subgrid col-span-2 py-0.5 dark:text-zinc-300"
                           >
                             <strong
                               className={cn(
@@ -253,24 +269,6 @@ export default function FoodDialogContent({
                   </h2>
                 )}
                 <div className="px-4 flex flex-col gap-2">
-                  {caloricInformationAvailable && (
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      className="w-full whitespace-nowrap border-input hover:bg-accent hover:text-accent-foreground text-sm font-medium h-8 rounded-md normal-case"
-                      sx={{
-                        borderColor: "hsl(var(--input))",
-                        color: "inherit",
-                        "&:hover": {
-                          borderColor: "hsl(var(--input))",
-                          backgroundColor: "hsl(var(--accent))",
-                        },
-                      }}
-                      onClick={() => setShowAllNutrients(!showAllNutrients)}
-                    >
-                      {showAllNutrients ? "Show Less" : "Show More Nutrients"}
-                    </Button>
-                  )}
                   {ingredientsAvailable && (
                     <IngredientsDialog
                       name={dish.name}
@@ -308,29 +306,44 @@ export default function FoodDialogContent({
               }}
             >
               <div className="px-4 pt-2 pb-6 shrink-0">
-                <button
+                <Box
+                  component="button"
                   type="button"
-                  disabled={true}
-                  className="w-full inline-flex h-[30px] justify-center items-center gap-0.5 rounded-md border border-gray-300 dark:border-zinc-600 bg-white dark:bg-transparent text-[12px] font-normal leading-[18px] text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-700 disabled:opacity-60"
+                  disabled
+                  className="w-full inline-flex h-10 justify-center items-center gap-0.5 rounded-md text-[12px] font-medium leading-[18px] disabled:opacity-60"
+                  sx={{
+                    bgcolor: "primary.main",
+                    color: "primary.contrastText",
+                    border: "none",
+                    fontFamily: "Poppins, sans-serif",
+                  }}
                 >
                   <Add sx={{ fontSize: 18, width: 18, height: 18 }} />
                   Add to Meal Tracker
-                </button>
+                </Box>
               </div>
             </Tooltip>
           )}
           {userId && onAddToMealTracker && (
             <div className="px-4 pt-2 pb-6 shrink-0">
-              <button
+              <Box
+                component="button"
                 type="button"
                 onClick={onAddToMealTracker}
                 disabled={isAddingToMealTracker}
-                className="w-full inline-flex h-[30px] justify-center items-center gap-0.5 rounded-md border border-gray-500 dark:border-zinc-300 bg-white dark:bg-transparent text-[12px] font-normal leading-[18px] text-zinc-500 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700 disabled:opacity-60"
-                style={{ fontFamily: "Poppins, sans-serif" }}
+                className="w-full inline-flex h-10 justify-center items-center gap-0.5 rounded-md text-[12px] font-medium leading-[18px] disabled:opacity-60"
+                sx={{
+                  bgcolor: "primary.main",
+                  color: "primary.contrastText",
+                  border: "none",
+                  cursor: "pointer",
+                  fontFamily: "Poppins, sans-serif",
+                  "&:hover:not(:disabled)": { bgcolor: "primary.dark" },
+                }}
               >
                 <Add sx={{ fontSize: 18, width: 18, height: 18 }} />
                 Add to Meal Tracker
-              </button>
+              </Box>
             </div>
           )}
         </DialogContent>

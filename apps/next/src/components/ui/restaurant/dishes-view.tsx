@@ -5,13 +5,13 @@ import { useMemo } from "react";
 import DishesInfo from "@/components/ui/dishes-info";
 import { useRestaurantUIStore } from "@/context/useRestaurantUIStore";
 import { useUserStore } from "@/context/useUserStore";
+import { useShowSuitableDishesOnly } from "@/hooks/useShowSuitableDishesOnly";
 import { getDietaryConflicts } from "@/utils/dietary";
 import { toTitleCase } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
 
 interface DishesViewProps {
   stations: Station[];
-  activeStation: Station | undefined;
   isLoading: boolean;
   isError: boolean;
   error: TRPCClientErrorLike<AppRouter> | null;
@@ -20,16 +20,13 @@ interface DishesViewProps {
 
 export function DishesView({
   stations,
-  activeStation,
   isLoading,
   isError,
   error,
   hallData,
 }: DishesViewProps) {
   const isCompactView = useRestaurantUIStore((s) => s.isCompactView);
-  const showPreferencesOnly = useRestaurantUIStore(
-    (s) => s.showPreferencesOnly,
-  );
+  const { showSuitableDishesOnly } = useShowSuitableDishesOnly();
 
   const errorMessage =
     error?.message ??
@@ -43,14 +40,13 @@ export function DishesView({
     userId: userId ?? "",
   });
 
-  // Pre-compute filtered dishes for every station so toggling isCompactView
-  // (which switches from single-station to all-stations) doesn't recompute
-  // getDietaryConflicts for every dish on each render.
+  // Pre-compute filtered dishes for every station so there's no
+  // recomputing getDietaryConflicts for every dish on each render.
   const filteredDishesMap = useMemo(() => {
     return new Map(
       stations.map((station) => [
         station.name,
-        showPreferencesOnly && allergies && preferences
+        showSuitableDishesOnly && allergies && preferences
           ? station.dishes.filter(
               (dish) =>
                 getDietaryConflicts(
@@ -62,66 +58,40 @@ export function DishesView({
           : station.dishes,
       ]),
     );
-  }, [stations, showPreferencesOnly, preferences, allergies]);
+  }, [stations, showSuitableDishesOnly, preferences, allergies]);
 
   return (
     <div className="w-full">
-      {isCompactView
-        ? // Compact View: Render ALL stations
-          stations.map((station) => (
-            <div
-              key={station.name}
-              id={station.name.toLowerCase()}
-              className="[&_#food-scroll]:h-auto [&_#food-scroll]:overflow-y-visible mb-8 scroll-mt-4"
-            >
-              <div className="my-4">
-                <Typography
-                  variant="h5"
-                  fontWeight={700}
-                  color="text.primary"
-                  className="w-full bg-primary-accent/20 pl-4 py-2 rounded-xl text-sky-700 dark:bg-[#46566a] dark:text-white"
-                  sx={{ fontSize: "1.875rem" }}
-                >
-                  {toTitleCase(station.name)}
-                </Typography>
-              </div>
-              <DishesInfo
-                dishes={filteredDishesMap.get(station.name) ?? station.dishes}
-                isLoading={isLoading}
-                isError={isError || (!isLoading && !hallData)}
-                errorMessage={errorMessage}
-                isCompactView={isCompactView}
-                restaurant={hallData?.name ?? "brandywine"}
-              />
+      {
+        // Renders ALL stations
+        stations.map((station) => (
+          <div
+            key={station.name}
+            id={station.name.toLowerCase()}
+            className="[&_#food-scroll]:h-auto [&_#food-scroll]:overflow-y-visible mb-8 scroll-mt-4"
+          >
+            <div className="my-4">
+              <Typography
+                variant="h5"
+                fontWeight={700}
+                color="text.primary"
+                className="w-full bg-primary-accent/20 pl-4 py-2 rounded-xl text-sky-700 dark:bg-[#46566a] dark:text-white"
+                sx={{ fontSize: "1.875rem" }}
+              >
+                {toTitleCase(station.name)}
+              </Typography>
             </div>
-          ))
-        : // Normal View: Render active station
-          activeStation && (
-            <div className="[&_#food-scroll]:h-auto [&_#food-scroll]:overflow-y-visible">
-              <div className="my-4">
-                <Typography
-                  variant="h5"
-                  fontWeight={700}
-                  color="text.primary"
-                  sx={{ fontSize: "1.875rem" }}
-                  className="w-full bg-primary-accent/20 pl-4 py-2 rounded-xl text-sky-700 dark:bg-[#46566a] dark:text-white"
-                >
-                  {toTitleCase(activeStation.name)}
-                </Typography>
-              </div>
-              <DishesInfo
-                dishes={
-                  filteredDishesMap.get(activeStation.name) ??
-                  activeStation.dishes
-                }
-                isLoading={isLoading}
-                isError={isError || (!isLoading && !hallData)}
-                errorMessage={errorMessage}
-                restaurant={hallData?.name ?? "brandywine"}
-                isCompactView={isCompactView}
-              />
-            </div>
-          )}
+            <DishesInfo
+              dishes={filteredDishesMap.get(station.name) ?? station.dishes}
+              isLoading={isLoading}
+              isError={isError || (!isLoading && !hallData)}
+              errorMessage={errorMessage}
+              isCompactView={isCompactView}
+              restaurant={hallData?.name ?? "brandywine"}
+            />
+          </div>
+        ))
+      }
     </div>
   );
 }

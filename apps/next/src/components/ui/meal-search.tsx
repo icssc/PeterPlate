@@ -353,13 +353,14 @@ export default function MealSearchDialog(props: MealSearchDialogProps) {
   return (
     <>
       <Fab
+        id="tour-fab-search-btn"
         size="large"
         aria-label="Search meals"
         onClick={handleOpen}
         sx={{
           position: "fixed",
-          bottom: 80,
-          right: 32,
+          bottom: isDesktop ? 40 : 100,
+          right: 40,
           backgroundColor: colors.sky700,
           "&:hover": { backgroundColor: colors.sky800 },
           color: "white",

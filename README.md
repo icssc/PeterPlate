@@ -59,14 +59,10 @@ erDiagram
       token text
    }
 
-   dishes_to_menus {
-      menu_id text
-      dish_id text
-   }
-
-   pins {
+   favorites {
       user_id text
       dish_id text
+      restaurant restaurant_id_enum
       created_at timestamp
       updated_at timestamp
    }
@@ -74,18 +70,15 @@ erDiagram
    ratings {
       user_id text PK,FK
       dish_id text PK,FK
-      rating smallint
+      restaurant restaurant_id_enum
+      rating real
       created_at timestamp
       updated_at timestamp
    }
 
    dishes {
       id text PK
-      station_id text FK
-      name text
-      description text
-      category text
-      num_ratings intger
+      num_ratings integer
       total_rating integer
       created_at timestamp
       updated_at timestamp
@@ -94,16 +87,10 @@ erDiagram
    users {
       id text PK
       name text
-      created_at timestamp
-      updated_at timestamp
-   }
-
-   menus {
-      id text PK
-      period_id text FK
-      date date
-      restaurant_id restaurant_id_enum
-      price text
+      email text
+      emailVerified boolean
+      hasOnboarded boolean
+      image text
       created_at timestamp
       updated_at timestamp
    }
@@ -130,93 +117,56 @@ erDiagram
       updated_at timestamp
    }
 
-   nutrition_infos {
-      dish_id text PK,FK
-      serving_size text
-      serving_unit text
-      calories text
-      total_fat_g text
-      trans_fat_g text
-      saturated_fat_g text
-      cholesterol_mg text
-      sodium_mg text
-      total_carbs_g text
-      dietary_fiber_g text
-      sugars_mg text
-      protein_g text
-      vitamin_a_iu text
-      vitamin_c_iu text
-      calcium_mg text
-      iron_mg text
-      created_at timestamp
-      updated_at timestamp
+   logged_meals {
+      id uuid PK
+      user_id text FK
+      dish_id text FK
+      servings real
+      eaten_at timestamp
    }
 
-   stations {
-      id text PK
-      name text
-      restaurant_id restaurant_id_enum
-      created_at timestamp
-      updated_at timestamp
+   user_allergies {
+      userId text PK,FK
+      allergy allergy PK
    }
 
-   events {
-      title text PK
-      restaurant_id restaurant_id_enum PK,FK
-      short_description text
-      long_description text
-      start timestamp PK
-      end timestamp
-      created_at timestamp
-      updated_at timestamp
+   user_dietary_preferences {
+      userId text PK,FK
+      preference preference PK
    }
 
-   periods {
-      id text PK
-      start time
-      end time
-      name text
-      created_at timestamp
-      updated_at timestamp
-   }
-
-   restaurants {
-      id restaurant_id_enum PK
-      name restaurant_name_enum
-      created_at timestamp
-      update_at timestamp
+   user_goals {
+      user_id text PK,FK
+      calorie_goal integer
+      protein_goal integer
+      carb_goal integer
+      fat_goal integer
    }
 
    restaurant_id_enum
 
    restaurant_name_enum
 
-   dishes_to_menus }o--|| menus : has
-   dishes_to_menus }o--|| dishes : has
+   allergy
 
-   pins }o--|| users : refers
-   pins }o--|| dishes : refers
+   preference
+
+   favorites }o--|| users : refers
+   favorites }o--|| dishes : refers
+   favorites }o--|| restaurant_id_enum : refers
 
    ratings }o--|| users : refers
-   ratings ||--|| dishes : refers
+   ratings }o--|| dishes : refers
+   ratings }o--|| restaurant_id_enum : refers
 
    dishes ||--|| diet_restrictions : refers
-   dishes ||--|| nutrition_infos : refers
-   dishes }o--|| stations : refers
-
-   menus ||--|| periods : refers
-   menus ||--|| restaurant_id_enum : has
-   menus ||--|| restaurants : refers
-
-   stations }o--|| restaurants : refers
-
-   stations ||--|| restaurant_id_enum : refers
-
-   events ||--|| restaurant : occurs
-   events ||--|| restaurant_id_enum : refers
-
-   restaurants ||--|| restaurant_id_enum : refers
-   restaurants ||--|| restaurant_name_enum : refers
+   logged_meals }o--|| users : refers
+   logged_meals }o--|| dishes : refers
+   user_allergies }o--|| users : refers
+   user_allergies }o--|| allergy : refers
+   user_dietary_preferences }o--|| users : refers
+   user_dietary_preferences }o--|| preference : refers
+   user_goals ||--|| users : refers
 
 ```
 
@@ -256,12 +206,11 @@ erDiagram
 3. While still in the root directory and install the dependencies by running
    `cd PeterPlate && pnpm install`
 
-4. To start a local Postgres container database run the `docker compose up` in the root directory.
-   This will automatically set up and run a test database using docker.
+4. To start a local Postgres container database run the `docker compose up` in the root directory. This will automatically set up and run a test database using docker.
 
-5. Create a new file called `.env` based on the example given in `.env.development`
-
-6. Run `pnpm db:push` to push the schema to the docker database.
+5. Open another terminal. If you made any database changes, run `pnpm db:generate` to generate a migration file. Run `pnpm db:migrate` to apply the migration files to the docker database.
+   
+6. In the root file, create a new file called `.env` based on the example variables given in `.env.example`. Do the same in `apps/next`. Ensure that all variables are nonempty to run the app properly.
 
 7. Start local development by running `pnpm dev` in the root directory. This will start the server in `apps/server` and the client in `apps/next`.
    The tRPC procedures are available on <http://localhost:3000/><router.procedure\>?input={field: value}
@@ -271,9 +220,7 @@ erDiagram
    http://localhost:3000/events.get
    ```
 
-8. Pull the latest CampusDish data into your local database by running `pnpm dev:data`.
-
-9. View the local website at [http://localhost:3000](http://localhost:3000). As you make changes to the Next.js application, those changes will be automatically
+8.  View the local website at [http://localhost:3000](http://localhost:3000). As you make changes to the Next.js application, those changes will be automatically
    reflected on the local website.
 
 ### Troubleshooting

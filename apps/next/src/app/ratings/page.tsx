@@ -5,7 +5,9 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import RatingsCard from "@/components/ui/card/ratings-card";
+import LoadingSpinner from "@/components/ui/loading-spinner";
 import MealDivider from "@/components/ui/meal-divider";
+import PageContainer from "@/components/ui/page-container";
 import { useSnackbarStore } from "@/context/useSnackbar";
 import { useUserStore } from "@/context/useUserStore";
 import { trpc } from "@/utils/trpc";
@@ -38,9 +40,9 @@ export default function RatedFoods() {
   );
 
   return (
-    <div className="max-w-full h-screen">
-      <div className="z-0 flex flex-col h-full overflow-x-hidden">
-        <div className="relative w-full min-h-80 max-h-80">
+    <div className="max-w-full min-h-screen">
+      <div className="z-0 flex flex-col overflow-x-hidden">
+        <div className="relative w-full h-80">
           <div className="absolute inset-0 bg-gradient-to-b from-black/65 to-transparent" />
           <Image
             className="object-cover w-full h-full"
@@ -51,20 +53,13 @@ export default function RatedFoods() {
           />
         </div>
 
-        <div
-          className="flex flex-col gap-4 justify-center w-full p-5 sm:px-12 sm:py-8"
-          id="food-scroll"
-        >
+        <PageContainer className="flex flex-col gap-4" id="food-scroll">
           <MealDivider title="My Rated Foods" />
 
           {isLoading && (
-            <Typography
-              variant="body1"
-              color="text.secondary"
-              className="text-center"
-            >
-              Loading your ratings...
-            </Typography>
+            <div className="flex justify-center mt-8">
+              <LoadingSpinner />
+            </div>
           )}
 
           {error && (
@@ -83,34 +78,12 @@ export default function RatedFoods() {
               <Typography
                 variant="body1"
                 color="text.secondary"
-                className="text-center py-5"
+                className="py-5"
               >
                 You haven't rated any foods yet
               </Typography>
             ))}
-          {!isLoading &&
-            !error &&
-            (ratedFoods && ratedFoods.length > 0 ? (
-              ratedFoods.map((food: (typeof ratedFoods)[number]) => (
-                <RatingsCard key={`${food.id}|${food.ratedAt}`} food={food} />
-              ))
-            ) : (
-              <p className="text-center text-zinc-700 py-5">
-                You haven't rated any foods yet
-              </p>
-            ))}
-          {!isLoading &&
-            !error &&
-            (ratedFoods && ratedFoods.length > 0 ? (
-              ratedFoods.map((food: (typeof ratedFoods)[number]) => (
-                <RatingsCard key={`${food.id}|${food.ratedAt}`} food={food} />
-              ))
-            ) : (
-              <p className="text-center text-zinc-700 py-5">
-                You haven't rated any foods yet
-              </p>
-            ))}
-        </div>
+        </PageContainer>
       </div>
     </div>
   );

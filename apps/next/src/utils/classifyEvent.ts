@@ -135,7 +135,6 @@ function isDessertMain(text: string): boolean {
 }
 
 export function classifyEvent(title: string, longDesc: string): EventCategory {
-  console.log(`Description: ${longDesc}`);
   const text = normalize(`${title} ${longDesc}`);
 
   if (matchesAny(text, CULTURAL_KEYWORDS)) return "Cultural & Heritage";

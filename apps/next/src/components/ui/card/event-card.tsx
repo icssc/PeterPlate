@@ -4,12 +4,17 @@ import { AccessTime, PinDrop } from "@mui/icons-material";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import { Card, CardContent, Dialog, Drawer, Typography } from "@mui/material";
 import type { Event } from "@peterplate/validators";
-import Image from "next/image";
 import React from "react";
+import EventImage from "@/components/ui/event-image";
 import EventTypeBadge from "@/components/ui/event-type-badge";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import type { EventCategory } from "@/utils/classifyEvent";
-import { timeToString, toTitleCase } from "@/utils/funcs";
+import {
+  eventDateRangeToString,
+  eventTimeRangeToString,
+  isHappeningToday,
+  toTitleCase,
+} from "@/utils/funcs";
 import EventDialogContent from "../event-dialog-content";
 import EventDrawerContent from "../event-drawer-content";
 import OngoingBadge from "../ongoing-badge";
@@ -41,21 +46,36 @@ const EventCardContent = React.forwardRef<
   HTMLDivElement,
   EventCardContentProps
 >(({ props, ...divProps }, ref) => {
+  const happeningToday = isHappeningToday(props);
+
   return (
     <div ref={ref} {...divProps}>
       <Card
-        className="cursor-pointer hover:shadow-lg transition h-full min-w-[280px] sm:min-w-0 dark:bg-[var(--surface-modal)]"
-        sx={{ borderRadius: "16px", backgroundImage: "none" }}
+        className={`cursor-pointer hover:shadow-lg transition h-full min-w-[280px] sm:min-w-0 dark:bg-[var(--surface-modal)] dark:shadow-none ${
+          happeningToday ? "ring-2 ring-sky-700 dark:ring-blue-300" : ""
+        }`}
+        sx={{
+          borderRadius: "16px",
+          backgroundImage: "none",
+          boxShadow: "0px 0px 2px 1px #E5E7EB",
+        }}
       >
-        <div className="p-7 pb-2 relative">
-          <Image
-            src={props.image}
-            alt={`An image for an event "${props.title}" at ${props.restaurantId}.`}
-            width={400}
-            height={300}
-            className="w-full object-contain"
-          />
-          <EventTypeBadge type={props.type} />
+        <div className="p-7 pb-2">
+          <div className="relative">
+            <EventImage
+              src={props.image}
+              alt={`An image for an event "${props.title}" at ${props.restaurantId}.`}
+              width={400}
+              height={300}
+              className="w-full object-contain"
+            />
+            {happeningToday && (
+              <span className="absolute top-2 left-2 rounded-full bg-sky-700 px-3 py-0.5 text-sm font-medium text-white dark:bg-blue-300 dark:text-zinc-900">
+                Today
+              </span>
+            )}
+            <EventTypeBadge type={props.type} />
+          </div>
         </div>
         <CardContent className="flex flex-col gap-2 p-4">
           <div className="flex flex-row gap-2 items-center">
@@ -66,19 +86,11 @@ const EventCardContent = React.forwardRef<
           <div className="flex flex-col gap-2 text-sm text-zinc-500 dark:text-zinc-400 mt-1">
             <div className="flex gap-3 items-center">
               <CalendarTodayOutlinedIcon sx={{ fontSize: 16 }} />
-              <span>
-                {props.start.toLocaleDateString(undefined, {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </span>
+              <span>{eventDateRangeToString(props)}</span>
             </div>
             <div className="flex gap-3 items-center">
               <AccessTime sx={{ fontSize: 16 }} />
-              <span>
-                {timeToString(props.start)} – {timeToString(props.end)}
-              </span>
+              <span>{eventTimeRangeToString(props)}</span>
             </div>
             <div className="flex gap-3 items-center">
               <PinDrop sx={{ fontSize: 16 }} />
@@ -120,22 +132,20 @@ export default function EventCard(props: EventWithType): React.JSX.Element {
         <Dialog
           open={open}
           onClose={handleClose}
-          maxWidth={false}
-          slotProps={{
-            paper: {
-              sx: {
-                bgcolor: "background.paper",
-                width: "570px",
-                maxWidth: "90vw",
-                margin: 2,
-                padding: 0,
-                overflow: "hidden",
-                borderRadius: "6px",
-              },
+          maxWidth="sm"
+          PaperProps={{
+            sx: {
+              bgcolor: "background.paper",
+              width: "570px",
+              maxWidth: "90vw",
+              margin: 2,
+              padding: 0,
+              overflow: "hidden",
+              borderRadius: "6px",
             },
           }}
         >
-          <EventDialogContent {...props} />
+          <EventDialogContent {...props} onClose={handleClose} />
         </Dialog>
       </>
     );

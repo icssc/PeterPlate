@@ -1,5 +1,10 @@
-import type { Drizzle } from "@peterplate/db";
-import { pushTokens } from "@peterplate/db";
+import type { Drizzle, InsertPushSubscription } from "@peterplate/db";
+import {
+  pushSubscriptions,
+  pushTokens,
+  savedNotifications,
+} from "@peterplate/db";
+import { and, eq } from "drizzle-orm";
 import type {
   ExpoPushErrorReceipt,
   ExpoPushMessage,
@@ -64,7 +69,6 @@ export async function broadcastNotification(
     for (const chunk of chunks) {
       try {
         const ticketChunk = await expo.sendPushNotificationsAsync(chunk);
-        console.log(ticketChunk);
         tickets.push(...ticketChunk);
 
         // NOTE: If a ticket contains an error code in ticket.details.error, you
@@ -111,7 +115,6 @@ export async function handleNotificationReceipts(
     for (const chunk of receiptIdChunks) {
       try {
         const receipts = await expo.getPushNotificationReceiptsAsync(chunk);
-        console.log(receipts);
 
         // The receipts specify whether Apple or Google successfully received the
         // notification and information about an error, if one occurred.
@@ -136,4 +139,78 @@ export async function handleNotificationReceipts(
       }
     }
   })();
+}
+
+export async function subscribeUser(
+  db: Drizzle,
+  subscription: InsertPushSubscription,
+): Promise<void> {
+  const updateSet: Record<string, unknown> = {
+    endpoint: subscription.endpoint,
+    p256dh: subscription.p256dh,
+    auth: subscription.auth,
+  };
+  if (subscription.isSubscribedFoodFavorites !== undefined) {
+    updateSet.isSubscribedFoodFavorites =
+      subscription.isSubscribedFoodFavorites;
+  }
+  if (subscription.isSubscribedEvents !== undefined) {
+    updateSet.isSubscribedEvents = subscription.isSubscribedEvents;
+  }
+
+  await db.insert(pushSubscriptions).values(subscription).onConflictDoUpdate({
+    target: pushSubscriptions.userId,
+    set: updateSet,
+  });
+}
+
+export async function unsubscribeUser(
+  db: Drizzle,
+  userId: string,
+): Promise<void> {
+  await db
+    .delete(pushSubscriptions)
+    .where(eq(pushSubscriptions.userId, userId));
+}
+
+export async function getSubscription(db: Drizzle, userId: string) {
+  const result = await db
+    .select()
+    .from(pushSubscriptions)
+    .where(eq(pushSubscriptions.userId, userId));
+  return result[0] ?? null;
+}
+
+export async function updateSubscription(
+  db: Drizzle,
+  userId: string,
+  data: { isSubscribedFoodFavorites?: boolean; isSubscribedEvents?: boolean },
+): Promise<void> {
+  await db
+    .update(pushSubscriptions)
+    .set(data)
+    .where(eq(pushSubscriptions.userId, userId));
+}
+
+export async function getSavedNotifications(db: Drizzle, userId: string) {
+  return await db
+    .select()
+    .from(savedNotifications)
+    .where(eq(savedNotifications.userId, userId))
+    .orderBy(savedNotifications.createdAt);
+}
+
+export async function markAllNotificationsRead(
+  db: Drizzle,
+  userId: string,
+): Promise<void> {
+  await db
+    .update(savedNotifications)
+    .set({ isRead: true })
+    .where(
+      and(
+        eq(savedNotifications.userId, userId),
+        eq(savedNotifications.isRead, false),
+      ),
+    );
 }

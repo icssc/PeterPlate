@@ -1,10 +1,10 @@
 import { Restaurant } from "@mui/icons-material";
 import type { DishWithRating, Event } from "@peterplate/validators";
+import { isFuture, isToday, startOfDay } from "date-fns";
 import {
   foodIconKeywords,
   foodIcons,
   HallEnum,
-  numToMonth,
   preferredCategoryOrder,
 } from "./types";
 
@@ -156,33 +156,17 @@ function enhanceDescription(
 }
 
 /**
- * Appends the correct ordinal suffix to a day number (e.g., 1 -> "1st", 2 -> "2nd").
- * @param day The day of the month (1-31).
- * @returns The day number with its ordinal suffix.
+ * Formats the days an event runs, like "October 2 – 30, 2026", or "October 2, 2026" for one day.
+ * @param startDate The start date.
+ * @param endDate The end date.
+ * @returns A formatted date range.
  */
-function getDayWithSuffix(day: number): string {
-  if (day > 3 && day < 21) return `${day}th`; // for 4th to 20th
-  switch (day % 10) {
-    case 1:
-      return `${day}st`;
-    case 2:
-      return `${day}nd`;
-    case 3:
-      return `${day}rd`;
-    default:
-      return `${day}th`;
-  }
-}
-
-/**
- * Formats a date range into a string like "Jan. 1st, 10:00am-2:00pm".
- * @param startDate The start date and time.
- * @param endDate The end date and time.
- * @returns A formatted string representing the date and time range.
- */
-function dateToString(startDate: Date, endDate: Date): string {
-  const dayWithSuffix = getDayWithSuffix(startDate.getDate());
-  return `${numToMonth[startDate.getMonth()]} ${dayWithSuffix}, ${timeToString(startDate)}-${timeToString(endDate)}`;
+function dateRangeToString(startDate: Date, endDate: Date): string {
+  return new Intl.DateTimeFormat(undefined, {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  }).formatRange(startDate, endDate < startDate ? startDate : endDate);
 }
 
 /**
@@ -460,8 +444,74 @@ function getPopularDishes(
     .slice(0, numCards);
 }
 
+/** Whether an event hasn't ended yet. */
+export function isUpcomingEvent(event: Event) {
+  return isFuture(event.end) || isFuture(event.start);
+}
+
+/** Whether an event's date is valid or not. **/
+export const isValidDate = (value: unknown): boolean => {
+  if (
+    value === null ||
+    value === undefined ||
+    value === "" ||
+    value === 0 ||
+    value === "0"
+  ) {
+    return false;
+  }
+
+  const date = new Date(value as string | number);
+
+  return !Number.isNaN(date.getTime()) && date.getTime() !== 0;
+};
+
+/**
+ * Whether the API gave an event an end time. A missing end time comes through
+ * as the epoch, because the schema coerces null to a Date.
+ */
+export function hasEndTime(event: Pick<Event, "start" | "end">) {
+  return event.end >= event.start;
+}
+
+/** Whether an event is on today, counting multi-day events that run through today. */
+export function isHappeningToday(event: Pick<Event, "start" | "end">) {
+  if (isToday(event.start)) return true;
+  const todayStart = startOfDay(new Date());
+  return (
+    hasEndTime(event) && event.start < todayStart && event.end >= todayStart
+  );
+}
+
+/** "October 2 – 30, 2026", only the day that's known, or "TBD" with neither. */
+export function eventDateRangeToString(event: Pick<Event, "start" | "end">) {
+  const firstDay = isValidDate(event.start) ? event.start : event.end;
+  return isValidDate(firstDay) ? dateRangeToString(firstDay, event.end) : "TBD";
+}
+
+/** "11:00am – 4:00pm", only the time that's known, or "TBD" with neither. */
+export function eventTimeRangeToString(event: Pick<Event, "start" | "end">) {
+  if (!isValidDate(event.start)) {
+    return isValidDate(event.end)
+      ? `Ends at ${timeToString(event.end)}`
+      : "TBD";
+  }
+  return hasEndTime(event)
+    ? `${timeToString(event.start)} – ${timeToString(event.end)}`
+    : timeToString(event.start);
+}
+
+/** Options for the events page's Upcoming/Past toggle. */
+export const EVENT_TIMEFRAMES = [
+  { value: "upcoming", label: "Upcoming" },
+  { value: "past", label: "Past" },
+] as const;
+
+export type EventTimeframe = (typeof EVENT_TIMEFRAMES)[number]["value"];
+
 export function sortedEvents(events: Event[], numCards: number) {
-  return [...(events ?? [])]
+  return (events ?? [])
+    .filter(isUpcomingEvent)
     .sort((event, nextEvent) => {
       const eventStartTime = event.start ? new Date(event.start).getTime() : 0;
       const nextEventStartTime = nextEvent.start
@@ -505,7 +555,7 @@ function getHallStatus(
 
 export {
   toTitleCase,
-  dateToString,
+  dateRangeToString,
   generateGCalLink,
   timeToString,
   enhanceDescription,
@@ -534,4 +584,25 @@ export function getEventType(title: string): string {
   if (celebrations.some((c) => lower.includes(c))) return "celebration";
   if (specialMeals.some((s) => lower.includes(s))) return "special";
   return "all";
+}
+
+/**
+ * Scrolls to a station section while leaving room for the toolbar and sticky
+ * restaurant controls.
+ */
+export function scrollToStation(stationId: string) {
+  const section = document.getElementById(stationId);
+  if (!section) return;
+  const controls = document.getElementById("restaurant-controls");
+  const controlsBottom = controls
+    ? Number.parseFloat(getComputedStyle(controls).top) + controls.offsetHeight
+    : 0;
+  window.scrollTo({
+    top:
+      section.getBoundingClientRect().top +
+      window.scrollY -
+      controlsBottom -
+      16,
+    behavior: "smooth",
+  });
 }
