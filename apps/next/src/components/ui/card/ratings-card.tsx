@@ -16,6 +16,7 @@ import { useUserStore } from "@/context/useUserStore";
 import { formatFoodName, getFoodIcon } from "@/utils/funcs";
 import { trpc } from "@/utils/trpc";
 import { cn } from "@/utils/tw";
+import DeleteRatingDialogContent from "../delete-rating-dialog-content";
 import FoodDialogContent from "../food-dialog-content";
 import InteractiveStarRating from "../rating";
 
@@ -36,6 +37,10 @@ const RatingsCardContent = React.forwardRef<
   } & React.HTMLAttributes<HTMLDivElement>
 >(({ food, handleDelete, deleteLoading, className, ...divProps }, ref) => {
   const IconComponent = getFoodIcon(food.name) ?? Restaurant;
+  const [openDelete, setOpenDelete] = React.useState(false);
+
+  const handleOpenDelete = () => setOpenDelete(true);
+  const handleCloseDelete = () => setOpenDelete(false);
 
   return (
     <div ref={ref} {...divProps} className={cn("w-full", className)}>
@@ -65,7 +70,7 @@ const RatingsCardContent = React.forwardRef<
                 restaurant={food.restaurant}
               />
               <IconButton
-                onClick={handleDelete}
+                onClick={handleOpenDelete}
                 disabled={deleteLoading}
                 title="Delete Rating"
                 size="small"
@@ -76,6 +81,28 @@ const RatingsCardContent = React.forwardRef<
               >
                 <Delete className="w-4 h-4 text-gray-400 hover:text-red-500" />
               </IconButton>
+              <Dialog
+                open={openDelete}
+                onClose={handleCloseDelete}
+                maxWidth={false}
+                slotProps={{
+                  paper: {
+                    sx: {
+                      width: "300px",
+                      maxWidth: "90vw",
+                      margin: 2,
+                      padding: 0,
+                      overflow: "hidden",
+                      borderRadius: "6px",
+                    },
+                  },
+                }}
+              >
+                <DeleteRatingDialogContent
+                  cancel={handleCloseDelete}
+                  handleDelete={handleDelete}
+                />
+              </Dialog>
             </div>
           </div>
         </CardContent>
@@ -116,13 +143,10 @@ export default function RatingsCard({ food }: RatingsCardProps) {
 
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    // TODO: Replace this with a MUI dialog instead of relying on browser window.
-    if (window.confirm("Delete this rating?")) {
-      await deleteRatingMutation.mutateAsync({
-        userId: userId ?? "default-user",
-        dishId: food.id,
-      });
-    }
+    await deleteRatingMutation.mutateAsync({
+      userId: userId ?? "default-user",
+      dishId: food.id,
+    });
   };
 
   const handleOpen = () => setOpen(true); // no dialog trigger component in MUI so handling manually
