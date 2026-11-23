@@ -12,6 +12,8 @@ import {
   eventDateRangeToString,
   eventTimeRangeToString,
   generateGCalLink,
+  generateICSDownload,
+  timeToString,
   isUpcomingEvent,
   isValidDate,
   toTitleCase,
@@ -88,9 +90,11 @@ export default function EventDialogContent({
         >
           {props.description}
         </Typography>
+        
         {isValidDate(props.start) && isUpcomingEvent(props) && (
-          <div className="w-full flex items-center justify-center pt-4">
+          <div className="w-full flex flex-col items-center justify-center gap-2 pt-4">
             <a
+              className="block w-full max-w-xs"
               href={generateGCalLink(
                 props.title,
                 props.description,
@@ -104,10 +108,32 @@ export default function EventDialogContent({
             >
               <Button
                 variant="contained"
-                className="[&_svg]:size-5 whitespace-nowrap"
+                className="w-full [&_svg]:size-5 whitespace-nowrap"
                 startIcon={<CalendarTodayOutlinedIcon />}
               >
                 Add to Google Calendar
+              </Button>
+            </a>
+
+            <a
+              className="block w-full max-w-xs"
+              download={`${props.restaurantId}-${props.title.toLowerCase()}.ics`}
+              href={generateICSDownload(
+                props.title,
+                props.description,
+                props.restaurantId === "brandywine"
+                  ? HallEnum.BRANDYWINE
+                  : HallEnum.ANTEATERY,
+                props.start,
+                props.end,
+              )}
+            >
+              <Button
+                variant="contained"
+                className="w-full [&_svg]:size-5 whitespace-nowrap"
+                startIcon={<CalendarTodayOutlinedIcon />}
+              >
+                Add to Apple Calendar
               </Button>
             </a>
           </div>

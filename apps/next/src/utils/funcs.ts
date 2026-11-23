@@ -220,6 +220,49 @@ function generateGCalLink(
 }
 
 /**
+ * Generates an object URL for an ICS calendar event.
+ * @param title The title of the event (usually the dish name).
+ * @param desc The description for the event.
+ * @param location The dining hall location (Anteatery or Brandywine).
+ * @param startTime The starting date and time of the event.
+ * @param endTime The ending date and time of the event.
+ * @returns An object URL for downloading the ICS file.
+ */
+function generateICSDownload(
+  title: string,
+  desc: string,
+  location: HallEnum,
+  startTime: Date,
+  endTime: Date,
+) {
+  const formatDate = (date: Date) =>
+    date.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+
+  const escapeText = (str = "") =>
+    str
+      .replace(/\\/g, "\\\\")
+      .replace(/;/g, "\\;")
+      .replace(/,/g, "\\,")
+      .replace(/\n/g, "\\n");
+
+  const icsContent = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "BEGIN:VEVENT",
+    `DTSTART:${formatDate(startTime)}`,
+    `DTEND:${formatDate(endTime)}`,
+    `SUMMARY:${escapeText(title)}`,
+    `DESCRIPTION:${escapeText(desc)}`,
+    `LOCATION:${escapeText(decodeURIComponent((location === HallEnum.ANTEATERY ? ANTEAT_ADDY : BWINE_ADDY).replaceAll("+", " ")))}`,
+    "END:VEVENT",
+    "END:VCALENDAR",
+  ].join("\r\n");
+
+  const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
+  return URL.createObjectURL(blob);
+}
+
+/**
  * Converts a UTC time string (HH:MM:SS) to a Date object in Pacific Time.
  * The date part of the returned Date object will be the current date.
  * @param utcTimeString The UTC time string in "HH:MM:SS" format.
@@ -557,6 +600,7 @@ export {
   toTitleCase,
   dateRangeToString,
   generateGCalLink,
+  generateICSDownload,
   timeToString,
   enhanceDescription,
   utcToPacificTime,
