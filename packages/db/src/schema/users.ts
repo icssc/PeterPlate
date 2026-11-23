@@ -14,6 +14,9 @@ export const users = pgTable("users", {
   email: text("email").notNull().unique(),
   emailVerified: boolean("emailVerified").notNull().default(false),
   hasOnboarded: boolean("hasOnboarded").default(false).notNull(),
+  showSuitableDishesOnly: boolean("showSuitableDishesOnly")
+    .default(false)
+    .notNull(),
   image: text("image"),
   ...metadataColumns,
 });

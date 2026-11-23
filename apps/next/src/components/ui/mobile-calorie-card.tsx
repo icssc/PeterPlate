@@ -27,7 +27,13 @@ export default function MobileCalorieCard({
   return (
     <div className="bg-sky-100 dark:bg-[#8EC5FF33] rounded-xl px-4 flex flex-row items-center justify-between h-36 w-full relative">
       <div className="absolute top-0 right-4">
-        {!hideEditButton && <NutritionGoals userId={userId} date={date} />}
+        {!hideEditButton && (
+          <NutritionGoals
+            userId={userId}
+            date={date}
+            tourId="tour-edit-goals-mobile"
+          />
+        )}
       </div>
       <span className="text-3xl text-sky-700 dark:text-blue-300 font-medium pr-3">
         Calories

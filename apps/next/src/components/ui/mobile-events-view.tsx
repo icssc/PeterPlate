@@ -1,0 +1,218 @@
+"use client";
+
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import MenuIcon from "@mui/icons-material/Menu";
+import {
+  FormControl,
+  MenuItem,
+  Select,
+  type SelectChangeEvent,
+} from "@mui/material";
+import { useEffect, useState } from "react";
+import type { EventWithType } from "@/app/events/page";
+import { useTourStore } from "@/context/useTourStore";
+import { EVENT_TIMEFRAMES, type EventTimeframe } from "@/utils/funcs";
+import EventDetailsDrawer from "./event-details-drawer";
+import EventsOnboarding from "./events-onboarding";
+import MobileCalendarView from "./mobile-calendar-view";
+import MobileListView from "./mobile-list-view";
+import MonthPickerDrawer from "./month-picker-drawer";
+
+interface MobileEventsViewProps {
+  selectedDiningHall: "both" | "anteatery" | "brandywine";
+  handleLocationChange: (
+    event: SelectChangeEvent<"both" | "anteatery" | "brandywine">,
+  ) => void;
+  timeframe: EventTimeframe;
+  onTimeframeChange: (timeframe: EventTimeframe) => void;
+  isLoading: boolean;
+  error: { message: string } | null;
+  filteredEvents: EventWithType[];
+  currentDate: Date;
+  setCurrentDate: (date: Date) => void;
+  selectedEventData: EventWithType | null;
+  handleSelectEvent: (calendarEvent: { resource: EventWithType }) => void;
+  handleClose: () => void;
+  availableMonths: { year: number; monthIndex: number }[];
+}
+
+const MobileEventsView = ({
+  selectedDiningHall,
+  handleLocationChange,
+  timeframe,
+  onTimeframeChange,
+  isLoading,
+  error,
+  filteredEvents,
+  currentDate,
+  setCurrentDate,
+  selectedEventData,
+  handleSelectEvent,
+  handleClose,
+  availableMonths,
+}: MobileEventsViewProps) => {
+  const [mobileView, setMobileView] = useState<"calendar" | "list">("calendar");
+  const [monthPickerOpen, setMonthPickerOpen] = useState(false);
+  const [selectedDayEvents, setSelectedDayEvents] = useState<EventWithType[]>(
+    [],
+  );
+  const tourRunning = useTourStore((state) => state.activeTour === "events");
+  const tourLaunchId = useTourStore((state) => state.launchId);
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: re-run on every tour restart and view switch
+  useEffect(() => {
+    if (tourRunning) window.scrollTo({ top: 0 });
+  }, [tourRunning, tourLaunchId, mobileView]);
+
+  const locationFormControlClasses =
+    "w-36 [&_.MuiOutlinedInput-root]:h-[38px] [&_.MuiOutlinedInput-root]:rounded-lg [&_.MuiOutlinedInput-root]:bg-white [&_.MuiOutlinedInput-root]:text-[0.9rem] [&_.MuiOutlinedInput-root]:text-slate-900 [&_.MuiOutlinedInput-notchedOutline]:border-sky-700 [&_.MuiOutlinedInput-root:hover_.MuiOutlinedInput-notchedOutline]:border-sky-800 [&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-2 [&_.MuiOutlinedInput-root.Mui-focused_.MuiOutlinedInput-notchedOutline]:border-sky-700 dark:[&_.MuiOutlinedInput-root]:bg-transparent dark:[&_.MuiOutlinedInput-root]:text-zinc-100 dark:[&_.MuiOutlinedInput-notchedOutline]:!border-blue-300";
+  const locationSelectClasses =
+    "[&_.MuiSelect-select]:!py-2 [&_.MuiSelect-select]:!pl-3 [&_.MuiSelect-select]:!pr-6 [&_.MuiSelect-icon]:right-1 [&_.MuiSelect-icon]:text-sky-700 dark:[&_.MuiSelect-icon]:text-zinc-100";
+
+  const handleEventDrawerClose = () => {
+    handleClose();
+    setSelectedDayEvents([]);
+  };
+
+  const emptyMessage = `No ${timeframe} events.`;
+
+  return (
+    <div className="flex flex-col h-screen w-full bg-background overflow-hidden font-sans">
+      <div className="flex flex-col px-4 pt-6 pb-4 bg-background z-20">
+        <div className="flex items-center justify-between gap-3 mb-4">
+          <h1 className="text-4xl font-bold text-sky-700 dark:text-blue-300">
+            Events
+          </h1>
+          <div
+            id="tour-events-timeframe-mobile"
+            className="flex bg-white dark:bg-transparent border border-sky-700 dark:border-blue-300 rounded-lg overflow-hidden h-[38px]"
+          >
+            {EVENT_TIMEFRAMES.map(({ value, label }, idx) => (
+              <button
+                key={value}
+                type="button"
+                aria-pressed={timeframe === value}
+                onClick={() => onTimeframeChange(value)}
+                className={`px-3 text-sm font-medium transition-colors ${
+                  idx > 0 ? "border-l border-sky-700 dark:border-blue-300" : ""
+                } ${
+                  timeframe === value
+                    ? "bg-sky-700 text-white dark:bg-blue-300 dark:text-zinc-900"
+                    : "text-sky-700 dark:text-blue-300 hover:bg-sky-50 dark:hover:bg-zinc-700"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <FormControl
+            id="tour-events-location-mobile"
+            className={locationFormControlClasses}
+          >
+            <Select
+              id="mobile-location-select"
+              className={locationSelectClasses}
+              value={selectedDiningHall}
+              onChange={handleLocationChange}
+            >
+              <MenuItem value="both">All Locations</MenuItem>
+              <MenuItem value="brandywine">Brandywine</MenuItem>
+              <MenuItem value="anteatery">Anteatery</MenuItem>
+            </Select>
+          </FormControl>
+
+          <div
+            id="tour-events-view-toggle-mobile"
+            className="flex bg-white dark:bg-transparent border border-sky-700 dark:border-blue-300 rounded-lg overflow-hidden h-[38px]"
+          >
+            <button
+              type="button"
+              onClick={() => setMobileView("calendar")}
+              className={`px-3 flex items-center justify-center transition-colors ${
+                mobileView === "calendar"
+                  ? "bg-sky-700 text-white dark:bg-blue-300 dark:text-zinc-900"
+                  : "text-sky-700 dark:text-blue-300 hover:bg-sky-50 dark:hover:bg-zinc-700"
+              }`}
+            >
+              <CalendarTodayIcon fontSize="small" />
+            </button>
+            <div className="w-[1px] bg-sky-700 dark:bg-blue-300 h-full" />
+            <button
+              type="button"
+              onClick={() => setMobileView("list")}
+              className={`px-3 flex items-center justify-center transition-colors ${
+                mobileView === "list"
+                  ? "bg-sky-700 text-white dark:bg-blue-300 dark:text-zinc-900"
+                  : "text-sky-700 dark:text-blue-300 hover:bg-sky-50 dark:hover:bg-zinc-700"
+              }`}
+            >
+              <MenuIcon fontSize="small" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {isLoading && (
+        <div className="flex-1 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-sky-700"></div>
+        </div>
+      )}
+      {error && (
+        <div className="flex-1 flex flex-col px-4 text-red-500 text-center justify-center">
+          <p>Error loading data: {error.message}</p>
+        </div>
+      )}
+
+      {!isLoading &&
+        !error &&
+        (mobileView === "calendar" ? (
+          <MobileCalendarView
+            currentDate={currentDate}
+            onDateChange={setCurrentDate}
+            filteredEvents={filteredEvents}
+            availableMonths={availableMonths}
+            onSelectEventDay={(_date, eventsForDay) => {
+              if (eventsForDay.length > 0) setSelectedDayEvents(eventsForDay);
+            }}
+            onOpenMonthPicker={() => setMonthPickerOpen(true)}
+          />
+        ) : (
+          <MobileListView
+            currentDate={currentDate}
+            onDateChange={setCurrentDate}
+            filteredEvents={filteredEvents}
+            emptyMessage={emptyMessage}
+            showToday={timeframe === "upcoming"}
+            onOpenMonthPicker={() => setMonthPickerOpen(true)}
+            onSelectEvent={(evtInfo) =>
+              handleSelectEvent({ resource: evtInfo })
+            }
+          />
+        ))}
+
+      <MonthPickerDrawer
+        open={monthPickerOpen}
+        onClose={() => setMonthPickerOpen(false)}
+        currentDate={currentDate}
+        availableMonths={availableMonths}
+        emptyMessage={emptyMessage}
+        onSelectMonth={(year, monthIndex) => {
+          setCurrentDate(new Date(year, monthIndex, 1));
+          setMonthPickerOpen(false);
+        }}
+      />
+
+      <EventsOnboarding viewMode={mobileView} />
+
+      <EventDetailsDrawer
+        selectedEventData={selectedEventData}
+        selectedDayEvents={selectedDayEvents}
+        onClose={handleEventDrawerClose}
+      />
+    </div>
+  );
+};
+
+export default MobileEventsView;

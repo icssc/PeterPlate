@@ -17,6 +17,10 @@
 /.next/
 /out/
 
+# next-pwa generated service worker files
+/public/sw.js
+/public/workbox-*.js
+
 # production
 /build
 
@@ -32,6 +36,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel

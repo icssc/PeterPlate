@@ -3,8 +3,11 @@ import { Box, Card, Dialog, Typography } from "@mui/material";
 import type { Event } from "@peterplate/validators";
 import { useState } from "react";
 import { classifyEvent } from "@/utils/classifyEvent";
-import { timeToString, toTitleCase } from "@/utils/funcs";
-import { numToMonth } from "@/utils/types";
+import {
+  eventDateRangeToString,
+  eventTimeRangeToString,
+  toTitleCase,
+} from "@/utils/funcs";
 import EventDialogContent from "../event-dialog-content";
 import EventTypeBadge from "../event-type-badge";
 
@@ -49,15 +52,13 @@ export default function UpcomingEventCard({
               <Box className="flex items-center gap-1.5">
                 <CalendarMonth style={{ fontSize: iconSize }} />
                 <Typography variant="caption" color="text.secondary">
-                  {numToMonth[event.start.getMonth()]} {event.start.getDate()},{" "}
-                  {event.start.getFullYear()}
+                  {eventDateRangeToString(event)}
                 </Typography>
               </Box>
               <Box className="flex items-center gap-1.5">
                 <AccessTime style={{ fontSize: iconSize }} />
                 <Typography variant="caption" color="text.secondary">
-                  {timeToString(event.end)}
-                  {event.end ? ` - ${timeToString(event.end)}` : ""}
+                  {eventTimeRangeToString(event)}
                 </Typography>
               </Box>
             </>
@@ -87,7 +88,7 @@ export default function UpcomingEventCard({
           },
         }}
       >
-        <EventDialogContent {...event} />
+        <EventDialogContent {...event} onClose={() => setOpen(false)} />
       </Dialog>
     </>
   );

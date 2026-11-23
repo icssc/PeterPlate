@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import PopularDishCard from "@/components/ui/card/popular-dish-card";
 import UpcomingEventCard from "@/components/ui/card/upcoming-event-card";
 import OnboardingDialog from "@/components/ui/onboarding";
+import PageContainer from "@/components/ui/page-container";
 import { useDate } from "@/context/date-context";
 import { useUserStore } from "@/context/useUserStore";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
@@ -143,6 +144,7 @@ function DesktopHome(): React.JSX.Element {
   const { data: events } = trpc.event.upcoming.useQuery(undefined, {
     staleTime: 5 * 60 * 1000,
   });
+  const upcomingEvents = sortedEvents(events ?? [], 4);
 
   // Get hall information
   const brandywineStatus = getHallStatus(brandywineData?.periods ?? []);
@@ -182,7 +184,7 @@ function DesktopHome(): React.JSX.Element {
 
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
+      <PageContainer className="space-y-8">
         <Typography className="text-2xl sm:text-3xl font-bold" gutterBottom>
           See what's on the menu today!
         </Typography>
@@ -271,12 +273,12 @@ function DesktopHome(): React.JSX.Element {
               ))}
             </div>
           )}
-          {!isLoading && events && events.length === 0 && (
+          {!isLoading && events && upcomingEvents.length === 0 && (
             <Typography color="text.secondary">No upcoming events.</Typography>
           )}
-          {events && events.length > 0 && (
+          {upcomingEvents.length > 0 && (
             <div className="grid grid-cols-4 gap-4">
-              {sortedEvents(events, 4).map((event, idx) => (
+              {upcomingEvents.map((event, idx) => (
                 <UpcomingEventCard
                   key={`${event.title}-${idx}`}
                   event={event}
@@ -285,7 +287,7 @@ function DesktopHome(): React.JSX.Element {
             </div>
           )}
         </section>
-      </div>
+      </PageContainer>
     </Box>
   );
 }
@@ -311,6 +313,7 @@ function MobileHome(): React.JSX.Element {
   const { data: events } = trpc.event.upcoming.useQuery(undefined, {
     staleTime: 5 * 60 * 1000,
   });
+  const upcomingEvents = sortedEvents(events ?? [], 3);
 
   // Get hall information
   const brandywineStatus = getHallStatus(brandywineData?.periods);
@@ -350,7 +353,7 @@ function MobileHome(): React.JSX.Element {
 
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-3">
+      <PageContainer className="space-y-3">
         {/* ── Dining Halls ── */}
         <section>
           <Typography className="text-1xl font-bold mb-2" color="primary">
@@ -435,13 +438,13 @@ function MobileHome(): React.JSX.Element {
               <ChevronRight color="primary" style={{ fontSize: 16 }} />
             </Link>
           </div>
-          {!events || events.length === 0 ? (
+          {upcomingEvents.length === 0 ? (
             <Typography variant="body2" color="text.secondary">
               No upcoming events.
             </Typography>
           ) : (
             <div className="flex gap-3 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              {sortedEvents(events, 3).map((event, idx) => (
+              {upcomingEvents.map((event, idx) => (
                 <UpcomingEventCard
                   key={`${event.title}-${idx}`}
                   event={event}
@@ -451,7 +454,7 @@ function MobileHome(): React.JSX.Element {
             </div>
           )}
         </section>
-      </div>
+      </PageContainer>
     </Box>
   );
 }

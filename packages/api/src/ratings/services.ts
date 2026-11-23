@@ -80,7 +80,6 @@ export const deleteRating = async (
       `No rating found to delete for dish ${dishId} by user ${userId}.`,
     );
   } else {
-    console.log(`Rating for dish ${dishId} by user ${userId} deleted.`);
     await updateDishStats(db, dishId);
   }
 

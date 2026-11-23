@@ -1,12 +1,20 @@
 import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import PinDropOutlinedIcon from "@mui/icons-material/PinDropOutlined";
-import { Box, Typography } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import type { Event } from "@peterplate/validators";
-import Image from "next/image";
+import EventImage from "@/components/ui/event-image";
 import EventTypeBadge from "@/components/ui/event-type-badge";
 import { classifyEvent } from "@/utils/classifyEvent";
-import { timeToString, toTitleCase } from "@/utils/funcs";
+import {
+  eventDateRangeToString,
+  eventTimeRangeToString,
+  generateGCalLink,
+  isUpcomingEvent,
+  isValidDate,
+  toTitleCase,
+} from "@/utils/funcs";
+import { HallEnum } from "@/utils/types";
 
 /**
  * `EventDrawerContent` renders the detailed view of an event within a drawer (mobile view).
@@ -21,7 +29,7 @@ export default function EventDrawerContent(props: Event): React.JSX.Element {
   return (
     <Box className="dark:bg-[var(--surface-modal)]">
       <div className="relative">
-        <Image
+        <EventImage
           src={props.image}
           alt={`An image for an event "${props.title}" at ${props.restaurantId}.`}
           width={600}
@@ -42,19 +50,11 @@ export default function EventDrawerContent(props: Event): React.JSX.Element {
         <div className="flex flex-col gap-2 text-sm text-zinc-500 dark:text-zinc-400 mt-1">
           <div className="flex gap-2 items-center">
             <CalendarTodayOutlinedIcon sx={{ fontSize: 16 }} />
-            <span>
-              {props.start.toLocaleDateString(undefined, {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </span>
+            <span>{eventDateRangeToString(props)}</span>
           </div>
           <div className="flex gap-2 items-center">
             <AccessTimeOutlinedIcon sx={{ fontSize: 16 }} />
-            <span>
-              {timeToString(props.start)} – {timeToString(props.end)}
-            </span>
+            <span>{eventTimeRangeToString(props)}</span>
           </div>
           <div className="flex gap-2 items-center">
             <PinDropOutlinedIcon sx={{ fontSize: 16 }} />
@@ -68,6 +68,30 @@ export default function EventDrawerContent(props: Event): React.JSX.Element {
         >
           {props.description?.replace(/\u00A0+/g, " ")}
         </Typography>
+        {isValidDate(props.start) && isUpcomingEvent(props) && (
+          <div className="w-full flex items-center justify-center pt-4">
+            <a
+              href={generateGCalLink(
+                props.title,
+                props.description,
+                props.restaurantId === "brandywine"
+                  ? HallEnum.BRANDYWINE
+                  : HallEnum.ANTEATERY,
+                props.start,
+              )}
+              rel="noreferrer"
+              target="_blank"
+            >
+              <Button
+                variant="contained"
+                className="[&_svg]:size-5 whitespace-nowrap"
+                startIcon={<CalendarTodayOutlinedIcon />}
+              >
+                Add to Google Calendar
+              </Button>
+            </a>
+          </div>
+        )}
       </Box>
     </Box>
   );

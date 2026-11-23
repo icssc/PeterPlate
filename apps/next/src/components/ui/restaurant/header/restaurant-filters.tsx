@@ -1,12 +1,16 @@
 "use client";
 
-import { ArrowDropDownRounded } from "@mui/icons-material";
 import {
+  ArrowDropDownRounded,
+  GridView,
+  Menu as MenuIcon,
+} from "@mui/icons-material";
+import {
+  Button,
   FormControl,
   InputLabel,
   MenuItem,
   Select,
-  Tooltip,
   Typography,
 } from "@mui/material";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -15,9 +19,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { useTheme } from "next-themes";
 import type { CalendarRange } from "@/components/ui/toolbar";
 import { useRestaurantUIStore } from "@/context/useRestaurantUIStore";
-import { useUserStore } from "@/context/useUserStore";
 import { formatOpenCloseTime, toTitleCase } from "@/utils/funcs";
-import { cn } from "@/utils/tw";
 
 interface RestaurantFiltersProps {
   isDesktop: boolean;
@@ -38,7 +40,6 @@ export function RestaurantFilters({
   calendarRange,
 }: RestaurantFiltersProps) {
   const { resolvedTheme } = useTheme();
-  const { userId } = useUserStore();
 
   const selectedPeriod = useRestaurantUIStore((s) => s.selectedPeriod);
   const setSelectedPeriod = useRestaurantUIStore((s) => s.setSelectedPeriod);
@@ -46,37 +47,20 @@ export function RestaurantFilters({
   const setIsDatePickerOpen = useRestaurantUIStore(
     (s) => s.setIsDatePickerOpen,
   );
-  const showPreferencesOnly = useRestaurantUIStore(
-    (s) => s.showPreferencesOnly,
-  );
-  const setShowPreferencesOnly = useRestaurantUIStore(
-    (s) => s.setShowPreferencesOnly,
-  );
-
-  const ShowPrefsButton = (
-    <button
-      type="button"
-      onClick={() => setShowPreferencesOnly(!showPreferencesOnly)}
-      disabled={userId === null}
-      className={cn(
-        "h-[40px] rounded-md border text-sm font-medium transition-all duration-200 w-full",
-        userId === null &&
-          "text-black/50 border-sky-700/50 dark:text-white/40 dark:border-blue-300/40",
-        isDesktop && "w-[240px]",
-        showPreferencesOnly &&
-          "bg-sky-700 text-white border-sky-700 shadow-md dark:bg-blue-300 dark:text-gray-900 dark:border-blue-300",
-        !showPreferencesOnly &&
-          userId &&
-          "bg-white text-sky-700 border-sky-700 hover:bg-sky-50 dark:bg-surface-scroll dark:text-blue-300 dark:border-blue-300 dark:hover:bg-zinc-700",
-      )}
-    >
-      Show Preferences Only
-    </button>
-  );
+  const isCompactView = useRestaurantUIStore((s) => s.isCompactView);
+  const setIsCompactView = useRestaurantUIStore((s) => s.setIsCompactView);
 
   return (
-    <div className={isDesktop ? "flex gap-2" : "grid grid-cols-2 gap-2 w-full"}>
-      <div className={isDesktop ? "w-52" : "w-full"}>
+    // On desktop, items keep their natural widths on one line, and wrap and
+    // grow to fill the column when the sidebar leaves too little room.
+    <div
+      className={
+        isDesktop
+          ? "flex flex-wrap grow gap-2"
+          : "grid grid-cols-2 gap-3 w-full"
+      }
+    >
+      <div id="tour-meal-select" className={isDesktop ? "w-52 grow" : "w-full"}>
         <FormControl fullWidth size="small" variant="outlined">
           <InputLabel
             id="meal-select-label"
@@ -159,11 +143,15 @@ export function RestaurantFilters({
       </div>
 
       {calendarRange && (
-        <div className={isDesktop ? "w-[240px]" : "w-full"}>
+        <div
+          id="tour-date-picker"
+          className={isDesktop ? "w-[240px] grow" : "w-full"}
+        >
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <DatePicker
               label="Select date"
               value={selectedDate || null}
+              format={isDesktop ? "MM/dd/yyyy (EEE)" : undefined}
               onChange={(newValue) => handleDateSelect(newValue || undefined)}
               minDate={calendarRange.earliest}
               maxDate={calendarRange.latest}
@@ -224,14 +212,29 @@ export function RestaurantFilters({
         </div>
       )}
 
-      <div>
-        {!userId && (
-          <Tooltip title="Log in to filter by preferences!" placement="top">
-            {ShowPrefsButton}
-          </Tooltip>
-        )}
-        {userId && ShowPrefsButton}
-      </div>
+      {/* Card / compact view toggles (desktop only; mobile has its own) */}
+      {isDesktop && (
+        <div id="tour-view-toggle-desktop" className="flex shrink-0 gap-2">
+          <Button
+            variant="outlined"
+            size="small"
+            type="button"
+            onClick={() => setIsCompactView(false)}
+            className={`!min-w-0 !w-10 !h-10 !p-0 !border-sky-700 dark:!border-blue-300 !normal-case ${!isCompactView ? "!bg-sky-700 !text-white hover:!bg-sky-700 dark:!bg-blue-300 dark:!text-gray-900" : "!bg-white !text-sky-700 hover:!bg-sky-50 dark:!bg-transparent dark:!text-white"}`}
+          >
+            <MenuIcon className="h-5 w-5" />
+          </Button>
+          <Button
+            variant="outlined"
+            size="small"
+            type="button"
+            onClick={() => setIsCompactView(true)}
+            className={`!min-w-0 !w-10 !h-10 !p-0 !border-sky-700 dark:!border-blue-300 !normal-case ${isCompactView ? "!bg-sky-700 !text-white hover:!bg-sky-700 dark:!bg-blue-300 dark:!text-gray-900" : "!bg-white !text-sky-700 hover:!bg-sky-50 dark:!bg-transparent dark:!text-white"}`}
+          >
+            <GridView className="h-5 w-5" />
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
