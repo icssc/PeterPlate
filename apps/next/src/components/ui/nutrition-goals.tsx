@@ -3,7 +3,7 @@
 import EditIcon from "@mui/icons-material/Edit";
 import { Button, Drawer } from "@mui/material";
 import { NutritionGoalsSchema } from "@peterplate/validators";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSnackbarStore } from "@/context/useSnackbar";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { trpc } from "@/utils/trpc";
@@ -64,27 +64,6 @@ export default function NutritionGoals({ userId, date, tourId }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const { showSnackbar } = useSnackbarStore();
 
-  const updateGoal = (updates: {
-    calorieGoal?: number;
-    proteinGoal?: number;
-    carbGoal?: number;
-    fatGoal?: number;
-  }) => {
-    const merged = {
-      calorieGoal,
-      proteinGoal,
-      carbGoal,
-      fatGoal,
-      ...updates,
-    };
-
-    if (date) {
-      upsertGoalsByDay.mutate({ userId, date, ...merged });
-    } else {
-      upsertGoals.mutate({ userId, ...merged });
-    }
-  };
-
   const handleUpdate = (
     field: "calorieGoal" | "proteinGoal" | "carbGoal" | "fatGoal",
     value: number,
@@ -101,7 +80,7 @@ export default function NutritionGoals({ userId, date, tourId }: Props) {
     if (field === "calorieGoal") {
       const macros = scaleMacros(value, carbGoal, proteinGoal, fatGoal);
 
-      if (!macros) return;
+      if (!macros) return false;
 
       Object.assign(updated, macros);
     } else {
@@ -114,18 +93,25 @@ export default function NutritionGoals({ userId, date, tourId }: Props) {
 
     // Confirm if values are still in range
     const result = NutritionGoalsSchema.safeParse(updated);
-
     if (!result.success) {
       showSnackbar(result.error.issues[0].message, "error");
-      return;
+      return false;
     }
 
+    // Update React state
     setCalorieGoal(updated.calorieGoal);
     setProteinGoal(updated.proteinGoal);
     setCarbGoal(updated.carbGoal);
     setFatGoal(updated.fatGoal);
 
-    updateGoal(updated);
+    // Save to database
+    if (date) {
+      upsertGoalsByDay.mutate({ userId, date, ...updated });
+    } else {
+      upsertGoals.mutate({ userId, ...updated });
+    }
+
+    return true;
   };
 
   useEffect(() => {
@@ -158,12 +144,24 @@ export default function NutritionGoals({ userId, date, tourId }: Props) {
       <label className="flex items-center justify-between gap-4 text-sm font-medium text-zinc-900 dark:text-white">
         Calorie Goal
         <input
+          key={calorieGoal}
           type="number"
           defaultValue={calorieGoal}
           min={100}
           max={10000}
           onBlur={(e) => {
-            handleUpdate("calorieGoal", Number(e.currentTarget.value));
+            const input = e.currentTarget;
+            const raw = input.value;
+
+            if (raw === "") {
+              input.value = String(calorieGoal);
+              return;
+            }
+            if (Number(raw) === calorieGoal) return;
+
+            if (!handleUpdate("calorieGoal", Number(raw))) {
+              input.value = String(calorieGoal);
+            }
           }}
           onKeyDown={(e) => {
             if (e.key === "Enter") e.currentTarget.blur();
@@ -174,21 +172,23 @@ export default function NutritionGoals({ userId, date, tourId }: Props) {
       <label className="flex items-center justify-between gap-4 text-sm font-medium text-zinc-900 dark:text-white">
         Protein Goal
         <input
+          key={proteinGoal}
           type="number"
-          value={proteinGoal === 0 ? "" : proteinGoal}
+          defaultValue={proteinGoal}
           min={1}
           max={500}
-          onChange={(e) => {
-            const raw = e.target.value;
+          onBlur={(e) => {
+            const input = e.currentTarget;
+            const raw = input.value;
+
             if (raw === "") {
-              setProteinGoal(0);
+              input.value = String(proteinGoal);
               return;
             }
-            handleUpdate("proteinGoal", Number(e.target.value));
-          }}
-          onBlur={(e) => {
-            if (e.target.value === "") {
-              setProteinGoal(proteinGoal);
+            if (Number(raw) === proteinGoal) return;
+
+            if (!handleUpdate("proteinGoal", Number(raw))) {
+              input.value = String(proteinGoal);
             }
           }}
           onKeyDown={(e) => {
@@ -200,21 +200,23 @@ export default function NutritionGoals({ userId, date, tourId }: Props) {
       <label className="flex items-center justify-between gap-4 text-sm font-medium text-zinc-900 dark:text-white">
         Carb Goal
         <input
+          key={carbGoal}
           type="number"
-          value={carbGoal === 0 ? "" : carbGoal}
+          defaultValue={carbGoal}
           min={1}
           max={1000}
-          onChange={(e) => {
-            const raw = e.target.value;
+          onBlur={(e) => {
+            const input = e.currentTarget;
+            const raw = input.value;
+
             if (raw === "") {
-              setCarbGoal(0);
+              input.value = String(carbGoal);
               return;
             }
-            handleUpdate("carbGoal", Number(e.target.value));
-          }}
-          onBlur={(e) => {
-            if (e.target.value === "") {
-              setCarbGoal(carbGoal);
+            if (Number(raw) === carbGoal) return;
+
+            if (!handleUpdate("carbGoal", Number(raw))) {
+              input.value = String(carbGoal);
             }
           }}
           onKeyDown={(e) => {
@@ -226,21 +228,24 @@ export default function NutritionGoals({ userId, date, tourId }: Props) {
       <label className="flex items-center justify-between gap-4 text-sm font-medium text-zinc-900 dark:text-white">
         Fat Goal
         <input
+          key={fatGoal}
           type="number"
-          value={fatGoal === 0 ? "" : fatGoal}
+          defaultValue={fatGoal}
           min={1}
           max={500}
-          onChange={(e) => {
-            const raw = e.target.value;
+          onBlur={(e) => {
+            const input = e.currentTarget;
+            const raw = input.value;
+
             if (raw === "") {
-              setFatGoal(0);
+              input.value = String(fatGoal);
               return;
             }
-            handleUpdate("fatGoal", Number(e.target.value));
-          }}
-          onBlur={(e) => {
-            if (e.target.value === "") {
-              setFatGoal(fatGoal);
+
+            if (Number(raw) === fatGoal) return;
+
+            if (!handleUpdate("fatGoal", Number(raw))) {
+              input.value = String(fatGoal);
             }
           }}
           onKeyDown={(e) => {
@@ -256,12 +261,7 @@ export default function NutritionGoals({ userId, date, tourId }: Props) {
     <div className="relative mt-4" ref={containerRef}>
       <Button
         id={tourId}
-        onClick={() => {
-          if (open) {
-            flushPendingSave();
-          }
-          setOpen(!open);
-        }}
+        onClick={() => setOpen(!open)}
         variant="contained"
         className="!bg-sky-700 !text-white hover:!bg-sky-800 !rounded-lg !min-w-0 !p-1 md:!p-2 dark:!bg-blue-300 dark:!text-gray-900 dark:hover:!bg-blue-400"
       >
@@ -272,10 +272,7 @@ export default function NutritionGoals({ userId, date, tourId }: Props) {
         <Drawer
           anchor="bottom"
           open={open}
-          onClose={() => {
-            flushPendingSave();
-            setOpen(false);
-          }}
+          onClose={() => setOpen(false)}
           sx={{
             ".dark & .MuiDrawer-paper": {
               backgroundImage: "none",
