@@ -76,6 +76,13 @@ export default function NutritionGoals({ userId, date, tourId }: Props) {
       [field]: value,
     };
 
+    // Validate the user's input before recalculating
+    const fieldResult = NutritionGoalsSchema.shape[field].safeParse(value);
+    if (!fieldResult.success) {
+      showSnackbar(fieldResult.error.issues[0].message, "error");
+      return false;
+    }
+
     // Scaling calories/macros so all values add up correctly
     if (field === "calorieGoal") {
       const macros = scaleMacros(value, carbGoal, proteinGoal, fatGoal);
@@ -91,10 +98,18 @@ export default function NutritionGoals({ userId, date, tourId }: Props) {
       );
     }
 
-    // Confirm if values are still in range
+    // Confirm if values are still in range - the only error possible here is if recalculating results in Calories < 100
     const result = NutritionGoalsSchema.safeParse(updated);
     if (!result.success) {
-      showSnackbar(result.error.issues[0].message, "error");
+      if (field !== "calorieGoal" && updated.calorieGoal < 100) {
+        showSnackbar(
+          `Changing ${field.replace("Goal", "").toUpperCase()} results in ${updated.calorieGoal} Calories. Calories must be at least 100.`,
+          "error",
+        );
+      } else {
+        showSnackbar(result.error.issues[0].message, "error");
+      }
+
       return false;
     }
 
