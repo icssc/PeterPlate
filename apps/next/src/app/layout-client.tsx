@@ -90,7 +90,14 @@ function GlobalSnackbar() {
   }, [showSnackbar]);
 
   return (
-    <Snackbar open={open} autoHideDuration={4000} onClose={closeSnackbar}>
+    <Snackbar
+      open={open}
+      autoHideDuration={4000}
+      onClose={(_, reason) => {
+        if (reason === "clickaway") return;
+        closeSnackbar();
+      }}
+    >
       <Alert onClose={closeSnackbar} severity={severity} variant="filled">
         {message}
       </Alert>
