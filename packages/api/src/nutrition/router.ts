@@ -1,6 +1,7 @@
 import { getDishes } from "@api/dishes/services";
 import { createTRPCRouter, publicProcedure } from "@api/trpc";
 import { loggedMeals, userGoals, userGoalsByDay } from "@peterplate/db";
+import { NutritionGoalsSchema } from "@peterplate/validators";
 import { TRPCError } from "@trpc/server";
 import { and, desc, eq, gt, gte, lt } from "drizzle-orm";
 import { z } from "zod";
@@ -190,12 +191,8 @@ export const nutritionRouter = createTRPCRouter({
 
   upsertGoals: publicProcedure
     .input(
-      z.object({
+      NutritionGoalsSchema.extend({
         userId: z.string(),
-        calorieGoal: z.number().min(100).max(10000),
-        proteinGoal: z.number().min(1).max(500),
-        carbGoal: z.number().min(1).max(1000),
-        fatGoal: z.number().min(1).max(500),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -243,13 +240,9 @@ export const nutritionRouter = createTRPCRouter({
 
   upsertGoalsByDay: publicProcedure
     .input(
-      z.object({
+      NutritionGoalsSchema.extend({
         userId: z.string(),
         date: z.string(),
-        calorieGoal: z.number().min(100).max(10000),
-        proteinGoal: z.number().min(1).max(500),
-        carbGoal: z.number().min(1).max(1000),
-        fatGoal: z.number().min(1).max(500),
       }),
     )
     .mutation(async ({ ctx, input }) => {

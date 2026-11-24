@@ -2,7 +2,9 @@
 
 import EditIcon from "@mui/icons-material/Edit";
 import { Button, Drawer } from "@mui/material";
+import { NutritionGoalsSchema } from "@peterplate/validators";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useSnackbarStore } from "@/context/useSnackbar";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { trpc } from "@/utils/trpc";
 
@@ -12,7 +14,7 @@ interface Props {
   tourId?: string;
 }
 
-// Macros scaling so that macros and calories add up when changed
+/* Macros scaling so that macros and calories add up when changed */
 const calculateCalories = (carbs: number, protein: number, fat: number) =>
   carbs * 4 + protein * 4 + fat * 9;
 
@@ -60,9 +62,7 @@ export default function NutritionGoals({ userId, date, tourId }: Props) {
   const [carbGoal, setCarbGoal] = useState(250);
   const [fatGoal, setFatGoal] = useState(50);
   const containerRef = useRef<HTMLDivElement>(null);
-  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const pendingSaveRef = useRef<(() => void) | null>(null);
-  const DELAY = 500;
+  const { showSnackbar } = useSnackbarStore();
 
   const updateGoal = (updates: {
     calorieGoal?: number;
@@ -78,25 +78,11 @@ export default function NutritionGoals({ userId, date, tourId }: Props) {
       ...updates,
     };
 
-    if (saveTimeoutRef.current) {
-      clearTimeout(saveTimeoutRef.current);
+    if (date) {
+      upsertGoalsByDay.mutate({ userId, date, ...merged });
+    } else {
+      upsertGoals.mutate({ userId, ...merged });
     }
-
-    const save = () => {
-      if (date) {
-        upsertGoalsByDay.mutate({ userId, date, ...merged });
-      } else {
-        upsertGoals.mutate({ userId, ...merged });
-      }
-    };
-
-    pendingSaveRef.current = save;
-
-    saveTimeoutRef.current = setTimeout(() => {
-      pendingSaveRef.current = null;
-      saveTimeoutRef.current = null;
-      save();
-    }, DELAY);
   };
 
   const handleUpdate = (
@@ -127,16 +113,10 @@ export default function NutritionGoals({ userId, date, tourId }: Props) {
     }
 
     // Confirm if values are still in range
-    if (
-      updated.calorieGoal < 100 ||
-      updated.calorieGoal > 10000 ||
-      updated.proteinGoal < 1 ||
-      updated.proteinGoal > 500 ||
-      updated.carbGoal < 1 ||
-      updated.carbGoal > 1000 ||
-      updated.fatGoal < 1 ||
-      updated.fatGoal > 500
-    ) {
+    const result = NutritionGoalsSchema.safeParse(updated);
+
+    if (!result.success) {
+      showSnackbar(result.error.issues[0].message, "error");
       return;
     }
 
@@ -147,19 +127,6 @@ export default function NutritionGoals({ userId, date, tourId }: Props) {
 
     updateGoal(updated);
   };
-
-  const flushPendingSave = useCallback(() => {
-    if (saveTimeoutRef.current) {
-      clearTimeout(saveTimeoutRef.current);
-      saveTimeoutRef.current = null;
-    }
-
-    if (pendingSaveRef.current) {
-      const save = pendingSaveRef.current;
-      pendingSaveRef.current = null;
-      save();
-    }
-  }, []);
 
   useEffect(() => {
     if (goals && !open) {
@@ -178,14 +145,13 @@ export default function NutritionGoals({ userId, date, tourId }: Props) {
         containerRef.current &&
         !containerRef.current.contains(e.target as Node)
       ) {
-        flushPendingSave();
         setOpen(false);
       }
     };
 
     document.addEventListener("click", handleClickOutside);
     return () => document.removeEventListener("click", handleClickOutside);
-  }, [open, isMobile, flushPendingSave]);
+  }, [open, isMobile]);
 
   const inputs = (
     <>
@@ -193,24 +159,11 @@ export default function NutritionGoals({ userId, date, tourId }: Props) {
         Calorie Goal
         <input
           type="number"
-          value={calorieGoal === 0 ? "" : calorieGoal}
+          defaultValue={calorieGoal}
           min={100}
           max={10000}
-          onChange={(e) => {
-            const raw = e.target.value;
-            if (raw === "") {
-              setCalorieGoal(0);
-              return;
-            }
-            const val = Number(raw);
-            if (val >= 100 && val <= 10000) {
-              handleUpdate("calorieGoal", Number(e.target.value));
-            }
-          }}
           onBlur={(e) => {
-            if (e.target.value === "") {
-              setCalorieGoal(calorieGoal);
-            }
+            handleUpdate("calorieGoal", Number(e.currentTarget.value));
           }}
           onKeyDown={(e) => {
             if (e.key === "Enter") e.currentTarget.blur();
@@ -231,10 +184,7 @@ export default function NutritionGoals({ userId, date, tourId }: Props) {
               setProteinGoal(0);
               return;
             }
-            const val = Number(raw);
-            if (val >= 1 && val <= 500) {
-              handleUpdate("proteinGoal", Number(e.target.value));
-            }
+            handleUpdate("proteinGoal", Number(e.target.value));
           }}
           onBlur={(e) => {
             if (e.target.value === "") {
@@ -260,10 +210,7 @@ export default function NutritionGoals({ userId, date, tourId }: Props) {
               setCarbGoal(0);
               return;
             }
-            const val = Number(raw);
-            if (val >= 1 && val <= 1000) {
-              handleUpdate("carbGoal", Number(e.target.value));
-            }
+            handleUpdate("carbGoal", Number(e.target.value));
           }}
           onBlur={(e) => {
             if (e.target.value === "") {
@@ -289,10 +236,7 @@ export default function NutritionGoals({ userId, date, tourId }: Props) {
               setFatGoal(0);
               return;
             }
-            const val = Number(raw);
-            if (val >= 1 && val <= 500) {
-              handleUpdate("fatGoal", Number(e.target.value));
-            }
+            handleUpdate("fatGoal", Number(e.target.value));
           }}
           onBlur={(e) => {
             if (e.target.value === "") {
