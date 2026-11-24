@@ -12,6 +12,29 @@ interface Props {
   tourId?: string;
 }
 
+// Macros scaling so that macros and calories add up when changed
+const calculateCalories = (carbs: number, protein: number, fat: number) =>
+  carbs * 4 + protein * 4 + fat * 9;
+
+const scaleMacros = (
+  targetCalories: number,
+  carbs: number,
+  protein: number,
+  fat: number,
+) => {
+  const currentCalories = calculateCalories(carbs, protein, fat);
+
+  if (currentCalories <= 0) return null;
+
+  const ratio = targetCalories / currentCalories;
+
+  return {
+    carbGoal: Math.round(carbs * ratio),
+    proteinGoal: Math.round(protein * ratio),
+    fatGoal: Math.round(fat * ratio),
+  };
+};
+
 export default function NutritionGoals({ userId, date, tourId }: Props) {
   const isMobile = useMediaQuery("(max-width: 768px)");
   const utils = trpc.useUtils();
@@ -41,7 +64,7 @@ export default function NutritionGoals({ userId, date, tourId }: Props) {
   const pendingSaveRef = useRef<(() => void) | null>(null);
   const DELAY = 500;
 
-  const handleUpdate = (updates: {
+  const updateGoal = (updates: {
     calorieGoal?: number;
     proteinGoal?: number;
     carbGoal?: number;
@@ -74,6 +97,55 @@ export default function NutritionGoals({ userId, date, tourId }: Props) {
       saveTimeoutRef.current = null;
       save();
     }, DELAY);
+  };
+
+  const handleUpdate = (
+    field: "calorieGoal" | "proteinGoal" | "carbGoal" | "fatGoal",
+    value: number,
+  ) => {
+    const updated = {
+      calorieGoal,
+      proteinGoal,
+      carbGoal,
+      fatGoal,
+      [field]: value,
+    };
+
+    // Scaling calories/macros so all values add up correctly
+    if (field === "calorieGoal") {
+      const macros = scaleMacros(value, carbGoal, proteinGoal, fatGoal);
+
+      if (!macros) return;
+
+      Object.assign(updated, macros);
+    } else {
+      updated.calorieGoal = calculateCalories(
+        updated.carbGoal,
+        updated.proteinGoal,
+        updated.fatGoal,
+      );
+    }
+
+    // Confirm if values are still in range
+    if (
+      updated.calorieGoal < 100 ||
+      updated.calorieGoal > 10000 ||
+      updated.proteinGoal < 1 ||
+      updated.proteinGoal > 500 ||
+      updated.carbGoal < 1 ||
+      updated.carbGoal > 1000 ||
+      updated.fatGoal < 1 ||
+      updated.fatGoal > 500
+    ) {
+      return;
+    }
+
+    setCalorieGoal(updated.calorieGoal);
+    setProteinGoal(updated.proteinGoal);
+    setCarbGoal(updated.carbGoal);
+    setFatGoal(updated.fatGoal);
+
+    updateGoal(updated);
   };
 
   const flushPendingSave = useCallback(() => {
@@ -131,10 +203,8 @@ export default function NutritionGoals({ userId, date, tourId }: Props) {
               return;
             }
             const val = Number(raw);
-            setCalorieGoal(val);
-
             if (val >= 100 && val <= 10000) {
-              handleUpdate({ calorieGoal: Number(e.target.value) });
+              handleUpdate("calorieGoal", Number(e.target.value));
             }
           }}
           onBlur={(e) => {
@@ -162,10 +232,8 @@ export default function NutritionGoals({ userId, date, tourId }: Props) {
               return;
             }
             const val = Number(raw);
-            setProteinGoal(val);
-
             if (val >= 1 && val <= 500) {
-              handleUpdate({ proteinGoal: Number(e.target.value) });
+              handleUpdate("proteinGoal", Number(e.target.value));
             }
           }}
           onBlur={(e) => {
@@ -193,10 +261,8 @@ export default function NutritionGoals({ userId, date, tourId }: Props) {
               return;
             }
             const val = Number(raw);
-            setCarbGoal(val);
-
             if (val >= 1 && val <= 1000) {
-              handleUpdate({ carbGoal: Number(e.target.value) });
+              handleUpdate("carbGoal", Number(e.target.value));
             }
           }}
           onBlur={(e) => {
@@ -224,10 +290,8 @@ export default function NutritionGoals({ userId, date, tourId }: Props) {
               return;
             }
             const val = Number(raw);
-            setFatGoal(val);
-
             if (val >= 1 && val <= 500) {
-              handleUpdate({ fatGoal: Number(e.target.value) });
+              handleUpdate("fatGoal", Number(e.target.value));
             }
           }}
           onBlur={(e) => {
