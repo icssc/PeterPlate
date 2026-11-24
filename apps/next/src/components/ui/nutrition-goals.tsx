@@ -2,7 +2,7 @@
 
 import EditIcon from "@mui/icons-material/Edit";
 import { Button, Drawer } from "@mui/material";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { trpc } from "@/utils/trpc";
 
@@ -37,29 +37,9 @@ export default function NutritionGoals({ userId, date, tourId }: Props) {
   const [carbGoal, setCarbGoal] = useState(250);
   const [fatGoal, setFatGoal] = useState(50);
   const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (goals) {
-      setCalorieGoal(goals.calorieGoal);
-      setProteinGoal(goals.proteinGoal);
-      setCarbGoal(goals.carbGoal);
-      setFatGoal(goals.fatGoal);
-    }
-  }, [goals]);
-
-  useEffect(() => {
-    if (isMobile || !open) return;
-    const handleClickOutside = (e: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(e.target as Node)
-      ) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
-  }, [open, isMobile]);
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingSaveRef = useRef<(() => void) | null>(null);
+  const DELAY = 500;
 
   const handleUpdate = (updates: {
     calorieGoal?: number;
@@ -74,12 +54,66 @@ export default function NutritionGoals({ userId, date, tourId }: Props) {
       fatGoal,
       ...updates,
     };
-    if (date) {
-      upsertGoalsByDay.mutate({ userId, date, ...merged });
-    } else {
-      upsertGoals.mutate({ userId, ...merged });
+
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
     }
+
+    const save = () => {
+      if (date) {
+        upsertGoalsByDay.mutate({ userId, date, ...merged });
+      } else {
+        upsertGoals.mutate({ userId, ...merged });
+      }
+    };
+
+    pendingSaveRef.current = save;
+
+    saveTimeoutRef.current = setTimeout(() => {
+      pendingSaveRef.current = null;
+      saveTimeoutRef.current = null;
+      save();
+    }, DELAY);
   };
+
+  const flushPendingSave = useCallback(() => {
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+      saveTimeoutRef.current = null;
+    }
+
+    if (pendingSaveRef.current) {
+      const save = pendingSaveRef.current;
+      pendingSaveRef.current = null;
+      save();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (goals && !open) {
+      setCalorieGoal(goals.calorieGoal);
+      setProteinGoal(goals.proteinGoal);
+      setCarbGoal(goals.carbGoal);
+      setFatGoal(goals.fatGoal);
+    }
+  }, [goals, open]);
+
+  useEffect(() => {
+    if (isMobile || !open) return;
+
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
+        flushPendingSave();
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, [open, isMobile, flushPendingSave]);
 
   const inputs = (
     <>
@@ -98,12 +132,15 @@ export default function NutritionGoals({ userId, date, tourId }: Props) {
             }
             const val = Number(raw);
             setCalorieGoal(val);
+
+            if (val >= 100 && val <= 10000) {
+              handleUpdate({ calorieGoal: Number(e.target.value) });
+            }
           }}
           onBlur={(e) => {
             if (e.target.value === "") {
               setCalorieGoal(calorieGoal);
             }
-            handleUpdate({ calorieGoal: Number(e.target.value) });
           }}
           onKeyDown={(e) => {
             if (e.key === "Enter") e.currentTarget.blur();
@@ -126,12 +163,15 @@ export default function NutritionGoals({ userId, date, tourId }: Props) {
             }
             const val = Number(raw);
             setProteinGoal(val);
+
+            if (val >= 1 && val <= 500) {
+              handleUpdate({ proteinGoal: Number(e.target.value) });
+            }
           }}
           onBlur={(e) => {
             if (e.target.value === "") {
               setProteinGoal(proteinGoal);
             }
-            handleUpdate({ proteinGoal: Number(e.target.value) });
           }}
           onKeyDown={(e) => {
             if (e.key === "Enter") e.currentTarget.blur();
@@ -154,12 +194,15 @@ export default function NutritionGoals({ userId, date, tourId }: Props) {
             }
             const val = Number(raw);
             setCarbGoal(val);
+
+            if (val >= 1 && val <= 1000) {
+              handleUpdate({ carbGoal: Number(e.target.value) });
+            }
           }}
           onBlur={(e) => {
             if (e.target.value === "") {
               setCarbGoal(carbGoal);
             }
-            handleUpdate({ carbGoal: Number(e.target.value) });
           }}
           onKeyDown={(e) => {
             if (e.key === "Enter") e.currentTarget.blur();
@@ -182,12 +225,15 @@ export default function NutritionGoals({ userId, date, tourId }: Props) {
             }
             const val = Number(raw);
             setFatGoal(val);
+
+            if (val >= 1 && val <= 500) {
+              handleUpdate({ fatGoal: Number(e.target.value) });
+            }
           }}
           onBlur={(e) => {
             if (e.target.value === "") {
               setFatGoal(fatGoal);
             }
-            handleUpdate({ fatGoal: Number(e.target.value) });
           }}
           onKeyDown={(e) => {
             if (e.key === "Enter") e.currentTarget.blur();
@@ -202,7 +248,12 @@ export default function NutritionGoals({ userId, date, tourId }: Props) {
     <div className="relative mt-4" ref={containerRef}>
       <Button
         id={tourId}
-        onClick={() => setOpen(!open)}
+        onClick={() => {
+          if (open) {
+            flushPendingSave();
+          }
+          setOpen(!open);
+        }}
         variant="contained"
         className="!bg-sky-700 !text-white hover:!bg-sky-800 !rounded-lg !min-w-0 !p-1 md:!p-2 dark:!bg-blue-300 dark:!text-gray-900 dark:hover:!bg-blue-400"
       >
@@ -213,7 +264,10 @@ export default function NutritionGoals({ userId, date, tourId }: Props) {
         <Drawer
           anchor="bottom"
           open={open}
-          onClose={() => setOpen(false)}
+          onClose={() => {
+            flushPendingSave();
+            setOpen(false);
+          }}
           sx={{
             ".dark & .MuiDrawer-paper": {
               backgroundImage: "none",
