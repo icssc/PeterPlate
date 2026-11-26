@@ -1,7 +1,7 @@
 import type { Station } from "@api/index";
 import { MoreHoriz } from "@mui/icons-material";
 import { Chip, IconButton, Typography } from "@mui/material";
-import type { DishWithRating, Event } from "@peterplate/validators";
+import type { DiningSchedule, DishWithRating } from "@peterplate/validators";
 import { DiningHallStatus } from "@/components/ui/status";
 import type { CalendarRange } from "@/components/ui/toolbar";
 import { useRestaurantUIStore } from "@/context/useRestaurantUIStore";
@@ -28,7 +28,9 @@ interface RestaurantControlsProps {
   isError: boolean;
   dishes: DishWithRating[];
   stations: Station[];
-  hallEvents: Event[];
+  specialSchedules: DiningSchedule[];
+  isSpecialSchedulesLoading: boolean;
+  isSpecialSchedulesError: boolean;
 }
 
 export function RestaurantControls({
@@ -44,7 +46,9 @@ export function RestaurantControls({
   isError,
   dishes,
   stations,
-  hallEvents,
+  specialSchedules,
+  isSpecialSchedulesLoading,
+  isSpecialSchedulesError,
 }: RestaurantControlsProps) {
   const isFiltersExpanded = useRestaurantUIStore((s) => s.isFiltersExpanded);
   const setIsFiltersExpanded = useRestaurantUIStore(
@@ -133,7 +137,9 @@ export function RestaurantControls({
               isError={isError}
               dishes={dishes}
               stations={stations}
-              hallEvents={hallEvents}
+              specialSchedules={specialSchedules}
+              isSpecialSchedulesLoading={isSpecialSchedulesLoading}
+              isSpecialSchedulesError={isSpecialSchedulesError}
             />
           )}
         </div>

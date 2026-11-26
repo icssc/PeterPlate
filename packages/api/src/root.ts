@@ -12,6 +12,7 @@ import {
   getAvailableDateRange,
   getRestaurantByDate,
 } from "./restaurants/services";
+import { scheduleRouter } from "./schedules/router";
 import { createTRPCRouter, publicProcedure } from "./trpc";
 import { userRouter } from "./users/router";
 
@@ -24,6 +25,7 @@ export const appRouter = createTRPCRouter({
   preference: preferencesRouter,
   allergy: allergiesRouter,
   nutrition: nutritionRouter,
+  schedule: scheduleRouter,
   /** Get information for a given restaurant. */
   restaurant: publicProcedure
     .input(

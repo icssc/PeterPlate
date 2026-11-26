@@ -47,6 +47,9 @@ export function RestaurantPage({
     isError,
     error,
     hallEvents,
+    specialSchedules,
+    isSpecialSchedulesLoading,
+    isSpecialSchedulesError,
     periods,
     stations,
     dishes,
@@ -140,7 +143,9 @@ export function RestaurantPage({
               isError={isError}
               dishes={dishes}
               stations={stations}
-              hallEvents={hallEvents}
+              specialSchedules={specialSchedules}
+              isSpecialSchedulesLoading={isSpecialSchedulesLoading}
+              isSpecialSchedulesError={isSpecialSchedulesError}
             />
 
             {/* On desktop this sits in the sidebar instead */}
@@ -166,6 +171,9 @@ export function RestaurantPage({
               availablePeriodTimes={availablePeriodTimes}
               hall={hall}
               hallEvents={hallEvents}
+              specialSchedules={specialSchedules}
+              isSpecialSchedulesLoading={isSpecialSchedulesLoading}
+              isSpecialSchedulesError={isSpecialSchedulesError}
             />
           )}
         </div>

@@ -1,15 +1,7 @@
-import { ExpandMore } from "@mui/icons-material";
-import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  Chip,
-  Link,
-  Paper,
-  Typography,
-} from "@mui/material";
+import { Link, Paper, Typography } from "@mui/material";
+import type { DiningSchedule } from "@peterplate/validators";
 import type React from "react";
-import { formatOpenCloseTime, isValidDate, toTitleCase } from "@/utils/funcs";
+import { formatOpenCloseTime, toTitleCase } from "@/utils/funcs";
 import {
   ANTEATERY_MAP_EMBED_URL,
   ANTEATERY_MAP_LINK_URL,
@@ -17,6 +9,7 @@ import {
   BRANDYWINE_MAP_LINK_URL,
   HallEnum,
 } from "@/utils/types";
+import { SpecialSchedules } from "./special-schedules";
 import { TodayEvents } from "./today-events";
 
 interface SidebarProps {
@@ -25,6 +18,9 @@ interface SidebarProps {
   availablePeriodTimes: Record<string, [Date, Date] | null> | undefined;
   hall: HallEnum;
   hallEvents: any[]; // Using any for now as the type wasn't explicitly exported in the original file, or I need to import it if available.
+  specialSchedules: DiningSchedule[];
+  isSpecialSchedulesLoading: boolean;
+  isSpecialSchedulesError: boolean;
 }
 
 function SidebarSection({
@@ -62,6 +58,9 @@ export function Sidebar({
   availablePeriodTimes,
   hall,
   hallEvents,
+  specialSchedules,
+  isSpecialSchedulesLoading,
+  isSpecialSchedulesError,
 }: SidebarProps) {
   return (
     <div className="w-full md:basis-[325px] md:max-w-[325px] md:min-h-[740px]">
@@ -154,81 +153,11 @@ export function Sidebar({
 
       {/* Special Schedules card */}
       <SidebarSection title="Special Schedules" id="tour-special-schedules">
-        {hallEvents.length > 0 ? (
-          <div className="space-y-2">
-            {hallEvents.map((event) => {
-              // Use whichever date is known when the other is missing
-              const start = new Date(
-                isValidDate(event.start) ? event.start : event.end,
-              );
-              const end = new Date(
-                isValidDate(event.end) ? event.end : event.start,
-              );
-              const now = new Date();
-              const isActive = start && end && now >= start && now <= end;
-              const dateRange =
-                start && end
-                  ? `${start.toLocaleDateString(undefined, {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    })} - ${end.toLocaleDateString(undefined, {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    })}`
-                  : "";
-
-              return (
-                <Accordion
-                  key={`${event.title}-${String(event.start)}-${event.restaurantId}`}
-                  className="!border !border-sky-200 dark:!border-blue-300/30 !rounded-lg !shadow-none before:!hidden dark:!bg-transparent"
-                >
-                  <AccordionSummary
-                    expandIcon={
-                      <ExpandMore className="!text-sky-600 dark:!text-blue-300" />
-                    }
-                    className="!min-h-0 !py-2 dark:!bg-transparent"
-                  >
-                    <div className="flex flex-col w-full pr-2">
-                      <div className="flex justify-between items-center w-full gap-2">
-                        <Typography
-                          variant="body2"
-                          className="!text-sky-700 dark:!text-blue-300 !font-semibold"
-                        >
-                          {event.title}
-                        </Typography>
-                        {isActive && (
-                          <Chip
-                            label="ACTIVE"
-                            size="small"
-                            className="!h-5 !text-[0.65rem] !font-bold !bg-sky-600 dark:!bg-blue-300 dark:!text-gray-900 !text-white !rounded-full"
-                          />
-                        )}
-                      </div>
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        className="!text-xs !mt-0.5"
-                      >
-                        {dateRange}
-                      </Typography>
-                    </div>
-                  </AccordionSummary>
-                  <AccordionDetails className="!pt-0 !pb-2">
-                    <Typography variant="body2" color="text.secondary">
-                      {event.shortDescription ?? dateRange}
-                    </Typography>
-                  </AccordionDetails>
-                </Accordion>
-              );
-            })}
-          </div>
-        ) : (
-          <Typography variant="body2" color="text.secondary">
-            No special schedules.
-          </Typography>
-        )}
+        <SpecialSchedules
+          schedules={specialSchedules}
+          isLoading={isSpecialSchedulesLoading}
+          isError={isSpecialSchedulesError}
+        />
       </SidebarSection>
     </div>
   );

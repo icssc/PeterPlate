@@ -1,27 +1,23 @@
 import type { Station } from "@api/index";
 import {
   Close as CloseIcon,
-  ExpandMore,
   GridView,
   Menu as MenuIcon,
   MoreVert,
 } from "@mui/icons-material";
 import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
   Button,
-  Chip,
   Drawer,
   IconButton,
   ToggleButton,
   ToggleButtonGroup,
   Typography,
 } from "@mui/material";
-import type { DishWithRating, Event } from "@peterplate/validators";
+import type { DiningSchedule, DishWithRating } from "@peterplate/validators";
 import { useRestaurantUIStore } from "@/context/useRestaurantUIStore";
-import { isValidDate, scrollToStation, toTitleCase } from "@/utils/funcs";
+import { scrollToStation, toTitleCase } from "@/utils/funcs";
 import { cn } from "@/utils/tw";
+import { SpecialSchedules } from "../special-schedules";
 
 interface MobileActionsProps {
   isDesktop: boolean;
@@ -29,7 +25,9 @@ interface MobileActionsProps {
   isError: boolean;
   dishes: DishWithRating[];
   stations: Station[];
-  hallEvents: Event[];
+  specialSchedules: DiningSchedule[];
+  isSpecialSchedulesLoading: boolean;
+  isSpecialSchedulesError: boolean;
 }
 
 export function MobileActions({
@@ -38,7 +36,9 @@ export function MobileActions({
   isError,
   dishes,
   stations,
-  hallEvents,
+  specialSchedules,
+  isSpecialSchedulesLoading,
+  isSpecialSchedulesError,
 }: MobileActionsProps) {
   const isMenuDrawerOpen = useRestaurantUIStore((s) => s.isMenuDrawerOpen);
   const setIsMenuDrawerOpen = useRestaurantUIStore(
@@ -161,70 +161,11 @@ export function MobileActions({
               </IconButton>
             </div>
             <div className="p-4 overflow-y-auto">
-              {hallEvents.length > 0 ? (
-                hallEvents.map((event) => {
-                  // Use whichever date is known when the other is missing
-                  const start = new Date(
-                    isValidDate(event.start) ? event.start : event.end,
-                  );
-                  const end = new Date(
-                    isValidDate(event.end) ? event.end : event.start,
-                  );
-                  const now = new Date();
-                  const isActive = start && end && now >= start && now <= end;
-                  const dateRange =
-                    start && end
-                      ? `${start.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })} - ${end.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}`
-                      : "";
-                  return (
-                    <Accordion
-                      key={`${event.title}-${String(event.start)}-${event.restaurantId}`}
-                      disableGutters
-                      elevation={0}
-                      className="before:hidden border-b dark:border-blue-300/30 last:border-b-0 dark:bg-transparent"
-                    >
-                      <AccordionSummary
-                        expandIcon={
-                          <ExpandMore className="dark:text-blue-300" />
-                        }
-                        className="dark:!bg-transparent"
-                      >
-                        <div className="flex flex-col w-full pr-2 text-left">
-                          <div className="flex justify-between items-center w-full">
-                            <Typography
-                              variant="body2"
-                              fontWeight={700}
-                              color="primary"
-                            >
-                              {event.title}
-                            </Typography>
-                            {isActive && (
-                              <Chip
-                                label="Active"
-                                size="small"
-                                color="primary"
-                                className="h-5 text-[0.7rem] ml-2"
-                              />
-                            )}
-                          </div>
-                          <Typography variant="caption" color="text.secondary">
-                            {dateRange}
-                          </Typography>
-                        </div>
-                      </AccordionSummary>
-                      <AccordionDetails className="pt-0 pb-2">
-                        <Typography variant="body2" color="text.secondary">
-                          {event.description ?? dateRange}
-                        </Typography>
-                      </AccordionDetails>
-                    </Accordion>
-                  );
-                })
-              ) : (
-                <Typography variant="body2" color="text.secondary">
-                  No special schedules.
-                </Typography>
-              )}
+              <SpecialSchedules
+                schedules={specialSchedules}
+                isLoading={isSpecialSchedulesLoading}
+                isError={isSpecialSchedulesError}
+              />
             </div>
           </Drawer>
 
