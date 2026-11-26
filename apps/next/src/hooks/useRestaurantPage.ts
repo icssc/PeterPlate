@@ -1,7 +1,11 @@
 "use client";
 
 import type { FormattedRestaurantInfo, Station } from "@api/index";
-import type { DishWithRating, Event } from "@peterplate/validators";
+import type {
+  DiningSchedule,
+  DishWithRating,
+  Event,
+} from "@peterplate/validators";
 import { useEffect, useMemo, useState } from "react";
 import type { CalendarRange } from "@/components/ui/toolbar";
 import { useDate } from "@/context/date-context";
@@ -72,6 +76,9 @@ export interface UseRestaurantPageResult {
   isError: boolean;
   error: unknown;
   hallEvents: Event[];
+  specialSchedules: DiningSchedule[];
+  isSpecialSchedulesLoading: boolean;
+  isSpecialSchedulesError: boolean;
   periods: string[];
   activeStation: Station | undefined;
   stations: Station[];
@@ -156,6 +163,16 @@ export function useRestaurantPage(hall: HallEnum): UseRestaurantPageResult {
             (b.start ? new Date(b.start).getTime() : 0),
         ),
     [upcomingEvents, restaurantId],
+  );
+
+  // --- Current & upcoming special schedules for this hall ---
+  const {
+    data: specialSchedules = [],
+    isLoading: isSpecialSchedulesLoading,
+    isError: isSpecialSchedulesError,
+  } = trpc.schedule.special.useQuery(
+    { restaurant: restaurantId },
+    { staleTime: 2 * 60 * 60 * 1000 },
   );
 
   // --- Hall status / open-close times ---
@@ -248,6 +265,9 @@ export function useRestaurantPage(hall: HallEnum): UseRestaurantPageResult {
     isError,
     error,
     hallEvents,
+    specialSchedules,
+    isSpecialSchedulesLoading,
+    isSpecialSchedulesError,
     periods,
     activeStation,
     stations,

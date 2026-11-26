@@ -111,6 +111,43 @@ export const getStateForRestaurantOnDayResponseSchema = z.object({
   }),
 });
 
+const scheduleDayHoursSchema = z.object({
+  open: z.string().time().nullable(),
+  close: z.string().time().nullable(),
+});
+
+export const getDiningSchedulesResponseSchema = z.object({
+  ok: z.boolean(),
+  data: z.array(
+    z.object({
+      upstreamId: z.string(),
+      restaurantId: z.enum(["brandywine", "anteatery", "oasis"]),
+      name: z.string(),
+      type: z.enum(["standard", "special"]),
+      // Plain "YYYY-MM-DD" dates; null for the standard schedule.
+      startDate: z.string().date().nullable(),
+      endDate: z.string().date().nullable(),
+      mealPeriods: z.array(
+        z.object({
+          adobeId: z.number(),
+          name: z.string(),
+          position: z.number(),
+          hours: z.object({
+            sunday: scheduleDayHoursSchema,
+            monday: scheduleDayHoursSchema,
+            tuesday: scheduleDayHoursSchema,
+            wednesday: scheduleDayHoursSchema,
+            thursday: scheduleDayHoursSchema,
+            friday: scheduleDayHoursSchema,
+            saturday: scheduleDayHoursSchema,
+          }),
+        }),
+      ),
+      updatedAt: z.coerce.date(),
+    }),
+  ),
+});
+
 export type Dish = z.infer<typeof retrieveDishesByIdResponseSchema>["data"][0];
 export type DishWithRating = Dish & { totalRating: number; numRatings: number };
 export type DietaryRestrictions = Dish["dietRestriction"];
@@ -120,3 +157,6 @@ export type RestaurantInfo = z.infer<
   typeof getStateForRestaurantOnDayResponseSchema
 >["data"];
 export type Period = RestaurantInfo["periods"][""];
+export type DiningSchedule = z.infer<
+  typeof getDiningSchedulesResponseSchema
+>["data"][0];
